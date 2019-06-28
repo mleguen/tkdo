@@ -1,0 +1,23 @@
+{
+  "name": "tkdo",
+  "version": "1.0.0",
+  "description": "Tirages cadeaux",
+  "scripts": {
+    "install": "npm run install:front",
+    "install:front": "cd front && npm install",
+    "build": "npm run build:front && npm run build:docker",
+    "build:front": "cd front && npm run build",
+    "build:docker": "docker-compose build",
+    "start": "docker-compose up"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mleguen/tkdo.git"
+  },
+  "author": "Mael Le Guen",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/mleguen/tkdo/issues"
+  },
+  "homepage": "https://github.com/mleguen/tkdo#readme"
+}
