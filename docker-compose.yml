@@ -1,12 +1,8 @@
 version: '3'
 services:
-  front:
+  tkdo-front:
     build: ./front
     volumes:
-      - ./certs/front.key:/usr/local/apache2/conf/server.key
-      - ./certs/front.crt:/usr/local/apache2/conf/server.crt
-      - logfront:/var/log
-    ports:
-      - "443:443"
+      - tkdo-front-logs:/var/log
 volumes:
-  logfront: {}
+  tkdo-front-logs: {}

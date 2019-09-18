@@ -2,21 +2,19 @@
 
 Tirages au sort de cadeaux.
 
-## Paramétrage
+## Démarrage (développement)
 
-### Certificat SSL front
-
-Vous pouvez paramétrer le certificat SSL à utiliser pour le front et la clé correspondante en créant des fichiers `config/front.crt` et `config/front.key`.
-
-A défaut, des certificats de développement seront automatiquement générés au 1er lancement.
-
-## Lancement (Docker)
+> Prérequis :
+> - docker
+> - docker-compose
+> - openssl
+> - node et npm
 
 ```
-$ make up
+$ make start
 ```
 
-puis [ouvrez l'application](https://localhost).
+Après la construction des images et le démarrage des conteneurs Docker, votre navigateur s'ouvrira sur [la page d'accueil](https://localhost).
 
 ## Documentation
 

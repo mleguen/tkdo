@@ -1,2 +1,3 @@
-/certs
-.built
+.last-docker-compose
+.last-contents-change
+.last-prod-contents-change

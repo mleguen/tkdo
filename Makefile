@@ -1,23 +1,23 @@
-# A chaque build, vérifie que front et .built sont à jour
-build: front .built
+PROD_MODULES = front
+DEV_MODULES = dev-gateway
+ALL_MODULES = $(PROD_MODULES) $(DEV_MODULES)
 
-# Ne considère jamais front comme à jour...
-.PHONY: front
+build: $(PROD_MODULES) .last-prod-contents-change
+
+start: build $(DEV_MODULES) .last-docker-compose
+	(sleep 5 && xdg-open https://localhost)&
+	docker-compose up
+
+# Ne considère jamais aucun des modules comme à jour...
+.PHONY: $(ALL_MODULES)
 
 # ... pour y forcer un make
-front:
+$(ALL_MODULES):
 	$(MAKE) -C $@
 
-# .built matérialise la dernière exécution de docker-compose build
-# qui n'est exécutée que si la conf, le front ou les certificats ont changé
-.built: docker-compose.yml front/.built certs/front.crt certs/front.key
+.last-docker-compose: .last-prod-contents-change docker-compose.override.yml $(addsuffix /.last-contents-change,$(DEV_MODULES))
 	docker-compose build
-	touch .built
+	touch .last-docker-compose
 
-# génère des certificats de développement pour le front s'ils ne sont pas fournis
-certs/front.crt certs/front.key:
-	[ ! -d certs ] && mkdir certs
-	openssl req -new -x509 -nodes -out certs/front.crt -keyout certs/front.key; done
-
-up: build
-	docker-compose up
+.last-prod-contents-change: docker-compose.yml $(addsuffix /.last-contents-change,$(PROD_MODULES))
+	touch .last-prod-contents-change

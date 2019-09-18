@@ -1,12 +1,5 @@
 FROM httpd:alpine
 
-# Active HTTPS
-RUN sed -i \
-  -e 's/^#\(Include .*httpd-ssl.conf\)/\1/' \
-  -e 's/^#\(LoadModule .*mod_ssl.so\)/\1/' \
-  -e 's/^#\(LoadModule .*mod_socache_shmcb.so\)/\1/' \
-  /usr/local/apache2/conf/httpd.conf
-
 # Configure Apache (cf. https://angular.io/guide/deployment)
 RUN sed -i \
   -e 's/^#\(LoadModule .*mod_rewrite.so\)/\1/' \

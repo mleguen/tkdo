@@ -1,9 +1,9 @@
 .PHONY: build
 
-build: .built
+build: .last-contents-change
 
-.built: Dockerfile dist
-	touch .built
+.last-contents-change: Dockerfile dist
+	touch .last-contents-change
 
 dist: $(exec find src)
-	ng build
+	npm build

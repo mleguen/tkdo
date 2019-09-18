@@ -1,0 +1,10 @@
+version: '3'
+services:
+  tkdo-dev-gateway:
+    build: ./dev-gateway
+    volumes:
+      - tkdo-dev-gateway-logs:/var/log
+    ports:
+      - "443:443"
+volumes:
+  tkdo-dev-gateway-logs: {}
