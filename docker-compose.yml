@@ -1,0 +1,12 @@
+version: '3'
+services:
+  front:
+    build: ./front
+    volumes:
+      - ./certs/front.key:/usr/local/apache2/conf/server.key
+      - ./certs/front.crt:/usr/local/apache2/conf/server.crt
+      - logfront:/var/log
+    ports:
+      - "443:443"
+volumes:
+  logfront: {}
