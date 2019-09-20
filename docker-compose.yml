@@ -1,7 +1,22 @@
-version: '3'
+version: '3.7'
+secrets:
+  auth-jwt.key:
+    file: auth-jwt.key
+  auth-jwt.key.pub:
+    file: auth-jwt.key.pub
 services:
+  tkdo-auth-sp:
+    build:
+      args:
+        - NPM_CONFIG_REGISTRY
+      context: ./auth-sp
+      network: host
+    secrets:
+      - auth-jwt.key
   tkdo-front:
     build: ./front
+    secrets:
+      - auth-jwt.key.pub
     volumes:
       - tkdo-front-logs:/var/log
 volumes:

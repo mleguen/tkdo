@@ -13,5 +13,5 @@ RUN sed -i \
   /usr/local/apache2/conf/httpd.conf
 
 # Copie l'application
-COPY ./dist/front/ /usr/local/apache2/htdocs/
+COPY dist/front/ /usr/local/apache2/htdocs/
 RUN chmod -R 644 /usr/local/apache2/htdocs/*

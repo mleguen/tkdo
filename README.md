@@ -7,15 +7,23 @@ Tirages au sort de cadeaux.
 > Prérequis :
 > - docker
 > - docker-compose
-> - openssl
 > - node et npm
+> - openssl
 
 ```
 $ make start
 ```
 
-Après la construction des images et le démarrage des conteneurs Docker, votre navigateur s'ouvrira sur [la page d'accueil](https://localhost).
+Après la construction des images et le démarrage des conteneurs Docker, votre navigateur s'ouvre automatiquement sur [la page d'accueil](https://localhost).
+
+> Note : pour arrêter ensuite proprement les conteneurs, faire :
+> - soit un `CTRL+C` depuis le terminal où s'exécute le `make start`
+> - soit depuis un autre terminal :
+>   ```bash
+>   $ make stop
+>   ```
 
 ## Documentation
 
 - [fonctionnalités implémentées](./feature)
+- [utilisation d'un registry npm local](./doc/registry-npm-local.md)

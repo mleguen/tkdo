@@ -2,7 +2,7 @@
 
 build: .build
 
-.build: Dockerfile dist
+.build: Dockerfile dist  $(wildcard .env)
 	touch .build
 
 dist: $(shell find src)

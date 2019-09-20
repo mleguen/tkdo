@@ -1,10 +1,20 @@
-version: '3'
+version: '3.7'
+secrets:
+  dev-gateway-ssl.crt:
+    file: dev-gateway-ssl.crt
+  dev-gateway-ssl.key:
+    file: dev-gateway-ssl.key
 services:
   tkdo-dev-gateway:
     build: ./dev-gateway
-    volumes:
-      - tkdo-dev-gateway-logs:/var/log
     ports:
       - "443:443"
+    volumes:
+      - tkdo-dev-gateway-logs:/var/log
+    secrets:
+      - source: dev-gateway-ssl.crt
+        target: /usr/local/apache2/conf/server.crt
+      - source: dev-gateway-ssl.key
+        target: /usr/local/apache2/conf/server.key
 volumes:
   tkdo-dev-gateway-logs: {}

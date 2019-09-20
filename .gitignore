@@ -1,3 +1,6 @@
-.last-docker-compose
-.last-contents-change
-.last-prod-contents-change
+.env
+.dev-build
+.build
+*.crt
+*.key
+*.key.pub
