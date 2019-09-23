@@ -6,4 +6,4 @@ build: .build
 	touch .build
 
 dist: $(shell find src)
-	npm run build --prod
+	npm run build -- --prod
