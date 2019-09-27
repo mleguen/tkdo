@@ -1,5 +1,5 @@
 PROD_SERVICES = auth-sp front
-DEV_SERVICES = dev-gateway
+DEV_SERVICES = dev-auth-idp dev-gateway
 ALL_SERVICES = $(PROD_SERVICES) $(DEV_SERVICES)
 
 build: $(PROD_SERVICES) .build
@@ -23,9 +23,13 @@ auth-jwt.key:
 auth-jwt.key.pub: auth-jwt.key
 	openssl rsa -in auth-jwt.key -outform PEM -pubout -out auth-jwt.key.pub
 
-.dev-build: .build $(addsuffix /.build,$(DEV_SERVICES)) docker-compose.override.yml dev-gateway-ssl.crt dev-gateway-ssl.key
+.dev-build: .build $(addsuffix /.build,$(DEV_SERVICES)) docker-compose.override.yml dev-gateway-ssl.crt dev-gateway-ssl.key dev-auth-idp.crt dev-auth-idp.key
 	docker-compose build
 	touch .dev-build
+
+dev-auth-idp.crt dev-auth-idp.key:
+	openssl req -newkey rsa:3072 -new -x509 -days 3652 -nodes -out dev-auth-idp.crt -keyout dev-auth-idp.key
+	chmod 600 dev-gateway-ssl.key
 
 dev-gateway-ssl.crt dev-gateway-ssl.key:
 	openssl req -new -x509 -nodes -out dev-gateway-ssl.crt -keyout dev-gateway-ssl.key
