@@ -1,15 +1,13 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
-import { promises } from 'fs';
+import { readFileSync } from 'fs';
 import { AppController } from './app.controller';
+import { SamlModule } from './saml/saml.module';
 
 @Module({
   imports: [
-    JwtModule.registerAsync({
-      useFactory: async () => ({
-        secret: await promises.readFile(process.env.JWT_PRIVATE_KEY_FILE || '/run/secrets/auth-jwt.key')
-      })
-    })
+    JwtModule.register({ secret: readFileSync(process.env.JWT_PRIVATE_KEY_FILE || '/run/secrets/auth-sp-jwt.key').toString() }),
+    SamlModule
   ],
   controllers: [AppController],
   providers: [],

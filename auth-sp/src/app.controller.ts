@@ -1,19 +1,27 @@
-import { Controller, Get, Res, Query } from '@nestjs/common';
+import { Controller, Get, Req, Res, UseGuards, Post, Body } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { Response } from 'express';
+import { Request, Response } from 'express';
+import { AuthGuard } from '@nestjs/passport';
+import { SamlStrategy } from './saml/saml.strategy';
 
 @Controller()
 export class AppController {
-  constructor(private jwtService: JwtService) {}
+  constructor(private jwtService: JwtService, private samlStrategy: SamlStrategy) {}
 
-  @Get('/login')
-  async getLogin(@Res() res: Response, @Query('RelayState') relayState?: string) {
+  @UseGuards(AuthGuard('saml'))
+  @Post('/acs')
+  async postAssertionConsumerService(@Req() req: Request, @Res() res: Response, @Body('RelayState') relayState?: string) {
     if(!relayState) throw new Error('RelayState manquant');
-    let utilisateur = {
-      nom: 'Alice',
-      roles: ['PARTICIPANT']
-    };
-    let jwt = await this.jwtService.signAsync(utilisateur);
+    let jwt = await this.jwtService.signAsync(req.user);
     res.redirect([relayState, jwt].join('#'));
+  }
+
+  @UseGuards(AuthGuard('saml'))
+  @Get('/login')
+  getLogin() {}
+
+  @Get('/metadata')
+  getMetadata(): string {
+    return this.samlStrategy.generateServiceProviderMetadata();
   }
 }

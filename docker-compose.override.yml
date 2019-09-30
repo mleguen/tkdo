@@ -1,22 +1,25 @@
 version: '3.7'
 secrets:
-  dev-auth-idp.crt:
-    file: dev-auth-idp.crt
-  dev-auth-idp.key:
-    file: dev-auth-idp.key
+  dev-auth-idp-saml.crt:
+    file: dev-auth-idp-saml.crt
+  dev-auth-idp-saml.key:
+    file: dev-auth-idp-saml.key
   dev-gateway-ssl.crt:
     file: dev-gateway-ssl.crt
   dev-gateway-ssl.key:
     file: dev-gateway-ssl.key
 services:
+  tkdo-auth-sp:
+    secrets:
+      - dev-auth-idp-saml.crt
   tkdo-dev-auth-idp:
     build: ./dev-auth-idp
     volumes:
       - tkdo-dev-auth-idp-logs:/var/log
     secrets:
-      - source: dev-auth-idp.crt
+      - source: dev-auth-idp-saml.crt
         target: /var/simplesamlphp/cert/server.crt
-      - source: dev-auth-idp.key
+      - source: dev-auth-idp-saml.key
         target: /var/simplesamlphp/cert/server.pem
   tkdo-dev-gateway:
     build: ./dev-gateway

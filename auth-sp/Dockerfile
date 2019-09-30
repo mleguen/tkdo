@@ -1,5 +1,5 @@
 FROM node:10-alpine
-WORKDIR /usr/local/tkdo/auth
+WORKDIR /usr/local/tkdo
 
 # Installe d'abord les dépendances pour que ça ne soit refait que si le package.json change
 COPY package*.json ./
@@ -10,4 +10,4 @@ RUN npm install --production
 COPY dist ./
 
 # Demarre le serveur
-CMD ["node", "main.js"]:
+CMD ["node", "auth-sp/src/main.js"]:

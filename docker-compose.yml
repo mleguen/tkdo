@@ -1,9 +1,13 @@
 version: '3.7'
 secrets:
-  auth-jwt.key:
-    file: auth-jwt.key
-  auth-jwt.key.pub:
-    file: auth-jwt.key.pub
+  auth-sp-jwt.key:
+    file: auth-sp-jwt.key
+  auth-sp-jwt.key.pub:
+    file: auth-sp-jwt.key.pub
+  auth-sp-saml.key:
+    file: auth-sp-saml.key
+  auth-sp-saml.crt:
+    file: auth-sp-saml.crt
 services:
   tkdo-auth-sp:
     build:
@@ -12,11 +16,13 @@ services:
       context: ./auth-sp
       network: host
     secrets:
-      - auth-jwt.key
+      - auth-sp-jwt.key
+      - auth-sp-saml.crt
+      - auth-sp-saml.key
   tkdo-front:
     build: ./front
     secrets:
-      - auth-jwt.key.pub
+      - auth-sp-jwt.key.pub
     volumes:
       - tkdo-front-logs:/var/log
 volumes:

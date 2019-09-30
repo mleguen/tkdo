@@ -9,8 +9,8 @@
     </li>
   </ul> -->
   <span class="navbar-text">
-    <ng-container *ngIf="utilisateurConnecte$ | async; let utilisateur; else pasConnecte">
-      {{utilisateur.nom}} ({{utilisateur.roles.join(', ')}})
+    <ng-container *ngIf="utilisateur$ | async; else pasConnecte">
+      {{(utilisateur$ | async).nom}} ({{roles$ | async}})
     </ng-container>
     <ng-template #pasConnecte>(non connecté)</ng-template>
   </span>

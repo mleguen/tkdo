@@ -20,7 +20,7 @@ $config = [
 
         'alice:alice' => [
             'nom' => 'Alice',
-            'roles' => ['participant'],
+            'roles' => ['TKDO_PARTICIPANT', 'AUTRE_APPLI_ADMIN'],
         ],
         'owen:owen' => [
             'nom' => 'Owen',
