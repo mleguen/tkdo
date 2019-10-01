@@ -1,8 +1,10 @@
 # language: fr
 Fonctionnalité: authentification
+
   Les utilisateurs doivent s'authentifier pour pouvoir accéder à l'application.
 
   Scénario: Alice doit s'authentifier pour accéder à l'accueil
+  
     Soit une participante Alice
 
     Quand elle demande à accéder à la page d'accueil

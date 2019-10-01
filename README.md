@@ -23,7 +23,11 @@ Après la construction des images et le démarrage des conteneurs Docker, votre 
 >   $ make stop
 >   ```
 
+## Changements
+
+- [historique des changements](./feature/done/README.md)
+- [roadmap](./feature/todo/README.md)
+
 ## Documentation
 
-- [fonctionnalités implémentées](./feature)
 - [utilisation d'un registry npm local](./doc/registry-npm-local.md)
