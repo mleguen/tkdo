@@ -22,7 +22,7 @@
     "@nestjs/common": "^6.0.0",
     "@nestjs/core": "^6.0.0",
     "@nestjs/jwt": "^6.1.1",
-    "@nestjs/passport": "^6.1.0",
+    "@nestjs/passport": "mleguen/passport#standalone",
     "@nestjs/platform-express": "^6.0.0",
     "dotenv": "^8.1.0",
     "passport": "^0.4.0",
