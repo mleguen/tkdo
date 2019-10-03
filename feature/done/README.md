@@ -1,6 +1,7 @@
 # Historique des changements
 
-[Roadmap](./roadmap/README.md)
+## V0.1
+
+- [1-authentification.feature](./1-authentification.feature)
 
 ## Prochaine version
-- [1-authentification.feature](./1-authentification.feature)
