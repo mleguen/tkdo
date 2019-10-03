@@ -10,4 +10,4 @@ RUN npm install --production
 COPY dist ./
 
 # Demarre le serveur
-CMD ["node", "auth-sp/src/main.js"]:
+CMD ["node", "auth-sp.js"]:
