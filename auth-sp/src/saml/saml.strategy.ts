@@ -2,7 +2,7 @@
 import { Strategy } from 'passport-saml';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { IAuthProfile, Droit } from '../../../shared/tkdo-auth';
+import { Droit, IUtilisateur } from '../../../shared/habilitation';
 import { readFileSync } from 'fs';
 
 @Injectable()
@@ -22,7 +22,7 @@ export class SamlStrategy extends PassportStrategy(Strategy) {
   /**
    * Valide le profile renvoyé par l'IDP.
    */
-  async validate(profile: IAuthProfile): Promise<IAuthProfile> {
+  async validate(profile: IUtilisateur): Promise<IUtilisateur> {
     // Ne conserve que les rôles concernant l'application
     profile.roles = ensureStringArray(profile.roles).filter(role => Droit.estRoleConnu(role));
 

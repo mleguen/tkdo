@@ -1,0 +1,15 @@
+{
+  "name": "tkdo-auth",
+  "version": "1.0.0",
+  "description": "code partagé de gestion des habilitations pour TKDO",
+  "main": "index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Mael Le Guen",
+  "license": "ISC",
+  "devDependencies": {
+    "tslib": "^1.10.0",
+    "typescript": "^3.6.3"
+  }
+}
