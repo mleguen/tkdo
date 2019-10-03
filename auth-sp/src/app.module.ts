@@ -1,8 +1,9 @@
-import { Module } from '@nestjs/common';
+import { Module, MiddlewareConsumer } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { readFileSync } from 'fs';
 import { AppController } from './app.controller';
 import { SamlModule } from './saml/saml.module';
+import { RouteLoggerMiddleware } from './route-logger.middleware';
 
 @Module({
   imports: [
@@ -12,4 +13,10 @@ import { SamlModule } from './saml/saml.module';
   controllers: [AppController],
   providers: [],
 })
-export class AppModule {}
+export class AppModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(RouteLoggerMiddleware)
+      .forRoutes(AppController);
+  }
+}
