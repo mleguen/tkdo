@@ -1,4 +1,4 @@
-BUILD_DIR = auth-sp front
+BUILD_DIR = auth-sp back front
 DOC_DIR = feature
 
 CERT_MODS = auth-idp auth-sp gateway

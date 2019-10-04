@@ -23,6 +23,8 @@ services:
         - NPM_CONFIG_REGISTRY
       context: ./auth-sp
       network: host
+    environment:
+      - TKDO_JWT_PRIVATE_KEY_FILE=/run/secrets/auth-sp-sign.key
     secrets:
       - auth-idp-cert.crt
       - auth-sp-cert.crt
@@ -37,6 +39,16 @@ services:
         target: /var/simplesamlphp/cert/server.crt
       - source: auth-idp-cert.key
         target: /var/simplesamlphp/cert/server.pem
+  tkdo-back:
+    build:
+      args:
+        - NPM_CONFIG_REGISTRY
+      context: ./back
+      network: host
+    environment:
+      - TKDO_JWT_PUBLIC_KEY_FILE=/run/secrets/auth-sp-sign.key.pub
+    secrets:
+      - auth-sp-sign.key.pub
   tkdo-front:
     build: ./front
     secrets:

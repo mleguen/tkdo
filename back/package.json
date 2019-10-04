@@ -1,8 +1,8 @@
 {
-  "name": "auth-sp",
+  "name": "back",
   "version": "0.0.1",
   "description": "",
-  "author": "Service Provider TKDO",
+  "author": "back TKDO",
   "license": "MIT",
   "scripts": {
     "build": "rimraf dist && webpack",
@@ -22,7 +22,6 @@
     "@nestjs/common": "^6.0.0",
     "@nestjs/core": "^6.0.0",
     "@nestjs/platform-express": "^6.0.0",
-    "passport-saml": "^1.2.0",
     "reflect-metadata": "^0.1.12",
     "rxjs": "^6.3.3"
   },
@@ -34,7 +33,6 @@
     "@types/express": "4.16.1",
     "@types/jest": "24.0.11",
     "@types/node": "11.13.4",
-    "@types/passport-saml": "^1.1.0",
     "@types/supertest": "2.0.7",
     "dotenv": "^8.1.0",
     "jest": "24.7.1",

@@ -3,15 +3,13 @@ import { JwtModule } from '@nestjs/jwt';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import { AppController } from './app.controller';
-import { SamlModule } from './saml/saml.module';
 import { RouteLoggerMiddleware } from './route-logger.middleware';
 
-const JWT_PRIVATE_KEY_FILE = process.env.TKDO_JWT_PRIVATE_KEY_FILE || join(__dirname, '..', '..', 'auth-sp-sign.key');
+const JWT_PUBLIC_KEY_FILE = process.env.TKDO_JWT_PUBLIC_KEY_FILE || join(__dirname, '..', '..', 'auth-sp-sign.key.pub');
 
 @Module({
   imports: [
-    JwtModule.register({ privateKey: readFileSync(JWT_PRIVATE_KEY_FILE).toString() }),
-    SamlModule
+    JwtModule.register({ publicKey: readFileSync(JWT_PUBLIC_KEY_FILE).toString() }),
   ],
   controllers: [AppController],
   providers: [],
