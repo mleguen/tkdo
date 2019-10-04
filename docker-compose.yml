@@ -1,13 +1,21 @@
 version: '3.7'
 secrets:
-  auth-sp-jwt.key:
-    file: auth-sp-jwt.key
-  auth-sp-jwt.key.pub:
-    file: auth-sp-jwt.key.pub
-  auth-sp-saml.key:
-    file: auth-sp-saml.key
-  auth-sp-saml.crt:
-    file: auth-sp-saml.crt
+  auth-idp-cert.crt:
+    file: auth-idp-cert.crt
+  auth-idp-cert.key:
+    file: auth-idp-cert.key
+  auth-sp-cert.crt:
+    file: auth-sp-cert.crt
+  auth-sp-cert.key:
+    file: auth-sp-cert.key
+  auth-sp-sign.key:
+    file: auth-sp-sign.key
+  auth-sp-sign.key.pub:
+    file: auth-sp-sign.key.pub
+  gateway-cert.crt:
+    file: gateway-cert.crt
+  gateway-cert.key:
+    file: gateway-cert.key
 services:
   tkdo-auth-sp:
     build:
@@ -16,14 +24,37 @@ services:
       context: ./auth-sp
       network: host
     secrets:
-      - auth-sp-jwt.key
-      - auth-sp-saml.crt
-      - auth-sp-saml.key
+      - auth-idp-cert.crt
+      - auth-sp-cert.crt
+      - auth-sp-cert.key
+      - auth-sp-sign.key
+  tkdo-auth-idp:
+    build: ./auth-idp
+    volumes:
+      - tkdo-auth-idp-logs:/var/log
+    secrets:
+      - source: auth-idp-cert.crt
+        target: /var/simplesamlphp/cert/server.crt
+      - source: auth-idp-cert.key
+        target: /var/simplesamlphp/cert/server.pem
   tkdo-front:
     build: ./front
     secrets:
-      - auth-sp-jwt.key.pub
+      - auth-sp-sign.key.pub
     volumes:
       - tkdo-front-logs:/var/log
+  tkdo-gateway:
+    build: ./gateway
+    ports:
+      - "443:443"
+    volumes:
+      - tkdo-gateway-logs:/var/log
+    secrets:
+      - source: gateway-cert.crt
+        target: /usr/local/apache2/conf/server.crt
+      - source: gateway-cert.key
+        target: /usr/local/apache2/conf/server.key
 volumes:
+  tkdo-auth-idp-logs: {}
   tkdo-front-logs: {}
+  tkdo-gateway-logs: {}

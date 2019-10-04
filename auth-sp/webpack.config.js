@@ -10,7 +10,7 @@ for (let mod of Object.keys(require('./package.json').dependencies)) {
 module.exports = {
   entry: './src/main.ts',
   externals: externals,
-  mode: 'development',
+  mode: 'production',
   module: {
     rules: [
       {
@@ -26,9 +26,12 @@ module.exports = {
       }
     ]
   },
+  optimization: {
+    minimize: false
+  },
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: 'auth-sp.js'
+    filename: 'main.js'
   },
   resolve: {
     extensions: ['.ts', '.js'],

@@ -8,9 +8,9 @@ export const environment = Object.assign({}, defaultEnvironment, {
   production: false,
   titre: 'TKDO (développement)',
   utilisateurParDefaut: {
-    nom: 'Bob',
+    nom: 'Alice',
     roles: [
-      'PARTICIPANT'
+      'TKDO_PARTICIPANT'
     ]
   }
 });

@@ -7,7 +7,7 @@ import { RouteLoggerMiddleware } from './route-logger.middleware';
 
 @Module({
   imports: [
-    JwtModule.register({ secret: readFileSync(process.env.JWT_PRIVATE_KEY_FILE || '/run/secrets/auth-sp-jwt.key').toString() }),
+    JwtModule.register({ secret: readFileSync(process.env.JWT_PRIVATE_KEY_FILE || '/run/secrets/auth-sp-sign.key').toString() }),
     SamlModule
   ],
   controllers: [AppController],

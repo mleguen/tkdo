@@ -3,7 +3,7 @@ import { Title } from '@angular/platform-browser';
 import { replace } from 'feather-icons';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { Role } from '../../../shared/tkdo-auth';
+import { Role } from '../../../shared/habilitation';
 
 import { environment } from 'src/environments/environment';
 import { AuthService } from './auth/auth.service';

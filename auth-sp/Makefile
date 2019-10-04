@@ -1,9 +1,2 @@
-.PHONY: build
-
-build: .build
-
-.build: Dockerfile dist  $(wildcard .env)
-	touch .build
-
-dist: $(shell find src) package.json webpack.config.js tsconfig.build.json tsconfig.json
+dist: $(shell find src -type f \! -name "*.spec.ts" ) package*.json tsconfig*.json webpack.config.js
 	npm run build

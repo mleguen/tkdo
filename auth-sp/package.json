@@ -6,7 +6,6 @@
   "license": "MIT",
   "scripts": {
     "build": "rimraf dist && webpack",
-    "preinstall": "cd ../shared/habilitation && npm install",
     "format": "prettier --write \"src/**/*.ts\"",
     "start": "ts-node -r tsconfig-paths/register src/main.ts",
     "start:dev": "tsc-watch -p tsconfig.build.json --onSuccess \"node dist/main.js\"",
