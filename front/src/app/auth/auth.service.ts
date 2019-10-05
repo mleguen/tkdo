@@ -21,13 +21,13 @@ export class AuthService {
   }
 
   public connecte() {
-    if (environment.production) this.redirigeVersAuthSp();
-    this.setUtilisateurConnecte(environment.utilisateurParDefaut);
+    this.redirigeVersAuthSp();
   }
 
   private getAuthToken(): string {
     let authToken = this.getAuthTokenFromHash();
-    if (!authToken) authToken = localStorage.getItem(environment.authTokenLocalStorageKey);
+    // En environnement de développement, le token n'est pas lu en localStorage pour faciliter les changements d'utilisateur
+    if (!authToken && environment.production) authToken = localStorage.getItem(environment.authTokenLocalStorageKey);
     return authToken;
   }
 
@@ -54,6 +54,7 @@ export class AuthService {
   }
 
   private redirigeVersAuthSp() {
+    // Le RelayState nous permettra d'être redirigé sur la page courante en retour de l'authentification auprès du SP
     window.location.href = this.addUrlParam(environment.authSpLoginUrl, 'RelayState', window.location.href);
   }
 

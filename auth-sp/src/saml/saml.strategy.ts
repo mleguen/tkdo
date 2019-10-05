@@ -1,21 +1,21 @@
 
-import { Strategy } from 'passport-saml';
-import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { Droit, IUtilisateur } from '../../../shared/habilitation';
+import { PassportStrategy } from '@nestjs/passport';
 import { readFileSync } from 'fs';
+import { Strategy } from 'passport-saml';
+import { Droit, IUtilisateur } from '../../../shared/auth/lib';
 
 @Injectable()
 export class SamlStrategy extends PassportStrategy(Strategy) {
-  private signinCert = readFileSync(process.env.TKDO_SAML_SP_CERT_FILE || '/run/secrets/auth-sp-cert.crt').toString();
+  private signinCert = readFileSync(process.env.TKDO_SAML_SP_CERT_FILE).toString();
 
   constructor()  {
     super({
-      callbackUrl: process.env.TKDO_SAML_CALLBACK_URL || 'https://localhost/auth-sp/acs',
-      cert: readFileSync(process.env.TKDO_SAML_IDP_CERT_FILE || '/run/secrets/auth-idp-cert.crt').toString(),
-      entryPoint: process.env.TKDO_SAML_ENTRY_POINT || 'https://localhost/auth-idp/saml2/idp/SSOService.php',
-      issuer: process.env.TKDO_SAML_ISSUER || 'https://localhost/auth-sp',
-      privateCert: readFileSync(process.env.TKDO_SAML_SP_PRIVATE_KEY_FILE || '/run/secrets/auth-sp-cert.key').toString()
+      callbackUrl: process.env.TKDO_SAML_CALLBACK_URL,
+      cert: readFileSync(process.env.TKDO_SAML_IDP_CERT_FILE).toString(),
+      entryPoint: process.env.TKDO_SAML_ENTRY_POINT,
+      issuer: process.env.TKDO_SAML_ISSUER,
+      privateCert: readFileSync(process.env.TKDO_SAML_SP_PRIVATE_KEY_FILE).toString()
     });
   }
 

@@ -1,5 +1,5 @@
 import { Role } from "./role";
-import { IUtilisateur } from "./utilisateur.interface";
+import { IUtilisateur } from "./interfaces/utilisateur.interface";
 
 export class Droit {
   static CONNEXION: string = 'CONNEXION';

@@ -1,5 +1,8 @@
-import { defaultEnvironment } from './environment.default';
+import { environmentDev, extendsEnv } from './environment.dev';
 
-export const environment = Object.assign({}, defaultEnvironment, {
+export const environment = extendsEnv(environmentDev, {
+  authSpLoginUrl: '/auth-sp/login',
+  backUrl: '/back',
   production: true,
+  titre: 'TKDO'
 });

@@ -24,7 +24,15 @@ services:
       context: ./auth-sp
       network: host
     environment:
+      - NODE_ENV=production
       - TKDO_JWT_PRIVATE_KEY_FILE=/run/secrets/auth-sp-sign.key
+      - TKDO_SAML_CALLBACK_URL=https://localhost/auth-sp/acs
+      - TKDO_SAML_ENTRY_POINT=https://localhost/auth-idp/saml2/idp/SSOService.php
+      - TKDO_SAML_IDP_CERT_FILE=/run/secrets/auth-idp-cert.crt
+      - TKDO_SAML_ISSUER=https://localhost/auth-sp
+      - TKDO_SAML_SP_CERT_FILE=/run/secrets/auth-sp-cert.crt
+      - TKDO_SAML_SP_PRIVATE_KEY_FILE=/run/secrets/auth-sp-cert.key
+      - TKDO_PORT=3000
     secrets:
       - auth-idp-cert.crt
       - auth-sp-cert.crt
@@ -46,6 +54,7 @@ services:
       context: ./back
       network: host
     environment:
+      - NODE_ENV=production
       - TKDO_JWT_PUBLIC_KEY_FILE=/run/secrets/auth-sp-sign.key.pub
     secrets:
       - auth-sp-sign.key.pub
