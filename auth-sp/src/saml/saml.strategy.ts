@@ -3,13 +3,13 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { readFileSync } from 'fs';
 import { Strategy } from 'passport-saml';
-import { Droit, IUtilisateur } from '../../../shared/auth/lib';
+import { PortHabilitations, Utilisateur } from '../../../domaine';
 
 @Injectable()
 export class SamlStrategy extends PassportStrategy(Strategy) {
   private signinCert = readFileSync(process.env.TKDO_SAML_SP_CERT_FILE).toString();
 
-  constructor()  {
+  constructor(private portHabilitations: PortHabilitations)  {
     super({
       callbackUrl: process.env.TKDO_SAML_CALLBACK_URL,
       cert: readFileSync(process.env.TKDO_SAML_IDP_CERT_FILE).toString(),
@@ -22,11 +22,11 @@ export class SamlStrategy extends PassportStrategy(Strategy) {
   /**
    * Valide le profile renvoyé par l'IDP.
    */
-  async validate(profile: IUtilisateur): Promise<IUtilisateur> {
+  async validate(profile: Utilisateur): Promise<Utilisateur> {
     // Ne conserve que les rôles concernant l'application
-    profile.roles = ensureStringArray(profile.roles).filter(role => Droit.estRoleConnu(role));
+    profile.roles = ensureStringArray(profile.roles).filter(role => this.portHabilitations.estRoleConnu(role));
 
-    if (!Droit.has(Droit.CONNEXION, profile)) throw new UnauthorizedException();
+    if (!this.portHabilitations.hasDroit(PortHabilitations.DROIT_CONNEXION, profile)) throw new UnauthorizedException();
     return profile;
   }
 

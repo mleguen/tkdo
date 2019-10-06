@@ -3,12 +3,10 @@ import { Injectable } from '@angular/core';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { BehaviorSubject } from 'rxjs';
 
-import { environment } from 'src/environments/environment';
-import { Utilisateur } from './utilisateur.interface';
+import { Utilisateur } from '../../../../domaine';
+import { environment } from '../../environments/environment';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable()
 export class AuthService {
   utilisateurConnecte$ = new BehaviorSubject<Utilisateur>(undefined);
   utilisateurConnecte: Utilisateur;

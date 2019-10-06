@@ -1,8 +1,8 @@
 {
-  "name": "tkdo-auth",
+  "name": "tkdo-domaine",
   "version": "1.0.0",
-  "description": "code partagé de gestion de l'authentification et des habilitations pour TKDO",
-  "main": "lib/index.ts",
+  "description": "domaine TKDO",
+  "main": "index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

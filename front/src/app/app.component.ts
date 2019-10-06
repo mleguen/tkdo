@@ -3,9 +3,9 @@ import { Title } from '@angular/platform-browser';
 import { replace } from 'feather-icons';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { Role } from '../../../shared/auth/lib';
 
-import { environment } from 'src/environments/environment';
+import { PortHabilitations } from '../../../domaine';
+import { environment } from '../environments/environment';
 import { AuthService } from './auth/auth.service';
 
 @Component({
@@ -30,12 +30,12 @@ export class AppComponent implements OnInit {
   }
 
   public get roles$(): Observable<string> {
-    const NOM_ROLE = {
-      [Role.PARTICIPANT]: 'participant(e)'
+    const NOMS_ROLES = {
+      [PortHabilitations.ROLE_PARTICIPANT]: 'participant(e)'
     };
     return this.utilisateur$.pipe(map(utilisateur =>
       utilisateur.roles
-        .map(role => NOM_ROLE[role] || 'rôle inconnu')
+        .map(role => NOMS_ROLES[role] || 'rôle inconnu')
         .join(', ')
     ));
   }

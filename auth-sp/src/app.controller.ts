@@ -1,7 +1,7 @@
 import { Controller, Get, Req, Res, UseGuards, Post, Body } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { AuthGuard } from '@nestjs/passport';
-import { IUtilisateur } from '../../shared/auth';
+import { Utilisateur } from '../../domaine';
 import { SamlStrategy } from './saml/saml.strategy';
 import { AppService } from './app.service';
 
@@ -12,7 +12,7 @@ export class AppController {
   @UseGuards(AuthGuard('saml'))
   @Post('/acs')
   postAssertionConsumerService(@Req() req: Request, @Res() res: Response, @Body('RelayState') relayState?: string) {
-    return this.appService.redirectToRelayStateWithJwt(res, relayState, req.user as IUtilisateur);
+    return this.appService.redirectToRelayStateWithJwt(res, relayState, req.user as Utilisateur);
   }
 
   @UseGuards(AuthGuard('saml'))

@@ -1,16 +1,12 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { JwtModule } from "@auth0/angular-jwt";
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
-import { environment } from 'src/environments/environment';
 import { AccueilComponent } from './accueil/accueil.component';
+import { AuthModule } from './auth/auth.module';
+import { UtilisateursModule } from './utilisateurs/utilisateurs.module';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-
-export function jwtTokenGetter(): string {
-  return localStorage.getItem(environment.authTokenLocalStorageKey);
-}
 
 @NgModule({
   declarations: [
@@ -21,12 +17,8 @@ export function jwtTokenGetter(): string {
     NgbModule,
     BrowserModule,
     AppRoutingModule,
-    JwtModule.forRoot({
-      config: {
-        tokenGetter: jwtTokenGetter,
-        whitelistedDomains: [environment.backUrl]
-      }
-    })
+    AuthModule,
+    UtilisateursModule
   ],
   providers: [],
   bootstrap: [AppComponent]
