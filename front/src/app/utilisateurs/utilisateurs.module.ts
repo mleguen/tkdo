@@ -2,8 +2,9 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 
-import { UtilisateursRoutingModule } from './utilisateurs-routing.module';
+import { SharedModule } from '../shared/shared.module';
 import { TiragesUtilisateurComponent } from './tirages-utilisateur/tirages-utilisateur.component';
+import { UtilisateursRoutingModule } from './utilisateurs-routing.module';
 
 
 @NgModule({
@@ -11,7 +12,8 @@ import { TiragesUtilisateurComponent } from './tirages-utilisateur/tirages-utili
   imports: [
     CommonModule,
     HttpClientModule,
-    UtilisateursRoutingModule
+    UtilisateursRoutingModule,
+    SharedModule
   ]
 })
 export class UtilisateursModule { }
