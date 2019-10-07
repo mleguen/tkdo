@@ -19,7 +19,13 @@ export class AuthService {
   }
 
   public connecte() {
-    this.redirigeVersAuthSp();
+    // Le RelayState nous permettra d'être redirigé sur la page courante en retour de l'authentification auprès du SP
+    window.location.href = this.addUrlParam(environment.authSpLoginUrl, 'RelayState', window.location.href);
+  }
+
+  public deconnecte() {
+    localStorage.removeItem(environment.authTokenLocalStorageKey);
+    window.location.href = this.addUrlParam('/deconnexion', 'RelayState', window.location.href);
   }
 
   private getAuthToken(): string {
@@ -46,14 +52,9 @@ export class AuthService {
       if (this.jwtHelperService.isTokenExpired(authToken)) throw new Error();
       return this.jwtHelperService.decodeToken(authToken);
     } catch (err) {
-      localStorage.removeItem(environment.authTokenLocalStorageKey);
+      this.deconnecte();
       return;
     }
-  }
-
-  private redirigeVersAuthSp() {
-    // Le RelayState nous permettra d'être redirigé sur la page courante en retour de l'authentification auprès du SP
-    window.location.href = this.addUrlParam(environment.authSpLoginUrl, 'RelayState', window.location.href);
   }
 
   private addUrlParam(url: string, key: string, value: string): string {

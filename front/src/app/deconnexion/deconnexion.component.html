@@ -1,0 +1,5 @@
+<app-titre-page titre="Vous êtes déconnecté"></app-titre-page>
+
+<p *ngIf="urlReconnexion$|async">
+  <a [href]="urlReconnexion$|async">Se reconnecter</a>
+</p>

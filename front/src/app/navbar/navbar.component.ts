@@ -35,4 +35,8 @@ export class NavbarComponent implements OnInit {
   public connecte() {
     this.authService.connecte();
   }
+
+  public deconnecte() {
+    this.authService.deconnecte();
+  }
 }

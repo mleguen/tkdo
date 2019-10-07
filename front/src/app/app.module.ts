@@ -13,6 +13,7 @@ import { SidebarItemComponent } from './sidebar-item/sidebar-item.component';
 import { UtilisateursModule } from './utilisateurs/utilisateurs.module';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { DeconnexionComponent } from './deconnexion/deconnexion.component';
 
 @NgModule({
   declarations: [
@@ -21,7 +22,8 @@ import { AppComponent } from './app.component';
     SidebarComponent,
     FooterComponent,
     SidebarItemComponent,
-    AccueilComponent
+    AccueilComponent,
+    DeconnexionComponent
   ],
   imports: [
     NgbModule,
