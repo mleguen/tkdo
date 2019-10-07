@@ -1,8 +1,8 @@
 {
   "name": "auth-sp",
   "version": "0.0.1",
-  "description": "",
-  "author": "Service Provider TKDO",
+  "description": "Service Provider TKDO",
+  "author": "Mael Le Guen",
   "license": "MIT",
   "scripts": {
     "build": "rimraf dist && webpack",
@@ -65,5 +65,6 @@
     },
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
-  }
+  },
+  "repository": "https://github.com/mleguen/tkdo"
 }

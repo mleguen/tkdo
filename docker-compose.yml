@@ -47,6 +47,7 @@ services:
         target: /var/simplesamlphp/cert/server.crt
       - source: auth-idp-cert.key
         target: /var/simplesamlphp/cert/server.pem
+      - auth-sp-cert.crt
   tkdo-back:
     build:
       args:

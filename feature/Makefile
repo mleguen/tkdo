@@ -2,7 +2,8 @@ REPERTOIRES = todo done
 
 build: $(REPERTOIRES)
 
-.PHONY: $(REPERTOIRES)
-
 $(REPERTOIRES):
 	make -C $@
+
+# Cibles qui ne doivent jamais être considérées comme à jour
+.PHONY: $(REPERTOIRES)

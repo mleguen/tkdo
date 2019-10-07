@@ -1,14 +1,12 @@
 FROM unicon/simplesamlphp
 
-COPY authsources.php /var/simplesamlphp/config/
-COPY saml20-sp-remote.php /var/simplesamlphp/metadata/
+COPY config/ /var/simplesamlphp/config/
+COPY metadata/ /var/simplesamlphp/metadata/
 
 RUN	touch /var/simplesamlphp/modules/exampleauth/enable && \
   sed \
-	-e "s/\('auth.adminpassword' => \).*,/\1'tkdo',/" \
-	-e "s@\('baseurlpath' => \).*,@\1'https://localhost/auth-idp/',@" \
-	-e "s/\('enable.saml20-idp' => \).*,/\1true,/" \
 	-e "s/\('secretsalt' => \).*,/\1'$(tr -c -d '0123456789abcdefghijklmnopqrstuvwxyz' </dev/urandom | dd bs=32 count=1 2>/dev/null)',/" \
   -i /var/simplesamlphp/config/config.php && \
+	chmod 644 /var/simplesamlphp/config/config.php && \
 	chmod 644 /var/simplesamlphp/config/authsources.php && \
 	chmod 644 /var/simplesamlphp/metadata/saml20-sp-remote.php

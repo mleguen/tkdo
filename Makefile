@@ -1,28 +1,39 @@
-BUILD_DIR = auth-sp back front
-DOC_DIR = feature
+BUILD_DIR = domaine auth-sp back front
 
-CERT_MODS = auth-idp auth-sp gateway
-SIGN_MODS = auth-sp
+build:
+	for d in $(BUILD_DIR); do $(MAKE) -C $$d $@; done
 
-ALL_DIR = $(BUILD_DIR) $(DOC_DIR)
+clean:
+	for d in $(BUILD_DIR); do $(MAKE) -C $$d $@; done
+
+install: build secrets
+	docker-compose build
 
 all: build doc
 
-build: $(BUILD_DIR)
-	docker-compose build
+# Documentation
+
+DOC_DIR = feature
 
 doc: $(DOC_DIR)
 
-# Ne considère jamais aucun des répertoires comme à jour...
-.PHONY: $(ALL_DIR)
+# Sous-répertoires
 
-# ... pour y forcer un make
-$(ALL_DIR):
+$(BUILD_DIR) $(DOC_DIR):
 	$(MAKE) -C $@
 
-start: build secrets
-	(sleep 10 && xdg-open https://localhost)&
+# Start/stop
+
+start: install
 	docker-compose up
+
+stop:
+	docker-compose down
+
+# Secrets (si pas fournis)
+
+CERT_MODS = auth-idp auth-sp gateway
+SIGN_MODS = auth-sp
 
 CERT_ROOTS = $(addsuffix -cert, $(CERT_MODS))
 CERT_SECRETS = $(addsuffix .crt, $(CERT_ROOTS))  $(addsuffix .key, $(CERT_ROOTS))
@@ -44,5 +55,5 @@ secrets: $(CERT_SECRETS) $(SIGN_SECRETS)
 	openssl req -new -x509 -nodes -out $*-cert.crt -keyout $*-cert.key
 	chmod 644 $*-cert.{crt,key}
 
-stop:
-	docker-compose down
+# Cibles qui ne doivent jamais être considérées comme à jour
+.PHONY: build clean install secrets start stop doc 
