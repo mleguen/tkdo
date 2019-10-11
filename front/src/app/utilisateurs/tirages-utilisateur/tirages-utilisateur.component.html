@@ -1,7 +1,5 @@
 <app-titre-page titre="Mes tirages"></app-titre-page>
 
-<ul>
-  <li *ngFor="let tirage of tirages$|async">
-    {{ tirage.titre }} ({{ tirage.date }})
-  </li>
-</ul>
+<div class="card-deck">
+  <app-tirage-resume *ngFor="let tirage of tirages$|async" [tirage]="tirage"></app-tirage-resume>
+</div>

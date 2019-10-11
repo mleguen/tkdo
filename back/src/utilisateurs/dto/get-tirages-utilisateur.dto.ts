@@ -1,3 +1,3 @@
-import { Tirage } from '../../../../domaine';
+import { TirageResume } from '../../../../domaine';
 
-export type GetTiragesUtilisateurDTO = Omit<Tirage, 'idOrganisateur' | 'idParticipants'>[];
+export type GetTiragesUtilisateurDTO = TirageResume[];

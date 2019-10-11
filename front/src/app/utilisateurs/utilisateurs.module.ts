@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 
 import { SharedModule } from '../shared/shared.module';
+import { TiragesModule } from '../tirages/tirages.module';
 import { TiragesUtilisateurComponent } from './tirages-utilisateur/tirages-utilisateur.component';
 import { UtilisateursRoutingModule } from './utilisateurs-routing.module';
 
@@ -13,7 +14,8 @@ import { UtilisateursRoutingModule } from './utilisateurs-routing.module';
     CommonModule,
     HttpClientModule,
     UtilisateursRoutingModule,
-    SharedModule
+    SharedModule,
+    TiragesModule
   ]
 })
 export class UtilisateursModule { }

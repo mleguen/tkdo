@@ -1,4 +1,4 @@
-import { Utilisateur } from "./utilisateur.interface";
+import { Utilisateur } from "../../utilisateurs/interfaces/utilisateur.interface";
 
 export interface Tirage {
   id: number;
