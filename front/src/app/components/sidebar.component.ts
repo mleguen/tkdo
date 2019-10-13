@@ -10,7 +10,7 @@ import { AuthService } from '../modules/auth/services/auth.service';
 })
 export class SidebarComponent {
   utilisateur$ = this.authService.utilisateurConnecte$;
-  hasDroitVoirMenusParticipant$ = this.authService.hasDroit$(PortHabilitations.DROIT_VOIR_MENUS_PARTICIPANT);
+  hasDroitVoirMenusParticipant$ = this.authService.hasDroit$(PortHabilitations.DROIT_FRONT_AFFICHAGE_MENUS_PARTICIPANT);
 
   constructor(
     private authService: AuthService
