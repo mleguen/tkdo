@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { PassportModule } from '@nestjs/passport';
 import { PortHabilitations } from '../../../domaine';
-import { SamlStrategy } from './saml.strategy';
+import { AuthSamlStrategy } from './auth-saml.strategy';
 
 @Module({
   imports: [PassportModule],
@@ -10,8 +10,8 @@ import { SamlStrategy } from './saml.strategy';
       provide: PortHabilitations,
       useFactory: () => new PortHabilitations()
     },
-    SamlStrategy
+    AuthSamlStrategy
   ],
-  exports: [SamlStrategy]
+  exports: [AuthSamlStrategy]
 })
-export class SamlModule {}
+export class AuthModule {}

@@ -4,7 +4,7 @@ import * as moment from 'moment';
 import { GetTiragesUtilisateurDTO } from './dto/get-tirages-utilisateur.dto';
 import { GetTirageUtilisateurDTO } from './dto/get-tirage-utilisateur.dto';
 
-// @UseGuards(AuthGuard('jwt'))
+@UseGuards(AuthGuard('jwt'))
 @Controller('utilisateurs')
 export class UtilisateursController {
   // TODO : DroitGuard(Droit:GET_TIRAGES_PARTICIPANT) - rejet si l'utilisateur n'a pas un des droits fournis

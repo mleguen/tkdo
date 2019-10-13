@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpClientModule } from '@angular/common/http';
 
 import { SharedModule } from '../shared/shared.module';
 import { TiragesModule } from '../tirages/tirages.module';
@@ -14,7 +13,6 @@ import { IconesModule } from '../icones/icones.module';
   declarations: [TiragesUtilisateurPageComponent, TirageUtilisateurPageComponent, UtilisateurResumeCardComponent],
   imports: [
     CommonModule,
-    HttpClientModule,
     UtilisateursRoutingModule,
     SharedModule,
     IconesModule,

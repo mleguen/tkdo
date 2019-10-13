@@ -6,7 +6,7 @@ import { Strategy } from 'passport-saml';
 import { PortHabilitations, Utilisateur, UtilisateurResume } from '../../../domaine';
 
 @Injectable()
-export class SamlStrategy extends PassportStrategy(Strategy) {
+export class AuthSamlStrategy extends PassportStrategy(Strategy) {
   private signinCert = readFileSync(process.env.TKDO_SAML_SP_CERT_FILE).toString();
 
   constructor(private portHabilitations: PortHabilitations)  {

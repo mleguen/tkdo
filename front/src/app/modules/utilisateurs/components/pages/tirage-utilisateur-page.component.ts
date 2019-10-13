@@ -26,8 +26,9 @@ export class TirageUtilisateurPageComponent {
     );
     this.tirage$ = route.params.pipe(
       map(p => [p.idUtilisateur, p.idTirage]),
-      switchMap((idUtilisateur, idTirage) =>
-        http.get<GetTirageUtilisateurDTO>(environment.backUrl + `/utilisateurs/${idUtilisateur}/tirages/${idTirage}`)
+      switchMap(([idUtilisateur, idTirage]) => {
+        return http.get<GetTirageUtilisateurDTO>(environment.backUrl + `/utilisateurs/${idUtilisateur}/tirages/${idTirage}`)
+      }
       ),
       map(TiragesService.formateDates())
     );

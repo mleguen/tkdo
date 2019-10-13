@@ -2,12 +2,12 @@ import { Controller, Get, Req, Res, UseGuards, Post, Body } from '@nestjs/common
 import { Request, Response } from 'express';
 import { AuthGuard } from '@nestjs/passport';
 import { Utilisateur } from '../../domaine';
-import { SamlStrategy } from './saml/saml.strategy';
+import { AuthSamlStrategy } from './auth/auth-saml.strategy';
 import { AppService } from './app.service';
 
 @Controller()
 export class AppController {
-  constructor(private appService: AppService, private samlStrategy: SamlStrategy) {}
+  constructor(private appService: AppService, private samlStrategy: AuthSamlStrategy) {}
 
   @UseGuards(AuthGuard('saml'))
   @Post('/acs')

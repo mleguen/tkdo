@@ -11,6 +11,8 @@ import { environment } from '../../../../environments/environment';
 export class AuthService {
   utilisateurConnecte$ = new BehaviorSubject<Utilisateur>(undefined);
   utilisateurConnecte: Utilisateur;
+  
+  private authToken: string;
 
   constructor(
     private location: Location,
@@ -36,11 +38,11 @@ export class AuthService {
     );
   }
 
-  private getAuthToken(): string {
-    let authToken = this.getAuthTokenFromHash();
+  public getAuthToken(): string {
+    if (!this.authToken) this.authToken = this.getAuthTokenFromHash();
     // En environnement de développement, le token n'est pas lu en localStorage pour faciliter les changements d'utilisateur
-    if (!authToken && environment.production) authToken = localStorage.getItem(environment.authTokenLocalStorageKey);
-    return authToken;
+    if (!this.authToken && environment.production) this.authToken = localStorage.getItem(environment.authTokenLocalStorageKey);
+    return this.authToken;
   }
 
   private getAuthTokenFromHash(): string {

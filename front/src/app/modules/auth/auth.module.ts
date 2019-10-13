@@ -23,8 +23,8 @@ export function tokenGetter() {
     }),
   ],
   providers: [
-    AuthGuard,
     AuthService,
+    AuthGuard,
     {
       provide: PortHabilitations,
       useFactory: () => new PortHabilitations()
