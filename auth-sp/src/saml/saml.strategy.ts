@@ -3,7 +3,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { readFileSync } from 'fs';
 import { Strategy } from 'passport-saml';
-import { PortHabilitations, Utilisateur } from '../../../domaine';
+import { PortHabilitations, Utilisateur, UtilisateurResume } from '../../../domaine';
 
 @Injectable()
 export class SamlStrategy extends PassportStrategy(Strategy) {
@@ -23,11 +23,13 @@ export class SamlStrategy extends PassportStrategy(Strategy) {
    * Valide le profile renvoyé par l'IDP.
    */
   async validate(profile: Utilisateur): Promise<Utilisateur> {
-    // Ne conserve que les rôles concernant l'application
-    profile.roles = ensureStringArray(profile.roles).filter(role => this.portHabilitations.estRoleConnu(role));
+    let utilisateur = Object.assign({}, profile, {
+      // Ne conserve que les rôles concernant l'application
+      roles: ensureStringArray(profile.roles).filter(role => this.portHabilitations.estRoleConnu(role))
+    } as Utilisateur);
 
-    if (!this.portHabilitations.hasDroit(PortHabilitations.DROIT_CONNEXION, profile)) throw new UnauthorizedException();
-    return profile;
+    if (!this.portHabilitations.hasDroit(PortHabilitations.DROIT_CONNEXION, utilisateur)) throw new UnauthorizedException();
+    return utilisateur;
   }
 
   generateServiceProviderMetadata(): string {

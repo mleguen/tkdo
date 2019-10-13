@@ -2,18 +2,18 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
-import { AccueilComponent } from './accueil/accueil.component';
-import { AuthModule } from './auth/auth.module';
-import { FooterComponent } from './footer/footer.component';
-import { IconesModule } from './icones/icones.module';
-import { NavbarComponent } from './navbar/navbar.component';
-import { SharedModule } from './shared/shared.module';
-import { SidebarComponent } from './sidebar/sidebar.component';
-import { SidebarItemComponent } from './sidebar-item/sidebar-item.component';
-import { UtilisateursModule } from './utilisateurs/utilisateurs.module';
+import { AccueilPageComponent } from './components/pages/accueil-page.component';
+import { DeconnexionPageComponent } from './components/pages/deconnexion-page.component';
+import { AppComponent } from './components/app.component';
+import { FooterComponent } from './components/footer.component';
+import { NavbarComponent } from './components/navbar.component';
+import { SidebarComponent } from './components/sidebar.component';
+import { SidebarItemComponent } from './components/sidebar-item.component';
+import { AuthModule } from './modules/auth/auth.module';
+import { IconesModule } from './modules/icones/icones.module';
+import { SharedModule } from './modules/shared/shared.module';
+import { UtilisateursModule } from './modules/utilisateurs/utilisateurs.module';
 import { AppRoutingModule } from './app-routing.module';
-import { AppComponent } from './app.component';
-import { DeconnexionComponent } from './deconnexion/deconnexion.component';
 
 @NgModule({
   declarations: [
@@ -22,8 +22,8 @@ import { DeconnexionComponent } from './deconnexion/deconnexion.component';
     SidebarComponent,
     FooterComponent,
     SidebarItemComponent,
-    AccueilComponent,
-    DeconnexionComponent
+    AccueilPageComponent,
+    DeconnexionPageComponent
   ],
   imports: [
     NgbModule,
@@ -34,7 +34,6 @@ import { DeconnexionComponent } from './deconnexion/deconnexion.component';
     SharedModule,
     UtilisateursModule
   ],
-  providers: [],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

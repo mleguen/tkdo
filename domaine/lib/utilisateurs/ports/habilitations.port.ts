@@ -5,13 +5,15 @@ export class PortHabilitations {
   static ROLE_PARTICIPANT: string = 'TKDO_PARTICIPANT';
   
   static DROIT_CONNEXION: string = 'CONNEXION';
+  static DROIT_VOIR_MENUS_PARTICIPANT: string = 'DROIT_VOIR_MENUS_PARTICIPANT';
 
   /**
    * La matrice rôles/droits
    */
   private static matrice: { [role: string]: string[] } = {
     [PortHabilitations.ROLE_PARTICIPANT]: [
-      PortHabilitations.DROIT_CONNEXION
+      PortHabilitations.DROIT_CONNEXION,
+      PortHabilitations.DROIT_VOIR_MENUS_PARTICIPANT
     ]
   }
 

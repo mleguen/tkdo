@@ -1,0 +1,5 @@
+<app-bandeau-titre titre="Mes tirages"></app-bandeau-titre>
+
+<div class="card-deck" *ngIf="idUtilisateur$|async as idUtilisateur">
+  <app-tirage-resume-card *ngFor="let tirage of tirages$|async" [tirage]="tirage" [idUtilisateur]="idUtilisateur"></app-tirage-resume-card>
+</div>
