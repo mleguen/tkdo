@@ -1,18 +1,20 @@
 import { Controller, UseGuards, Get, Param } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import * as moment from 'moment';
+import { PortHabilitations } from '../../../domaine';
 import { Droit } from '../auth/droit.decorator';
 import { DroitsGuard } from '../auth/droits.guard';
+import { IdUtilisateurGuard } from '../auth/id-utilisateur.guard';
+import { ParamIdUtilisateur } from '../auth/param-id-utilisateur.decorator';
 import { GetTiragesUtilisateurDTO } from './dto/get-tirages-utilisateur.dto';
 import { GetTirageUtilisateurDTO } from './dto/get-tirage-utilisateur.dto';
-import { PortHabilitations } from '../../../domaine';
 
 @Controller('utilisateurs')
-@UseGuards(AuthGuard('jwt'), DroitsGuard)
+@UseGuards(AuthGuard('jwt'), DroitsGuard, IdUtilisateurGuard)
 export class UtilisateursController {
-  // TODO : IdUtilisateurParamGuard() - rejet si l'id utilisateur n'est pas le même que le param id
   @Get('/:idUtilisateur/tirages')
   @Droit(PortHabilitations.DROIT_BACK_GET_TIRAGES_PARTICIPANT)
+  @ParamIdUtilisateur()
   getTiragesUtilisateur(@Param('idUtilisateur') idUtilisateur: string): GetTiragesUtilisateurDTO {
     return [
       {
@@ -28,9 +30,9 @@ export class UtilisateursController {
     ];
   }
 
-  // TODO : IdUtilisateurParamGuard() - rejet si l'id utilisateur n'est pas le même que le param id
   @Get('/:idUtilisateur/tirages/:idTirage')
   @Droit(PortHabilitations.DROIT_BACK_GET_TIRAGES_PARTICIPANT)
+  @ParamIdUtilisateur()
   getTirageUtilisateur(@Param('idUtilisateur') idUtilisateur: string, @Param('idTirage') idTirage: string): GetTirageUtilisateurDTO {
     // TODO : rejet si l'utilisateur n'est pas un des participants du tirage
     return {

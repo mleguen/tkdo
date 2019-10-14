@@ -3,6 +3,7 @@ import { PassportModule } from '@nestjs/passport';
 import { PortHabilitations } from '../../../domaine';
 import { AuthJwtStrategy } from './auth-jwt.strategy';
 import { DroitsGuard } from './droits.guard';
+import { IdUtilisateurGuard } from './id-utilisateur.guard';
 
 @Module({
   imports: [PassportModule],
@@ -12,8 +13,9 @@ import { DroitsGuard } from './droits.guard';
       provide: PortHabilitations,
       useFactory: () => new PortHabilitations()
     },
-    DroitsGuard
+    DroitsGuard,
+    IdUtilisateurGuard
   ],
-  exports: [AuthJwtStrategy, PortHabilitations, DroitsGuard]
+  exports: [AuthJwtStrategy, PortHabilitations, DroitsGuard, IdUtilisateurGuard]
 })
 export class AuthModule {}
