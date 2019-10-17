@@ -9,7 +9,7 @@ import { AuthService } from '../modules/auth/services/auth.service';
   styleUrls: ['./sidebar.component.scss']
 })
 export class SidebarComponent {
-  utilisateur$ = this.authService.utilisateurConnecte$;
+  utilisateur$ = this.authService.utilisateur$;
   hasDroitVoirMenusParticipant$ = this.authService.hasDroit$(PortHabilitations.DROIT_FRONT_AFFICHAGE_MENUS_PARTICIPANT);
 
   constructor(

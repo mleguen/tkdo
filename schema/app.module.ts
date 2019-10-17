@@ -3,7 +3,6 @@ import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { readFileSync } from 'fs';
 
-import { PortHabilitations } from '../../domaine';
 import { Utilisateur } from '../../schema';
 import { AuthModule } from './auth/auth.module';
 import { AppController } from './app.controller';
@@ -20,18 +19,13 @@ import { RouteLoggerMiddleware } from './route-logger.middleware';
       {
         entities: [Utilisateur]
       }
-    )),
-    TypeOrmModule.forFeature([Utilisateur])
+    ))
   ],
   controllers: [
     process.env.NODE_ENV === 'production' ? AppController : AppDevController
   ],
   providers: [
-    AppService,
-    {
-      provide: PortHabilitations,
-      useFactory: () => new PortHabilitations()
-    }
+    AppService
   ]
 })
 export class AppModule {

@@ -4,10 +4,9 @@ import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 
-import { GetTiragesUtilisateurDTO } from '../../../../../../../back/src/utilisateurs/dto/get-tirages-utilisateur.dto';
+import { TirageResumeDTO } from '../../../../../../../back/src/utilisateurs/dto/tirage-resume.dto';
 import { environment } from '../../../../../environments/environment';
 import { TiragesService } from '../../../../modules/tirages/services/tirages.service';
-import { UtilisateurResume } from '../../../../../../../domaine';
 
 @Component({
   selector: 'app-tirages-utilisateur-page',
@@ -15,7 +14,7 @@ import { UtilisateurResume } from '../../../../../../../domaine';
   styleUrls: ['./tirages-utilisateur-page.component.scss']
 })
 export class TiragesUtilisateurPageComponent {
-  tirages$: Observable<GetTiragesUtilisateurDTO>;
+  tirages$: Observable<TirageResumeDTO[]>;
   idUtilisateur$: Observable<string>;
 
   constructor(
@@ -27,7 +26,7 @@ export class TiragesUtilisateurPageComponent {
     );
     this.tirages$ = this.idUtilisateur$.pipe(
       switchMap(idUtilisateur =>
-        http.get<GetTiragesUtilisateurDTO>(environment.backUrl + `/utilisateurs/${idUtilisateur}/tirages`)
+        http.get<TirageResumeDTO[]>(environment.backUrl + `/utilisateurs/${idUtilisateur}/tirages`)
       ),
       map(tirages => tirages
         .sort((A, B) => -A.date.localeCompare(B.date))

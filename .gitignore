@@ -4,3 +4,4 @@
 *.crt
 *.key
 *.key.pub
+*.sqlite

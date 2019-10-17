@@ -2,7 +2,7 @@
 import { Injectable, CanActivate, ExecutionContext, Logger } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
-import { PortHabilitations, Utilisateur } from '../../../domaine';
+import { PortHabilitations, ISSPProfile } from '../../../domaine';
 
 @Injectable()
 export class DroitsGuard implements CanActivate {
@@ -18,11 +18,11 @@ export class DroitsGuard implements CanActivate {
     if (!droit) return true;
     
     const request = context.switchToHttp().getRequest<Request>();
-    const utilisateur = request.user as Utilisateur;
-    if (utilisateur === undefined) return false;
+    const profile = request.user as ISSPProfile;
+    if (!profile ) return false;
 
-    if (!this.portHabilitations.hasDroit(droit, utilisateur)) {
-      this.logger.log(`${utilisateur.nom} n'a pas le droit ${droit}`);
+    if (!this.portHabilitations.hasDroit(droit, profile.roles)) {
+      this.logger.log(`${profile.utilisateur.nom} n'a pas le droit ${droit}`);
       return false;
     }
     return true;

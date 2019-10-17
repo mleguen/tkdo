@@ -3,7 +3,8 @@ import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { readFileSync } from 'fs';
 import { Strategy, StrategyOptions, ExtractJwt } from 'passport-jwt';
-import { Utilisateur } from '../../../domaine';
+
+import { ISSPProfile } from '../../../domaine';
 
 @Injectable()
 export class AuthJwtStrategy extends PassportStrategy(Strategy) {
@@ -14,7 +15,7 @@ export class AuthJwtStrategy extends PassportStrategy(Strategy) {
     } as StrategyOptions);
   }
 
-  async validate(payload: Utilisateur): Promise<Utilisateur> {
+  async validate(payload: ISSPProfile): Promise<ISSPProfile> {
     return payload;
   }
   

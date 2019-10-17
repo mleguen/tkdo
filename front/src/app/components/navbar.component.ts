@@ -1,9 +1,15 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 
-import { Utilisateur, PortHabilitations } from '../../../../domaine';
+import { PortHabilitations, IUtilisateur } from '../../../../domaine';
 import { environment } from '../../environments/environment';
 import { AuthService } from '../modules/auth/services/auth.service';
+import { Observable } from 'rxjs';
+import { filter, map } from 'rxjs/operators';
+
+const NOMS_ROLES = {
+  [PortHabilitations.ROLE_PARTICIPANT]: 'participant(e)'
+};
 
 @Component({
   selector: 'app-navbar',
@@ -12,7 +18,14 @@ import { AuthService } from '../modules/auth/services/auth.service';
 })
 export class NavbarComponent implements OnInit {
   public titre = environment.titre;
-  @Input() utilisateur: Utilisateur;
+  public utilisateur$ = this.authService.utilisateur$;
+  public role$ = this.authService.profile$.pipe(
+    filter(profile => !!profile),
+    map(profile => profile.roles
+      .map(role => NOMS_ROLES[role] || 'rôle inconnu')
+      .join(', ')
+    )
+  );
   
   constructor(
     private titleService: Title,
@@ -21,15 +34,6 @@ export class NavbarComponent implements OnInit {
 
   ngOnInit() {
     this.titleService.setTitle(this.titre);
-  }
-
-  public get roles(): string {
-    const NOMS_ROLES = {
-      [PortHabilitations.ROLE_PARTICIPANT]: 'participant(e)'
-    };
-    return this.utilisateur.roles
-      .map(role => NOMS_ROLES[role] || 'rôle inconnu')
-      .join(', ');
   }
 
   public connecte() {

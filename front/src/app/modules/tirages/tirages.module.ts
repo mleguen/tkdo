@@ -1,15 +1,15 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { TiragesResumeCardComponent } from './components/tirage-resume-card.component';
+import { TirageResumeCardComponent } from './components/tirage-resume-card.component';
 import { RouterModule } from '@angular/router';
 
 @NgModule({
-  declarations: [TiragesResumeCardComponent],
+  declarations: [TirageResumeCardComponent],
   imports: [
     CommonModule,
     RouterModule
   ],
-  exports: [TiragesResumeCardComponent]
+  exports: [TirageResumeCardComponent]
 })
 export class TiragesModule { }

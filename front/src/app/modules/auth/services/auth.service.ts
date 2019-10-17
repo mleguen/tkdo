@@ -4,13 +4,14 @@ import { JwtHelperService } from '@auth0/angular-jwt';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
-import { Utilisateur, PortHabilitations } from '../../../../../../domaine';
+import { PortHabilitations, ISSPProfile, IUtilisateur } from '../../../../../../domaine';
 import { environment } from '../../../../environments/environment';
 
 @Injectable()
 export class AuthService {
-  utilisateurConnecte$ = new BehaviorSubject<Utilisateur>(undefined);
-  utilisateurConnecte: Utilisateur;
+  public connecte$: Observable<boolean>;
+  public profile$: BehaviorSubject<ISSPProfile>;
+  public utilisateur$: Observable<IUtilisateur>;
   
   private authToken: string;
 
@@ -19,7 +20,9 @@ export class AuthService {
     private jwtHelperService: JwtHelperService,
     private portHabilitations: PortHabilitations
   ) {
-    this.setUtilisateurConnecte(this.getUtilisateurFromAuthToken());
+    this.profile$ = new BehaviorSubject<ISSPProfile>(this.getProfileFromAuthToken());
+    this.connecte$ = this.profile$.pipe(map(profile => !!profile));
+    this.utilisateur$ = this.profile$.pipe(map(profile => !!profile ? profile.utilisateur : undefined));
   }
 
   public connecte() {
@@ -29,12 +32,13 @@ export class AuthService {
 
   public deconnecte() {
     localStorage.removeItem(environment.authTokenLocalStorageKey);
+    this.profile$.next(undefined);
     window.location.href = this.addUrlParam('/deconnexion', 'RelayState', window.location.href);
   }
 
   public hasDroit$(droit: string): Observable<boolean> {
-    return this.utilisateurConnecte$.pipe(
-      map(utilisateur => !!utilisateur && this.portHabilitations.hasDroit(droit, utilisateur))
+    return this.profile$.pipe(
+      map(profile => !!profile && this.portHabilitations.hasDroit(droit, profile.roles))
     );
   }
 
@@ -54,7 +58,7 @@ export class AuthService {
     return authToken;
   }
 
-  private getUtilisateurFromAuthToken(): Utilisateur {
+  private getProfileFromAuthToken(): ISSPProfile {
     let authToken = this.getAuthToken();
     if (!authToken) return;
 
@@ -74,10 +78,5 @@ export class AuthService {
     params.push(newParam);
     paramString = params.join('&');
     return [base, paramString].join('?');
-  }
-
-  private setUtilisateurConnecte(utilisateur: Utilisateur) {
-    this.utilisateurConnecte = utilisateur;
-    this.utilisateurConnecte$.next(utilisateur);
   }
 }

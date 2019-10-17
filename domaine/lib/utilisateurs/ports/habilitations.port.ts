@@ -1,4 +1,4 @@
-import { Utilisateur } from "../interfaces/utilisateur.interface";
+import { IUtilisateur } from "../interfaces/utilisateur.interface";
 
 export class PortHabilitations {
 
@@ -22,8 +22,8 @@ export class PortHabilitations {
   /**
    * Vérifie qu'un utilisateur a un droit donné.
    */
-  hasDroit(droit: string, utilisateur: Utilisateur): boolean {
-    return utilisateur.roles
+  hasDroit(droit: string, roles: string[]): boolean {
+    return roles
       .map(role => PortHabilitations.matrice[role])
       .some(droits => droits.includes(droit));
   }

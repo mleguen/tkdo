@@ -1,0 +1,22 @@
+{
+  "name": "tkdo-scheam",
+  "version": "1.0.0",
+  "description": "schéma de la base de données TKDO",
+  "main": "index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "typeorm": "ts-node ./node_modules/.bin/typeorm"
+  },
+  "author": "Mael Le Guen",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^12.11.1",
+    "dotenv": "^8.2.0",
+    "sqlite3": "^4.1.0",
+    "ts-node": "^8.4.1",
+    "tslib": "^1.10.0",
+    "typeorm": "^0.2.19",
+    "typescript": "^3.6.3"
+  },
+  "repository": "https://github.com/mleguen/tkdo"
+}

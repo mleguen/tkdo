@@ -4,13 +4,19 @@
   <a class="navbar-brand col-sm-3 col-md-2 mr-0" routerLink="/">{{ titre }}</a>
   <!-- <input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search"> -->
   <span class="w-100"></span>
-  <ul class="navbar-nav px-3">
-    <li class="nav-item text-nowrap" *ngIf="utilisateur">
-      <a class="nav-link" (click)="deconnecte()">Se déconnecter</a>
-    </li>
-    <li class="nav-item text-nowrap" *ngIf="!utilisateur">
-      <a class="nav-link" (click)="connecte()">Se connecter</a>
-    </li>
-  </ul>
-  <span class="navbar-text text-nowrap px-3" *ngIf="utilisateur">{{utilisateur.nom}} ({{roles}})</span>
+  <ng-container *ngIf="utilisateur$|async as utilisateur; else pasConnecte">
+    <ul class="navbar-nav px-3">
+      <li class="nav-item text-nowrap">
+        <a class="nav-link" (click)="deconnecte()">Se déconnecter</a>
+      </li>
+    </ul>
+    <span class="navbar-text text-nowrap px-3">{{utilisateur.nom}} ({{role$|async}})</span>
+  </ng-container>
+  <ng-template #pasConnecte>
+    <ul class="navbar-nav px-3">
+      <li class="nav-item text-nowrap">
+        <a class="nav-link" (click)="connecte()">Se connecter</a>
+      </li>
+    </ul>    
+  </ng-template> 
 </nav>

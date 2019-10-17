@@ -1,4 +1,4 @@
-BUILD_DIR = domaine auth-sp back front
+BUILD_DIR = domaine schema auth-sp back front
 
 build:
 	for d in $(BUILD_DIR); do $(MAKE) -C $$d $@; done
