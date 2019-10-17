@@ -1,0 +1,17 @@
+entity: Utilisateur
+items:
+  alice:
+    login: alice@domain.tld
+    nom: Alice
+  bob:
+    login: bob@domain.tld
+    nom: Bob
+  charlie:
+    login: charlie@domain.tld
+    nom: Charlie
+  david:
+    login: david@domain.tld
+    nom: David
+  eve:
+    login: eve@domain.tld
+    nom: Eve
