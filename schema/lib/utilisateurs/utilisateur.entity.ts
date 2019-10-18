@@ -1,8 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToMany } from 'typeorm';
 import { IUtilisateur } from '../../../domaine';
+import { Tirage } from '../tirages';
 
 @Entity()
 export class Utilisateur implements IUtilisateur {
+  
   constructor(utilisateur: Pick<Utilisateur, 'login' | 'nom'>) {
     Object.assign(this, utilisateur);
   }
@@ -15,4 +17,7 @@ export class Utilisateur implements IUtilisateur {
 
   @Column({ length: 255, nullable: false })
   nom: string;
+
+  @ManyToMany(type => Tirage, tirage => tirage.participants)
+  tirages: Tirage[];
 }
