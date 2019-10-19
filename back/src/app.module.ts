@@ -9,7 +9,7 @@ import { RouteLoggerMiddleware } from './route-logger.middleware';
 @Module({
   imports: [
     TypeOrmModule.forRoot(Object.assign(
-      JSON.parse(process.env.TKDO_DATABASE_TYPE),
+      JSON.parse(process.env.TKDO_DATABASE),
       {
         entities: [
           Utilisateur,

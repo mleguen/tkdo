@@ -4,7 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { readFileSync } from 'fs';
 
 import { PortHabilitations } from '../../domaine';
-import { Utilisateur, Tirage } from '../../schema';
+import { Utilisateur } from '../../schema';
 import { AuthModule } from './auth/auth.module';
 import { AppController } from './app.controller';
 import { AppDevController } from './app.dev.controller';
@@ -17,12 +17,7 @@ import { RouteLoggerMiddleware } from './route-logger.middleware';
     ...process.env.NODE_ENV === 'production' ? [AuthModule] : [],
     TypeOrmModule.forRoot(Object.assign(
       JSON.parse(process.env.TKDO_DATABASE),
-      {
-        entities: [
-          Utilisateur,
-          Tirage
-        ]
-      }
+      { entities: [Utilisateur] }
     )),
     TypeOrmModule.forFeature([Utilisateur])
   ],

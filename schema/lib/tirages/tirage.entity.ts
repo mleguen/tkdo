@@ -18,7 +18,7 @@ export class Tirage implements ITirage {
   @Column({ length: 255, nullable: false })
   date: string;
 
-  @ManyToMany(type => Utilisateur, utilisateur => utilisateur.tirages)
+  @ManyToMany(type => Utilisateur)
   @JoinTable()
   participants: Utilisateur[];
 }
