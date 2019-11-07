@@ -61,6 +61,6 @@ $metadata['https://localhost/auth-sp'] = [
   ],
   'SingleLogoutService' => [],
   'NameIDFormat' => 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress',
-  'certificate' => '/run/secrets/auth-sp-cert.crt',
+  'certificate' => '/var/simplesamlphp/cert/auth-sp.crt',
   'validate.authnrequest' => true,
 ];

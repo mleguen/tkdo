@@ -1,7 +1,2 @@
-.env
-.dev-build
-.build
-*.crt
-*.key
-*.key.pub
+/.env
 *.sqlite

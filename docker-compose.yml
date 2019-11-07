@@ -1,82 +1,128 @@
 version: '3.7'
-secrets:
-  auth-idp-cert.crt:
-    file: auth-idp-cert.crt
-  auth-idp-cert.key:
-    file: auth-idp-cert.key
-  auth-sp-cert.crt:
-    file: auth-sp-cert.crt
-  auth-sp-cert.key:
-    file: auth-sp-cert.key
-  auth-sp-sign.key:
-    file: auth-sp-sign.key
-  auth-sp-sign.key.pub:
-    file: auth-sp-sign.key.pub
-  gateway-cert.crt:
-    file: gateway-cert.crt
-  gateway-cert.key:
-    file: gateway-cert.key
 services:
+
+  database:
+    image: mysql
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_DATABASE_FILE: /run/secrets/mysql_database
+      MYSQL_USER_FILE: /run/secrets/mysql_user
+      MYSQL_PASSWORD_FILE: /run/secrets/mysql_password
+      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/mysql_root_password
+    networks:
+      - back
+      - dbtools
+    secrets:
+      - mysql_database
+      - mysql_password
+      - mysql_root_password
+      - mysql_user
+    volumes:
+      - database-data:/var/lib/mysql
+
   tkdo-auth-sp:
-    build:
-      args:
-        - NPM_CONFIG_REGISTRY
-      context: ./auth-sp
-      network: host
+    depends_on:
+      - tkdo-auth-idp
+      - database
     environment:
-      - NODE_ENV=production
-      - TKDO_JWT_PRIVATE_KEY_FILE=/run/secrets/auth-sp-sign.key
-      - TKDO_SAML_CALLBACK_URL=https://localhost/auth-sp/acs
-      - TKDO_SAML_ENTRY_POINT=https://localhost/auth-idp/saml2/idp/SSOService.php
-      - TKDO_SAML_IDP_CERT_FILE=/run/secrets/auth-idp-cert.crt
-      - TKDO_SAML_ISSUER=https://localhost/auth-sp
-      - TKDO_SAML_SP_CERT_FILE=/run/secrets/auth-sp-cert.crt
-      - TKDO_SAML_SP_PRIVATE_KEY_FILE=/run/secrets/auth-sp-cert.key
-      - TKDO_PORT=3000
+      TKDO_JWT_PRIVATE_KEY_FILE: /run/secrets/auth-sp.key
+      TKDO_SAML_CALLBACK_URL: https://localhost/auth-sp/acs
+      TKDO_SAML_ENTRY_POINT: https://localhost/auth-idp/saml2/idp/SSOService.php
+      TKDO_SAML_IDP_CERT_FILE: /run/secrets/cert.crt
+      TKDO_SAML_ISSUER: https://localhost/auth-sp
+      TKDO_SAML_SP_CERT_FILE: /run/secrets/cert.crt
+      TKDO_SAML_SP_PRIVATE_KEY_FILE: /run/secrets/cert.pem
+      TKDO_TYPEORM_CONNECTION: mysql
+      TKDO_TYPEORM_DATABASE: tkdo
+      TKDO_TYPEORM_HOST: database
+      TKDO_TYPEORM_USERNAME: tkdo
+      TKDO_TYPEORM_PASSWORD: qrCtmOHjhDQakmk7
+      TKDO_PORT: 3000
+    image: tkdo-auth-sp
     secrets:
-      - auth-idp-cert.crt
-      - auth-sp-cert.crt
-      - auth-sp-cert.key
-      - auth-sp-sign.key
+      - auth-sp.key
+      - cert.crt
+      - cert.pem
+
   tkdo-auth-idp:
-    build: ./auth-idp
-    volumes:
-      - tkdo-auth-idp-logs:/var/log
+    image: tkdo-auth-idp
     secrets:
-      - source: auth-idp-cert.crt
+      - source: cert.crt
+        target: /var/simplesamlphp/cert/auth-sp.crt
+      - source: cert.crt
         target: /var/simplesamlphp/cert/server.crt
-      - source: auth-idp-cert.key
+      - source: cert.pem
         target: /var/simplesamlphp/cert/server.pem
-      - auth-sp-cert.crt
+
   tkdo-back:
-    build:
-      args:
-        - NPM_CONFIG_REGISTRY
-      context: ./back
-      network: host
+    depends_on:
+      - database
     environment:
-      - NODE_ENV=production
-      - TKDO_JWT_PUBLIC_KEY_FILE=/run/secrets/auth-sp-sign.key.pub
+      TKDO_TYPEORM_CONNECTION: mysql
+      TKDO_TYPEORM_DATABASE: tkdo
+      TKDO_TYPEORM_HOST: database
+      TKDO_TYPEORM_USERNAME: tkdo
+      TKDO_TYPEORM_PASSWORD: qrCtmOHjhDQakmk7
+      TKDO_JWT_PUBLIC_KEY_FILE: /run/secrets/auth-sp.key.pub
+    image: tkdo-back
     secrets:
-      - auth-sp-sign.key.pub
+      - auth-sp.key.pub
+
   tkdo-front:
-    build: ./front
-    secrets:
-      - auth-sp-sign.key.pub
-    volumes:
-      - tkdo-front-logs:/var/log
+    depends_on:
+      - tkdo-auth-sp
+      - tkdo-back
+    image: tkdo-front
+
   tkdo-gateway:
-    build: ./gateway
+    depends_on:
+      - tkdo-auth-idp
+      - tkdo-auth-sp
+      - tkdo-back
+      - tkdo-front
+    image: tkdo-gateway
     ports:
       - "443:443"
-    volumes:
-      - tkdo-gateway-logs:/var/log
     secrets:
-      - source: gateway-cert.crt
+      - source: cert.crt
         target: /usr/local/apache2/conf/server.crt
-      - source: gateway-cert.key
+      - source: cert.pem
         target: /usr/local/apache2/conf/server.key
+  
+  tkdo-db-tools:
+    depends_on:
+      - database
+    environment:
+      TKDO_TYPEORM_CONNECTION: mysql
+      TKDO_TYPEORM_DATABASE: tkdo
+      TKDO_TYPEORM_HOST: database
+      TKDO_TYPEORM_USERNAME: tkdo
+      TKDO_TYPEORM_PASSWORD: qrCtmOHjhDQakmk7
+      TKDO_JWT_PUBLIC_KEY_FILE: /run/secrets/auth-sp.key.pub
+    image: tkdo-db-tools
+
+networks:
+  front:
+  back:
+  dbtools:
+
+secrets:
+  auth-sp.key:
+    file: secrets/auth-sp.key
+  auth-sp.key.pub:
+    file: secrets/auth-sp.key.pub
+  cert.crt:
+    file: secrets/cert.crt
+  cert.pem:
+    file: secrets/cert.pem
+  mysql_database:
+    file: secrets/mysql_database
+  mysql_password:
+    file: secrets/mysql_password
+  mysql_root_password:
+    file: secrets/mysql_root_password
+  mysql_user:
+    file: secrets/mysql_user
+
 volumes:
-  tkdo-auth-idp-logs: {}
-  tkdo-front-logs: {}
-  tkdo-gateway-logs: {}
+  database-data: {}

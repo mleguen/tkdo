@@ -8,7 +8,9 @@ import { UtilisateursController } from './utilisateurs.controller';
 @Module({
   imports: [
     AuthModule,
-    TypeOrmModule.forFeature([TirageRepository])
+    TypeOrmModule.forFeature([
+      TirageRepository
+    ])
   ],
   controllers: [UtilisateursController]
 })

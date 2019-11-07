@@ -18,17 +18,12 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
-  "dependencies": {
+  "devDependencies": {
     "@nestjs/common": "^6.0.0",
     "@nestjs/core": "^6.0.0",
-    "@nestjs/platform-express": "^6.0.0",
-    "passport-saml": "^1.2.0",
-    "reflect-metadata": "^0.1.12",
-    "rxjs": "^6.3.3"
-  },
-  "devDependencies": {
     "@nestjs/jwt": "^6.1.1",
     "@nestjs/passport": "mleguen/passport#standalone",
+    "@nestjs/platform-express": "^6.0.0",
     "@nestjs/testing": "^6.0.0",
     "@nestjs/typeorm": "^6.2.0",
     "@types/dotenv": "^6.1.1",
@@ -41,9 +36,12 @@
     "jest": "24.7.1",
     "mysql": "^2.17.1",
     "passport": "^0.4.0",
+    "passport-saml": "^1.2.0",
     "prettier": "1.17.0",
+    "reflect-metadata": "^0.1.12",
     "rimraf": "^2.6.2",
-    "sqlite": "^3.0.3",
+    "rxjs": "^6.3.3",
+    "sqlite3": "^4.1.0",
     "supertest": "4.0.2",
     "ts-jest": "24.0.2",
     "ts-loader": "^6.2.0",
@@ -51,7 +49,7 @@
     "tsc-watch": "2.2.1",
     "tsconfig-paths": "3.8.0",
     "tslint": "5.16.0",
-    "typeorm": "^0.2.19",
+    "typeorm": "^0.2.20",
     "typescript": "3.4.3",
     "webpack": "^4.41.0",
     "webpack-cli": "^3.3.9"

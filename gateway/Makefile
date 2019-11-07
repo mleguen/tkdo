@@ -1,10 +1,20 @@
-.PHONY: clean diff force
+.PHONY: build clean diff force install uninstall
+
+build:
 
 CONFIG = httpd.conf
 CONFIG_ORIG = $(addsuffix .orig,$(CONFIG))
 CONFIG_PATCH = $(addsuffix .patch,$(CONFIG))
+IMAGE=tkdo-gateway
+clean:
+	for f in $(CONFIG_ORIG) $(CONFIG_PATCH); do [ ! -f $$f ] || rm $$f; done
 
 diff: $(CONFIG_PATCH)
+
+install: .docker-build
+
+uninstall:
+	[ ! -f .docker-build ] || (rm .docker-build && docker rmi $(IMAGE))
 
 $(CONFIG_PATCH) : %.patch: %.orig
 	diff $*.orig $* > $@ || true
@@ -12,5 +22,6 @@ $(CONFIG_PATCH) : %.patch: %.orig
 $(CONFIG_ORIG): %.orig: force
 	docker run --rm --entrypoint cat httpd:alpine /usr/local/apache2/conf/$* > $@
 
-clean:
-	rm $(CONFIG_ORIG) $(CONFIG_PATCH)
+.docker-build: Dockerfile .dockerignore $(CONFIG)
+	docker build -t $(IMAGE) .
+	touch .docker-build

@@ -1,9 +1,5 @@
-REPERTOIRES = todo done
+.PHONY: build
 
-build: $(REPERTOIRES)
-
-$(REPERTOIRES):
-	make -C $@
-
-# Cibles qui ne doivent jamais être considérées comme à jour
-.PHONY: $(REPERTOIRES)
+BUILD_DIR = todo done
+build:
+	for d in $(BUILD_DIR); do $(MAKE) -C $$d $@; done

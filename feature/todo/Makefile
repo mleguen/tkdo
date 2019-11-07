@@ -1,3 +1,5 @@
+.PHONY: build add-new-features remove-missing-features
+
 build: add-new-features remove-missing-features
 
 add-new-features:

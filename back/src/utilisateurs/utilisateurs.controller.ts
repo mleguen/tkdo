@@ -1,5 +1,6 @@
 import { Controller, UseGuards, Get, Param } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { InjectRepository } from '@nestjs/typeorm';
 import { pick } from 'lodash';
 
 import { PortHabilitations } from '../../../domaine';
@@ -16,7 +17,13 @@ import { TirageResumeDTO } from './dto/tirage-resume.dto';
 export class UtilisateursController {
 
   constructor(
-    private tirageRepository: TirageRepository
+    // TODO: trouver une solution au problème d'injection venant du fait que @nestjs/typeorm et TirageRepository
+    // n'utilisent pas la même classe Repository :
+    // - l'une du module typeorm dans back/node_modules
+    // - l'autre du module typeorm dans schema/node_modules
+    // du coup, pour @nestjs/typeorm, TirageRepository n'est pas une instance de Repository
+    // Cela remet complètement en question l'utilisation d'un "répertoire partagé" au lieu d'un "module partagé".
+    @InjectRepository(TirageRepository) private readonly tirageRepository: TirageRepository
   ) {}
 
   @Get('/:idUtilisateur/tirages')

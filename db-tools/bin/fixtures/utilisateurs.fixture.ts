@@ -1,5 +1,5 @@
 import { Repository } from "typeorm";
-import { Utilisateur } from "../lib/utilisateurs";
+import { Utilisateur } from "../../../schema/lib/utilisateurs";
 
 export class UtilisateursFixture {
   alice: Utilisateur;

@@ -2,10 +2,11 @@ import { Module, MiddlewareConsumer, } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { readFileSync } from 'fs';
+import { ConnectionOptions } from 'typeorm';
 
-import { PortHabilitations } from '../../domaine';
-import { Utilisateur } from '../../schema';
+import { Utilisateur, connectionOptions } from '../../schema';
 import { AuthModule } from './auth/auth.module';
+import { DomaineModule } from './domaine/domaine.module';
 import { AppController } from './app.controller';
 import { AppDevController } from './app.dev.controller';
 import { AppService } from './app.service';
@@ -14,22 +15,16 @@ import { RouteLoggerMiddleware } from './route-logger.middleware';
 @Module({
   imports: [
     JwtModule.register({ privateKey: readFileSync(process.env.TKDO_JWT_PRIVATE_KEY_FILE).toString() }),
+    TypeOrmModule.forRoot(connectionOptions),
     ...process.env.NODE_ENV === 'production' ? [AuthModule] : [],
-    TypeOrmModule.forRoot(Object.assign(
-      JSON.parse(process.env.TKDO_DATABASE),
-      { entities: [Utilisateur] }
-    )),
-    TypeOrmModule.forFeature([Utilisateur])
+    DomaineModule,
+    TypeOrmModule.forFeature([Utilisateur]),
   ],
   controllers: [
     process.env.NODE_ENV === 'production' ? AppController : AppDevController
   ],
   providers: [
-    AppService,
-    {
-      provide: PortHabilitations,
-      useFactory: () => new PortHabilitations()
-    }
+    AppService
   ]
 })
 export class AppModule {
