@@ -3,7 +3,10 @@ WORKDIR /usr/local/tkdo
 
 ENV NODE_ENV=production
 
-RUN npm install --global typeorm
+RUN npm install --global mysql typeorm
 
-# Copie le service
+COPY package*.json ./
+RUN npm install
+
 COPY dist ./
+WORKDIR db-tools

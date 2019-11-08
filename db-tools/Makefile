@@ -6,14 +6,15 @@ clean:
 	[ ! -d dist ] || rm -rf dist
 	[ ! -d node_modules ] || rm -rf node_modules
 
-IMAGE=tkdo-db-tools
+IMAGE=tkdo/db-tools
 install: .docker-build
 
 uninstall:
 	[ ! -f .docker-build ] || (rm .docker-build && docker rmi $(IMAGE))
 
-dist: $(shell find bin -type f \! -name "*.spec.ts") ormconfig.ts node_modules tsconfig.json webpack.config.js
+dist: $(shell find ../shared/domaine/lib ../shared/schema/lib bin migrations -type f \! -name "*.spec.ts") ormconfig.ts node_modules tsconfig.json
 	npm run build
+	touch dist
 
 node_modules: package*.json
 	npm install

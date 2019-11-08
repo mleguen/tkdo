@@ -4,7 +4,7 @@ BUILD_DIR = auth-sp back db-tools feature front secrets
 build:
 	for d in $(BUILD_DIR); do $(MAKE) -C $$d $@; done
 
-CLEAN_DIR = auth-idp auth-sp back domaine front gateway schema secrets
+CLEAN_DIR = auth-idp auth-sp back front gateway schema secrets shared
 clean:
 	for d in $(CLEAN_DIR); do $(MAKE) -C $$d $@; done
 

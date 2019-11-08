@@ -1,7 +1,7 @@
 import * as moment from "moment";
 import { Repository } from "typeorm";
 
-import { Tirage } from "../../../schema/lib/tirages";
+import { Tirage } from "../../../shared/schema";
 import { UtilisateursFixture } from "./utilisateurs.fixture";
 
 export class TiragesFixture {

@@ -3,10 +3,8 @@
     "baseUrl": "./",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "module": "commonjs",
     "moduleResolution": "node",
-    "outDir": "./dist",
+    "sourceMap": true,
     "target": "es2017"
-  },
-  "exclude": ["node_modules", "dist"]
+  }
 }
