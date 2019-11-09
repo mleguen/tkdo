@@ -2,9 +2,8 @@ import { Module, MiddlewareConsumer, } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { readFileSync } from 'fs';
-import { ConnectionOptions } from 'typeorm';
 
-import { Utilisateur, connectionOptions } from '../../schema';
+import { Utilisateur, connectionOptions } from '../../shared/schema';
 import { AuthModule } from './auth/auth.module';
 import { DomaineModule } from './domaine/domaine.module';
 import { AppController } from './app.controller';

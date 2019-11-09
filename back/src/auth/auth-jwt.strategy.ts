@@ -4,7 +4,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { readFileSync } from 'fs';
 import { Strategy, StrategyOptions, ExtractJwt } from 'passport-jwt';
 
-import { ISSPProfile } from '../../../domaine';
+import { ISSPProfile } from '../../../shared/domaine';
 
 @Injectable()
 export class AuthJwtStrategy extends PassportStrategy(Strategy) {

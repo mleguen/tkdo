@@ -2,7 +2,7 @@
 import { Injectable, CanActivate, ExecutionContext, Logger } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
-import { PortHabilitations, ISSPProfile } from '../../../domaine';
+import { PortHabilitations, ISSPProfile } from '../../../shared/domaine';
 
 @Injectable()
 export class DroitsGuard implements CanActivate {

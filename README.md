@@ -14,7 +14,7 @@ Tirages au sort de cadeaux.
 $ make start
 ```
 
-Après la construction des images et le démarrage des conteneurs Docker, votre navigateur s'ouvre automatiquement sur [la page d'accueil](https://localhost).
+Après la construction des images et le démarrage des conteneurs Docker, vous pouvez [accéder à l'application](https://localhost).
 
 > Note : pour arrêter ensuite proprement les conteneurs, faire :
 > - soit un `CTRL+C` depuis le terminal où s'exécute le `make start`

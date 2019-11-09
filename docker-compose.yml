@@ -1,22 +1,21 @@
 version: '3.7'
+
 services:
 
   database:
     image: mysql
     command: --default-authentication-plugin=mysql_native_password
     environment:
-      MYSQL_DATABASE_FILE: /run/secrets/mysql_database
-      MYSQL_USER_FILE: /run/secrets/mysql_user
-      MYSQL_PASSWORD_FILE: /run/secrets/mysql_password
-      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/mysql_root_password
+      MYSQL_DATABASE: tkdo
+      MYSQL_USER: tkdo
+      MYSQL_PASSWORD_FILE: /run/secrets/mysql.pass
+      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/mysql_root.pass
     networks:
       - back
       - dbtools
     secrets:
-      - mysql_database
-      - mysql_password
-      - mysql_root_password
-      - mysql_user
+      - mysql.pass
+      - mysql_root.pass
     volumes:
       - database-data:/var/lib/mysql
 
@@ -27,16 +26,33 @@ services:
     environment:
       TKDO_CONNECTION_TYPE: mysql
       TKDO_CONNECTION_HOST: database
-      TKDO_CONNECTION_USERNAME_FILE: /run/secrets/mysql_user
-      TKDO_CONNECTION_PASSWORD_FILE: /run/secrets/mysql_password
-      TKDO_CONNECTION_DATABASE_FILE: /run/secrets/mysql_database
-      TKDO_JWT_PUBLIC_KEY_FILE: /run/secrets/auth-sp.key.pub
+      TKDO_CONNECTION_USERNAME: tkdo
+      TKDO_CONNECTION_PASSWORD_FILE: /run/secrets/mysql.pass
+      TKDO_CONNECTION_DATABASE: tkdo
     networks:
       - dbtools
     secrets:
-      - mysql_database
-      - mysql_password
-      - mysql_user
+      - mysql.pass
+
+  # TODO: comprendre pourquoi @nestjs/passport (la version mleguen) ne s'installe que partiellement dans l'image
+  # (il manque le répertoire dist ?)
+  back:
+    depends_on:
+      - database
+    image: tkdo/back
+    environment:
+      TKDO_CONNECTION_TYPE: mysql
+      TKDO_CONNECTION_HOST: database
+      TKDO_CONNECTION_USERNAME: tkdo
+      TKDO_CONNECTION_PASSWORD_FILE: /run/secrets/mysql.pass
+      TKDO_CONNECTION_DATABASE: tkdo
+      TKDO_JWT_PUBLIC_KEY_FILE: /run/secrets/auth-sp.key.pub
+    networks:
+      - back
+      - front
+    secrets:
+      - auth-sp.key.pub
+      - mysql.pass
 
   tkdo-auth-sp:
     depends_on:
@@ -72,31 +88,17 @@ services:
       - source: cert.pem
         target: /var/simplesamlphp/cert/server.pem
 
-  tkdo-back:
-    depends_on:
-      - database
-    environment:
-      TKDO_TYPEORM_CONNECTION: mysql
-      TKDO_TYPEORM_DATABASE: tkdo
-      TKDO_TYPEORM_HOST: database
-      TKDO_TYPEORM_USERNAME: tkdo
-      TKDO_TYPEORM_PASSWORD: qrCtmOHjhDQakmk7
-      TKDO_JWT_PUBLIC_KEY_FILE: /run/secrets/auth-sp.key.pub
-    image: tkdo-back
-    secrets:
-      - auth-sp.key.pub
-
   tkdo-front:
     depends_on:
       - tkdo-auth-sp
-      - tkdo-back
+      - back
     image: tkdo-front
 
   tkdo-gateway:
     depends_on:
       - tkdo-auth-idp
       - tkdo-auth-sp
-      - tkdo-back
+      - back
       - tkdo-front
     image: tkdo-gateway
     ports:
@@ -123,10 +125,10 @@ secrets:
     file: secrets/cert.pem
   mysql_database:
     file: secrets/mysql_database
-  mysql_password:
-    file: secrets/mysql_password
-  mysql_root_password:
-    file: secrets/mysql_root_password
+  mysql.pass:
+    file: secrets/mysql.pass
+  mysql_root.pass:
+    file: secrets/mysql_root.pass
   mysql_user:
     file: secrets/mysql_user
 

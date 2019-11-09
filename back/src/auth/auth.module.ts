@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { PassportModule } from '@nestjs/passport';
-import { PortHabilitations } from '../../../domaine';
+import { PortHabilitations } from '../../../shared/domaine';
 import { AuthJwtStrategy } from './auth-jwt.strategy';
 import { DroitsGuard } from './droits.guard';
 import { IdUtilisateurGuard } from './id-utilisateur.guard';

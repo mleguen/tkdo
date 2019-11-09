@@ -2,7 +2,7 @@
 import { Injectable, CanActivate, ExecutionContext, Logger } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
-import { ISSPProfile } from '../../../domaine';
+import { ISSPProfile } from '../../../shared/domaine';
 
 @Injectable()
 export class IdUtilisateurGuard implements CanActivate {

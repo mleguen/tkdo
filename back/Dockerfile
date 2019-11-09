@@ -1,10 +1,17 @@
 FROM node:10-alpine
-WORKDIR /usr/local/tkdo
+
+RUN apk add --no-cache git
 
 ENV NODE_ENV=production
 
-# Copie le service
-COPY dist ./
+USER node
+RUN mkdir /home/node/tkdo
+WORKDIR /home/node/tkdo
 
-# Demarre le serveur
-CMD ["node", "main.js"]:
+COPY --chown=node package*.json ./
+RUN npm install
+
+COPY --chown=node dist ./
+WORKDIR back
+
+CMD ["node", "src/main.js"]:

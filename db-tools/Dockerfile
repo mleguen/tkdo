@@ -5,8 +5,12 @@ ENV NODE_ENV=production
 
 RUN npm install --global mysql typeorm
 
-COPY package*.json ./
+USER node
+RUN mkdir /home/node/tkdo
+WORKDIR /home/node/tkdo
+
+COPY --chown=node package*.json ./
 RUN npm install
 
-COPY dist ./
+COPY --chown=node dist ./
 WORKDIR db-tools

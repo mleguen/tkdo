@@ -3,8 +3,8 @@ import { AuthGuard } from '@nestjs/passport';
 import { InjectRepository } from '@nestjs/typeorm';
 import { pick } from 'lodash';
 
-import { PortHabilitations } from '../../../domaine';
-import { TirageRepository } from '../../../schema';
+import { PortHabilitations } from '../../../shared/domaine';
+import { TirageRepository } from '../../../shared/schema';
 import { Droit } from '../auth/droit.decorator';
 import { DroitsGuard } from '../auth/droits.guard';
 import { IdUtilisateurGuard } from '../auth/id-utilisateur.guard';

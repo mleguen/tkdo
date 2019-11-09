@@ -1,6 +1,6 @@
 .PHONY: build clean install uninstall
 
-build: .docker-build
+build: dist
 
 clean:
 	[ ! -d dist ] || rm -rf dist
