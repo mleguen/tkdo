@@ -1,11 +1,10 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Title } from '@angular/platform-browser';
+import { filter, map } from 'rxjs/operators';
 
-import { PortHabilitations, IUtilisateur } from '../../../../domaine';
+import { PortHabilitations } from '../../../../shared/domaine';
 import { environment } from '../../environments/environment';
 import { AuthService } from '../modules/auth/services/auth.service';
-import { Observable } from 'rxjs';
-import { filter, map } from 'rxjs/operators';
 
 const NOMS_ROLES = {
   [PortHabilitations.ROLE_PARTICIPANT]: 'participant(e)'

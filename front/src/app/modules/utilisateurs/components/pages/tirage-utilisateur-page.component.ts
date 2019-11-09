@@ -2,11 +2,11 @@ import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
-import { map, switchMap, filter } from 'rxjs/operators';
+import { map, switchMap } from 'rxjs/operators';
+import { IUtilisateur } from '../../../../../../../shared/domaine';
 import { TirageDTO } from '../../../../../../../back/src/utilisateurs/dto/tirage.dto';
 import { environment } from '../../../../../environments/environment';
 import { TiragesService } from '../../../tirages/services/tirages.service';
-import { IUtilisateur } from '../../../../../../../domaine';
 
 @Component({
   selector: 'app-tirage-utilisateur-page',

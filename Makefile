@@ -11,11 +11,11 @@ clean: uninstall
 INSTALL_DIR = auth-idp auth-sp back db-tools front gateway
 install: build secrets
 	for d in $(INSTALL_DIR); do $(MAKE) -C $$d $@; done
-	docker-compose run db-tools typeorm migration:run
+	docker-compose run service-db-tools typeorm migration:run
 	docker-compose down
 
 start: install
-	docker-compose up gateway
+	docker-compose up
 
 stop:
 	docker-compose down

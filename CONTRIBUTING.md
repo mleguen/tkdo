@@ -7,7 +7,7 @@
 Depuis la racine du projet :
 
 ```bash
-$ docker-compose run -v $PWD/db-tools/migrations:/usr/local/tkdo/db-tools/migrations db-tools typeorm migration:generate -n feature-5-consultation-tirages
+$ docker-compose run -v $PWD/db-tools/migrations:/home/node/tkdo/db-tools/migrations service-db-tools typeorm migration:generate -n feature-5-consultation-tirages
 ```
 
 où `feature-5-consultation-tirages` est le nom de la nouvelle migration, qui sera créée dans le répertoires db-tools/migrations.
@@ -15,5 +15,5 @@ où `feature-5-consultation-tirages` est le nom de la nouvelle migration, qui se
 ### Appliquer les migrations
 
 ```bash
-$ docker-compose run db-tools typeorm migration:run
+$ docker-compose run service-db-tools typeorm migration:run
 ```

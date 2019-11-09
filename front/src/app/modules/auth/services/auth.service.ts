@@ -4,7 +4,7 @@ import { JwtHelperService } from '@auth0/angular-jwt';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
-import { PortHabilitations, ISSPProfile, IUtilisateur } from '../../../../../../domaine';
+import { PortHabilitations, ISSPProfile, IUtilisateur } from '../../../../../../shared/domaine';
 import { environment } from '../../../../environments/environment';
 
 @Injectable()

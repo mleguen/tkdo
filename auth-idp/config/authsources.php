@@ -76,10 +76,12 @@ $config = [
         //'remember.username.checked' => false,
 
         'alice:alice' => [
+            'login' => 'alice@domaine.tld',
             'nom' => 'Alice',
             'roles' => ['TKDO_PARTICIPANT', 'AUTRE_APPLI_ADMIN'],
         ],
         'owen:owen' => [
+            'login' => 'owen@domaine.tld',
             'nom' => 'Owen',
             'roles' => [],
         ],

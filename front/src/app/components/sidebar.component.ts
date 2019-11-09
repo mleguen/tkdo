@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 
-import { PortHabilitations } from '../../../../domaine';
+import { PortHabilitations } from '../../../../shared/domaine';
 import { AuthService } from '../modules/auth/services/auth.service';
 
 @Component({

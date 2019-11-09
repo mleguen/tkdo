@@ -2,11 +2,11 @@
 
 build: dist
 
-IMAGE=tkdo-front
-clean:
+clean: uninstall
 	[ ! -d dist ] || rm -rf dist
 	[ ! -d node_modules ] || rm -rf node_modules
 
+IMAGE=tkdo/front
 install: .docker-build
 
 uninstall:

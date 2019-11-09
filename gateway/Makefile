@@ -5,12 +5,12 @@ build:
 CONFIG = httpd.conf
 CONFIG_ORIG = $(addsuffix .orig,$(CONFIG))
 CONFIG_PATCH = $(addsuffix .patch,$(CONFIG))
-IMAGE=tkdo-gateway
-clean:
+clean: uninstall
 	for f in $(CONFIG_ORIG) $(CONFIG_PATCH); do [ ! -f $$f ] || rm $$f; done
 
 diff: $(CONFIG_PATCH)
 
+IMAGE=tkdo/gateway
 install: .docker-build
 
 uninstall:

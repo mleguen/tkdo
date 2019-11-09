@@ -2,7 +2,7 @@ version: '3.7'
 
 services:
 
-  database:
+  service-database:
     image: mysql
     command: --default-authentication-plugin=mysql_native_password
     environment:
@@ -19,13 +19,13 @@ services:
     volumes:
       - database-data:/var/lib/mysql
 
-  db-tools:
+  service-db-tools:
     depends_on:
-      - database
+      - service-database
     image: tkdo/db-tools
     environment:
       TKDO_CONNECTION_TYPE: mysql
-      TKDO_CONNECTION_HOST: database
+      TKDO_CONNECTION_HOST: service-database
       TKDO_CONNECTION_USERNAME: tkdo
       TKDO_CONNECTION_PASSWORD_FILE: /run/secrets/mysql.pass
       TKDO_CONNECTION_DATABASE: tkdo
@@ -34,7 +34,7 @@ services:
     secrets:
       - mysql.pass
 
-  auth-idp:
+  service-auth-idp:
     image: tkdo/auth-idp
     networks:
       - front
@@ -46,14 +46,14 @@ services:
       - source: cert.pem
         target: /var/simplesamlphp/cert/server.pem
 
-  auth-sp:
+  service-auth-sp:
     image: tkdo/auth-sp
     depends_on:
-      - auth-idp
-      - database
+      - service-auth-idp
+      - service-database
     environment:
       TKDO_CONNECTION_TYPE: mysql
-      TKDO_CONNECTION_HOST: database
+      TKDO_CONNECTION_HOST: service-database
       TKDO_CONNECTION_USERNAME: tkdo
       TKDO_CONNECTION_PASSWORD_FILE: /run/secrets/mysql.pass
       TKDO_CONNECTION_DATABASE: tkdo
@@ -74,14 +74,14 @@ services:
       - cert.pem
       - mysql.pass
 
-  back:
+  service-back:
     depends_on:
-      - auth-sp
-      - database
+      - service-auth-sp
+      - service-database
     image: tkdo/back
     environment:
       TKDO_CONNECTION_TYPE: mysql
-      TKDO_CONNECTION_HOST: database
+      TKDO_CONNECTION_HOST: service-database
       TKDO_CONNECTION_USERNAME: tkdo
       TKDO_CONNECTION_PASSWORD_FILE: /run/secrets/mysql.pass
       TKDO_CONNECTION_DATABASE: tkdo
@@ -93,20 +93,22 @@ services:
       - auth-sp.key.pub
       - mysql.pass
 
-  tkdo-front:
+  service-front:
     depends_on:
-      - auth-idp
-      - auth-sp
-      - back
-    image: tkdo-front
+      - service-back
+    image: tkdo/front
+    networks:
+      - front
 
-  tkdo-gateway:
+  service-gateway:
     depends_on:
-      - auth-idp
-      - auth-sp
-      - back
-      - tkdo-front
-    image: tkdo-gateway
+      - service-auth-idp
+      - service-auth-sp
+      - service-back
+      - service-front
+    image: tkdo/gateway
+    networks:
+      - front
     ports:
       - "443:443"
     secrets:
