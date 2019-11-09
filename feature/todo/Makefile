@@ -2,8 +2,9 @@
 
 build: add-new-features remove-missing-features
 
+ROADMAP=../../ROADMAP.md
 add-new-features:
-	for f in *.feature; do grep -q "\./$$f" README.md || echo "- [$$f](./$$f)" >> README.md; done
+	for f in *.feature; do grep -q "/$$f" $(ROADMAP) || echo "- [$$f](./feature/todo/$$f)" >> $(ROADMAP); done
 
 remove-missing-features:
-	for f in $$(grep -o "\./[^/]*\.feature" README.md); do [ -f "$$f" ] || (grep -v "$$f" README.md > README.tmp.md && mv -f README.tmp.md README.md); done
+	for f in $$(grep -o "/[^/]*\.feature" $(ROADMAP)); do [ -f ".$$f" ] || (grep -v "$$f" $(ROADMAP) > ROADMAP.tmp.md && mv -f ROADMAP.tmp.md $(ROADMAP)); done

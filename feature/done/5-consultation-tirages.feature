@@ -9,12 +9,16 @@ Fonctionnalité: consultation des tirages
 
   Scénario: Alice consulte les tirages auxquels elle participe
   
-    Soit des participants Alice, Bob, Charlie, David et Eve
+    Soit une participante Alice, connectée
+    Et des participants Bob, Charlie, David et Eve
     Et un tirage "Noël" pour le 25/12 à venir auxquels ils participent tous
     Et un tirage "Réveillon" pour le 31/12 à venir auxquels ils participent tous
 
-    Quand Alice arrive sur la page d'accueil
-    Alors cette page est intitulée "Mes tirages"
+    Quand Alice va sur la page d'accueil
+    Alors elle voit un lien "Mes tirages", dans la section "participant(e)" de la barre de côté
+
+    Quand elle clique sur le lien "Mes tirages"
+    Alors elle arrive sur une page intitulée "Mes tirages"
     Et elle voit le tirage "Réveillon" pour le 31/12 à venir
     Et elle voit le tirage "Noël" pour le 25/12 à venir
 
