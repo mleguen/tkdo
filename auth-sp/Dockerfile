@@ -1,11 +1,17 @@
 FROM node:10-alpine
-WORKDIR /usr/local/tkdo
+
+RUN apk add --no-cache git
 
 ENV NODE_ENV=production
 
-# Copie les templates nécessaires au module xml-encryption
-COPY node_modules/xml-encryption/lib/templates /templates
+USER node
+RUN mkdir /home/node/tkdo
+WORKDIR /home/node/tkdo
 
-# Copie et démarre le service
-COPY dist ./
-CMD ["node", "main.js"]:
+COPY --chown=node package*.json ./
+RUN npm install
+
+COPY --chown=node dist ./
+WORKDIR auth-sp
+
+CMD ["node", "src/main.js"]:

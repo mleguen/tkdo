@@ -4,8 +4,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Response } from 'express';
 import { Repository } from 'typeorm';
 
-import { ISSPProfile, PortHabilitations, IIDPProfile } from '../../domaine';
-import { Utilisateur } from '../../schema';
+import { ISSPProfile, PortHabilitations, IIDPProfile } from '../../shared/domaine';
+import { Utilisateur } from '../../shared/schema';
 
 @Injectable()
 export class AppService {

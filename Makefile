@@ -5,7 +5,7 @@ build:
 	for d in $(BUILD_DIR); do $(MAKE) -C $$d $@; done
 
 CLEAN_DIR = auth-idp auth-sp back front gateway schema secrets shared
-clean:
+clean: uninstall
 	for d in $(CLEAN_DIR); do $(MAKE) -C $$d $@; done
 
 INSTALL_DIR = auth-idp auth-sp back db-tools front gateway

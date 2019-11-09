@@ -1,11 +1,11 @@
 {
   "name": "auth-sp",
   "version": "0.0.1",
-  "description": "Service Provider TKDO",
+  "description": "SAML Service Provider pour TKDO",
   "author": "Mael Le Guen",
   "license": "MIT",
   "scripts": {
-    "build": "rimraf dist && webpack",
+    "build": "rimraf dist && tsc -p tsconfig.build.json",
     "format": "prettier --write \"src/**/*.ts\"",
     "start": "ts-node -r tsconfig-paths/register src/main.ts",
     "start:dev": "tsc-watch -p tsconfig.build.json --onSuccess \"node dist/auth-sp/src/main.js\"",
@@ -18,41 +18,40 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
-  "devDependencies": {
+  "dependencies": {
     "@nestjs/common": "^6.0.0",
     "@nestjs/core": "^6.0.0",
     "@nestjs/jwt": "^6.1.1",
     "@nestjs/passport": "mleguen/passport#standalone",
     "@nestjs/platform-express": "^6.0.0",
-    "@nestjs/testing": "^6.0.0",
     "@nestjs/typeorm": "^6.2.0",
+    "dotenv": "^8.1.0",
+    "mysql": "^2.17.1",
+    "passport": "^0.4.0",
+    "passport-saml": "^1.2.0",
+    "rxjs": "^6.3.3",
+    "typeorm": "^0.2.20"
+  },
+  "devDependencies": {
+    "@nestjs/testing": "^6.0.0",
     "@types/dotenv": "^6.1.1",
     "@types/express": "4.16.1",
     "@types/jest": "24.0.11",
     "@types/node": "11.13.4",
     "@types/passport-saml": "^1.1.0",
     "@types/supertest": "2.0.7",
-    "dotenv": "^8.1.0",
     "jest": "24.7.1",
-    "mysql": "^2.17.1",
-    "passport": "^0.4.0",
-    "passport-saml": "^1.2.0",
     "prettier": "1.17.0",
     "reflect-metadata": "^0.1.12",
     "rimraf": "^2.6.2",
-    "rxjs": "^6.3.3",
     "sqlite3": "^4.1.0",
     "supertest": "4.0.2",
     "ts-jest": "24.0.2",
-    "ts-loader": "^6.2.0",
     "ts-node": "8.1.0",
     "tsc-watch": "2.2.1",
     "tsconfig-paths": "3.8.0",
     "tslint": "5.16.0",
-    "typeorm": "^0.2.20",
-    "typescript": "3.4.3",
-    "webpack": "^4.41.0",
-    "webpack-cli": "^3.3.9"
+    "typescript": "3.4.3"
   },
   "jest": {
     "moduleFileExtensions": [

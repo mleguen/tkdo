@@ -3,7 +3,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { readFileSync } from 'fs';
 import { Strategy } from 'passport-saml';
-import { PortHabilitations, IIDPProfile } from '../../../domaine';
+import { PortHabilitations, IIDPProfile } from '../../../shared/domaine';
 
 @Injectable()
 export class AuthSamlStrategy extends PassportStrategy(Strategy) {

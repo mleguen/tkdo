@@ -1,7 +1,7 @@
 import { Controller, Get, Res, Query } from '@nestjs/common';
 import { Response } from 'express';
 import { AppService } from './app.service';
-import { IIDPProfile } from '../../domaine';
+import { IIDPProfile } from '../../shared/domaine';
 
 @Controller()
 export class AppDevController {

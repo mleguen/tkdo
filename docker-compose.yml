@@ -34,10 +34,49 @@ services:
     secrets:
       - mysql.pass
 
-  # TODO: comprendre pourquoi @nestjs/passport (la version mleguen) ne s'installe que partiellement dans l'image
-  # (il manque le répertoire dist ?)
+  auth-idp:
+    image: tkdo/auth-idp
+    networks:
+      - front
+    secrets:
+      - source: cert.crt
+        target: /var/simplesamlphp/cert/auth-sp.crt
+      - source: cert.crt
+        target: /var/simplesamlphp/cert/server.crt
+      - source: cert.pem
+        target: /var/simplesamlphp/cert/server.pem
+
+  auth-sp:
+    image: tkdo/auth-sp
+    depends_on:
+      - auth-idp
+      - database
+    environment:
+      TKDO_CONNECTION_TYPE: mysql
+      TKDO_CONNECTION_HOST: database
+      TKDO_CONNECTION_USERNAME: tkdo
+      TKDO_CONNECTION_PASSWORD_FILE: /run/secrets/mysql.pass
+      TKDO_CONNECTION_DATABASE: tkdo
+      TKDO_JWT_PRIVATE_KEY_FILE: /run/secrets/auth-sp.key
+      TKDO_PORT: 3000
+      TKDO_SAML_CALLBACK_URL: https://localhost/auth-sp/acs
+      TKDO_SAML_ENTRY_POINT: https://localhost/auth-idp/saml2/idp/SSOService.php
+      TKDO_SAML_IDP_CERT_FILE: /run/secrets/cert.crt
+      TKDO_SAML_ISSUER: https://localhost/auth-sp
+      TKDO_SAML_SP_CERT_FILE: /run/secrets/cert.crt
+      TKDO_SAML_SP_PRIVATE_KEY_FILE: /run/secrets/cert.pem
+    networks:
+      - back
+      - front
+    secrets:
+      - auth-sp.key
+      - cert.crt
+      - cert.pem
+      - mysql.pass
+
   back:
     depends_on:
+      - auth-sp
       - database
     image: tkdo/back
     environment:
@@ -54,50 +93,17 @@ services:
       - auth-sp.key.pub
       - mysql.pass
 
-  tkdo-auth-sp:
-    depends_on:
-      - tkdo-auth-idp
-      - database
-    environment:
-      TKDO_JWT_PRIVATE_KEY_FILE: /run/secrets/auth-sp.key
-      TKDO_SAML_CALLBACK_URL: https://localhost/auth-sp/acs
-      TKDO_SAML_ENTRY_POINT: https://localhost/auth-idp/saml2/idp/SSOService.php
-      TKDO_SAML_IDP_CERT_FILE: /run/secrets/cert.crt
-      TKDO_SAML_ISSUER: https://localhost/auth-sp
-      TKDO_SAML_SP_CERT_FILE: /run/secrets/cert.crt
-      TKDO_SAML_SP_PRIVATE_KEY_FILE: /run/secrets/cert.pem
-      TKDO_TYPEORM_CONNECTION: mysql
-      TKDO_TYPEORM_DATABASE: tkdo
-      TKDO_TYPEORM_HOST: database
-      TKDO_TYPEORM_USERNAME: tkdo
-      TKDO_TYPEORM_PASSWORD: qrCtmOHjhDQakmk7
-      TKDO_PORT: 3000
-    image: tkdo-auth-sp
-    secrets:
-      - auth-sp.key
-      - cert.crt
-      - cert.pem
-
-  tkdo-auth-idp:
-    image: tkdo-auth-idp
-    secrets:
-      - source: cert.crt
-        target: /var/simplesamlphp/cert/auth-sp.crt
-      - source: cert.crt
-        target: /var/simplesamlphp/cert/server.crt
-      - source: cert.pem
-        target: /var/simplesamlphp/cert/server.pem
-
   tkdo-front:
     depends_on:
-      - tkdo-auth-sp
+      - auth-idp
+      - auth-sp
       - back
     image: tkdo-front
 
   tkdo-gateway:
     depends_on:
-      - tkdo-auth-idp
-      - tkdo-auth-sp
+      - auth-idp
+      - auth-sp
       - back
       - tkdo-front
     image: tkdo-gateway

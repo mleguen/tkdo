@@ -1,7 +1,7 @@
 import { Controller, Get, Req, Res, UseGuards, Post, Body } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { AuthGuard } from '@nestjs/passport';
-import { IIDPProfile } from '../../domaine';
+import { IIDPProfile } from '../../shared/domaine';
 import { AuthSamlStrategy } from './auth/auth-saml.strategy';
 import { AppService } from './app.service';
 

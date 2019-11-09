@@ -2,7 +2,7 @@
 
 build: dist
 
-clean:
+clean: uninstall
 	[ ! -d dist ] || rm -rf dist
 	[ ! -d node_modules ] || rm -rf node_modules
 

@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 
-import { PortHabilitations } from '../../../domaine';
+import { PortHabilitations } from '../../../shared/domaine';
 
 @Module({
   providers: [
