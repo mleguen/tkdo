@@ -17,3 +17,9 @@ où `feature-5-consultation-tirages` est le nom de la nouvelle migration, qui se
 ```bash
 $ docker-compose run service-db-tools typeorm migration:run
 ```
+
+### Installer les fixtures
+
+```bash
+$ docker-compose run service-db-tools node bin/fixtures
+```

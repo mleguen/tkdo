@@ -16,11 +16,11 @@ async function main() {
     await utilisateurs.sync();
     await tirages.sync();
     
-    process.exitCode = 0;
+    process.exit(0);
   }
   catch(err) {
     console.error(err);
-    process.exitCode = 1;
+    process.exit(1);
   }
 }
 
