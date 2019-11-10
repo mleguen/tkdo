@@ -1,34 +1,45 @@
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { JwtModule } from "@auth0/angular-jwt";
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
-import { environment } from 'src/environments/environment';
-import { AccueilComponent } from './accueil/accueil.component';
+import { AccueilPageComponent } from './components/pages/accueil-page.component';
+import { DeconnexionPageComponent } from './components/pages/deconnexion-page.component';
+import { AppComponent } from './components/app.component';
+import { FooterComponent } from './components/footer.component';
+import { NavbarComponent } from './components/navbar.component';
+import { SidebarComponent } from './components/sidebar.component';
+import { SidebarItemComponent } from './components/sidebar-item.component';
+import { AuthInterceptor } from './interceptors/auth.interceptor';
+import { AuthModule } from './modules/auth/auth.module';
+import { IconesModule } from './modules/icones/icones.module';
+import { SharedModule } from './modules/shared/shared.module';
+import { UtilisateursModule } from './modules/utilisateurs/utilisateurs.module';
 import { AppRoutingModule } from './app-routing.module';
-import { AppComponent } from './app.component';
-
-export function jwtTokenGetter(): string {
-  return localStorage.getItem(environment.authTokenLocalStorageKey);
-}
 
 @NgModule({
   declarations: [
     AppComponent,
-    AccueilComponent
+    NavbarComponent,
+    SidebarComponent,
+    FooterComponent,
+    SidebarItemComponent,
+    AccueilPageComponent,
+    DeconnexionPageComponent
   ],
   imports: [
     NgbModule,
     BrowserModule,
+    HttpClientModule,
     AppRoutingModule,
-    JwtModule.forRoot({
-      config: {
-        tokenGetter: jwtTokenGetter,
-        whitelistedDomains: [environment.backUrl]
-      }
-    })
+    AuthModule,
+    IconesModule,
+    SharedModule,
+    UtilisateursModule
   ],
-  providers: [],
+  providers: [
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

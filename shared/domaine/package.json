@@ -1,0 +1,16 @@
+{
+  "name": "tkdo-domaine",
+  "version": "1.0.0",
+  "description": "domaine TKDO",
+  "main": "index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Mael Le Guen",
+  "license": "ISC",
+  "devDependencies": {
+    "tslib": "^1.10.0",
+    "typescript": "^3.6.3"
+  },
+  "repository": "https://github.com/mleguen/tkdo"
+}

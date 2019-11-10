@@ -1,0 +1,16 @@
+{
+  "name": "tkdo-schema",
+  "version": "1.0.0",
+  "description": "schéma de la base de données TKDO",
+  "main": "index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Mael Le Guen",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^12.12.6",
+    "typeorm": "^0.2.20"
+  },
+  "repository": "https://github.com/mleguen/tkdo"
+}

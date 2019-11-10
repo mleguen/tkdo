@@ -1,0 +1,19 @@
+/* Inspiré de : https://getbootstrap.com/docs/4.1/examples/dashboard/ */
+
+body {
+  font-size: .875rem;
+}
+
+.feather {
+  width: 16px;
+  height: 16px;
+  vertical-align: text-bottom;
+}
+
+/*
+ * Content
+ */
+
+[role="main"] {
+  padding-top: 48px; /* Space for fixed navbar */
+}

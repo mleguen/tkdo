@@ -1,0 +1,22 @@
+<nav class="col-md-2 d-none d-md-block bg-light sidebar">
+  <div class="sidebar-sticky">
+    <ul class="nav flex-column">
+      <app-sidebar-item icone="home" titre="Accueil" routerLink="/" ></app-sidebar-item>
+    </ul>
+    
+    <ng-container *ngIf="utilisateur$|async as utilisateur">
+      <ng-container *ngIf="hasDroitVoirMenusParticipant$|async">
+        <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+          <span>Participant(e)</span>
+          <a class="d-flex align-items-center text-muted" href="#">
+            <span data-feather="plus-circle"></span>
+          </a>
+        </h6>
+        <ul class="nav flex-column mb-2">
+          <app-sidebar-item icone="gift" titre="Mes tirages" routerLink="/utilisateurs/{{utilisateur.id}}/tirages">
+          </app-sidebar-item>
+        </ul>
+      </ng-container>
+    </ng-container>
+  </div>
+</nav>

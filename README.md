@@ -2,7 +2,7 @@
 
 Tirages au sort de cadeaux.
 
-## Démarrage (développement)
+## Installation
 
 > Prérequis :
 > - docker
@@ -11,10 +11,20 @@ Tirages au sort de cadeaux.
 > - openssl
 
 ```
+$ git clone https://github.com/mleguen/tkdo
+$ cd tkdo
+$ make install
+```
+
+## Utilisation
+
+Depuis la racine du projet (répertoire tkdo) :
+
+```
 $ make start
 ```
 
-Après la construction des images et le démarrage des conteneurs Docker, votre navigateur s'ouvre automatiquement sur [la page d'accueil](https://localhost).
+Après la construction des images et le démarrage des conteneurs Docker, vous pouvez [accéder à l'application](https://localhost).
 
 > Note : pour arrêter ensuite proprement les conteneurs, faire :
 > - soit un `CTRL+C` depuis le terminal où s'exécute le `make start`
@@ -23,11 +33,12 @@ Après la construction des images et le démarrage des conteneurs Docker, votre 
 >   $ make stop
 >   ```
 
-## Changements
+Dans la configuration par défaut, vous ne pouvez vous connecter qu'avec les identifiants alice:alice (participante).
 
-- [historique des changements](./feature/done/README.md)
-- [roadmap](./feature/todo/README.md)
+## Documentations
 
-## Documentation
-
-- [utilisation d'un registry npm local](./doc/registry-npm-local.md)
+- [historique des changements](./CHANGELOG.md)
+- [roadmap](./ROADMAP.md)
+- [guide du développeur](./CONTRIBUTING.md)
+- autre documents :
+  - [utilisation d'un registry npm local](./doc/registry-npm-local.md)

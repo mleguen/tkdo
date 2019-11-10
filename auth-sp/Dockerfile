@@ -1,13 +1,17 @@
 FROM node:10-alpine
-WORKDIR /usr/local/tkdo
 
-# Installe d'abord les dépendances pour que ça ne soit refait que si le package.json change
-COPY package*.json ./
-ARG NPM_CONFIG_REGISTRY
-RUN npm install --production
+RUN apk add --no-cache git
 
-# Copie l'application
-COPY dist ./
+ENV NODE_ENV=production
 
-# Demarre le serveur
-CMD ["node", "auth-sp.js"]:
+USER node
+RUN mkdir /home/node/tkdo
+WORKDIR /home/node/tkdo
+
+COPY --chown=node package*.json ./
+RUN npm install
+
+COPY --chown=node dist ./
+WORKDIR auth-sp
+
+CMD ["node", "src/main.js"]:

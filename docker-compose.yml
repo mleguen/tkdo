@@ -1,29 +1,144 @@
 version: '3.7'
-secrets:
-  auth-sp-jwt.key:
-    file: auth-sp-jwt.key
-  auth-sp-jwt.key.pub:
-    file: auth-sp-jwt.key.pub
-  auth-sp-saml.key:
-    file: auth-sp-saml.key
-  auth-sp-saml.crt:
-    file: auth-sp-saml.crt
+
 services:
-  tkdo-auth-sp:
-    build:
-      args:
-        - NPM_CONFIG_REGISTRY
-      context: ./auth-sp
-      network: host
+
+  service-database:
+    image: mysql
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_DATABASE: tkdo
+      MYSQL_USER: tkdo
+      MYSQL_PASSWORD_FILE: /run/secrets/mysql.pass
+      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/mysql_root.pass
+    networks:
+      - back
+      - dbtools
     secrets:
-      - auth-sp-jwt.key
-      - auth-sp-saml.crt
-      - auth-sp-saml.key
-  tkdo-front:
-    build: ./front
-    secrets:
-      - auth-sp-jwt.key.pub
+      - mysql.pass
+      - mysql_root.pass
     volumes:
-      - tkdo-front-logs:/var/log
+      - database-data:/var/lib/mysql
+
+  service-db-tools:
+    depends_on:
+      - service-database
+    image: tkdo/db-tools
+    environment:
+      TKDO_CONNECTION_TYPE: mysql
+      TKDO_CONNECTION_HOST: service-database
+      TKDO_CONNECTION_USERNAME: tkdo
+      TKDO_CONNECTION_PASSWORD_FILE: /run/secrets/mysql.pass
+      TKDO_CONNECTION_DATABASE: tkdo
+    networks:
+      - dbtools
+    secrets:
+      - mysql.pass
+
+  service-auth-idp:
+    image: tkdo/auth-idp
+    networks:
+      - front
+    secrets:
+      - source: cert.crt
+        target: /var/simplesamlphp/cert/auth-sp.crt
+      - source: cert.crt
+        target: /var/simplesamlphp/cert/server.crt
+      - source: cert.pem
+        target: /var/simplesamlphp/cert/server.pem
+
+  service-auth-sp:
+    image: tkdo/auth-sp
+    depends_on:
+      - service-auth-idp
+      - service-database
+    environment:
+      TKDO_CONNECTION_TYPE: mysql
+      TKDO_CONNECTION_HOST: service-database
+      TKDO_CONNECTION_USERNAME: tkdo
+      TKDO_CONNECTION_PASSWORD_FILE: /run/secrets/mysql.pass
+      TKDO_CONNECTION_DATABASE: tkdo
+      TKDO_JWT_PRIVATE_KEY_FILE: /run/secrets/auth-sp.key
+      TKDO_PORT: 3000
+      TKDO_SAML_CALLBACK_URL: https://localhost/auth-sp/acs
+      TKDO_SAML_ENTRY_POINT: https://localhost/auth-idp/saml2/idp/SSOService.php
+      TKDO_SAML_IDP_CERT_FILE: /run/secrets/cert.crt
+      TKDO_SAML_ISSUER: https://localhost/auth-sp
+      TKDO_SAML_SP_CERT_FILE: /run/secrets/cert.crt
+      TKDO_SAML_SP_PRIVATE_KEY_FILE: /run/secrets/cert.pem
+    networks:
+      - back
+      - front
+    secrets:
+      - auth-sp.key
+      - cert.crt
+      - cert.pem
+      - mysql.pass
+
+  service-back:
+    depends_on:
+      - service-auth-sp
+      - service-database
+    image: tkdo/back
+    environment:
+      TKDO_CONNECTION_TYPE: mysql
+      TKDO_CONNECTION_HOST: service-database
+      TKDO_CONNECTION_USERNAME: tkdo
+      TKDO_CONNECTION_PASSWORD_FILE: /run/secrets/mysql.pass
+      TKDO_CONNECTION_DATABASE: tkdo
+      TKDO_JWT_PUBLIC_KEY_FILE: /run/secrets/auth-sp.key.pub
+    networks:
+      - back
+      - front
+    secrets:
+      - auth-sp.key.pub
+      - mysql.pass
+
+  service-front:
+    depends_on:
+      - service-back
+    image: tkdo/front
+    networks:
+      - front
+
+  service-gateway:
+    depends_on:
+      - service-auth-idp
+      - service-auth-sp
+      - service-back
+      - service-front
+    image: tkdo/gateway
+    networks:
+      - front
+    ports:
+      - "443:443"
+    secrets:
+      - source: cert.crt
+        target: /usr/local/apache2/conf/server.crt
+      - source: cert.pem
+        target: /usr/local/apache2/conf/server.key
+  
+networks:
+  front:
+  back:
+  dbtools:
+
+secrets:
+  auth-sp.key:
+    file: secrets/auth-sp.key
+  auth-sp.key.pub:
+    file: secrets/auth-sp.key.pub
+  cert.crt:
+    file: secrets/cert.crt
+  cert.pem:
+    file: secrets/cert.pem
+  mysql_database:
+    file: secrets/mysql_database
+  mysql.pass:
+    file: secrets/mysql.pass
+  mysql_root.pass:
+    file: secrets/mysql_root.pass
+  mysql_user:
+    file: secrets/mysql_user
+
 volumes:
-  tkdo-front-logs: {}
+  database-data: {}

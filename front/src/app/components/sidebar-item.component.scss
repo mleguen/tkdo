@@ -1,0 +1,27 @@
+.nav-link {
+  font-weight: 500;
+  color: #333;
+}
+
+.nav-link i-feather {
+  margin-right: 4px;
+  color: #999;
+}
+
+.nav-link.active {
+  color: #007bff;
+}
+
+.nav-link .active-only {
+  display: none
+}
+
+.nav-link.active .active-only {
+  display: inline
+}
+
+.nav-link:hover i-feather,
+.nav-link.active i-feather {
+  color: inherit;
+}
+

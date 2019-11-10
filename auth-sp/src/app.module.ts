@@ -1,22 +1,35 @@
-import { Module, MiddlewareConsumer } from '@nestjs/common';
+import { Module, MiddlewareConsumer, } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { readFileSync } from 'fs';
+
+import { Utilisateur, connectionOptions } from '../../shared/schema';
+import { AuthModule } from './auth/auth.module';
+import { DomaineModule } from './domaine/domaine.module';
 import { AppController } from './app.controller';
-import { SamlModule } from './saml/saml.module';
+import { AppDevController } from './app.dev.controller';
+import { AppService } from './app.service';
 import { RouteLoggerMiddleware } from './route-logger.middleware';
 
 @Module({
   imports: [
-    JwtModule.register({ secret: readFileSync(process.env.JWT_PRIVATE_KEY_FILE || '/run/secrets/auth-sp-jwt.key').toString() }),
-    SamlModule
+    JwtModule.register({ privateKey: readFileSync(process.env.TKDO_JWT_PRIVATE_KEY_FILE).toString() }),
+    TypeOrmModule.forRoot(connectionOptions),
+    ...process.env.NODE_ENV === 'production' ? [AuthModule] : [],
+    DomaineModule,
+    TypeOrmModule.forFeature([Utilisateur]),
   ],
-  controllers: [AppController],
-  providers: [],
+  controllers: [
+    process.env.NODE_ENV === 'production' ? AppController : AppDevController
+  ],
+  providers: [
+    AppService
+  ]
 })
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(RouteLoggerMiddleware)
-      .forRoutes(AppController);
+      .forRoutes(AppController, AppDevController);
   }
 }

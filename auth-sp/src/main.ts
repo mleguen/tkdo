@@ -1,10 +1,12 @@
-import { NestFactory } from '@nestjs/core';
+// L'environnement doit être chargé par l'appel à config avant l'import de AppModule
 import { config } from 'dotenv';
+config();
+
+import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-  config();
   const app = await NestFactory.create(AppModule);
-  await app.listen(3000);
+  await app.listen(process.env.TKDO_PORT);
 }
 bootstrap();

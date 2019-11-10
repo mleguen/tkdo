@@ -1,0 +1,22 @@
+<!-- Inspiré de : https://getbootstrap.com/docs/4.1/examples/dashboard/ -->
+
+<nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
+  <a class="navbar-brand col-sm-3 col-md-2 mr-0" routerLink="/">{{ titre }}</a>
+  <!-- <input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search"> -->
+  <span class="w-100"></span>
+  <ng-container *ngIf="utilisateur$|async as utilisateur; else pasConnecte">
+    <ul class="navbar-nav px-3">
+      <li class="nav-item text-nowrap">
+        <a class="nav-link" (click)="deconnecte()">Se déconnecter</a>
+      </li>
+    </ul>
+    <span class="navbar-text text-nowrap px-3">{{utilisateur.nom}} ({{role$|async}})</span>
+  </ng-container>
+  <ng-template #pasConnecte>
+    <ul class="navbar-nav px-3">
+      <li class="nav-item text-nowrap">
+        <a class="nav-link" (click)="connecte()">Se connecter</a>
+      </li>
+    </ul>    
+  </ng-template> 
+</nav>

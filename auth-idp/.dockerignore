@@ -1,0 +1,5 @@
+Makefile
+.gitignore
+*.orig
+*.patch
+.docker-build

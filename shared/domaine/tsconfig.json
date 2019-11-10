@@ -1,0 +1,7 @@
+{
+  "compilerOptions": {
+    "moduleResolution": "node",    
+    "sourceMap": true,
+    "target": "es2017"
+  }
+}

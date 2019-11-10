@@ -1,0 +1,10 @@
+<ng-container *ngIf="tirage$|async as tirage">
+  <app-bandeau-titre [titre]="tirage.titre" [sousTitre]="tirage.date"></app-bandeau-titre>
+  
+  <div class="card-deck">
+    <app-utilisateur-resume-card *ngFor="let participant of tirage.participants" [utilisateur]="participant"
+      [ngClass]="{ 'utilisateur-connecte': participant.id === (idUtilisateur$|async) }">
+    </app-utilisateur-resume-card>
+  </div>
+
+</ng-container>
