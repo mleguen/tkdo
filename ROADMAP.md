@@ -1,7 +1,6 @@
 # Roadmap
 
 ## V1.0 (MVP)
-- [7-consultation-tirage-lance.feature](./feature/todo/7-consultation-tirage-lance.feature)
 - [9-consultation-tirage-organisateur.feature](./feature/todo/9-consultation-tirage-organisateur.feature)
 - [3-creation-tirage.feature](./feature/todo/3-creation-tirage.feature)
 - [4-lancement-tirage.feature](./feature/todo/4-lancement-tirage.feature)

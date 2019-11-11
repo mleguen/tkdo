@@ -11,8 +11,8 @@ Fonctionnalité: consultation des tirages
   
     Soit une participante Alice, connectée
     Et des participants Bob, Charlie, David et Eve
-    Et un tirage "Noël" pour le 25/12 à venir auxquels ils participent tous
-    Et un tirage "Réveillon" pour le 31/12 à venir auxquels ils participent tous
+    Et un tirage "Noël" pour le 25/12 à venir auquel ils participent tous
+    Et un tirage "Réveillon" pour le 31/12 à venir auquel ils participent tous
 
     Quand Alice va sur la page d'accueil
     Alors elle voit un lien "Mes tirages", dans la section "participant(e)" de la barre de côté

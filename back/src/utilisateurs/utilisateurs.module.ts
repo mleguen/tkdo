@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { TirageRepository } from '../../../shared/schema';
+import { ParticipationRepository, Tirage } from '../../../shared/schema';
 import { AuthModule } from '../auth/auth.module';
 import { UtilisateursController } from './utilisateurs.controller';
 
@@ -9,7 +9,8 @@ import { UtilisateursController } from './utilisateurs.controller';
   imports: [
     AuthModule,
     TypeOrmModule.forFeature([
-      TirageRepository
+      ParticipationRepository,
+      Tirage
     ])
   ],
   controllers: [UtilisateursController]

@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { TirageUtilisateurPageComponent } from './tirage-utilisateur-page.component';
+import { UtilisateurTiragePageComponent } from './utilisateur-tirage-page.component';
 
 describe('PageTirageUtilisateurComponent', () => {
-  let component: TirageUtilisateurPageComponent;
-  let fixture: ComponentFixture<TirageUtilisateurPageComponent>;
+  let component: UtilisateurTiragePageComponent;
+  let fixture: ComponentFixture<UtilisateurTiragePageComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ TirageUtilisateurPageComponent ]
+      declarations: [UtilisateurTiragePageComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(TirageUtilisateurPageComponent);
+    fixture = TestBed.createComponent(UtilisateurTiragePageComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

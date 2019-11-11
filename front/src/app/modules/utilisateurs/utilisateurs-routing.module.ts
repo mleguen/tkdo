@@ -2,8 +2,8 @@ import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
 import { AuthGuard } from '../auth/guards/auth.guard';
-import { TiragesUtilisateurPageComponent } from './components/pages/tirages-utilisateur-page.component';
-import { TirageUtilisateurPageComponent } from './components/pages/tirage-utilisateur-page.component';
+import { UtilisateurTiragesPageComponent } from './components/pages/utilisateur-tirages-page.component';
+import { UtilisateurTiragePageComponent } from './components/pages/utilisateur-tirage-page.component';
 
 
 const routes: Routes = [{
@@ -13,8 +13,8 @@ const routes: Routes = [{
     {
       path: ':idUtilisateur/tirages',
       children: [
-        { path: '', component: TiragesUtilisateurPageComponent },
-        { path: ':idTirage', component: TirageUtilisateurPageComponent }
+        { path: '', component: UtilisateurTiragesPageComponent },
+        { path: ':idTirage', component: UtilisateurTiragePageComponent }
       ]
     }
   ]
