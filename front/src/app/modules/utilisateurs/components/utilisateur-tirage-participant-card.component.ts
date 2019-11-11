@@ -7,11 +7,14 @@ import { UtilisateurResumeDTO } from '../../../../../../back/src/utilisateurs/dt
   templateUrl: './utilisateur-tirage-participant-card.component.html',
   styleUrls: ['./utilisateur-tirage-participant-card.component.scss']
 })
-export class UtilisateurTirageParticipantCardComponent {
+export class UtilisateurTirageParticipantCardComponent {  
   // Le card deck ne supporte pas qu'il y ait des wrappers autours des cards
   // donc c'est le wrapper lui même qui doit porter la classe card
   @HostBinding('class.card') classCard = true;
-
-  @Input() utilisateur: UtilisateurResumeDTO;
-  @Input() featherName: string;
+  
+  @HostBinding('class.text-white') get classText() { return !!this.participant.aQuiOffrir; }
+  @HostBinding('class.bg-success') get classBg() { return !!this.participant.aQuiOffrir; }
+  
+  get icone() { return this.participant.aQuiOffrir ? 'gift' : 'user'; }
+  @Input() participant: UtilisateurResumeDTO & { aQuiOffrir?: boolean };
 }

@@ -1,8 +1,8 @@
 <!-- C'est le wrapper lui-même qui porte la classe card (cf .ts) -->
 <div class="card-header">
-  <i-feather name="{{ featherName }}"></i-feather>
+  <i-feather name="{{ icone }}"></i-feather>
 </div>
 <div class="card-body">
-  <h2 class="card-title">{{ utilisateur.nom }}</h2>
-  <!-- <p class="card-text">Description éventuelle.</p> -->
+  <h2 class="card-title">{{ participant.nom }}</h2>
+  <p *ngIf="!!participant.aQuiOffrir">Vous aurez le plaisir de lui offrir un cadeau !</p>
 </div>
