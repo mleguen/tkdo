@@ -1,7 +1,7 @@
 import { ConnectionOptions } from "typeorm";
 
 import { Utilisateur } from "../utilisateurs";
-import { Tirage, TirageRepository } from "../tirages";
+import { Participation, ParticipationRepository, Tirage } from "../tirages";
 import { readFileSync } from "fs";
 
 export const connectionOptions = {
@@ -12,10 +12,12 @@ export const connectionOptions = {
   database: process.env.TKDO_CONNECTION_DATABASE,
   synchronize: false,
   entities: [
+    Participation,
+    ParticipationRepository,
     Tirage,
-    TirageRepository,
     Utilisateur
-  ]
+  ],
+  logging: process.env.NODE_ENV !== 'production'
 } as ConnectionOptions;
 
 function fileToString(path?: string) {

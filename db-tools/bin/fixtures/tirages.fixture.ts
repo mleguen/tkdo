@@ -1,7 +1,7 @@
 import * as moment from "moment";
 import { Repository } from "typeorm";
 
-import { Tirage } from "../../../shared/schema";
+import { Tirage, Participation } from "../../../shared/schema";
 import { UtilisateursFixture } from "./utilisateurs.fixture";
 
 export class TiragesFixture {
@@ -14,34 +14,38 @@ export class TiragesFixture {
   ) { }
 
   async sync() {
-    this.noel = await this.findOrCreate({
-      titre: 'Noël', date: moment('25/12', 'DD/MM').format(), participants: [
-        this.utilisateursFixture.alice,
-        this.utilisateursFixture.bob,
-        this.utilisateursFixture.charlie,
-        this.utilisateursFixture.david,
-        this.utilisateursFixture.eve
+    await this.tiragesRepository.clear();
+
+    this.noel = await this.createTirage(
+      { titre: 'Noël', date: moment('25/12', 'DD/MM').format(), statut: 'LANCE' },
+      [
+        { participant: this.utilisateursFixture.alice, offreA: this.utilisateursFixture.david },
+        { participant: this.utilisateursFixture.bob, offreA: this.utilisateursFixture.eve },
+        { participant: this.utilisateursFixture.charlie, offreA: this.utilisateursFixture.alice },
+        { participant: this.utilisateursFixture.david, offreA: this.utilisateursFixture.bob },
+        { participant: this.utilisateursFixture.eve, offreA: this.utilisateursFixture.charlie }
       ]
-    });
-    this.reveillon = await this.findOrCreate({
-      titre: 'Réveillon', date: moment('31/12', 'DD/MM').format(), participants: [
-        this.utilisateursFixture.alice,
-        this.utilisateursFixture.bob,
-        this.utilisateursFixture.charlie,
-        this.utilisateursFixture.david,
-        this.utilisateursFixture.eve
+    );
+    this.reveillon = await this.createTirage(
+      { titre: 'Réveillon', date: moment('31/12', 'DD/MM').format(), statut: 'CREE' },
+      [
+        { participant: this.utilisateursFixture.alice },
+        { participant: this.utilisateursFixture.bob },
+        { participant: this.utilisateursFixture.charlie },
+        { participant: this.utilisateursFixture.david },
+        { participant: this.utilisateursFixture.eve }
       ]
-    });
+    );
   }
 
-  private async findOrCreate(proprietes: Pick<Tirage, 'titre' | 'date' | 'participants'>): Promise<Tirage> {
-    let tirage = await this.tiragesRepository.findOne({ titre: proprietes.titre });
-    if (tirage) {
-      console.log(`Le tirage ${tirage.titre} existe déjà (${tirage.id})`);
-    } else {
-      tirage = await this.tiragesRepository.save(new Tirage(proprietes))
-      console.log(`Tirage ${tirage.titre} créé (${tirage.id})`);
-    }
+  private async createTirage(
+    proprietes: Pick<Tirage, 'titre' | 'date' | 'statut'>,
+    proprietesParticipations: Pick<Participation, 'participant' | 'offreA'>[]
+  ): Promise<Tirage> {
+    let tirage = new Tirage(proprietes);
+    tirage.participations = proprietesParticipations.map(proprietesParticipation => new Participation(proprietesParticipation));
+    tirage = await this.tiragesRepository.save(tirage);
+    console.log(`Tirage ${tirage.titre} créé (${tirage.id})`);
     return tirage;
   }
 }

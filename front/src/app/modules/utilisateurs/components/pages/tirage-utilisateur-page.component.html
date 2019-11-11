@@ -2,8 +2,18 @@
   <app-bandeau-titre [titre]="tirage.titre" [sousTitre]="tirage.date"></app-bandeau-titre>
   
   <div class="card-deck">
+    <!-- TODO: rendre la carte spécifique au PARTICIPANT d'un tirage (et plus générique à un UTILISATEUR) :
+    - elle gère elle-même son icône et son style selon que c'est un participant lambda ou celui à qui l'utilisateur offre
+    - elle ajoute un texte "vous aurez le plaisir de lui offrir un cadeau"
+    -->
+    <!-- TODO: afficher une mention comme quoi le tirage au sort n'a pas encore été fait si le statut du tirage est CREE-->
     <app-utilisateur-resume-card *ngFor="let participant of tirage.participants" [utilisateur]="participant"
-      [ngClass]="{ 'utilisateur-connecte': participant.id === (idUtilisateur$|async) }">
+      [ngClass]="{
+        'utilisateur-connecte': participant.id === (idUtilisateur$|async),
+        'text-white': !!participant.aQuiOffrir,
+        'bg-success': !!participant.aQuiOffrir
+      }"
+      [featherName]="participant.aQuiOffrir ? 'gift' : 'user'">
     </app-utilisateur-resume-card>
   </div>
 

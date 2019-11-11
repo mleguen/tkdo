@@ -1,8 +1,9 @@
-import { IUtilisateur } from "../../utilisateurs/interfaces/utilisateur.interface";
+import { IParticipation } from "./participation.interface";
 
 export interface ITirage {
   id: number;
   titre: string;
   date: string;
-  participants: IUtilisateur[];
+  participations: IParticipation[];
+  statut: string;
 }
