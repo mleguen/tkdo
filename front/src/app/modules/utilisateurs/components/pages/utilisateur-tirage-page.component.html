@@ -7,14 +7,14 @@
     - elle ajoute un texte "vous aurez le plaisir de lui offrir un cadeau"
     -->
     <!-- TODO: afficher une mention comme quoi le tirage au sort n'a pas encore été fait si le statut du tirage est CREE-->
-    <app-utilisateur-resume-card *ngFor="let participant of tirage.participants" [utilisateur]="participant"
+    <app-utilisateur-tirage-participant-card *ngFor="let participant of tirage.participants" [utilisateur]="participant"
       [ngClass]="{
         'utilisateur-connecte': participant.id === (idUtilisateur$|async),
         'text-white': !!participant.aQuiOffrir,
         'bg-success': !!participant.aQuiOffrir
       }"
       [featherName]="participant.aQuiOffrir ? 'gift' : 'user'">
-    </app-utilisateur-resume-card>
+    </app-utilisateur-tirage-participant-card>
   </div>
 
 </ng-container>

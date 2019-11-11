@@ -6,14 +6,14 @@ import { map, switchMap } from 'rxjs/operators';
 
 import { TirageResumeDTO } from '../../../../../../../back/src/utilisateurs/dto/tirage-resume.dto';
 import { environment } from '../../../../../environments/environment';
-import { TiragesService } from '../../../../modules/tirages/services/tirages.service';
+import { TiragesService } from '../../../tirages/services/tirages.service';
 
 @Component({
-  selector: 'app-tirages-utilisateur-page',
-  templateUrl: './tirages-utilisateur-page.component.html',
-  styleUrls: ['./tirages-utilisateur-page.component.scss']
+  selector: 'app-utilisateur-tirages-page',
+  templateUrl: './utilisateur-tirages-page.component.html',
+  styleUrls: ['./utilisateur-tirages-page.component.scss']
 })
-export class TiragesUtilisateurPageComponent {
+export class UtilisateurTiragesPageComponent {
   tirages$: Observable<TirageResumeDTO[]>;
   idUtilisateur$: Observable<string>;
 

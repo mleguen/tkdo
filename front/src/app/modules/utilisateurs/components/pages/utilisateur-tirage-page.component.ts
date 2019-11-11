@@ -9,11 +9,11 @@ import { environment } from '../../../../../environments/environment';
 import { TiragesService } from '../../../tirages/services/tirages.service';
 
 @Component({
-  selector: 'app-tirage-utilisateur-page',
-  templateUrl: './tirage-utilisateur-page.component.html',
-  styleUrls: ['./tirage-utilisateur-page.component.scss']
+  selector: 'app-utilisateur-tirage-page',
+  templateUrl: './utilisateur-tirage-page.component.html',
+  styleUrls: ['./utilisateur-tirage-page.component.scss']
 })
-export class TirageUtilisateurPageComponent {
+export class UtilisateurTiragePageComponent {
   idUtilisateur$: Observable<IUtilisateur['id']>;
   tirage$: Observable<TirageDTO>;
 
