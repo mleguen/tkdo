@@ -13,6 +13,10 @@ export class UtilisateursFixture {
   ) { }
 
   async sync() {
+    // TODO: trouver un moyen de cascader le clear pour ne pas avoir une
+    // ER_TRUNCATE_ILLEGAL_FK: Cannot truncate a table referenced in a foreign key constraint
+    await this.utilisateursRepository.clear();
+
     this.alice = await this.createUtilisateur({ login: 'alice@domaine.tld', nom: 'Alice' });
     this.bob = await this.createUtilisateur({ login: 'bob@domaine.tld', nom: 'Bob' });
     this.charlie = await this.createUtilisateur({ login: 'charlie@domaine.tld', nom: 'Charlie' });

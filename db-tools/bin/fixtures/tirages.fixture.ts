@@ -14,8 +14,6 @@ export class TiragesFixture {
   ) { }
 
   async sync() {
-    await this.tiragesRepository.clear();
-
     this.noel = await this.createTirage(
       { titre: 'Noël', date: moment('25/12', 'DD/MM').format(), organisateur: this.utilisateurs.bob, statut: 'LANCE' },
       [

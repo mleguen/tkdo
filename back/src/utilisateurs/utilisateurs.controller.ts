@@ -56,7 +56,7 @@ export class UtilisateursController {
         participants: tirage.participations.map(participation => Object.assign(
           pick(participation.participant, 'id', 'nom'),
           participationUtilisateur && participationUtilisateur.offreA && (participation.participant.id === participationUtilisateur.offreA.id)
-            ? { estParticipantAQuiOffrir: true } : {},
+            ? { estAQuiOffrir: true } : {},
           (participation.participant.id === idUtilisateur) ? { estUtilisateur: true } : {}
         ))
       },

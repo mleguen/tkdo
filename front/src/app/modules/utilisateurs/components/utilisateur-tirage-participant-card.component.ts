@@ -13,16 +13,16 @@ export class UtilisateurTirageParticipantCardComponent {
   @HostBinding('class.card') classCard = true;
   
   @Input() participant: UtilisateurResumeDTO & {
-    estParticipantAQuiOffrir?: boolean,
+    estAQuiOffrir?: boolean,
     estUtilisateur?: boolean
   };
   
   @HostBinding('class.text-white') get classTextBlanc() { return !!this.participant.estUtilisateur; }
   @HostBinding('class.bg-success') get classBgVert() { return !!this.participant.estUtilisateur; }
-  @HostBinding('class.bg-warning') get classBgJaune() { return !!this.participant.estParticipantAQuiOffrir; }
+  @HostBinding('class.bg-warning') get classBgJaune() { return !!this.participant.estAQuiOffrir; }
   
   get icone() {
     return this.participant.estUtilisateur ? 'user-check' :
-      this.participant.estParticipantAQuiOffrir ? 'gift' : 'user';
+      this.participant.estAQuiOffrir ? 'gift' : 'user';
   }
 }
