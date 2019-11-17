@@ -1,12 +1,12 @@
-import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Observable, combineLatest } from 'rxjs';
-import { map, switchMap, filter } from 'rxjs/operators';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Observable, combineLatest, BehaviorSubject } from 'rxjs';
+import { map, switchMap, filter, tap } from 'rxjs/operators';
 
 import { TirageResumeDTO } from '../../../../../back/src/utilisateurs/dto/tirage-resume.dto';
-import { environment } from '../../../environments/environment';
-import { TiragesService } from '../tirages.service';
+import { DialogueNouveauTirageComponent } from '../dialogue-nouveau-tirage/dialogue-nouveau-tirage.component';
+import { TiragesService, estTiragePasse, compareTiragesParDate, formateDatesTirage } from '../tirages.service';
 
 @Component({
   selector: 'app-page-tirages',
@@ -20,30 +20,50 @@ export class PageTiragesComponent {
   }>;
   tiragesAVenir$: Observable<TirageResumeDTO[]>;
   tiragesPasses$: Observable<TirageResumeDTO[]>;
+  private idUtilisateur?: number;
+  private refresh$: BehaviorSubject<null> = new BehaviorSubject(null);
 
   constructor(
-    http: HttpClient,
     route: ActivatedRoute,
+    private modalService: NgbModal,
+    tiragesService: TiragesService
   ) {
     this.params$ = combineLatest(route.paramMap, route.queryParamMap).pipe(
       map(([pm, qpm]) => ({
         idUtilisateur: parseInt(pm.get('idUtilisateur')),
         organisateur: !!parseInt(qpm.get('organisateur'))
       })),
-      filter(params => !isNaN(params.idUtilisateur))
+      filter(params => !isNaN(params.idUtilisateur)),
+      tap(params => {
+        this.idUtilisateur = params.idUtilisateur;
+      })
     );
-    const tirages$ = this.params$.pipe(
-      switchMap(({ idUtilisateur, organisateur }) =>
-        http.get<TirageResumeDTO[]>(environment.backUrl + `/utilisateurs/${idUtilisateur}/tirages?organisateur=${organisateur ? 1 : 0}`)
-      )
+    const tirages$ = combineLatest(this.params$, this.refresh$).pipe(
+      switchMap(([{ idUtilisateur, organisateur }]) => tiragesService.getTirages(idUtilisateur, organisateur))
     );
     this.tiragesAVenir$ = tirages$.pipe(
-      map(TiragesService.aVenir),
-      filter(tirages => tirages.length > 0)
+      map(tirages => tirages
+        .filter(estTiragePasse(false))
+        .sort(compareTiragesParDate())
+        .map(formateDatesTirage())
+      )
     );
     this.tiragesPasses$ = tirages$.pipe(
-      map(TiragesService.passes),
-      filter(tirages => tirages.length > 0)
+      map(tirages => tirages
+        .filter(estTiragePasse())
+        .sort(compareTiragesParDate(false))
+        .map(formateDatesTirage())
+      )
     );
+  }
+
+  async ouvreDialogueNouveauTirage() {
+    let modalRef = this.modalService.open(DialogueNouveauTirageComponent, { centered: true });
+    modalRef.componentInstance.init(this.idUtilisateur);
+    try {
+      await modalRef.result;
+      this.refresh$.next(null);
+    }
+    catch (err) { }
   }
 }

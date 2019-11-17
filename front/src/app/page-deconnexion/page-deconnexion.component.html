@@ -1,4 +1,6 @@
-<app-bandeau-titre titre="Vous êtes déconnecté(e)"></app-bandeau-titre>
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+  <h1>Vous êtes déconnecté(e)</h1>
+</div>
 
 <p *ngIf="urlReconnexion$|async">
   <a [href]="urlReconnexion$|async">Se reconnecter</a>

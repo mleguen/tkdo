@@ -27,7 +27,6 @@
           </a>
         </h6>
         <ul class="nav flex-column mb-2">
-          <!-- TODO : retour arrière sur le masquage de l'utilisateur connecté en tant que participant -->
           <app-sidebar-item icone="clipboard" titre="Les tirages que j'organise"
             routerLink="/utilisateurs/{{utilisateur.id}}/tirages"
             [queryParams]="{ organisateur: 1 }">

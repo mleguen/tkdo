@@ -1,13 +1,11 @@
-import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Observable, combineLatest } from 'rxjs';
+import { Observable } from 'rxjs';
 import { map, switchMap, filter } from 'rxjs/operators';
 
+import { GetTirageDTO } from '../../../../../back/src/utilisateurs/dto/get-tirage.dto';
 import { StatutTirage } from '../../../../../shared/domaine';
-import { TirageDTO } from '../../../../../back/src/utilisateurs/dto/tirage.dto';
-import { environment } from '../../../environments/environment';
-import { TiragesService } from '../tirages.service';
+import { TiragesService, formateDatesTirage } from '../tirages.service';
 
 @Component({
   selector: 'app-page-tirage',
@@ -19,11 +17,11 @@ export class PageTirageComponent {
     idUtilisateur: number,
     idTirage: number
   }>;
-  tirage$: Observable<TirageDTO & { lance: boolean }>;
+  tirage$: Observable<GetTirageDTO & { lance: boolean }>;
 
   constructor(
-    http: HttpClient,
-    route: ActivatedRoute
+    route: ActivatedRoute,
+    tiragesService: TiragesService
   ) {
     this.params$ = route.paramMap.pipe(
       map(pm => ({
@@ -33,10 +31,8 @@ export class PageTirageComponent {
       filter(params => !isNaN(params.idUtilisateur) && !isNaN(params.idTirage))
     );
     this.tirage$ = this.params$.pipe(
-      switchMap(({ idUtilisateur, idTirage }) => {
-        return http.get<TirageDTO>(environment.backUrl + `/utilisateurs/${idUtilisateur}/tirages/${idTirage}`)
-      }),
-      map(TiragesService.formateDates()),
+      switchMap(({ idUtilisateur, idTirage }) => tiragesService.getTirage(idUtilisateur, idTirage)),
+      map(formateDatesTirage()),
       map(tirage => Object.assign(tirage, {
         lance: tirage.statut !== StatutTirage.CREE
       }))

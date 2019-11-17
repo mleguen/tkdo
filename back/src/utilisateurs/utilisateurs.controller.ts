@@ -9,7 +9,7 @@ import { Droit } from '../auth/droit.decorator';
 import { DroitsGuard } from '../auth/droits.guard';
 import { IdUtilisateurGuard } from '../auth/id-utilisateur.guard';
 import { ParamIdUtilisateur } from '../auth/param-id-utilisateur.decorator';
-import { TirageDTO } from './dto/tirage.dto';
+import { GetTirageDTO } from './dto/get-tirage.dto';
 import { TirageResumeDTO } from './dto/tirage-resume.dto';
 
 @Controller('utilisateurs')
@@ -40,7 +40,7 @@ export class UtilisateursController {
   async getTirageUtilisateur(
     @Param('idUtilisateur', new ParseIntPipe()) idUtilisateur: number,
     @Param('idTirage', new ParseIntPipe()) idTirage: number
-  ): Promise<TirageDTO> {
+  ): Promise<GetTirageDTO> {
     const tirage = await this.tirageRepository.findOne(idTirage, {
       relations: ['organisateur', 'participations', 'participations.participant', 'participations.offreA']
     });

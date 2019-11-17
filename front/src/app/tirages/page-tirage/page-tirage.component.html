@@ -1,5 +1,8 @@
 <ng-container *ngIf="tirage$|async as tirage">
-  <app-bandeau-titre [titre]="tirage.titre" [sousTitre]="tirage.date"></app-bandeau-titre>
+  <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1>{{tirage.titre}}</h1>
+    <small class="text-muted" *ngIf="sousTitre">{{tirage.date}}</small>
+  </div>
 
   <ng-container *ngIf="tirage.estOrganisateur">
     <div class="alert alert-success" role="success">

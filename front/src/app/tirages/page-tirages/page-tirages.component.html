@@ -1,6 +1,15 @@
 <ng-container *ngIf="params$|async as params">
-  <app-bandeau-titre titre="{{params.organisateur ? 'Les tirages que j\'organise' : 'Les tirages auxquels je participe'}}"></app-bandeau-titre>
-  
+  <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1>{{ params.organisateur ? 'Les tirages que j\'organise' : 'Les tirages auxquels je participe' }}</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+      <div class="btn-group mr-2">
+        <button class="btn btn-sm btn-outline-secondary" (click)="ouvreDialogueNouveauTirage()" *ngIf="params.organisateur">
+          <i-feather name="plus"></i-feather>Nouveau
+        </button>
+      </div>
+    </div>
+  </div>
+
   <ng-container *ngIf="tiragesAVenir$|async as tirages">
     <h3>Tirages à venir</h3>
     <div class="card-deck">

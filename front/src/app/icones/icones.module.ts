@@ -1,9 +1,9 @@
 import { NgModule } from '@angular/core';
 
 import { FeatherModule } from'angular-feather';
-import { AlertTriangle, Clipboard, Gift, Home, User, UserCheck } from'angular-feather/icons';
+import { AlertTriangle, Calendar, Clipboard, Gift, Home, Plus, User, UserCheck } from'angular-feather/icons';
 
-const icones = { AlertTriangle, Clipboard, Gift, Home, User, UserCheck };
+const icones = { AlertTriangle, Calendar, Clipboard, Gift, Home, Plus, User, UserCheck };
 
 @NgModule({
   imports: [
