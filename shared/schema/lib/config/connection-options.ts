@@ -1,7 +1,7 @@
 import { ConnectionOptions } from "typeorm";
 
 import { Utilisateur } from "../utilisateurs";
-import { Participation, ParticipationRepository, Tirage } from "../tirages";
+import { Participation, ParticipationRepository, Tirage, TirageRepository } from "../tirages";
 import { readFileSync } from "fs";
 
 export const connectionOptions = {
@@ -15,6 +15,7 @@ export const connectionOptions = {
     Participation,
     ParticipationRepository,
     Tirage,
+    TirageRepository,
     Utilisateur
   ],
   logging: process.env.NODE_ENV !== 'production'

@@ -80,6 +80,11 @@ $config = [
             'nom' => 'Alice',
             'roles' => ['TKDO_PARTICIPANT', 'AUTRE_APPLI_ADMIN'],
         ],
+        'bob:bob' => [
+            'login' => 'bob@domaine.tld',
+            'nom' => 'Bob',
+            'roles' => ['TKDO_ORGANISATEUR', 'TKDO_PARTICIPANT', 'AUTRE_APPLI_ADMIN'],
+        ],
         'owen:owen' => [
             'login' => 'owen@domaine.tld',
             'nom' => 'Owen',

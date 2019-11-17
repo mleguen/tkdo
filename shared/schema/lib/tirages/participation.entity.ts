@@ -20,13 +20,13 @@ export class Participation implements IParticipation {
   @PrimaryColumn()
   tirageId: number;
 
-  @ManyToOne(type => Utilisateur, { nullable: false })
+  @ManyToOne(type => Utilisateur, { nullable: false, cascade: true })
   participant: Utilisateur;
   
   // Même remarque que pour tirageId
   @PrimaryColumn()
   participantId: number;
 
-  @ManyToOne(type => Utilisateur, { nullable: true })
+  @ManyToOne(type => Utilisateur, { nullable: true, cascade: true })
   offreA?: Utilisateur;
 }

@@ -9,3 +9,4 @@
 - nouvelles fonctionnalités :
   - [5-consultation-tirages.feature](./feature/done/5-consultation-tirages.feature)
   - [7-consultation-tirage-lance.feature](./feature/done/7-consultation-tirage-lance.feature)
+  - [9-consultation-tirage-organisateur.feature](./feature/done/9-consultation-tirage-organisateur.feature)

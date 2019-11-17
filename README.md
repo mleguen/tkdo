@@ -33,7 +33,10 @@ Après la construction des images et le démarrage des conteneurs Docker, vous p
 >   $ make stop
 >   ```
 
-Dans la configuration par défaut, vous ne pouvez vous connecter qu'avec les identifiants alice:alice (participante).
+Dans la configuration par défaut, vous pourrez vous connecter avec les identifiants :
+
+- alice:alice (participante)
+- ou bob:bob (organisateur)
 
 ## Documentations
 

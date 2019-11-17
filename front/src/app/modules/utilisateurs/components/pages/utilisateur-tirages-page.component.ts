@@ -1,8 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Observable } from 'rxjs';
-import { map, switchMap } from 'rxjs/operators';
+import { Observable, combineLatest } from 'rxjs';
+import { map, switchMap, filter } from 'rxjs/operators';
 
 import { TirageResumeDTO } from '../../../../../../../back/src/utilisateurs/dto/tirage-resume.dto';
 import { environment } from '../../../../../environments/environment';
@@ -14,24 +14,36 @@ import { TiragesService } from '../../../tirages/services/tirages.service';
   styleUrls: ['./utilisateur-tirages-page.component.scss']
 })
 export class UtilisateurTiragesPageComponent {
-  tirages$: Observable<TirageResumeDTO[]>;
-  idUtilisateur$: Observable<string>;
+  params$: Observable<{
+    idUtilisateur: number,
+    organisateur: boolean
+  }>;
+  tiragesAVenir$: Observable<TirageResumeDTO[]>;
+  tiragesPasses$: Observable<TirageResumeDTO[]>;
 
   constructor(
     http: HttpClient,
     route: ActivatedRoute,
   ) {
-    this.idUtilisateur$ = route.params.pipe(
-      map(p => p.idUtilisateur)
+    this.params$ = combineLatest(route.paramMap, route.queryParamMap).pipe(
+      map(([pm, qpm]) => ({
+        idUtilisateur: parseInt(pm.get('idUtilisateur')),
+        organisateur: !!parseInt(qpm.get('organisateur'))
+      })),
+      filter(params => !isNaN(params.idUtilisateur))
     );
-    this.tirages$ = this.idUtilisateur$.pipe(
-      switchMap(idUtilisateur =>
-        http.get<TirageResumeDTO[]>(environment.backUrl + `/utilisateurs/${idUtilisateur}/tirages`)
-      ),
-      map(tirages => tirages
-        .sort((A, B) => -A.date.localeCompare(B.date))
-        .map(TiragesService.formateDates())
+    const tirages$ = this.params$.pipe(
+      switchMap(({ idUtilisateur, organisateur }) =>
+        http.get<TirageResumeDTO[]>(environment.backUrl + `/utilisateurs/${idUtilisateur}/tirages?organisateur=${organisateur ? 1 : 0}`)
       )
+    );
+    this.tiragesAVenir$ = tirages$.pipe(
+      map(TiragesService.aVenir),
+      filter(tirages => tirages.length > 0)
+    );
+    this.tiragesPasses$ = tirages$.pipe(
+      map(TiragesService.passes),
+      filter(tirages => tirages.length > 0)
     );
   }
 }

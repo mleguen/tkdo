@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne } from 'typeorm';
+
 import { ITirage, StatutTirage } from '../../../domaine';
 import { Utilisateur } from '../utilisateurs/utilisateur.entity';
 import { Participation } from './participation.entity';
@@ -6,7 +7,7 @@ import { Participation } from './participation.entity';
 @Entity()
 export class Tirage implements ITirage {
 
-  constructor(tirage: Pick<Tirage, 'titre' | 'date'>) {
+  constructor(tirage: Pick<Tirage, 'titre' | 'date' | 'organisateur' | 'statut'>) {
     Object.assign(this, tirage);
   }
 
@@ -18,6 +19,9 @@ export class Tirage implements ITirage {
 
   @Column({ length: 255, nullable: false })
   date: string;
+
+  @ManyToOne(type => Utilisateur, { nullable: false, cascade: true })
+  organisateur: Utilisateur;
 
   @OneToMany(type => Participation, participation => participation.tirage, { cascade: true })
   participations: Participation[];
