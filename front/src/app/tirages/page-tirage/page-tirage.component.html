@@ -1,0 +1,25 @@
+<ng-container *ngIf="tirage$|async as tirage">
+  <app-bandeau-titre [titre]="tirage.titre" [sousTitre]="tirage.date"></app-bandeau-titre>
+
+  <ng-container *ngIf="tirage.estOrganisateur">
+    <div class="alert alert-success" role="success">
+      <i-feather name="clipboard"></i-feather>
+      Vous organisez ce tirage.
+    </div>
+  </ng-container>
+  
+  <ng-container *ngIf="!tirage.lance">
+    <div class="alert alert-warning" role="warning">
+      <i-feather name="alert-triangle"></i-feather>
+      <span class="sr-only">Attention :</span>
+      Le tirage au sort n'a pas encore été lancé !
+    </div>
+  </ng-container>
+
+  <p>Participants :</p>
+
+  <div class="card-deck">
+    <app-participant *ngFor="let participant of tirage.participants" [participant]="participant">
+    </app-participant>
+  </div>
+</ng-container>

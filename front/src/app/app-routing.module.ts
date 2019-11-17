@@ -1,13 +1,13 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
-import { AccueilPageComponent } from './components/pages/accueil-page.component';
-import { DeconnexionPageComponent } from './components/pages/deconnexion-page.component';
+import { PageAccueilComponent } from './page-accueil/page-accueil.component';
+import { PageDeconnexionComponent } from './page-deconnexion/page-deconnexion.component';
 
 
 const routes: Routes = [
-  { path: '', component: AccueilPageComponent },
-  { path: 'deconnexion', component: DeconnexionPageComponent }
+  { path: '', component: PageAccueilComponent },
+  { path: 'deconnexion', component: PageDeconnexionComponent }
 ];
 
 @NgModule({

@@ -3,18 +3,18 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
-import { AccueilPageComponent } from './components/pages/accueil-page.component';
-import { DeconnexionPageComponent } from './components/pages/deconnexion-page.component';
-import { AppComponent } from './components/app.component';
-import { FooterComponent } from './components/footer.component';
-import { NavbarComponent } from './components/navbar.component';
-import { SidebarComponent } from './components/sidebar.component';
-import { SidebarItemComponent } from './components/sidebar-item.component';
-import { AuthInterceptor } from './interceptors/auth.interceptor';
-import { AuthModule } from './modules/auth/auth.module';
-import { IconesModule } from './modules/icones/icones.module';
-import { SharedModule } from './modules/shared/shared.module';
-import { UtilisateursModule } from './modules/utilisateurs/utilisateurs.module';
+import { PageAccueilComponent } from './page-accueil/page-accueil.component';
+import { PageDeconnexionComponent } from './page-deconnexion/page-deconnexion.component';
+import { AppComponent } from './app.component';
+import { FooterComponent } from './footer/footer.component';
+import { NavbarComponent } from './navbar/navbar.component';
+import { SidebarComponent } from './sidebar/sidebar.component';
+import { SidebarItemComponent } from './sidebar-item/sidebar-item.component';
+import { AuthInterceptor } from './auth/auth.interceptor';
+import { AuthModule } from './auth/auth.module';
+import { IconesModule } from './icones/icones.module';
+import { SharedModule } from './shared/shared.module';
+import { TiragesModule } from './tirages/tirages.module';
 import { AppRoutingModule } from './app-routing.module';
 
 @NgModule({
@@ -24,8 +24,8 @@ import { AppRoutingModule } from './app-routing.module';
     SidebarComponent,
     FooterComponent,
     SidebarItemComponent,
-    AccueilPageComponent,
-    DeconnexionPageComponent
+    PageAccueilComponent,
+    PageDeconnexionComponent
   ],
   imports: [
     NgbModule,
@@ -35,10 +35,7 @@ import { AppRoutingModule } from './app-routing.module';
     AuthModule,
     IconesModule,
     SharedModule,
-    UtilisateursModule
-  ],
-  providers: [
-    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }
+    TiragesModule
   ],
   bootstrap: [AppComponent]
 })
