@@ -7,6 +7,7 @@ import { environment } from '../../environments/environment';
 import { AuthService } from '../modules/auth/services/auth.service';
 
 const NOMS_ROLES = {
+  [PortHabilitations.ROLE_ORGANISATEUR]: 'organisateur(trice)',
   [PortHabilitations.ROLE_PARTICIPANT]: 'participant(e)'
 };
 

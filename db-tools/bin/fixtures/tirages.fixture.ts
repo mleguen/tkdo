@@ -10,36 +10,35 @@ export class TiragesFixture {
 
   constructor(
     private tiragesRepository: Repository<Tirage>,
-    private utilisateursFixture: UtilisateursFixture
+    private utilisateurs: UtilisateursFixture
   ) { }
 
   async sync() {
     await this.tiragesRepository.clear();
 
     this.noel = await this.createTirage(
-      { titre: 'Noël', date: moment('25/12', 'DD/MM').format(), statut: 'LANCE' },
+      { titre: 'Noël', date: moment('25/12', 'DD/MM').format(), organisateur: this.utilisateurs.bob, statut: 'LANCE' },
       [
-        { participant: this.utilisateursFixture.alice, offreA: this.utilisateursFixture.david },
-        { participant: this.utilisateursFixture.bob, offreA: this.utilisateursFixture.eve },
-        { participant: this.utilisateursFixture.charlie, offreA: this.utilisateursFixture.alice },
-        { participant: this.utilisateursFixture.david, offreA: this.utilisateursFixture.bob },
-        { participant: this.utilisateursFixture.eve, offreA: this.utilisateursFixture.charlie }
+        { participant: this.utilisateurs.alice, offreA: this.utilisateurs.david },
+        { participant: this.utilisateurs.bob, offreA: this.utilisateurs.eve },
+        { participant: this.utilisateurs.charlie, offreA: this.utilisateurs.alice },
+        { participant: this.utilisateurs.david, offreA: this.utilisateurs.bob },
+        { participant: this.utilisateurs.eve, offreA: this.utilisateurs.charlie }
       ]
     );
     this.reveillon = await this.createTirage(
-      { titre: 'Réveillon', date: moment('31/12', 'DD/MM').format(), statut: 'CREE' },
+      { titre: 'Réveillon', date: moment('31/12', 'DD/MM').format(), organisateur: this.utilisateurs.bob, statut: 'CREE' },
       [
-        { participant: this.utilisateursFixture.alice },
-        { participant: this.utilisateursFixture.bob },
-        { participant: this.utilisateursFixture.charlie },
-        { participant: this.utilisateursFixture.david },
-        { participant: this.utilisateursFixture.eve }
+        { participant: this.utilisateurs.alice },
+        { participant: this.utilisateurs.charlie },
+        { participant: this.utilisateurs.david },
+        { participant: this.utilisateurs.eve }
       ]
     );
   }
 
   private async createTirage(
-    proprietes: Pick<Tirage, 'titre' | 'date' | 'statut'>,
+    proprietes: Pick<Tirage, 'titre' | 'date' | 'organisateur' | 'statut'>,
     proprietesParticipations: Pick<Participation, 'participant' | 'offreA'>[]
   ): Promise<Tirage> {
     let tirage = new Tirage(proprietes);

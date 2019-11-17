@@ -12,9 +12,17 @@ export class UtilisateurTirageParticipantCardComponent {
   // donc c'est le wrapper lui même qui doit porter la classe card
   @HostBinding('class.card') classCard = true;
   
-  @HostBinding('class.text-white') get classText() { return !!this.participant.aQuiOffrir; }
-  @HostBinding('class.bg-success') get classBg() { return !!this.participant.aQuiOffrir; }
+  @Input() participant: UtilisateurResumeDTO & {
+    estParticipantAQuiOffrir?: boolean,
+    estUtilisateur?: boolean
+  };
   
-  get icone() { return this.participant.aQuiOffrir ? 'gift' : 'user'; }
-  @Input() participant: UtilisateurResumeDTO & { aQuiOffrir?: boolean };
+  @HostBinding('class.text-white') get classTextBlanc() { return !!this.participant.estUtilisateur; }
+  @HostBinding('class.bg-success') get classBgVert() { return !!this.participant.estUtilisateur; }
+  @HostBinding('class.bg-warning') get classBgJaune() { return !!this.participant.estParticipantAQuiOffrir; }
+  
+  get icone() {
+    return this.participant.estUtilisateur ? 'user-check' :
+      this.participant.estParticipantAQuiOffrir ? 'gift' : 'user';
+  }
 }

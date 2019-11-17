@@ -1,4 +1,4 @@
-import { EntityRepository, Repository, SelectQueryBuilder } from 'typeorm';
+import { EntityRepository, Repository } from 'typeorm';
 import { Participation } from './participation.entity';
 import { Tirage } from './tirage.entity';
 

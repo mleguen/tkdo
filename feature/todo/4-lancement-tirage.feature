@@ -17,3 +17,5 @@ Fonctionnalité: lancement d'un tirage
     - du participant de qui recevoir = même méthode de calcul
 
   La pertinence globale de l'affectation est la moyenne des pertinences pour chaque participant.
+
+  Lorsque l'organisateur d'un tirage lancé le consulte, il doit voir la note de pertinence de l'affectation.
