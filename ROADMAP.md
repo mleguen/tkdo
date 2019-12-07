@@ -2,6 +2,7 @@
 
 ## V1.0 (MVP)
 - [3-creation-tirage.feature](./feature/todo/3-creation-tirage.feature)
+- [11-une-url-par-ressource.feature](./feature/todo/11-une-url-par-ressource.feature)
 - [4-lancement-tirage.feature](./feature/todo/4-lancement-tirage.feature)
 
 ## V1.1
