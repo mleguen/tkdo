@@ -1,5 +1,5 @@
-import { IParticipation } from "./participation.interface";
 import { IUtilisateur } from '../../utilisateurs';
+import { IParticipation } from "./participation";
 
 export interface ITirage {
   id: number;

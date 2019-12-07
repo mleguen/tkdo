@@ -1,14 +1,20 @@
 import { Controller, Get, Res, Query } from '@nestjs/common';
 import { Response } from 'express';
+
+import { IIDPProfile } from './auth/types/idp-profile';
+import { AuthService } from './auth/auth.service';
 import { AppService } from './app.service';
-import { IIDPProfile } from '../../shared/domaine';
 
 @Controller()
 export class AppDevController {
-  constructor(private appService: AppService) {}
+  constructor(
+    private appService: AppService,
+    private authService: AuthService
+  ) {}
 
   @Get('/login')
-  getLogin(@Res() res: Response, @Query('RelayState') relayState?: string) {
-    return this.appService.redirectToRelayStateWithJwt(res, relayState, JSON.parse(process.env.TKDO_IDP_PROFILE_DEV) as IIDPProfile);
+  async getLogin(@Res() res: Response, @Query('RelayState') relayState?: string) {
+    const profile = await this.authService.createProfile(JSON.parse(process.env.TKDO_IDP_PROFILE_DEV) as IIDPProfile);
+    return this.appService.redirectToRelayStateWithJwt(res, relayState, profile);
   }
 }

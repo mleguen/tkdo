@@ -1,5 +1,5 @@
 /**
- * Profile utilisateur IDP
+ * Profile utilisateur venant de l'IDP
  */
 export interface IIDPProfile {
   /**

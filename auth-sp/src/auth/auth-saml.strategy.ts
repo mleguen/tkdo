@@ -1,16 +1,19 @@
 
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { readFileSync } from 'fs';
 import { Strategy } from 'passport-saml';
-import { PortHabilitations, IIDPProfile } from '../../../shared/domaine';
+
+import { IProfile } from '../../../shared/domaine';
+import { IIDPProfile } from './types/idp-profile';
+import { AuthService } from './auth.service';
 
 @Injectable()
 export class AuthSamlStrategy extends PassportStrategy(Strategy) {
   private signinCert = readFileSync(process.env.TKDO_SAML_SP_CERT_FILE).toString();
 
   constructor(
-    private portHabilitations: PortHabilitations
+    private authService: AuthService
   ) {
     super({
       callbackUrl: process.env.TKDO_SAML_CALLBACK_URL,
@@ -24,9 +27,8 @@ export class AuthSamlStrategy extends PassportStrategy(Strategy) {
   /**
    * Valide le profile renvoyé par l'IDP.
    */
-  async validate(profile: IIDPProfile): Promise<IIDPProfile> {
-    if (!this.portHabilitations.hasDroit(PortHabilitations.DROIT_CONNEXION, profile.roles)) throw new UnauthorizedException();
-    return profile;
+  validate(profile: IIDPProfile): Promise<IProfile> {
+    return this.authService.createProfile(profile);
   }
 
   generateServiceProviderMetadata(): string {

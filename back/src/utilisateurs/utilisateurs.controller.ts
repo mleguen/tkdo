@@ -1,19 +1,19 @@
-import { Controller, UseGuards, Get, Param, Query, ParseIntPipe } from '@nestjs/common';
+import { Controller, UseGuards, Get, Param, Query, ParseIntPipe, Post } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { InjectRepository } from '@nestjs/typeorm';
 import { pick } from 'lodash';
 
-import { PortHabilitations } from '../../../shared/domaine';
+import { Droit } from '../../../shared/domaine';
 import { ParticipationRepository, TirageRepository } from '../../../shared/schema';
-import { Droit } from '../auth/droit.decorator';
-import { DroitsGuard } from '../auth/droits.guard';
+import { NecessiteDroit } from '../auth/droit.decorator';
+import { DroitGuard } from '../auth/droits.guard';
 import { IdUtilisateurGuard } from '../auth/id-utilisateur.guard';
 import { ParamIdUtilisateur } from '../auth/param-id-utilisateur.decorator';
 import { GetTirageDTO } from './dto/get-tirage.dto';
 import { TirageResumeDTO } from './dto/tirage-resume.dto';
 
 @Controller('utilisateurs')
-@UseGuards(AuthGuard('jwt'), DroitsGuard, IdUtilisateurGuard)
+@UseGuards(AuthGuard('jwt'), DroitGuard, IdUtilisateurGuard)
 export class UtilisateursController {
 
   constructor(
@@ -22,7 +22,7 @@ export class UtilisateursController {
   ) {}
 
   @Get('/:idUtilisateur/tirages')
-  @Droit(PortHabilitations.DROIT_BACK_GET_TIRAGES)
+  @NecessiteDroit(Droit.ConsultationTirages)
   @ParamIdUtilisateur()
   async getTiragesUtilisateur(
     @Param('idUtilisateur', new ParseIntPipe()) idUtilisateur: number,
@@ -35,7 +35,7 @@ export class UtilisateursController {
   }
 
   @Get('/:idUtilisateur/tirages/:idTirage')
-  @Droit(PortHabilitations.DROIT_BACK_GET_TIRAGES)
+  @NecessiteDroit(Droit.ConsultationTirages)
   @ParamIdUtilisateur()
   async getTirageUtilisateur(
     @Param('idUtilisateur', new ParseIntPipe()) idUtilisateur: number,
@@ -62,5 +62,18 @@ export class UtilisateursController {
       },
       estOrganisateur ? { estOrganisateur } : {}
     );
+  }
+
+  @Post('/:idUtilisateur/tirages')
+  @NecessiteDroit(Droit.ModificationTirages)
+  @ParamIdUtilisateur()
+  async postTiragesUtilisateur(
+    @Param('idUtilisateur', new ParseIntPipe()) idUtilisateur: number,
+    @Query('organisateur', new ParseIntPipe()) organisateur?: number
+  ): Promise<TirageResumeDTO[]> {
+    let tirages = !!organisateur
+      ? await this.tirageRepository.findTiragesOrganisateur(idUtilisateur)
+      : await this.participationRepository.findTiragesParticipant(idUtilisateur);
+    return tirages.map(tirage => pick(tirage, 'id', 'titre', 'date'));
   }
 }

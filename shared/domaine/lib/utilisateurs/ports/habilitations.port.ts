@@ -1,42 +1,37 @@
+import { Droit } from "../constantes/droit";
+import { Role } from "../constantes/role";
+
 export class PortHabilitations {
-
-  static ROLE_ORGANISATEUR: string = 'TKDO_ORGANISATEUR';
-  static ROLE_PARTICIPANT: string = 'TKDO_PARTICIPANT';
-  
-  static DROIT_CONNEXION: string = 'DROIT_CONNEXION';
-  static DROIT_BACK_GET_TIRAGES: string = 'DROIT_BACK_GET_TIRAGES';
-  static DROIT_FRONT_AFFICHAGE_MENUS_PARTICIPANT: string = 'DROIT_FRONT_AFFICHAGE_MENUS_PARTICIPANT';
-  static DROIT_FRONT_AFFICHAGE_MENUS_ORGANISATEUR: string = 'DROIT_FRONT_AFFICHAGE_MENUS_ORGANISATEUR';
-
   /**
    * La matrice rôles/droits
    */
-  private static matrice: { [role: string]: string[] } = {
-    [PortHabilitations.ROLE_ORGANISATEUR]: [
-      PortHabilitations.DROIT_CONNEXION,
-      PortHabilitations.DROIT_BACK_GET_TIRAGES,
-      PortHabilitations.DROIT_FRONT_AFFICHAGE_MENUS_ORGANISATEUR
+  private static matrice: { [role in Role]: Droit[] } = {
+    [Role.Organisateur]: [
+      Droit.Connexion,
+      Droit.ConsultationTirages,
+      Droit.ModificationTirages,
+      Droit.Organisation
     ],
-    [PortHabilitations.ROLE_PARTICIPANT]: [
-      PortHabilitations.DROIT_CONNEXION,
-      PortHabilitations.DROIT_BACK_GET_TIRAGES,
-      PortHabilitations.DROIT_FRONT_AFFICHAGE_MENUS_PARTICIPANT
+    [Role.Participant]: [
+      Droit.Connexion,
+      Droit.ConsultationTirages,
+      Droit.Participation
     ]
   }
 
   /**
    * Vérifie qu'un utilisateur a un droit donné.
    */
-  hasDroit(droit: string, roles: string[]): boolean {
+  hasDroit(droit: Droit, roles: Role[]): boolean {
     return roles
       .map(role => PortHabilitations.matrice[role])
       .some(droits => droits.includes(droit));
   }
 
   /**
-   * Vérifie qu'un rôle est bien connu de l'application.
+   * Vérifie qu'un rôle renvoyé par l'IDP est bien un rôle applicatif.
    */
-  estRoleConnu(role: string): boolean {
-    return !!PortHabilitations.matrice[role];
+  estRoleApplicatif(roleIDP: string): roleIDP is Role {
+    return !!PortHabilitations.matrice[roleIDP];
   }
 }

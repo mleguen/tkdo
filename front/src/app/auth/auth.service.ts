@@ -4,13 +4,13 @@ import { JwtHelperService } from '@auth0/angular-jwt';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
-import { PortHabilitations, ISSPProfile, IUtilisateur } from '../../../../shared/domaine';
+import { PortHabilitations, IProfile, IUtilisateur, Droit } from '../../../../shared/domaine';
 import { environment } from '../../environments/environment';
 
 @Injectable()
 export class AuthService {
   public connecte$: Observable<boolean>;
-  public profile$: BehaviorSubject<ISSPProfile>;
+  public profile$: BehaviorSubject<IProfile>;
   public utilisateur$: Observable<IUtilisateur>;
   
   private authToken: string;
@@ -20,7 +20,7 @@ export class AuthService {
     private jwtHelperService: JwtHelperService,
     private portHabilitations: PortHabilitations
   ) {
-    this.profile$ = new BehaviorSubject<ISSPProfile>(this.getProfileFromAuthToken());
+    this.profile$ = new BehaviorSubject<IProfile>(this.getProfileFromAuthToken());
     this.connecte$ = this.profile$.pipe(map(profile => !!profile));
     this.utilisateur$ = this.profile$.pipe(map(profile => !!profile ? profile.utilisateur : undefined));
   }
@@ -36,7 +36,7 @@ export class AuthService {
     window.location.href = this.addUrlParam('/deconnexion', 'RelayState', window.location.href);
   }
 
-  public hasDroit$(droit: string): Observable<boolean> {
+  public hasDroit$(droit: Droit): Observable<boolean> {
     return this.profile$.pipe(
       map(profile => !!profile && this.portHabilitations.hasDroit(droit, profile.roles))
     );
@@ -58,7 +58,7 @@ export class AuthService {
     return authToken;
   }
 
-  private getProfileFromAuthToken(): ISSPProfile {
+  private getProfileFromAuthToken(): IProfile {
     let authToken = this.getAuthToken();
     if (!authToken) return;
 

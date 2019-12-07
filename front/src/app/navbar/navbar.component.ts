@@ -2,13 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { filter, map } from 'rxjs/operators';
 
-import { PortHabilitations } from '../../../../shared/domaine';
+import { Role } from '../../../../shared/domaine';
 import { environment } from '../../environments/environment';
 import { AuthService } from '../auth/auth.service';
 
 const NOMS_ROLES = {
-  [PortHabilitations.ROLE_ORGANISATEUR]: 'organisateur(trice)',
-  [PortHabilitations.ROLE_PARTICIPANT]: 'participant(e)'
+  [Role.Organisateur]: 'organisateur(trice)',
+  [Role.Participant]: 'participant(e)'
 };
 
 @Component({
