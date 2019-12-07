@@ -1,7 +1,8 @@
 import { Component } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbActiveModal, NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
 
 import { TiragesService } from '../tirages.service';
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-dialogue-nouveau-tirage',
@@ -9,7 +10,7 @@ import { TiragesService } from '../tirages.service';
   styleUrls: ['./dialogue-nouveau-tirage.component.scss']
 })
 export class DialogueNouveauTirageComponent {
-  date: string;
+  date: NgbDateStruct;
   errMessage?: string;
   statut: Statut = Statut.Ouvert;
   titre: string;
@@ -45,8 +46,16 @@ export class DialogueNouveauTirageComponent {
   async submit() {
     if (this.statut === Statut.Pret) {
       this.statut = Statut.EnAttente;
+      console.log(this.date);
 
-      this.serviceTirages.postTirage(this.idUtilisateur, this).subscribe({
+      this.serviceTirages.postTirage(this.idUtilisateur, {
+        titre: this.titre,
+        date: moment({
+          year: this.date.year,
+          month: this.date.month - 1,
+          day: this.date.day
+        }).format()
+      }).subscribe({
         next: () => {
           this.activeModal.close();
         },

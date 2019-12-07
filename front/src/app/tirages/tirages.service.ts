@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import * as moment from 'moment';
 
-import { GetTirageDTO } from '../../../../back/src/utilisateurs/dto/get-tirage.dto';
-import { PostTirageDTO } from '../../../../back/src/utilisateurs/dto/post-tirage.dto';
+import { GetTirageResDTO } from '../../../../back/src/utilisateurs/dto/get-tirage-res.dto';
+import { PostTirageReqDTO } from '../../../../back/src/utilisateurs/dto/post-tirage-req.dto';
 import { TirageResumeDTO } from '../../../../back/src/utilisateurs/dto/tirage-resume.dto';
 import { Observable } from 'rxjs';
 
@@ -17,19 +17,16 @@ export class TiragesService {
     private backendService: BackendService
   ) {}
 
-  getTirage(idUtilisateur: number, idTirage: number): Observable<GetTirageDTO> {
-    return this.backendService.get<GetTirageDTO>(URL_TIRAGES(idUtilisateur) + `/${idTirage}`);
+  getTirage(idUtilisateur: number, idTirage: number): Observable<GetTirageResDTO> {
+    return this.backendService.get<GetTirageResDTO>(URL_TIRAGES(idUtilisateur) + `/${idTirage}`);
   }
 
   getTirages(idUtilisateur: number, organisateur: boolean): Observable<TirageResumeDTO[]> {
     return this.backendService.get<TirageResumeDTO[]>(URL_TIRAGES(idUtilisateur) + `?organisateur=${organisateur ? 1 : 0}`);
   }
 
-  postTirage(idUtilisateur: number, tirage: PostTirageDTO) {
-    return this.backendService.post<PostTirageDTO>(URL_TIRAGES(idUtilisateur), {
-      titre: tirage.titre,
-      date: tirage.date
-    });
+  postTirage(idUtilisateur: number, tirage: PostTirageReqDTO) {
+    return this.backendService.post<PostTirageReqDTO>(URL_TIRAGES(idUtilisateur), tirage);
   }
 }
 

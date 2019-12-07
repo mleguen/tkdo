@@ -3,7 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 import { map, switchMap, filter } from 'rxjs/operators';
 
-import { GetTirageDTO } from '../../../../../back/src/utilisateurs/dto/get-tirage.dto';
+import { GetTirageResDTO } from '../../../../../back/src/utilisateurs/dto/get-tirage-res.dto';
 import { StatutTirage } from '../../../../../shared/domaine';
 import { TiragesService, formateDatesTirage } from '../tirages.service';
 
@@ -17,7 +17,7 @@ export class PageTirageComponent {
     idUtilisateur: number,
     idTirage: number
   }>;
-  tirage$: Observable<GetTirageDTO & { lance: boolean }>;
+  tirage$: Observable<GetTirageResDTO & { lance: boolean }>;
 
   constructor(
     route: ActivatedRoute,

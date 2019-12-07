@@ -1,3 +1,6 @@
 import { SetMetadata } from '@nestjs/common';
 
-export const ParamIdUtilisateur = (paramIdUtilisateur: string = 'idUtilisateur') => SetMetadata('paramIdUtilisateur', paramIdUtilisateur);
+export function UtilisateurAuthentifieDoitAvoirId (paramIdUtilisateur: string = 'idUtilisateur') {
+  return SetMetadata('paramIdUtilisateur', paramIdUtilisateur);
+}
+
