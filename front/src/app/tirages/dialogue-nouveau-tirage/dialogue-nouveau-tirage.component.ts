@@ -46,7 +46,6 @@ export class DialogueNouveauTirageComponent {
   async submit() {
     if (this.statut === Statut.Pret) {
       this.statut = Statut.EnAttente;
-      console.log(this.date);
 
       this.serviceTirages.postTirage(this.idUtilisateur, {
         titre: this.titre,

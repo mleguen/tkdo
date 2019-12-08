@@ -10,6 +10,7 @@ import { Observable } from 'rxjs';
 import { BackendService } from '../backend.service';
 
 const URL_TIRAGES = (idUtilisateur: number) => `/utilisateurs/${idUtilisateur}/tirages`;
+const URL_TIRAGE = (idUtilisateur: number, idTirage: number) => URL_TIRAGES(idUtilisateur) + `/${idTirage}`;
 
 @Injectable()
 export class TiragesService {
@@ -18,8 +19,12 @@ export class TiragesService {
     private backendService: BackendService
   ) {}
 
+  deleteTirage(idUtilisateur: number, idTirage: number): Observable<any> {
+    return this.backendService.delete(URL_TIRAGE(idUtilisateur, idTirage));
+  }
+
   getTirage(idUtilisateur: number, idTirage: number): Observable<GetTirageResDTO> {
-    return this.backendService.get<GetTirageResDTO>(URL_TIRAGES(idUtilisateur) + `/${idTirage}`);
+    return this.backendService.get<GetTirageResDTO>(URL_TIRAGE(idUtilisateur, idTirage));
   }
 
   getTirages(idUtilisateur: number, organisateur: boolean): Observable<TirageResumeDTO[]> {

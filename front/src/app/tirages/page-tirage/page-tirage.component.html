@@ -1,27 +1,37 @@
-<ng-container *ngIf="tirage$|async as tirage">
+<ng-container *ngIf="tirage">
   <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
     <h1>
       {{tirage.titre}}
       <small class="text-muted">{{tirage.date}}</small>
     </h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+      <div class="btn-group mr-2">
+        <button class="btn btn-sm btn-danger" (click)="supprime()" *ngIf="tirage.estOrganisateur"
+          [disabled]="suppressionEnCours">
+          <i-feather name="x"></i-feather>Supprimer
+        </button>
+      </div>
+    </div>
   </div>
 
-  <ng-container *ngIf="tirage.estOrganisateur">
-    <div class="alert alert-success" role="success">
-      <i-feather name="clipboard"></i-feather>
-      Vous organisez ce tirage.
-    </div>
-  </ng-container>
+  <div class="alert alert-success" role="success" *ngIf="tirage.estOrganisateur">
+    <i-feather name="clipboard"></i-feather>
+    Vous organisez ce tirage.
+  </div>
   
-  <ng-container *ngIf="!tirage.lance">
-    <div class="alert alert-warning" role="warning">
-      <i-feather name="alert-triangle"></i-feather>
-      <span class="sr-only">Attention :</span>
-      Le tirage au sort n'a pas encore été lancé !
-    </div>
-  </ng-container>
+  <div class="alert alert-warning" role="warning" *ngIf="!tirage.lance">
+    <i-feather name="alert-triangle"></i-feather>
+    <span class="sr-only">Attention :</span>
+    Le tirage au sort n'a pas encore été lancé !
+  </div>
+  
+  <ngb-alert type="danger" role="danger" *ngFor="let erreur of erreurs; index as i" (close)="fermeErreur(i)">
+    <i-feather name="alert-triangle"></i-feather>
+    <span class="sr-only">Erreur :</span>
+    {{erreur}}
+  </ngb-alert>
 
-  <p>Participants :</p>
+  <h3>Participants</h3>
 
   <div class="card-deck">
     <app-participant *ngFor="let participant of tirage.participants" [participant]="participant">

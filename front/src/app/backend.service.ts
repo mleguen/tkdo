@@ -14,6 +14,12 @@ export class BackendService {
     private http: HttpClient
   ) {}
 
+  delete<T = any>(url: string): Observable<T> {
+    return this.http.delete<T>(environment.backUrl + url).pipe(
+      catchError<T, Observable<T>>(err => this.handleHttpError(err))
+    );
+  }
+
   get<T>(url: string): Observable<T> {
     return this.http.get<T>(environment.backUrl + url).pipe(
       catchError<T, Observable<T>>(err => this.handleHttpError(err))

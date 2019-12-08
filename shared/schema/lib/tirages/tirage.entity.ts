@@ -26,6 +26,6 @@ export class Tirage implements ITirage {
   @OneToMany(type => Participation, participation => participation.tirage, { cascade: true })
   participations: Participation[];
 
-  @Column({ length: 16, nullable: false, default: StatutTirage.CREE })
+  @Column({ length: 16, nullable: false, default: StatutTirage.Cree })
   statut: string;
 }

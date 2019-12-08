@@ -1,18 +1,15 @@
-import { Controller, UseGuards, Get, Param, Query, ParseIntPipe, Post, Body } from '@nestjs/common';
+import { Controller, UseGuards, Get, Param, Query, ParseIntPipe, Post, Body, Delete, BadRequestException, NotFoundException } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { InjectRepository } from '@nestjs/typeorm';
 import { pick } from 'lodash';
 
-import { Droit } from '../../../shared/domaine';
+import { Droit, StatutTirage } from '../../../shared/domaine';
 import { ParticipationRepository, TirageRepository, Tirage, Utilisateur } from '../../../shared/schema';
 import { UtilisateurAuthentifieDoitAvoirDroit } from '../auth/droit.decorator';
 import { DroitGuard } from '../auth/droits.guard';
 import { IdUtilisateurGuard } from '../auth/id-utilisateur.guard';
 import { UtilisateurAuthentifieDoitAvoirId } from '../auth/param-id-utilisateur.decorator';
-import { GetTirageResDTO } from './dto/get-tirage-res.dto';
-import { TirageResumeDTO } from './dto/tirage-resume.dto';
-import { PostTirageReqDTO } from './dto/post-tirage-req.dto';
-import { PostTirageResDTO } from './dto/post-tirage-res.dto';
+import { GetTirageResDTO, TirageResumeDTO, PostTirageReqDTO, PostTirageResDTO } from './dto';
 
 @Controller('utilisateurs')
 @UseGuards(AuthGuard('jwt'), DroitGuard, IdUtilisateurGuard)
@@ -22,6 +19,30 @@ export class UtilisateursController {
     @InjectRepository(ParticipationRepository) private readonly participationRepository: ParticipationRepository,
     @InjectRepository(TirageRepository) private readonly tirageRepository: TirageRepository
   ) {}
+
+  @Delete('/:idUtilisateur/tirages/:idTirage')
+  @UtilisateurAuthentifieDoitAvoirDroit(Droit.ModificationTirages)
+  @UtilisateurAuthentifieDoitAvoirId()
+  async deleteTirageUtilisateur(
+    @Param('idUtilisateur', new ParseIntPipe()) idUtilisateur: number,
+    @Param('idTirage', new ParseIntPipe()) idTirage: number
+  ): Promise<any> {
+    const tirage = await this.tirageRepository.findOne(idTirage, {
+      relations: ['organisateur']
+    });
+    if (!tirage) {
+      throw new NotFoundException("ce tirage n'existe pas");
+    }
+    if (tirage.organisateur.id !== idUtilisateur) {
+      throw new BadRequestException("vous n'êtes pas l'organisateur de ce tirage");
+    }
+    // TODO : la suite devrait être faite dans le domaine, via un plugin repository
+    if (tirage.statut !== StatutTirage.Cree) {
+      throw new BadRequestException("le tirage est déjà lancé");
+    }
+
+    await this.tirageRepository.remove(tirage);
+  }
 
   @Get('/:idUtilisateur/tirages')
   @UtilisateurAuthentifieDoitAvoirDroit(Droit.ConsultationTirages)
@@ -46,10 +67,13 @@ export class UtilisateursController {
     const tirage = await this.tirageRepository.findOne(idTirage, {
       relations: ['organisateur', 'participations', 'participations.participant', 'participations.offreA']
     });
+    if (!tirage) {
+      throw new NotFoundException("ce tirage n'existe pas");
+    }
     const estOrganisateur = tirage.organisateur.id === idUtilisateur;
     const participationUtilisateur = tirage.participations.find(participation => participation.participant.id === idUtilisateur);
     if (!estOrganisateur && !participationUtilisateur) {
-      throw new Error("l'utilisateur ne participe pas à ce tirage et n'en est pas l'organisateur");
+      throw new BadRequestException("vous ne participez pas à ce tirage et n'en êtes pas l'organisateur");
     }
 
     return Object.assign(
@@ -69,11 +93,12 @@ export class UtilisateursController {
   @Post('/:idUtilisateur/tirages')
   @UtilisateurAuthentifieDoitAvoirDroit(Droit.ModificationTirages)
   @UtilisateurAuthentifieDoitAvoirId()
-  async postTiragesUtilisateur(
+  async postTirageUtilisateur(
     @Param('idUtilisateur', new ParseIntPipe()) idUtilisateur: number,
-    @Body() proprietes: PostTirageReqDTO
+    @Body() body: PostTirageReqDTO
   ): Promise<PostTirageResDTO> {
-    let tirage = new Tirage(proprietes);
+    // TODO : devrait être fait dans le domaine, via un plugin repository
+    let tirage = new Tirage(body);
     tirage.organisateur = new Utilisateur({ id: idUtilisateur });
     tirage = await this.tirageRepository.save(tirage);
     return pick(tirage, 'id');
