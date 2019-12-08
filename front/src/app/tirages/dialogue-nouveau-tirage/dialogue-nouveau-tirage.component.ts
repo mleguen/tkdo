@@ -56,8 +56,8 @@ export class DialogueNouveauTirageComponent {
           day: this.date.day
         }).format()
       }).subscribe({
-        next: () => {
-          this.activeModal.close();
+        next: ({ id }) => {
+          this.activeModal.close(id);
         },
         error: (err: Error) => {
           this.errMessage = err.message;

@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { Observable, combineLatest, BehaviorSubject } from 'rxjs';
+import { Observable, combineLatest } from 'rxjs';
 import { map, switchMap, filter, tap } from 'rxjs/operators';
 
 import { TirageResumeDTO } from '../../../../../back/src/utilisateurs/dto/tirage-resume.dto';
@@ -21,12 +21,12 @@ export class PageTiragesComponent {
   tiragesAVenir$: Observable<TirageResumeDTO[]>;
   tiragesPasses$: Observable<TirageResumeDTO[]>;
   private idUtilisateur?: number;
-  private refresh$: BehaviorSubject<null> = new BehaviorSubject(null);
 
   constructor(
     route: ActivatedRoute,
     private modalService: NgbModal,
-    tiragesService: TiragesService
+    tiragesService: TiragesService,
+    private router: Router
   ) {
     this.params$ = combineLatest(route.paramMap, route.queryParamMap).pipe(
       map(([pm, qpm]) => ({
@@ -38,8 +38,8 @@ export class PageTiragesComponent {
         this.idUtilisateur = params.idUtilisateur;
       })
     );
-    const tirages$ = combineLatest(this.params$, this.refresh$).pipe(
-      switchMap(([{ idUtilisateur, organisateur }]) => tiragesService.getTirages(idUtilisateur, organisateur))
+    const tirages$ = this.params$.pipe(
+      switchMap(({ idUtilisateur, organisateur }) => tiragesService.getTirages(idUtilisateur, organisateur))
     );
     this.tiragesAVenir$ = tirages$.pipe(
       map(tirages => tirages
@@ -61,8 +61,8 @@ export class PageTiragesComponent {
     let modalRef = this.modalService.open(DialogueNouveauTirageComponent, { centered: true });
     modalRef.componentInstance.init(this.idUtilisateur);
     try {
-      await modalRef.result;
-      this.refresh$.next(null);
+      const idTirage = (await modalRef.result) as number;
+      this.router.navigate(['utilisateurs', this.idUtilisateur, 'tirages', idTirage]);
     }
     catch (err) { }
   }

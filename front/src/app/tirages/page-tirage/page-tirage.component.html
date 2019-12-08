@@ -1,7 +1,9 @@
 <ng-container *ngIf="tirage$|async as tirage">
   <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-    <h1>{{tirage.titre}}</h1>
-    <small class="text-muted" *ngIf="sousTitre">{{tirage.date}}</small>
+    <h1>
+      {{tirage.titre}}
+      <small class="text-muted">{{tirage.date}}</small>
+    </h1>
   </div>
 
   <ng-container *ngIf="tirage.estOrganisateur">

@@ -3,6 +3,7 @@ import * as moment from 'moment';
 
 import { GetTirageResDTO } from '../../../../back/src/utilisateurs/dto/get-tirage-res.dto';
 import { PostTirageReqDTO } from '../../../../back/src/utilisateurs/dto/post-tirage-req.dto';
+import { PostTirageResDTO } from '../../../../back/src/utilisateurs/dto/post-tirage-res.dto';
 import { TirageResumeDTO } from '../../../../back/src/utilisateurs/dto/tirage-resume.dto';
 import { Observable } from 'rxjs';
 
@@ -25,8 +26,8 @@ export class TiragesService {
     return this.backendService.get<TirageResumeDTO[]>(URL_TIRAGES(idUtilisateur) + `?organisateur=${organisateur ? 1 : 0}`);
   }
 
-  postTirage(idUtilisateur: number, tirage: PostTirageReqDTO) {
-    return this.backendService.post<PostTirageReqDTO>(URL_TIRAGES(idUtilisateur), tirage);
+  postTirage(idUtilisateur: number, tirage: PostTirageReqDTO): Observable<PostTirageResDTO> {
+    return this.backendService.post<PostTirageResDTO>(URL_TIRAGES(idUtilisateur), tirage);
   }
 }
 
