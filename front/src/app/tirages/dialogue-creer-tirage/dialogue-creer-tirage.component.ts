@@ -5,11 +5,11 @@ import { TiragesService } from '../tirages.service';
 import * as moment from 'moment';
 
 @Component({
-  selector: 'app-dialogue-nouveau-tirage',
-  templateUrl: './dialogue-nouveau-tirage.component.html',
-  styleUrls: ['./dialogue-nouveau-tirage.component.scss']
+  selector: 'app-dialogue-creer-tirage',
+  templateUrl: './dialogue-creer-tirage.component.html',
+  styleUrls: ['./dialogue-creer-tirage.component.scss']
 })
-export class DialogueNouveauTirageComponent {
+export class DialogueCreerTirageComponent {
   date: NgbDateStruct;
   errMessage?: string;
   statut: Statut = Statut.Ouvert;
@@ -47,7 +47,7 @@ export class DialogueNouveauTirageComponent {
     if (this.statut === Statut.Pret) {
       this.statut = Statut.EnAttente;
 
-      this.serviceTirages.postTirage(this.idUtilisateur, {
+      this.serviceTirages.postTirages(this.idUtilisateur, {
         titre: this.titre,
         date: moment({
           year: this.date.year,

@@ -5,7 +5,8 @@ import { RouterModule } from '@angular/router';
 import { NgbModule, NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap';
 
 import { IconesModule } from '../icones/icones.module';
-import { DialogueNouveauTirageComponent } from './dialogue-nouveau-tirage/dialogue-nouveau-tirage.component';
+import { UtilisateursModule } from '../utilisateurs/utilisateurs.module';
+import { DialogueCreerTirageComponent } from './dialogue-creer-tirage/dialogue-creer-tirage.component';
 import { PageTirageComponent } from './page-tirage/page-tirage.component';
 import { PageTiragesComponent } from './page-tirages/page-tirages.component';
 import { ParticipantComponent } from './participant/participant.component';
@@ -13,6 +14,7 @@ import { TirageResumeComponent } from './tirage-resume/tirage-resume.component';
 import { MomentDateParserFormatter } from './moment-date-parser-formatter.service';
 import { TiragesRoutingModule } from './tirages-routing.module';
 import { TiragesService } from './tirages.service';
+import { DialogueAjouterParticipantComponent } from './dialogue-ajouter-participant/dialogue-ajouter-participant.component';
 
 @NgModule({
   declarations: [
@@ -20,7 +22,8 @@ import { TiragesService } from './tirages.service';
     PageTirageComponent,
     ParticipantComponent,
     TirageResumeComponent,
-    DialogueNouveauTirageComponent
+    DialogueAjouterParticipantComponent,
+    DialogueCreerTirageComponent
   ],
   imports: [
     CommonModule,
@@ -28,12 +31,16 @@ import { TiragesService } from './tirages.service';
     FormsModule,
     NgbModule,
     IconesModule,
-    TiragesRoutingModule
+    TiragesRoutingModule,
+    UtilisateursModule
   ],
   providers: [
     { provide: NgbDateParserFormatter, useClass: MomentDateParserFormatter },
     TiragesService
   ],
-  bootstrap: [DialogueNouveauTirageComponent]
+  bootstrap: [
+    DialogueAjouterParticipantComponent,
+    DialogueCreerTirageComponent
+  ]
 })
 export class TiragesModule { }

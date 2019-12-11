@@ -1,0 +1,24 @@
+<div class="modal-header">
+  <h5 class="modal-title">Ajouter un participant</h5>
+  <button type="button" class="close" (click)="close()" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<form #dialogueForm="ngForm" (ngSubmit)="submit()">
+  <div class="modal-body">
+    <div class="alert alert-danger" *ngIf="errMessage">{{errMessage}}</div>
+    <div class="form-group">
+      <label for="nom">Nom</label>
+      <input id="nom" name="nom" type="text" class="form-control" [(ngModel)]="nom" [ngbTypeahead]="chercheNom.bind(this)" required />
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-success" [disabled]="!pret || !dialogueForm.valid" type="submit">
+      <div class="spinner-border" role="status" *ngIf="enAttente">
+        <span class="sr-only">Demande en cours...</span>
+      </div>
+      Ajouter
+    </button>
+    <button type="button" class="btn btn-secondary" (click)="close()">Annuler</button>
+  </div>
+</form>

@@ -6,8 +6,8 @@
     </h1>
     <div class="btn-toolbar mb-2 mb-md-0">
       <div class="btn-group mr-2">
-        <button class="btn btn-sm btn-danger" (click)="supprime()" *ngIf="tirage.estOrganisateur"
-          [disabled]="suppressionEnCours">
+        <button class="btn btn-sm btn-danger" (click)="supprimeTirage()" *ngIf="tirage.estOrganisateur"
+          [disabled]="suppressionTirageEnCours">
           <i-feather name="x"></i-feather>Supprimer
         </button>
       </div>
@@ -31,7 +31,17 @@
     {{erreur}}
   </ngb-alert>
 
-  <h3>Participants</h3>
+  <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3">
+    <h3>Participants</h3>
+    <div class="btn-toolbar mb-2 mb-md-0">
+      <div class="btn-group mr-2">
+        <button class="btn btn-sm btn-success" (click)="ajouteParticipant()" [disabled]="ajoutParticipantEnCours"
+          *ngIf="tirage.estOrganisateur">
+          <i-feather name="plus"></i-feather>Ajouter
+        </button>
+      </div>
+    </div>
+  </div>
 
   <div class="card-deck">
     <app-participant *ngFor="let participant of tirage.participants" [participant]="participant">

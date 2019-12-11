@@ -3,8 +3,8 @@
     <h1>{{ params.organisateur ? 'Les tirages que j\'organise' : 'Les tirages auxquels je participe' }}</h1>
     <div class="btn-toolbar mb-2 mb-md-0">
       <div class="btn-group mr-2">
-        <button class="btn btn-sm btn-success" (click)="ouvreDialogueNouveauTirage()" *ngIf="params.organisateur">
-          <i-feather name="plus"></i-feather>Nouveau
+        <button class="btn btn-sm btn-success" (click)="creeTirage()" *ngIf="params.organisateur">
+          <i-feather name="plus"></i-feather>Créer
         </button>
       </div>
     </div>

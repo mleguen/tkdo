@@ -1,3 +1,3 @@
 import { ITirage } from '../../../../shared/domaine';
 
-export type PostTirageResDTO = Pick<ITirage, 'id'>;
+export type PostTiragesResDTO = Pick<ITirage, 'id'>;

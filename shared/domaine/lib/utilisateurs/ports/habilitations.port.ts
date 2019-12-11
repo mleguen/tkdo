@@ -9,6 +9,7 @@ export class PortHabilitations {
     [Role.Organisateur]: [
       Droit.Connexion,
       Droit.ConsultationTirages,
+      Droit.ConsultationUtilisateurs,
       Droit.ModificationTirages,
       Droit.Organisation
     ],

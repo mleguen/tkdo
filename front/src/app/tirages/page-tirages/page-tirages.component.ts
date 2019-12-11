@@ -5,7 +5,7 @@ import { Observable, combineLatest } from 'rxjs';
 import { map, switchMap, filter, tap } from 'rxjs/operators';
 
 import { TirageResumeDTO } from '../../../../../back/src/utilisateurs/dto/tirage-resume.dto';
-import { DialogueNouveauTirageComponent } from '../dialogue-nouveau-tirage/dialogue-nouveau-tirage.component';
+import { DialogueCreerTirageComponent } from '../dialogue-creer-tirage/dialogue-creer-tirage.component';
 import { TiragesService, estTiragePasse, compareTiragesParDate, formateDatesTirage } from '../tirages.service';
 
 @Component({
@@ -57,8 +57,8 @@ export class PageTiragesComponent {
     );
   }
 
-  async ouvreDialogueNouveauTirage() {
-    let modalRef = this.modalService.open(DialogueNouveauTirageComponent, { centered: true });
+  async creeTirage() {
+    let modalRef = this.modalService.open(DialogueCreerTirageComponent, { centered: true });
     modalRef.componentInstance.init(this.idUtilisateur);
     try {
       const idTirage = (await modalRef.result) as number;

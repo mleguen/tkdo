@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { DialogueNouveauTirageComponent } from './dialogue-nouveau-tirage.component';
+import { DialogueCreerTirageComponent } from './dialogue-creer-tirage.component';
 
 describe('DialogueNouveauTirageComponent', () => {
-  let component: DialogueNouveauTirageComponent;
-  let fixture: ComponentFixture<DialogueNouveauTirageComponent>;
+  let component: DialogueCreerTirageComponent;
+  let fixture: ComponentFixture<DialogueCreerTirageComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ DialogueNouveauTirageComponent ]
+      declarations: [ DialogueCreerTirageComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(DialogueNouveauTirageComponent);
+    fixture = TestBed.createComponent(DialogueCreerTirageComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
