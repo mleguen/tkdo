@@ -5,7 +5,7 @@ import { RouterModule } from '@angular/router';
 import { NgbModule, NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap';
 
 import { IconesModule } from '../icones/icones.module';
-import { UtilisateursModule } from '../utilisateurs/utilisateurs.module';
+import { UtilisateursModule } from '../utilisateurs';
 import { DialogueCreerTirageComponent } from './dialogue-creer-tirage/dialogue-creer-tirage.component';
 import { PageTirageComponent } from './page-tirage/page-tirage.component';
 import { PageTiragesComponent } from './page-tirages/page-tirages.component';
@@ -14,7 +14,7 @@ import { CarteTirageComponent } from './carte-tirage/carte-tirage.component';
 import { MomentDateParserFormatter } from './moment-date-parser-formatter.service';
 import { TiragesRoutingModule } from './tirages-routing.module';
 import { TiragesService } from './tirages.service';
-import { DialogueAjouterParticipantComponent } from './dialogue-ajouter-participant/dialogue-ajouter-participant.component';
+import { DialogueChoisirUtilisateurComponent } from './dialogue-choisir-utilisateur/dialogue-choisir-utilisateur.component';
 
 @NgModule({
   declarations: [
@@ -22,7 +22,7 @@ import { DialogueAjouterParticipantComponent } from './dialogue-ajouter-particip
     PageTirageComponent,
     CarteParticipantComponent,
     CarteTirageComponent,
-    DialogueAjouterParticipantComponent,
+    DialogueChoisirUtilisateurComponent,
     DialogueCreerTirageComponent
   ],
   imports: [
@@ -39,7 +39,7 @@ import { DialogueAjouterParticipantComponent } from './dialogue-ajouter-particip
     TiragesService
   ],
   bootstrap: [
-    DialogueAjouterParticipantComponent,
+    DialogueChoisirUtilisateurComponent,
     DialogueCreerTirageComponent
   ]
 })

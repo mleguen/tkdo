@@ -6,8 +6,9 @@ import { Subject } from 'rxjs';
 import { map, switchMap, filter, tap, takeUntil, finalize, combineLatest } from 'rxjs/operators';
 
 import { GetTirageResDTO } from '../../../../../back/src/utilisateurs/dto/get-tirage-res.dto';
-import { StatutTirage } from '../../../../../shared/domaine';
-import { DialogueAjouterParticipantComponent } from '../dialogue-ajouter-participant/dialogue-ajouter-participant.component';
+import { StatutTirage, IUtilisateur } from '../../../../../shared/domaine';
+import { UtilisateursService } from '../../utilisateurs';
+import { DialogueChoisirUtilisateurComponent } from '../dialogue-choisir-utilisateur/dialogue-choisir-utilisateur.component';
 import { TiragesService, formateDatesTirage } from '../tirages.service';
 
 @Component({
@@ -30,6 +31,7 @@ export class PageTirageComponent implements OnInit, OnDestroy {
   constructor(
     private route: ActivatedRoute,
     private serviceTirages: TiragesService,
+    private serviceUtilisateurs: UtilisateursService,
     private location: Location,
     private modalService: NgbModal
   ) { }
@@ -68,15 +70,35 @@ export class PageTirageComponent implements OnInit, OnDestroy {
     this.refresh.next();
   }
 
-  async ajouteParticipant() {
-    let modalRef = this.modalService.open(DialogueAjouterParticipantComponent, { centered: true });
-    modalRef.componentInstance.init(this.idUtilisateur, this.tirage);
+  ajouteParticipant() {
+    this.serviceUtilisateurs.getUtilisateurs().subscribe({
+      next: async (utilisateurs) => {
+        let modalRef = this.modalService.open(DialogueChoisirUtilisateurComponent, { centered: true });
+        modalRef.componentInstance.label = "Ajouter";
+        modalRef.componentInstance.titre = "Ajouter un participant";
+        modalRef.componentInstance.utilisateurs = utilisateurs
+          .filter(utilisateur => !this.tirage.participants.some(participant => participant.id === utilisateur.id));
+        
     try {
-      await modalRef.result;
+          let utilisateur: Pick<IUtilisateur, "id"> = await modalRef.result;
+          this.serviceTirages.postParticipantsTirage(this.idUtilisateur, this.tirage.id, {
+            id: utilisateur.id
+          }).subscribe({
+            next: () => {
+              this.actualise();
+            },
+            error: (err: Error) => {
+              this.erreurs.push(`L'ajout du participant a échoué : ${err.message}`);
+            }
+          });
     }
     catch (err) { }
     
-    this.actualise();
+      },
+      error: (err: Error) => {
+        this.erreurs.push(`La récupération de la liste des utilisateurs a échoué : ${err.message}`);
+      }
+    });
   }
 
   fermeErreur(i: number) {
