@@ -13,16 +13,16 @@
   <ng-container *ngIf="tiragesAVenir$|async as tirages">
     <h3>Tirages à venir</h3>
     <div class="card-deck">
-      <app-tirage-resume *ngFor="let tirage of tirages" [tirage]="tirage"
-        [idUtilisateur]="params.idUtilisateur"></app-tirage-resume>
+      <app-carte-tirage *ngFor="let tirage of tirages" [tirage]="tirage"
+        [idUtilisateur]="params.idUtilisateur"></app-carte-tirage>
     </div>
   </ng-container>
   
   <ng-container *ngIf="tiragesPasses$|async as tirages">
     <h3>Tirages passés</h3>
     <div class="card-deck">
-      <app-tirage-resume *ngFor="let tirage of tirages" [tirage]="tirage"
-        [idUtilisateur]="params.idUtilisateur"></app-tirage-resume>
+      <app-carte-tirage *ngFor="let tirage of tirages" [tirage]="tirage"
+        [idUtilisateur]="params.idUtilisateur"></app-carte-tirage>
     </div>
   </ng-container>
 </ng-container>

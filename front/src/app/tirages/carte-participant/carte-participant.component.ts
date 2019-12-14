@@ -3,11 +3,11 @@ import { Component, HostBinding, Input } from '@angular/core';
 import { UtilisateurResumeDTO } from '../../../../../back/src/utilisateurs/dto/utilisateur-resume.dto';
 
 @Component({
-  selector: 'app-participant',
-  templateUrl: './participant.component.html',
-  styleUrls: ['./participant.component.scss']
+  selector: 'app-carte-participant',
+  templateUrl: './carte-participant.component.html',
+  styleUrls: ['./carte-participant.component.scss']
 })
-export class ParticipantComponent {  
+export class CarteParticipantComponent {  
   // Le card deck ne supporte pas qu'il y ait des wrappers autours des cards
   // donc c'est le wrapper lui même qui doit porter la classe card
   @HostBinding('class.card') classCard = true;

@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { TirageResumeComponent } from './tirage-resume.component';
+import { CarteTirageComponent } from './carte-tirage.component';
 
-describe('TirageResumeComponent', () => {
-  let component: TirageResumeComponent;
-  let fixture: ComponentFixture<TirageResumeComponent>;
+describe('CarteTirageComponent', () => {
+  let component: CarteTirageComponent;
+  let fixture: ComponentFixture<CarteTirageComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ TirageResumeComponent ]
+      declarations: [ CarteTirageComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(TirageResumeComponent);
+    fixture = TestBed.createComponent(CarteTirageComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

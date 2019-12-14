@@ -9,8 +9,8 @@ import { UtilisateursModule } from '../utilisateurs/utilisateurs.module';
 import { DialogueCreerTirageComponent } from './dialogue-creer-tirage/dialogue-creer-tirage.component';
 import { PageTirageComponent } from './page-tirage/page-tirage.component';
 import { PageTiragesComponent } from './page-tirages/page-tirages.component';
-import { ParticipantComponent } from './participant/participant.component';
-import { TirageResumeComponent } from './tirage-resume/tirage-resume.component';
+import { CarteParticipantComponent } from './carte-participant/carte-participant.component';
+import { CarteTirageComponent } from './carte-tirage/carte-tirage.component';
 import { MomentDateParserFormatter } from './moment-date-parser-formatter.service';
 import { TiragesRoutingModule } from './tirages-routing.module';
 import { TiragesService } from './tirages.service';
@@ -20,8 +20,8 @@ import { DialogueAjouterParticipantComponent } from './dialogue-ajouter-particip
   declarations: [
     PageTiragesComponent,
     PageTirageComponent,
-    ParticipantComponent,
-    TirageResumeComponent,
+    CarteParticipantComponent,
+    CarteTirageComponent,
     DialogueAjouterParticipantComponent,
     DialogueCreerTirageComponent
   ],
