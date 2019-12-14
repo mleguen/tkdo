@@ -25,7 +25,6 @@ export class PageTirageComponent implements OnInit, OnDestroy {
   private ngUnsubscribe = new Subject();
   private refresh = new Subject();
 
-  // TODO : ajouter un bouton sur chaque participant pour le supprimer tant que le tirage n'a pas été lancé (grisé sinon)
   // TODO : rendre consultable sur smartphone (valable pour toutes les pages de l'application)
 
   constructor(
@@ -79,10 +78,10 @@ export class PageTirageComponent implements OnInit, OnDestroy {
         modalRef.componentInstance.utilisateurs = utilisateurs
           .filter(utilisateur => !this.tirage.participants.some(participant => participant.id === utilisateur.id));
         
-    try {
-          let utilisateur: Pick<IUtilisateur, "id"> = await modalRef.result;
+        try {
+          let participant: Pick<IUtilisateur, "id"> = await modalRef.result;
           this.serviceTirages.postParticipantsTirage(this.idUtilisateur, this.tirage.id, {
-            id: utilisateur.id
+            id: participant.id
           }).subscribe({
             next: () => {
               this.actualise();
@@ -91,12 +90,22 @@ export class PageTirageComponent implements OnInit, OnDestroy {
               this.erreurs.push(`L'ajout du participant a échoué : ${err.message}`);
             }
           });
-    }
-    catch (err) { }
-    
+        }
+        catch (err) { }
       },
       error: (err: Error) => {
         this.erreurs.push(`La récupération de la liste des utilisateurs a échoué : ${err.message}`);
+      }
+    });
+  }
+
+  enleveParticipant(participant: Pick<IUtilisateur, "id">) {
+    this.serviceTirages.deleteParticipantTirage(this.idUtilisateur, this.tirage.id, participant.id).subscribe({
+      next: () => {
+        this.actualise();
+      },
+      error: (err: Error) => {
+        this.erreurs.push(`La suppression du participant a échoué : ${err.message}`);
       }
     });
   }

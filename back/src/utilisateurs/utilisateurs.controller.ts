@@ -30,6 +30,35 @@ export class UtilisateursController {
     return utilisateurs.map(utilisateur => pick(utilisateur, 'id', 'nom', 'login'));
   }
 
+  @Delete('/:idUtilisateur/tirages/:idTirage/participants/:idParticipant')
+  @UtilisateurAuthentifieDoitAvoirDroit(Droit.ModificationTirages)
+  @UtilisateurAuthentifieDoitAvoirId()
+  async deleteParticipantTirageUtilisateur(
+    @Param('idUtilisateur', new ParseIntPipe()) idUtilisateur: number,
+    @Param('idTirage', new ParseIntPipe()) idTirage: number,
+    @Param('idParticipant', new ParseIntPipe()) idParticipant: number
+  ): Promise<any> {
+    // TODO : toute manipulation de repository devrait être faite dans un service
+    const tirage = await this.tirageRepository.findOne(idTirage, {
+      relations: ['organisateur', 'participations']
+    });
+    if (!tirage) {
+      throw new NotFoundException("ce tirage n'existe pas");
+    }
+    if (tirage.organisateur.id !== idUtilisateur) {
+      throw new BadRequestException("vous n'êtes pas l'organisateur de ce tirage");
+    }
+    // TODO : la suite devrait être faite dans le domaine, via un plugin repository
+    if (tirage.statut !== StatutTirage.Cree) {
+      throw new BadRequestException("le tirage est déjà lancé");
+    }
+    let participation = tirage.participations.find(({ participantId }: Participation) => participantId === idParticipant)
+    if (!participation) {
+      throw new BadRequestException("cet utilisateur ne participe déjà pas au tirage");
+    }
+    await this.participationRepository.remove(participation);
+  }
+
   @Delete('/:idUtilisateur/tirages/:idTirage')
   @UtilisateurAuthentifieDoitAvoirDroit(Droit.ModificationTirages)
   @UtilisateurAuthentifieDoitAvoirId()

@@ -1,4 +1,4 @@
-import { Component, HostBinding, Input } from '@angular/core';
+import { Component, EventEmitter, HostBinding, Input, Output } from '@angular/core';
 
 import { UtilisateurResumeDTO } from '../../../../../back/src/utilisateurs/dto/utilisateur-resume.dto';
 
@@ -14,13 +14,20 @@ export class CarteParticipantComponent {
   
   @Input() participant: UtilisateurResumeDTO & {
     estAQuiOffrir?: boolean,
-    estUtilisateur?: boolean
+    estUtilisateur?: boolean,
   };
+  @Input() supprimable: boolean;
   
+  @Output() deleted = new EventEmitter();
+
   @HostBinding('class.text-white') get classTextBlanc() { return !!this.participant.estUtilisateur; }
   @HostBinding('class.bg-success') get classBgVert() { return !!this.participant.estUtilisateur; }
   @HostBinding('class.bg-warning') get classBgJaune() { return !!this.participant.estAQuiOffrir; }
-  
+
+  delete() {
+    this.deleted.emit();
+  }
+
   get icone() {
     return this.participant.estUtilisateur ? 'user-check' :
       this.participant.estAQuiOffrir ? 'gift' : 'user';

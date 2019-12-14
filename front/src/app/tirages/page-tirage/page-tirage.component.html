@@ -44,7 +44,10 @@
   </div>
 
   <div class="card-deck">
-    <app-carte-participant *ngFor="let participant of tirage.participants" [participant]="participant">
+    <app-carte-participant *ngFor="let participant of tirage.participants"
+      [participant]="participant"
+      [supprimable]="tirage.estOrganisateur"
+      (deleted)="enleveParticipant(participant)">
     </app-carte-participant>
   </div>
 </ng-container>

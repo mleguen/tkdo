@@ -8,6 +8,10 @@ import { BackendService } from '../backend.service';
 
 const URL_TIRAGES = (idUtilisateur: number) => `/utilisateurs/${idUtilisateur}/tirages`;
 const URL_TIRAGE = (idUtilisateur: number, idTirage: number) => URL_TIRAGES(idUtilisateur) + `/${idTirage}`;
+const URL_PARTICIPANTS_TIRAGE = (idUtilisateur: number, idTirage: number) =>
+  URL_TIRAGE(idUtilisateur, idTirage) + `/participants`;
+const URL_PARTICIPANT_TIRAGE = (idUtilisateur: number, idTirage: number, idParticipant: number) =>
+  URL_PARTICIPANTS_TIRAGE(idUtilisateur, idTirage) + `/${idParticipant}`;
 
 @Injectable()
 export class TiragesService {
@@ -15,6 +19,10 @@ export class TiragesService {
   constructor(
     private backendService: BackendService
   ) {}
+
+  deleteParticipantTirage(idUtilisateur: number, idTirage: number, idParticipant: number): Observable<any> {
+    return this.backendService.delete(URL_PARTICIPANT_TIRAGE(idUtilisateur, idTirage, idParticipant));
+  }
 
   deleteTirage(idUtilisateur: number, idTirage: number): Observable<any> {
     return this.backendService.delete(URL_TIRAGE(idUtilisateur, idTirage));
@@ -29,7 +37,7 @@ export class TiragesService {
   }
 
   postParticipantsTirage(idUtilisateur: number, idTirage: number, participant: PostParticipantsTirageReqDTO): Observable<any> {
-    return this.backendService.post(URL_TIRAGE(idUtilisateur, idTirage) + '/participants', participant);
+    return this.backendService.post(URL_PARTICIPANTS_TIRAGE(idUtilisateur, idTirage), participant);
   }
 
   postTirages(idUtilisateur: number, tirage: PostTiragesReqDTO): Observable<PostTiragesResDTO> {
