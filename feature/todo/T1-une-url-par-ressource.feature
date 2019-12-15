@@ -1,5 +1,5 @@
 # language: fr
-Fonctionnalité: n'utiliser qu'une seule URL par ressource
+Fonctionnalité: (technique) une seule URL par ressource
 
   Aussi bien côté back que côté front, une même ressource doit avoir une URL unique,
   et pas une URL par représentation de cette ressource.
