@@ -4,7 +4,7 @@ import { IUtilisateur } from '../../../domaine';
 @Entity()
 export class Utilisateur implements IUtilisateur {
   
-  constructor(utilisateur: Pick<Utilisateur, 'login' | 'nom'>) {
+  constructor(utilisateur: Partial<Utilisateur>) {
     Object.assign(this, utilisateur);
   }
 

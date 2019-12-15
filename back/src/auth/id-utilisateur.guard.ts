@@ -2,7 +2,7 @@
 import { Injectable, CanActivate, ExecutionContext, Logger } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
-import { ISSPProfile } from '../../../shared/domaine';
+import { IProfile } from '../../../shared/domaine';
 
 @Injectable()
 export class IdUtilisateurGuard implements CanActivate {
@@ -20,7 +20,7 @@ export class IdUtilisateurGuard implements CanActivate {
     if (paramIdUtilisateur) idUtilisateur = request.params[paramIdUtilisateur];
     if (idUtilisateur === undefined) return true;
     
-    const profile = request.user as ISSPProfile;
+    const profile = request.user as IProfile;
     if (!profile) return false;
 
     if (+idUtilisateur !== profile.utilisateur.id) {

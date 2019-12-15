@@ -1,2 +1,3 @@
-export * from './constantes/statut-tirage.constante';
-export * from './interfaces/tirage.interface';
+export * from './constantes/statut-tirage';
+export * from './types/participation';
+export * from './types/tirage';

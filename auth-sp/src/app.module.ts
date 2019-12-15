@@ -3,7 +3,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { readFileSync } from 'fs';
 
-import { Utilisateur, connectionOptions } from '../../shared/schema';
+import { connectionOptions } from '../../shared/schema';
 import { AuthModule } from './auth/auth.module';
 import { DomaineModule } from './domaine/domaine.module';
 import { AppController } from './app.controller';
@@ -15,9 +15,8 @@ import { RouteLoggerMiddleware } from './route-logger.middleware';
   imports: [
     JwtModule.register({ privateKey: readFileSync(process.env.TKDO_JWT_PRIVATE_KEY_FILE).toString() }),
     TypeOrmModule.forRoot(connectionOptions),
-    ...process.env.NODE_ENV === 'production' ? [AuthModule] : [],
     DomaineModule,
-    TypeOrmModule.forFeature([Utilisateur]),
+    AuthModule
   ],
   controllers: [
     process.env.NODE_ENV === 'production' ? AppController : AppDevController

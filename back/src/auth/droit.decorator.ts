@@ -1,3 +1,7 @@
 import { SetMetadata } from '@nestjs/common';
 
-export const Droit = (droit: string) => SetMetadata('droit', droit);
+import { Droit } from '../../../shared/domaine';
+
+export function UtilisateurAuthentifieDoitAvoirDroit(droit: Droit) {
+  return SetMetadata('droitNecessaire', droit);
+}

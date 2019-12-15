@@ -1,0 +1,21 @@
+<div class="modal-header">
+  <h5 class="modal-title" *ngIf="titre">{{titre}}</h5>
+  <button type="button" class="close" (click)="close()" aria-label="Fermer">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<form #dialogueForm="ngForm" (ngSubmit)="submit()">
+  <div class="modal-body">
+    <div class="form-group">
+      <label for="nom">Nom</label>
+      <input id="nom" name="nom" type="text" class="form-control" [(ngModel)]="nomUnique" required
+        [ngbTypeahead]="getSuggestions.bind(this)" />
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-success" [disabled]="!choix" type="submit" *ngIf="label">
+      {{label}}
+    </button>
+    <button type="button" class="btn btn-secondary" (click)="close()">Annuler</button>
+  </div>
+</form>

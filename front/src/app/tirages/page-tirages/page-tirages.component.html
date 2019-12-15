@@ -1,0 +1,28 @@
+<ng-container *ngIf="params$|async as params">
+  <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1>{{ params.organisateur ? 'Les tirages que j\'organise' : 'Les tirages auxquels je participe' }}</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+      <div class="btn-group mr-2">
+        <button class="btn btn-sm btn-success" (click)="creeTirage()" *ngIf="params.organisateur">
+          <i-feather name="plus"></i-feather>Créer
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <ng-container *ngIf="tiragesAVenir$|async as tirages">
+    <h3>Tirages à venir</h3>
+    <div class="card-deck">
+      <app-carte-tirage *ngFor="let tirage of tirages" [tirage]="tirage"
+        [idUtilisateur]="params.idUtilisateur"></app-carte-tirage>
+    </div>
+  </ng-container>
+  
+  <ng-container *ngIf="tiragesPasses$|async as tirages">
+    <h3>Tirages passés</h3>
+    <div class="card-deck">
+      <app-carte-tirage *ngFor="let tirage of tirages" [tirage]="tirage"
+        [idUtilisateur]="params.idUtilisateur"></app-carte-tirage>
+    </div>
+  </ng-container>
+</ng-container>

@@ -1,13 +1,13 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, PrimaryColumn } from 'typeorm';
+import { Entity, ManyToOne, PrimaryColumn } from 'typeorm';
 
-import { IParticipation } from '../../../domaine/lib/tirages/interfaces/participation.interface';
-import { Utilisateur } from '../utilisateurs/utilisateur.entity';
+import { IParticipation } from '../../../domaine';
+import { Utilisateur } from '../utilisateurs';
 import { Tirage } from './tirage.entity';
 
 @Entity()
 export class Participation implements IParticipation {
 
-  constructor(participation: Pick<Participation, 'participant' | 'offreA'>) {
+  constructor(participation: Partial<Participation>) {
     Object.assign(this, participation);
   }
 
