@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import { UtilisateurResumeDTO } from '../../../../back/src/utilisateurs/dto/utilisateur-resume.dto';
+import { IUtilisateur } from '../../../../shared/domaine';
 import { BackendService } from '../backend.service';
 
 const URL_UTILISATEURS = '/utilisateurs';
@@ -13,6 +13,6 @@ export class UtilisateursService {
   ) { }
   
   getUtilisateurs() {
-    return this.backendService.get<UtilisateurResumeDTO[]>(URL_UTILISATEURS);
+    return this.backendService.get<IUtilisateur[]>(URL_UTILISATEURS);
   }
 }

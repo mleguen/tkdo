@@ -7,7 +7,7 @@ import { Participation } from './participation.entity';
 @Entity()
 export class Tirage implements ITirage {
 
-  constructor(tirage: Partial<Tirage>) {
+  constructor(tirage: Partial<ITirage>) {
     Object.assign(this, tirage);
   }
 

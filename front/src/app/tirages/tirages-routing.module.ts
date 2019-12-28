@@ -7,16 +7,11 @@ import { PageTirageComponent } from './page-tirage/page-tirage.component';
 
 
 const routes: Routes = [{
-  path: 'utilisateurs/:idUtilisateur',
+  path: 'tirages',
   canActivate: [AuthGuard],
   children: [
-    {
-      path: 'tirages',
-      children: [
-        { path: '', component: PageTiragesComponent },
-        { path: ':idTirage', component: PageTirageComponent }
-      ]
-    }
+    { path: '', component: PageTiragesComponent },
+    { path: ':idTirage', component: PageTirageComponent }
   ]
 }];
 

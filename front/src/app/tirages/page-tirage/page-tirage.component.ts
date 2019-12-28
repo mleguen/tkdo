@@ -3,10 +3,9 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Subject } from 'rxjs';
-import { map, switchMap, filter, tap, takeUntil, finalize, combineLatest } from 'rxjs/operators';
+import { map, switchMap, filter, takeUntil, finalize, combineLatest } from 'rxjs/operators';
 
-import { GetTirageResDTO } from '../../../../../back/src/utilisateurs/dto/get-tirage-res.dto';
-import { StatutTirage, IUtilisateur } from '../../../../../shared/domaine';
+import { StatutTirage, IUtilisateur, TirageAnonymise } from '../../../../../shared/domaine';
 import { UtilisateursService } from '../../utilisateurs';
 import { DialogueChoisirUtilisateurComponent } from '../dialogue-choisir-utilisateur/dialogue-choisir-utilisateur.component';
 import { TiragesService, formateDatesTirage } from '../tirages.service';
@@ -19,9 +18,8 @@ import { TiragesService, formateDatesTirage } from '../tirages.service';
 export class PageTirageComponent implements OnInit, OnDestroy {
   erreurs: string[] = []
   suppressionTirageEnCours = false;
-  tirage: GetTirageResDTO & { lance: boolean };
+  tirage: TirageAnonymise & { lance: boolean };
   
-  private idUtilisateur: number;
   private ngUnsubscribe = new Subject();
   private refresh = new Subject();
 
@@ -38,15 +36,11 @@ export class PageTirageComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.route.paramMap.pipe(
       map(pm => ({
-        idUtilisateur: parseInt(pm.get('idUtilisateur')),
         idTirage: parseInt(pm.get('idTirage'))
       })),
-      filter(params => !isNaN(params.idUtilisateur) && !isNaN(params.idTirage)),
-      tap(({ idUtilisateur }) => {
-        this.idUtilisateur = idUtilisateur;
-      }),
+      filter(params => !isNaN(params.idTirage)),
       combineLatest(this.refresh),
-      switchMap(([{ idUtilisateur, idTirage }]) => this.serviceTirages.getTirage(idUtilisateur, idTirage)),
+      switchMap(([{ idTirage }]) => this.serviceTirages.getTirage(idTirage)),
       map(formateDatesTirage()),
       takeUntil(this.ngUnsubscribe)
     ).subscribe({
@@ -80,7 +74,7 @@ export class PageTirageComponent implements OnInit, OnDestroy {
         
         try {
           let participant: Pick<IUtilisateur, "id"> = await modalRef.result;
-          this.serviceTirages.postParticipantsTirage(this.idUtilisateur, this.tirage.id, {
+          this.serviceTirages.postParticipantsTirage(this.tirage.id, {
             id: participant.id
           }).subscribe({
             next: () => {
@@ -100,7 +94,7 @@ export class PageTirageComponent implements OnInit, OnDestroy {
   }
 
   enleveParticipant(participant: Pick<IUtilisateur, "id">) {
-    this.serviceTirages.deleteParticipantTirage(this.idUtilisateur, this.tirage.id, participant.id).subscribe({
+    this.serviceTirages.deleteParticipantTirage(this.tirage.id, participant.id).subscribe({
       next: () => {
         this.actualise();
       },
@@ -117,7 +111,7 @@ export class PageTirageComponent implements OnInit, OnDestroy {
   supprimeTirage() {
     this.suppressionTirageEnCours = true;
 
-    this.serviceTirages.deleteTirage(this.idUtilisateur, this.tirage.id).pipe(
+    this.serviceTirages.deleteTirage(this.tirage.id).pipe(
       takeUntil(this.ngUnsubscribe),
       finalize(() => {
         this.suppressionTirageEnCours = false;
