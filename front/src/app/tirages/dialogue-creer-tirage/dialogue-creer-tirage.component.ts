@@ -14,19 +14,18 @@ export class DialogueCreerTirageComponent {
   errMessage?: string;
   statut: Statut = Statut.Ouvert;
   titre: string;
-  
-  private idUtilisateur?: number;
 
+  // TODO : ne pas créer le tirage ici, mais :
+  // - avoir un événement Output quand le formulaire est validé (pour création du tirage par le parent)
+  // - une méthode de retour de création avec un paramètre err (fermeture de la modale si err undefined, affichage de err sinon)
+  
   constructor(
     private activeModal: NgbActiveModal,
     private serviceTirages: TiragesService
   ) { }
 
-  init(
-    idUtilisateur: number
-  ) {
+  init() {
     if (this.statut === Statut.Ouvert) {
-      this.idUtilisateur = idUtilisateur;
       this.statut = Statut.Pret;
     }
   }
@@ -47,7 +46,7 @@ export class DialogueCreerTirageComponent {
     if (this.statut === Statut.Pret) {
       this.statut = Statut.EnAttente;
 
-      this.serviceTirages.postTirages(this.idUtilisateur, {
+      this.serviceTirages.postTirages({
         titre: this.titre,
         date: moment({
           year: this.date.year,

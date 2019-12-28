@@ -5,8 +5,8 @@ import { Request } from 'express';
 import { PortHabilitations, IProfile, Droit } from '../../../shared/domaine';
 
 @Injectable()
-export class DroitGuard implements CanActivate {
-  private logger = new Logger(DroitGuard.name);
+export class DroitNecessaireGuard implements CanActivate {
+  private logger = new Logger(DroitNecessaireGuard.name);
 
   constructor(
     private readonly reflector: Reflector,

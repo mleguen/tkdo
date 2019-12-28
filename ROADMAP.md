@@ -1,8 +1,8 @@
 # Roadmap
 
 ## V1.0 (MVP)
-- [T1-une-url-par-ressource.feature](./feature/todo/T1-une-url-par-ressource.feature)
 - [T2-utilisable-sur-smartphone.feature](./feature/todo/T2-utilisable-sur-smartphone.feature)
+- faire le ménage dans les autres TODO
 - [4-lancement-tirage.feature](./feature/todo/4-lancement-tirage.feature)
 
 ## V1.1

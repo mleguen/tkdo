@@ -1,6 +1,5 @@
 import { Component, EventEmitter, HostBinding, Input, Output } from '@angular/core';
-
-import { UtilisateurResumeDTO } from '../../../../../back/src/utilisateurs/dto/utilisateur-resume.dto';
+import { ParticipantTirageAnonymise } from '../../../../../shared/domaine';
 
 @Component({
   selector: 'app-carte-participant',
@@ -12,10 +11,7 @@ export class CarteParticipantComponent {
   // donc c'est le wrapper lui même qui doit porter la classe card
   @HostBinding('class.card') classCard = true;
   
-  @Input() participant: UtilisateurResumeDTO & {
-    estAQuiOffrir?: boolean,
-    estUtilisateur?: boolean,
-  };
+  @Input() participant: ParticipantTirageAnonymise;
   @Input() supprimable: boolean;
   
   @Output() deleted = new EventEmitter();

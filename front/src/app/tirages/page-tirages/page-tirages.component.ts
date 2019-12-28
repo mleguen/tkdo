@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { Observable, combineLatest } from 'rxjs';
-import { map, switchMap, filter, tap } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { map, switchMap } from 'rxjs/operators';
 
-import { TirageResumeDTO } from '../../../../../back/src/utilisateurs/dto/tirage-resume.dto';
+import { ITirage } from '../../../../../shared/domaine';
 import { DialogueCreerTirageComponent } from '../dialogue-creer-tirage/dialogue-creer-tirage.component';
 import { TiragesService, estTiragePasse, compareTiragesParDate, formateDatesTirage } from '../tirages.service';
 
@@ -15,12 +15,12 @@ import { TiragesService, estTiragePasse, compareTiragesParDate, formateDatesTira
 })
 export class PageTiragesComponent {
   params$: Observable<{
-    idUtilisateur: number,
     organisateur: boolean
   }>;
-  tiragesAVenir$: Observable<TirageResumeDTO[]>;
-  tiragesPasses$: Observable<TirageResumeDTO[]>;
-  private idUtilisateur?: number;
+  tiragesAVenir$: Observable<Pick<ITirage, 'id' | 'titre' | 'date'>[]>;
+  tiragesPasses$: Observable<Pick<ITirage, 'id' | 'titre' | 'date'>[]>;
+
+  // TODO : comprendre pourquoi, à l'arrivée sur la page avec organisateur=1, le back est interrogé 3 fois (0, 1 et 1)
 
   constructor(
     route: ActivatedRoute,
@@ -28,18 +28,13 @@ export class PageTiragesComponent {
     tiragesService: TiragesService,
     private router: Router
   ) {
-    this.params$ = combineLatest(route.paramMap, route.queryParamMap).pipe(
-      map(([pm, qpm]) => ({
-        idUtilisateur: parseInt(pm.get('idUtilisateur')),
+    this.params$ = route.queryParamMap.pipe(
+      map(qpm => ({
         organisateur: !!parseInt(qpm.get('organisateur'))
-      })),
-      filter(params => !isNaN(params.idUtilisateur)),
-      tap(params => {
-        this.idUtilisateur = params.idUtilisateur;
-      })
+      }))
     );
     const tirages$ = this.params$.pipe(
-      switchMap(({ idUtilisateur, organisateur }) => tiragesService.getTirages(idUtilisateur, organisateur))
+      switchMap(({ organisateur }) => tiragesService.getTirages(organisateur))
     );
     this.tiragesAVenir$ = tirages$.pipe(
       map(tirages => tirages
@@ -59,10 +54,10 @@ export class PageTiragesComponent {
 
   async creeTirage() {
     let modalRef = this.modalService.open(DialogueCreerTirageComponent, { centered: true });
-    modalRef.componentInstance.init(this.idUtilisateur);
+    modalRef.componentInstance.init();
     try {
       const idTirage = (await modalRef.result) as number;
-      this.router.navigate(['utilisateurs', this.idUtilisateur, 'tirages', idTirage]);
+      this.router.navigate(['tirages', idTirage]);
     }
     catch (err) { }
   }

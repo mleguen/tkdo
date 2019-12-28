@@ -9,7 +9,6 @@ import { AuthService } from '../auth/auth.service';
   styleUrls: ['./sidebar.component.scss']
 })
 export class SidebarComponent {
-  utilisateur$ = this.authService.utilisateur$;
   hasDroitOrganisation$ = this.authService.hasDroit$(Droit.Organisation);
   hasDroitParticipation$ = this.authService.hasDroit$(Droit.Participation);
 
