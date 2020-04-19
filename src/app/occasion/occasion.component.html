@@ -1,11 +1,12 @@
-<ng-container *ngIf="occasion$|async as occasion">
-  <h2>{{occasion.titre}}</h2>
+<ng-container *ngIf="occasion$|async as o">
+  <h2>{{o.titre}}</h2>
   
   <h3>Participants</h3>
   <ul>
-    <li *ngFor="let participant of occasion.participants"
-      [ngClass]="{ estConnecte: participant.estConnecte, aQuiOffrir: participant.aQuiOffrir }">
-      {{participant.nom}}
+    <li *ngFor="let p of o.participants"
+      [ngClass]="{ participant: true, estMoi: p.estMoi, aQuiOffrir: p.aQuiOffrir }"
+      [routerLink]="['/idees', p.id]">
+      {{p.nom}}
     </li>
   </ul>
 </ng-container>

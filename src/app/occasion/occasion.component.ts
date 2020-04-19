@@ -13,9 +13,9 @@ export class OccasionComponent implements OnInit {
 
   constructor(
     private readonly backend: BackendService
-  ) {}
+  ) { }
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.occasion$ = this.backend.getOccasion$();
   }
 }
