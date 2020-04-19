@@ -1,0 +1,18 @@
+<h2>Connexion</h2>
+
+<form [formGroup]="formConnexion" (ngSubmit)="connecte(formConnexion.value)">
+  <p>
+    <label>
+      E-mail :
+      <input type="text" formControlName="email">
+    </label>
+  </p>
+  <p>
+    <label>
+      Mot de passe :
+      <input type="password" formControlName="mdp">
+    </label>
+  </p>  
+  <button class="button" type="submit">Se connecter</button>
+</form>
+

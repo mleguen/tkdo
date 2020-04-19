@@ -22,7 +22,7 @@ export class IdeesComponent implements OnInit {
 
   constructor(
     private readonly backend: BackendService,
-    private route: ActivatedRoute,
+    private readonly route: ActivatedRoute,
   ) { }
 
   ngOnInit(): void {

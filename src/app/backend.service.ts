@@ -69,18 +69,9 @@ const occasion: Occasion = {
 export class BackendService {
   // TODO: appeler les WS de l'API, et fournir les données de mock en interceptant les appels
 
-  getListeIdees$(idUtilisateur: number): Observable<ListeIdees> {
-    // TODO: me rediriger vers la page de login si je ne suis pas connecté
-    return of(listesIdees[idUtilisateur]);
-  }
-
-  getOccasion$(): Observable<Occasion> {
-    // TODO: me rediriger vers la page de login si je ne suis pas connecté
-    return of(occasion);
-  }
+  private _estConnecte = false;
 
   async ajouteIdee(idUtilisateur: number, desc: string) {
-    // TODO: me rediriger vers la page de login si je ne suis pas connecté
     listesIdees[idUtilisateur].idees.push({
       id: Math.max(...listesIdees[idUtilisateur].idees.map(i => i.id)) + 1,
       desc,
@@ -90,8 +81,23 @@ export class BackendService {
     });
   }
 
+  async connecte(email: string, mdp: string) {
+    this._estConnecte = true;
+  }
+
+  estConnecte(): boolean {
+    return this._estConnecte;
+  }
+
+  getListeIdees$(idUtilisateur: number): Observable<ListeIdees> {
+    return of(listesIdees[idUtilisateur]);
+  }
+
+  getOccasion$(): Observable<Occasion> {
+    return of(occasion);
+  }
+
   async supprimeIdee(idUtilisateur: number, idIdee: number) {
-    // TODO: me rediriger vers la page de login si je ne suis pas connecté
     listesIdees[idUtilisateur].idees = listesIdees[idUtilisateur].idees.filter(i => i.id !== idIdee);
   }
 }
