@@ -1,7 +1,6 @@
 <h2>Menu</h2>
 
 <ul>
-  <!-- TODO: changer mon mot de passe -->
-  <!-- TODO: changer le nom sous lequel j'apparais -->
-  <li><a (click)="deconnecte()">Se déconnecter</a></li>
+  <li><a [routerLink]="['/profil']">Mon profil</a></li>
+  <li><button (click)="deconnecte()">Se déconnecter</button></li>
 </ul>

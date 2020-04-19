@@ -11,7 +11,7 @@ import { FormGroup, FormControl } from '@angular/forms';
 export class ConnexionComponent implements OnInit {
 
   formConnexion = new FormGroup({
-    email: new FormControl(''),
+    identifiant: new FormControl(''),
     mdp: new FormControl(''),
   });
   
@@ -29,8 +29,8 @@ export class ConnexionComponent implements OnInit {
     });
   }
 
-  async connecte({ email, mdp }: { email: string, mdp: string}) {
-    await this.backend.connecte(email, mdp);
+  async connecte({ identifiant, mdp }: { identifiant: string, mdp: string}) {
+    await this.backend.connecte(identifiant, mdp);
     if (this.backend.estConnecte()) {
       return this.router.navigateByUrl(this.retour);
     }

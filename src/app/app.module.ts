@@ -8,6 +8,7 @@ import { OccasionComponent } from './occasion/occasion.component';
 import { IdeesComponent } from './idees/idees.component';
 import { ConnexionComponent } from './connexion/connexion.component';
 import { MenuComponent } from './menu/menu.component';
+import { ProfilComponent } from './profil/profil.component';
 
 @NgModule({
   declarations: [
@@ -15,7 +16,8 @@ import { MenuComponent } from './menu/menu.component';
     OccasionComponent,
     IdeesComponent,
     ConnexionComponent,
-    MenuComponent
+    MenuComponent,
+    ProfilComponent
   ],
   imports: [
     BrowserModule,

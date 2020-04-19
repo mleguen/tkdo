@@ -82,7 +82,7 @@ export class BackendService {
     });
   }
 
-  async connecte(email: string, mdp: string) {
+  async connecte(identifiant: string, mdp: string) {
     this.estConnecte$.next(true);
   }
 
