@@ -7,13 +7,15 @@ import { AppComponent } from './app.component';
 import { OccasionComponent } from './occasion/occasion.component';
 import { IdeesComponent } from './idees/idees.component';
 import { ConnexionComponent } from './connexion/connexion.component';
+import { MenuComponent } from './menu/menu.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     OccasionComponent,
     IdeesComponent,
-    ConnexionComponent
+    ConnexionComponent,
+    MenuComponent
   ],
   imports: [
     BrowserModule,

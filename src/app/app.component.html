@@ -1,4 +1,4 @@
 <!-- TODO: changer l'icône Angular -->
 <h1>TKDO</h1>
-<!-- TODO: lien vers mon profil pour me déconnecter, changer mon mot de passe ou le nom sous lequel j'apparais -->
+<button *ngIf="estConnecte$ | async" [routerLink]="['/menu']">Menu</button>
 <router-outlet></router-outlet>

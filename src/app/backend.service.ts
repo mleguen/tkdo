@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { Observable, of, BehaviorSubject } from 'rxjs';
 import * as moment from 'moment';
+import { first } from 'rxjs/operators';
 
 export interface ListeIdees {
   nomUtilisateur: string;
@@ -69,7 +70,7 @@ const occasion: Occasion = {
 export class BackendService {
   // TODO: appeler les WS de l'API, et fournir les données de mock en interceptant les appels
 
-  private _estConnecte = false;
+  estConnecte$ = new BehaviorSubject(false);
 
   async ajouteIdee(idUtilisateur: number, desc: string) {
     listesIdees[idUtilisateur].idees.push({
@@ -82,11 +83,15 @@ export class BackendService {
   }
 
   async connecte(email: string, mdp: string) {
-    this._estConnecte = true;
+    this.estConnecte$.next(true);
   }
 
-  estConnecte(): boolean {
-    return this._estConnecte;
+  async deconnecte() {
+    this.estConnecte$.next(false);
+  }
+
+  estConnecte() {
+    return this.estConnecte$.pipe(first()).toPromise();
   }
 
   getListeIdees$(idUtilisateur: number): Observable<ListeIdees> {
