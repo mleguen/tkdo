@@ -83,6 +83,7 @@ export class BackendService {
   }
 
   async connecte(identifiant: string, mdp: string) {
+    if ((identifiant !== 'alice@tkdo.org') || (mdp !== 'Alice')) throw new Error('Identifiant ou mot de passe invalide');
     this.estConnecte$.next(true);
   }
 

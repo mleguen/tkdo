@@ -10,6 +10,7 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 })
 export class ConnexionComponent implements OnInit {
 
+  erreurConnexion:string;
   formConnexion = this.fb.group({
     identifiant: ['', Validators.required],
     mdp: ['', Validators.required],
@@ -32,9 +33,12 @@ export class ConnexionComponent implements OnInit {
 
   async connecte() {
     const { identifiant, mdp } = this.formConnexion.value;
-    await this.backend.connecte(identifiant, mdp);
-    if (this.backend.estConnecte()) {
+    try {
+      await this.backend.connecte(identifiant, mdp);
       return this.router.navigateByUrl(this.retour);
+    }
+    catch (err) {
+      this.erreurConnexion = err.message;
     }
   }
 }
