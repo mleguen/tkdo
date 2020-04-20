@@ -1,6 +1,6 @@
 <h2>Connexion</h2>
 
-<form [formGroup]="formConnexion" (ngSubmit)="connecte(formConnexion.value)">
+<form [formGroup]="formConnexion" (ngSubmit)="connecte()">
   <p>
     <label>
       Identifiant :
@@ -13,6 +13,6 @@
       <input type="password" formControlName="mdp">
     </label>
   </p>  
-  <button class="button" type="submit">Se connecter</button>
+  <button class="button" type="submit" [disabled]="!formConnexion.valid">Se connecter</button>
 </form>
 

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { BackendService } from '../backend.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { FormGroup, FormControl } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-connexion',
@@ -10,17 +10,18 @@ import { FormGroup, FormControl } from '@angular/forms';
 })
 export class ConnexionComponent implements OnInit {
 
-  formConnexion = new FormGroup({
-    identifiant: new FormControl(''),
-    mdp: new FormControl(''),
+  formConnexion = this.fb.group({
+    identifiant: ['', Validators.required],
+    mdp: ['', Validators.required],
   });
   
   private retour: string;
 
   constructor(
+    private readonly fb: FormBuilder,
     private readonly backend: BackendService,
     private readonly route: ActivatedRoute,
-    private readonly router: Router
+    private readonly router: Router,
   ) { }
 
   ngOnInit(): void {
@@ -29,7 +30,8 @@ export class ConnexionComponent implements OnInit {
     });
   }
 
-  async connecte({ identifiant, mdp }: { identifiant: string, mdp: string}) {
+  async connecte() {
+    const { identifiant, mdp } = this.formConnexion.value;
     await this.backend.connecte(identifiant, mdp);
     if (this.backend.estConnecte()) {
       return this.router.navigateByUrl(this.retour);

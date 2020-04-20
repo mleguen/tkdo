@@ -14,11 +14,11 @@
     </li>
   </ul>
 
-  <form [formGroup]="formAjout" (ngSubmit)="ajoute(formAjout.value)">
+  <form [formGroup]="formAjout" (ngSubmit)="ajoute()">
     <label>
       Nouvelle idée :
       <input type="text" formControlName="desc">
     </label>
-    <button class="button" type="submit">Ajouter</button>
+    <button class="button" type="submit" [disabled]="!formAjout.valid">Ajouter</button>
   </form>
 </ng-container>

@@ -3,7 +3,7 @@ import { BackendService, ListeIdees, Idee } from '../backend.service';
 import { Observable, combineLatest, BehaviorSubject } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { ActivatedRoute } from '@angular/router';
-import { FormGroup, FormControl } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-idees',
@@ -13,14 +13,15 @@ import { FormGroup, FormControl } from '@angular/forms';
 export class IdeesComponent implements OnInit {
   
   listeIdees$: Observable<ListeIdees>;
-  formAjout = new FormGroup({
-    desc: new FormControl(''),
+  formAjout = this.fb.group({
+    desc: ['', Validators.required],
   });
 
   private idUtilisateur: number;
   private actualisation$ = new BehaviorSubject(true);
 
   constructor(
+    private readonly fb: FormBuilder,
     private readonly backend: BackendService,
     private readonly route: ActivatedRoute,
   ) { }
@@ -42,7 +43,8 @@ export class IdeesComponent implements OnInit {
     this.actualisation$.next(true);
   }
 
-  async ajoute({ desc }: Pick<Idee, "desc">) {
+  async ajoute() {
+    const { desc } = this.formAjout.value;
     await this.backend.ajouteIdee(this.idUtilisateur, desc);
     this.formAjout.reset();
     this.actualise();

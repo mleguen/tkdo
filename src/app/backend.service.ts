@@ -102,6 +102,9 @@ export class BackendService {
     return of(occasion);
   }
 
+  async modifieProfil(mdp: string) {
+  }
+
   async supprimeIdee(idUtilisateur: number, idIdee: number) {
     listesIdees[idUtilisateur].idees = listesIdees[idUtilisateur].idees.filter(i => i.id !== idIdee);
   }
