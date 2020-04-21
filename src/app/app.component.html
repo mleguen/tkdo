@@ -1,5 +1,10 @@
 <!-- TODO: changer l'icône Angular -->
 <h1 [routerLink]="['/']">Tkdo</h1>
+
+<div *ngIf="erreurBackend$ | async as erreurBackend" class="alert alert-danger">Le serveur a répondu : "{{erreurBackend}}"</div>
+
+<!-- TODO: sortir le menu du router-outlet et se servir de ce bouton pour afficher l'un ou l'autre -->
 <button *ngIf="estConnecte$ | async" [routerLink]="['/menu']">Menu</button>
 <router-outlet></router-outlet>
+
 <p class="credits"><a href="https://github.com/mleguen/tkdo">Maël Le Guen 2020</a></p>

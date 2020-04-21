@@ -23,6 +23,7 @@ export class ProfilComponent implements OnInit {
     },
   );
   erreurModification: string;
+  enregistre: boolean;
 
   constructor(
     private readonly fb: FormBuilder,
@@ -48,9 +49,11 @@ export class ProfilComponent implements OnInit {
     try {
       await this.backend.modifieProfil(nom, mdp);
       for (let champ of ['mdp', 'confirmeMdp']) this.formProfil.get(champ).reset();
+      this.enregistre = true;
     }
     catch (err) {
       this.erreurModification = err.message;
+      this.enregistre = false;
     }
   }
 }

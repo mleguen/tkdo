@@ -1,12 +1,12 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { IdeesComponent } from './idees.component';
+import { ListeIdeesComponent } from './liste-idees.component';
 import { ActivatedRoute } from '@angular/router';
 import { of } from 'rxjs';
 
-describe('IdeesComponent', () => {
-  let component: IdeesComponent;
-  let fixture: ComponentFixture<IdeesComponent>;
+describe('ListeIdeesComponent', () => {
+  let component: ListeIdeesComponent;
+  let fixture: ComponentFixture<ListeIdeesComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -16,13 +16,13 @@ describe('IdeesComponent', () => {
           params: of({ idUtilisateur: 0 })
         }
       }],
-      declarations: [ IdeesComponent ]
+      declarations: [ ListeIdeesComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(IdeesComponent);
+    fixture = TestBed.createComponent(ListeIdeesComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

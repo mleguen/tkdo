@@ -8,6 +8,7 @@ import { BackendService } from './backend.service';
 })
 export class AppComponent {
 
+  erreurBackend$ = this.backend.erreur$;
   estConnecte$ = this.backend.estConnecte$;
 
   constructor(

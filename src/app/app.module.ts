@@ -5,18 +5,20 @@ import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { OccasionComponent } from './occasion/occasion.component';
-import { IdeesComponent } from './idees/idees.component';
+import { ListeIdeesComponent } from './liste-idees/liste-idees.component';
 import { ConnexionComponent } from './connexion/connexion.component';
 import { MenuComponent } from './menu/menu.component';
 import { ProfilComponent } from './profil/profil.component';
-import { devBackendProvider } from './dev-backend.interceptor';
+import { devBackendInterceptorProvider } from './dev-backend.interceptor';
 import { HttpClientModule } from '@angular/common/http';
+import { erreurBackendInterceptorProvider } from './erreur-backend.interceptor';
+import { authBackendInterceptorProvider } from './auth-backend.interceptor';
 
 @NgModule({
   declarations: [
     AppComponent,
     OccasionComponent,
-    IdeesComponent,
+    ListeIdeesComponent,
     ConnexionComponent,
     MenuComponent,
     ProfilComponent
@@ -29,7 +31,9 @@ import { HttpClientModule } from '@angular/common/http';
     HttpClientModule
   ],
   providers: [
-    ...(isDevMode ? [devBackendProvider] : [])
+    authBackendInterceptorProvider,
+    erreurBackendInterceptorProvider,
+    ...(isDevMode ? [devBackendInterceptorProvider] : []),
   ],
   bootstrap: [AppComponent]
 })

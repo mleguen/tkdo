@@ -1,6 +1,9 @@
 <h2>Mon profil</h2>
 
 <form [formGroup]="formProfil" (ngSubmit)="modifie()">
+  <div *ngIf="enregistre" class="alert alert-success">Votre profil a été enregistré.</div>
+  <div *ngIf="erreurModification" class="alert alert-danger">{{erreurModification}}</div>
+
   <!-- TODO: changer mon identifiant -->
   <p>
     <label>
@@ -15,7 +18,7 @@
   <p>
     <label>
       Nouveau mot de passe :
-      <input type="password" formControlName="mdp">
+      <input type="password" formControlName="mdp" autocomplete="off">
     </label>
   </p>
   <div *ngIf="mdp.errors?.minlength" class="alert alert-danger">
@@ -24,14 +27,13 @@
   <p>
     <label>
       Confirmer le nouveau mot de passe :
-      <input type="password" formControlName="confirmeMdp">
+      <input type="password" formControlName="confirmeMdp" autocomplete="off">
     </label>
   </p>
   <div *ngIf="formProfil.errors?.sameValueIfDefined" class="alert alert-danger">
     Les 2 mots de passe doivent être identiques.
   </div>
 
-  <div *ngIf="erreurModification" class="alert alert-danger">{{erreurModification}}</div>
   <div>
     <button class="button" type="submit" [disabled]="!formProfil.valid">Modifier</button>
   </div>

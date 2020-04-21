@@ -1,16 +1,16 @@
 import { Component, OnInit } from '@angular/core';
-import { BackendService, ListeIdees, Idee } from '../backend.service';
+import { BackendService, ListeIdees } from '../backend.service';
 import { Observable, combineLatest, BehaviorSubject } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { ActivatedRoute } from '@angular/router';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { FormBuilder, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-idees',
-  templateUrl: './idees.component.html',
-  styleUrls: ['./idees.component.scss']
+  templateUrl: './liste-idees.component.html',
+  styleUrls: ['./liste-idees.component.scss']
 })
-export class IdeesComponent implements OnInit {
+export class ListeIdeesComponent implements OnInit {
   
   listeIdees$: Observable<ListeIdees>;
   formAjout = this.fb.group({

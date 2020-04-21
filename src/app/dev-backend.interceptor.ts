@@ -12,8 +12,6 @@ import { mergeMap, materialize, dematerialize, delay } from 'rxjs/operators';
 import { ListeIdees, Profil, Occasion } from './backend.service';
 import * as moment from 'moment';
 
-// inspired from: https://jasonwatmore.com/post/2019/05/02/angular-7-mock-backend-example-for-backendless-development
-
 interface Utilisateur extends Profil {
   mdp: string;
 }
@@ -59,6 +57,10 @@ const listesIdees: { [id: number]: ListeIdees } = {
   },
 };
 
+// inspired from: https://jasonwatmore.com/post/2019/05/02/angular-7-mock-backend-example-for-backendless-development
+
+const token = 'fake-jwt-token';
+
 @Injectable()
 export class DevBackendInterceptor implements HttpInterceptor {
 
@@ -75,50 +77,66 @@ export class DevBackendInterceptor implements HttpInterceptor {
       .pipe(dematerialize());
 
     function handleRoute() {
-      switch (true) {
-        case url.endsWith('/connexion') && method === 'POST':
-          return postConnexion();
+      let match: string[] | null;
 
-          case url.endsWith('/profil') && method === 'GET':
-          return getProfil();
-        case url.endsWith('/profil') && method === 'PUT':
-          return putProfil();
+      // API
+      if (match = url.match(/^\/api(\/.+)?$/)) {
+        const [, urlApi] = match;
 
-        case url.endsWith('/occasion') && method === 'GET':
-          return getOccasion();
+        if (urlApi === '/connexion') {
+          if (method === 'POST') return postConnexion();
+        }
+        else if (urlApi === '/profil') {
+          if (method === 'GET') return getProfil();
+          if (method === 'PUT') return putProfil();
+        }
+        else if (urlApi === '/occasion') {
+          if (method === 'GET') return getOccasion();
+        }
+        else if (match = urlApi.match(/\/liste-idees\/(\d+)(\/.+)?$/)) {
+          const [, idUtilisateur, urlListeIdees] = match;
+          if (!urlListeIdees) {
+            if (method === 'GET') return getIdees(+idUtilisateur);
+            if (method === 'POST') return postIdee(+idUtilisateur);
+          } else {
+            if (match = urlApi.match(/\/idee\/(\d+)$/)) {
+              const [, idIdee] = match;
+              if (method === 'DELETE') return deleteIdee(+idUtilisateur, +idIdee);
+            }
+          }
+        }
 
-        case url.match(/\/idees\/\d+$/) && method === 'GET':
-        return getIdees();
-        case url.match(/\/idees\/\d+$/) && method === 'POST':
-          return postIdee();
-        case url.match(/\/idees\/\d+\/\d+$/) && method === 'DELETE':
-          return deleteIdee();
-
-        default:
-          // pass through any requests not handled above
-          return next.handle(request);
+        // all other api routes are unknown
+        return notFound();   
       }
+      
+      // pass through any requests not handled above
+      return next.handle(request);
     }
 
     function postConnexion() {
       const { identifiant, mdp } = body as any;
 
-      if ((identifiant !== alice.identifiant) || (mdp !== alice.mdp)) return error('Identifiant ou mot de passe invalide');
-      return ok();
+      if ((identifiant !== alice.identifiant) || (mdp !== alice.mdp)) return badRequest('Identifiant ou mot de passe invalide');
+      return ok({ token });
     }
 
     function getProfil() {
+      if (!isLoggedIn()) return unauthorized();
+
       const { mdp, ...profilSansMdp } = alice;
       return ok(profilSansMdp);
     }
 
     function putProfil() {
+      if (!isLoggedIn()) return unauthorized();
+
       const { nom, mdp } = body as any;
       const oldNom = alice.nom;
 
       if (nom !== oldNom) {
         if (occasion.participants.filter(p => p.id !== 0).map(p => p.nom).includes(nom)) {
-          return error('Ce nom est déjà utilisé');
+          return badRequest('Ce nom est déjà utilisé');
         }
 
         alice.nom = nom;      
@@ -141,20 +159,24 @@ export class DevBackendInterceptor implements HttpInterceptor {
     }
 
     function getOccasion() {
+      if (!isLoggedIn()) return unauthorized();
+
       return ok(occasion);
     }
 
-    function getIdees() {
-      const [, idUtilisateur] = url.match(/\/idees\/(\d+)$/);
-      return ok(listesIdees[+idUtilisateur]);
+    function getIdees(idUtilisateur: number) {
+      if (!isLoggedIn()) return unauthorized();
+
+      return ok(listesIdees[idUtilisateur]);
     }
 
-    function postIdee() {
-      const [, idUtilisateur] = url.match(/\/idees\/(\d+)$/);
+    function postIdee(idUtilisateur: number) {
+      if (!isLoggedIn()) return unauthorized();
+
       const {desc} = body as any;
 
-      listesIdees[+idUtilisateur].idees.push({
-        id: Math.max(...listesIdees[+idUtilisateur].idees.map(i => i.id)) + 1,
+      listesIdees[idUtilisateur].idees.push({
+        id: Math.max(...listesIdees[idUtilisateur].idees.map(i => i.id)) + 1,
         desc,
         auteur: 'Alice',
         date: moment().locale('fr').format('L'),
@@ -164,35 +186,39 @@ export class DevBackendInterceptor implements HttpInterceptor {
       return ok();
     }
 
-    function deleteIdee() {
-      const [, idUtilisateur, idIdee] = url.match(/\/idees\/(\d+)\/(\d+)$/);
-      
-      listesIdees[+idUtilisateur].idees = listesIdees[+idUtilisateur].idees.filter(i => i.id !== +idIdee);
+    function deleteIdee(idUtilisateur: number, idIdee: number) {
+      if (!isLoggedIn()) return unauthorized();
+
+      listesIdees[idUtilisateur].idees = listesIdees[idUtilisateur].idees.filter(i => i.id !== idIdee);
 
       return ok();
     }
 
     // helper functions
 
-    function ok(body?) {
-      return of(new HttpResponse({ status: 200, body }))
+    function ok(body?: any) {
+      return of(new HttpResponse({ url, status: 200, body }));
     }
 
-    // function unauthorized() {
-    //   return throwError({ status: 401, error: { message: 'Unauthorised' } });
-    // }
-
-    function error(message: string) {
-      return throwError({ error: { message } });
+    function badRequest(message: string) {
+      return of(new HttpResponse({ url, status: 400, statusText: 'Bad request' }));
     }
 
-    // function isLoggedIn() {
-    //   return headers.get('Authorization') === 'Bearer fake-jwt-token';
-    // }
+    function unauthorized() {
+      return of(new HttpResponse({ url, status: 401, statusText: 'Unauthorized' }));
+    }
+
+    function notFound() {
+      return of(new HttpResponse({ url, status: 404, statusText: 'Not found' }));
+    }
+
+    function isLoggedIn() {
+      return headers.get('Authorization') === `Bearer ${token}`;
+    }
   }
 }
 
-export const devBackendProvider = {
+export const devBackendInterceptorProvider = {
   // use fake backend in place of Http service for backend-less development
   provide: HTTP_INTERCEPTORS,
   useClass: DevBackendInterceptor,

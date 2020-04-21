@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, onErrorResumeNext } from 'rxjs';
 import { first } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 
@@ -34,12 +34,21 @@ export interface Idee {
   estDeMoi?: boolean;
 }
 
+const URL_API = '/api';
+const URL_CONNEXION = `${URL_API}/connexion`;
+const URL_OCCASION = `${URL_API}/occasion`;
+const URL_PROFIL = `${URL_API}/profil`;
+const URL_LISTE_IDEES = (idUtilisateur: number) => `${URL_API}/liste-idees/${idUtilisateur}`;
+const URL_IDEE = (idUtilisateur: number, idIdee: number) => `${URL_LISTE_IDEES(idUtilisateur)}/idee/${idIdee}`;
+
 @Injectable({
   providedIn: 'root'
 })
 export class BackendService {
 
+  erreur$ = new BehaviorSubject<string>(undefined);
   estConnecte$ = new BehaviorSubject(false);
+  token: string;
 
   constructor(
     private readonly http: HttpClient,
@@ -48,44 +57,51 @@ export class BackendService {
   }
 
   ajouteIdee(idUtilisateur: number, desc: string) {
-    return this.http.post(`/api/idees/${idUtilisateur}`, { desc }).toPromise();
+    return this.http.post(URL_LISTE_IDEES(idUtilisateur), { desc }).toPromise();
   }
 
   async connecte(identifiant: string, mdp: string) {
-    // TODO: gérer l'authentification (interceptor lisant un token récupéré ici)
-    await this.http.post('/connexion', { identifiant, mdp }).toPromise();
+    const { token } = await this.http.post<{ token: string }>(URL_CONNEXION, { identifiant, mdp }).toPromise();
+    this.token = token;
     // TODO: stocker le token d'authentification en local storage
     this.estConnecte$.next(true);
   }
 
   async deconnecte() {
-    // TODO: effacer le token d'authentification
+    delete this.token;
     // TODO: supprimer le token d'authentification du local storage
     this.estConnecte$.next(false);
   }
   
   estConnecte() {
-    // TODO: supprimer le token d'authentification du local storage
     return this.estConnecte$.pipe(first()).toPromise();
   }
 
+  estUrlBackend(url: string): boolean {
+    return !!url.match(new RegExp(`^${URL_API}`));
+  }
+
   getListeIdees$(idUtilisateur: number) {
-    return this.http.get<ListeIdees>(`/api/idees/${idUtilisateur}`);
+    return this.http.get<ListeIdees>(URL_LISTE_IDEES(idUtilisateur));
   }
 
   getOccasion$() {
-    return this.http.get<Occasion>('/api/occasion');
+    return this.http.get<Occasion>(URL_OCCASION);
   }
 
   getProfil$() {
-    return this.http.get<Profil>('/api/profil');
+    return this.http.get<Profil>(URL_PROFIL);
   }
 
   modifieProfil(nom: string, mdp?: string) {
-    return this.http.put('/api/profil', { nom, mdp }).toPromise();
+    return this.http.put(URL_PROFIL, { nom, mdp }).toPromise();
+  }
+
+  setErreur(message: string) {
+    this.erreur$.next(message);
   }
 
   supprimeIdee(idUtilisateur: number, idIdee: number) {
-    return this.http.delete(`/api/idees/${idUtilisateur}/${idIdee}`).toPromise();
+    return this.http.delete(URL_IDEE(idUtilisateur, idIdee)).toPromise();
   }
 }
