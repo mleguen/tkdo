@@ -41,20 +41,20 @@ const URL_PROFIL = `${URL_API}/profil`;
 const URL_LISTE_IDEES = (idUtilisateur: number) => `${URL_API}/liste-idees/${idUtilisateur}`;
 const URL_IDEE = (idUtilisateur: number, idIdee: number) => `${URL_LISTE_IDEES(idUtilisateur)}/idee/${idIdee}`;
 
+const TOKEN_KEY = 'backend-token';
+
 @Injectable({
   providedIn: 'root'
 })
 export class BackendService {
 
   erreur$ = new BehaviorSubject<string>(undefined);
-  estConnecte$ = new BehaviorSubject(false);
-  token: string;
+  token = localStorage.getItem(TOKEN_KEY);
+  estConnecte$ = new BehaviorSubject(!!this.token);
 
   constructor(
     private readonly http: HttpClient,
-  ) {
-    // TODO: récupérer le token d'authentification en local storage (si OK, démarrer estConnecte$ à true)
-  }
+  ) { }
 
   ajouteIdee(idUtilisateur: number, desc: string) {
     return this.http.post(URL_LISTE_IDEES(idUtilisateur), { desc }).toPromise();
@@ -63,13 +63,13 @@ export class BackendService {
   async connecte(identifiant: string, mdp: string) {
     const { token } = await this.http.post<{ token: string }>(URL_CONNEXION, { identifiant, mdp }).toPromise();
     this.token = token;
-    // TODO: stocker le token d'authentification en local storage
+    localStorage.setItem(TOKEN_KEY, token);
     this.estConnecte$.next(true);
   }
 
   async deconnecte() {
     delete this.token;
-    // TODO: supprimer le token d'authentification du local storage
+    localStorage.removeItem(TOKEN_KEY);
     this.estConnecte$.next(false);
   }
   
