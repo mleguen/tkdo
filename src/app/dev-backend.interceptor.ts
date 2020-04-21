@@ -7,7 +7,7 @@ import {
   HTTP_INTERCEPTORS,
   HttpResponse
 } from '@angular/common/http';
-import { Observable, of, throwError } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { mergeMap, materialize, dematerialize, delay } from 'rxjs/operators';
 import { ListeIdees, Profil, Occasion } from './backend.service';
 import * as moment from 'moment';

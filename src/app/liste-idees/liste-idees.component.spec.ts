@@ -1,8 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { ListeIdeesComponent } from './liste-idees.component';
 import { ActivatedRoute } from '@angular/router';
 import { of } from 'rxjs';
+import { ListeIdeesComponent } from './liste-idees.component';
 
 describe('ListeIdeesComponent', () => {
   let component: ListeIdeesComponent;

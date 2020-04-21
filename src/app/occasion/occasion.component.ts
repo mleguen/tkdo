@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { BackendService, Occasion } from '../backend.service';
 import { Observable } from 'rxjs';
+import { BackendService, Occasion } from '../backend.service';
 
 @Component({
   selector: 'app-occasion',

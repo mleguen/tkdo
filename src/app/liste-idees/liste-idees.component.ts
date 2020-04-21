@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { BackendService, ListeIdees } from '../backend.service';
+import { FormBuilder, Validators } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { Observable, combineLatest, BehaviorSubject } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
-import { ActivatedRoute } from '@angular/router';
-import { FormBuilder, Validators } from '@angular/forms';
+import { BackendService, ListeIdees } from '../backend.service';
 
 @Component({
-  selector: 'app-idees',
+  selector: 'app-liste-idees',
   templateUrl: './liste-idees.component.html',
   styleUrls: ['./liste-idees.component.scss']
 })

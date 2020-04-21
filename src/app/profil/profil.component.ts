@@ -30,7 +30,7 @@ export class ProfilComponent implements OnInit {
     private readonly backend: BackendService,
   ) { }
 
-  async ngOnInit() {
+  ngOnInit(): void {
     this.backend.getProfil$().subscribe(({ nom }) => {
       this.nom.setValue(nom);
     });

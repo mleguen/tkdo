@@ -1,7 +1,7 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, onErrorResumeNext } from 'rxjs';
-import { first } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
+import { first } from 'rxjs/operators';
 
 export interface Profil {
   identifiant: string;
