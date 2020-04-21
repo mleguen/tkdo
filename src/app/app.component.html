@@ -3,8 +3,10 @@
 
 <div *ngIf="erreurBackend$ | async as erreurBackend" class="alert alert-danger">Le serveur a répondu : "{{erreurBackend}}"</div>
 
-<!-- TODO: sortir le menu du router-outlet et se servir de ce bouton pour afficher l'un ou l'autre -->
-<button *ngIf="estConnecte$ | async" [routerLink]="['/menu']">Menu</button>
-<router-outlet></router-outlet>
+<button *ngIf="estConnecte$ | async" (click)="toggleMenu()">{{ menuOuvert ? 'Fermer' : 'Menu' }}</button>
+
+<ng-container *ngIf="menuOuvert; then menu else routeur"></ng-container>
+<ng-template #menu><app-menu></app-menu></ng-template>
+<ng-template #routeur><router-outlet></router-outlet></ng-template>
 
 <p class="credits"><a href="https://github.com/mleguen/tkdo">Maël Le Guen 2020</a></p>
