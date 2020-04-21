@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Validators, FormBuilder, ValidatorFn } from '@angular/forms';
 import { BackendService } from '../backend.service';
 
@@ -7,41 +7,57 @@ import { BackendService } from '../backend.service';
   templateUrl: './profil.component.html',
   styleUrls: ['./profil.component.scss']
 })
-export class ProfilComponent {
+export class ProfilComponent implements OnInit {
 
   formProfil = this.fb.group(
     {
-      'mdp': ['', [Validators.required, Validators.minLength(8)]],
+      'nom': ['', [Validators.minLength(3)]],
+      'mdp': ['', [Validators.minLength(8)]],
       'confirmeMdp': [''],
     },
-    { validators: [
-      requireOne('mdp'),
-      sameValueIfDefined('mdp', 'confirmeMdp'),
-    ]},
+    {
+      validators: [
+        requireOne('nom', 'mdp'),
+        sameValueIfDefined('mdp', 'confirmeMdp'),
+      ]
+    },
   );
+  erreurModification: string;
 
   constructor(
     private readonly fb: FormBuilder,
     private readonly backend: BackendService,
   ) { }
 
-  get mdp() {
-    return this.formProfil?.get('mdp');
+  async ngOnInit() {
+    this.backend.getProfil$().subscribe(({ nom }) => {
+      this.nom.setValue(nom);
+    });
+  }
+
+  get nom() {
+    return this.formProfil.get('nom');
   }
   
-  get confirmeMdp() {
-    return this.formProfil?.get('confirmeMdp');
+  get mdp() {
+    return this.formProfil.get('mdp');
   }
 
   async modifie() {
-    await this.backend.modifieProfil(this.mdp.value);
-    this.formProfil.reset();
+    const { nom, mdp } = this.formProfil.value;
+    try {
+      await this.backend.modifieProfil(nom, mdp);
+      for (let champ of ['mdp', 'confirmeMdp']) this.formProfil.get(champ).reset();
+    }
+    catch (err) {
+      this.erreurModification = err.message;
+    }
   }
 }
 
 function requireOne (...names: string[]): ValidatorFn {
   return group => {
-    return names.some(name => Validators.required(group.get(name)) !== null)
+    return names.every(name => Validators.required(group.get(name)) !== null)
       ? { requireOne: names }
       : null;
   }

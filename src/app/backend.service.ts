@@ -17,7 +17,7 @@ export interface Idee {
   estDeMoi?: boolean;
 }
 
-let listesIdees: { [id: number]: ListeIdees } = {
+const listesIdees: { [id: number]: ListeIdees } = {
   0: {
     nomUtilisateur: 'Alice',
     estMoi: true,
@@ -64,6 +64,18 @@ const occasion: Occasion = {
   ]
 }
 
+export interface Profil {
+  identifiant: string;
+  nom: string;
+  mdp: string;
+}
+
+const profil: Profil = {
+  identifiant: 'alice@tkdo.org',
+  nom: 'Alice',
+  mdp: 'Alice',
+};
+
 @Injectable({
   providedIn: 'root'
 })
@@ -83,7 +95,7 @@ export class BackendService {
   }
 
   async connecte(identifiant: string, mdp: string) {
-    if ((identifiant !== 'alice@tkdo.org') || (mdp !== 'Alice')) throw new Error('Identifiant ou mot de passe invalide');
+    if ((identifiant !== profil.identifiant) || (mdp !== profil.mdp)) throw new Error('Identifiant ou mot de passe invalide');
     this.estConnecte$.next(true);
   }
 
@@ -103,7 +115,32 @@ export class BackendService {
     return of(occasion);
   }
 
-  async modifieProfil(mdp: string) {
+  getProfil$(): Observable<Omit<Profil, 'mdp'>> {
+    const { mdp, ...profilSansMdp } = profil;
+    return of(profilSansMdp);
+  }
+
+  async modifieProfil(nom: string, mdp?: string) {
+    const oldNom = profil.nom;
+    if (nom !== oldNom) {
+      if (occasion.participants.filter(p => p.id !== 0).map(p => p.nom).includes(nom)) {
+        throw new Error('Ce nom est déjà utilisé');
+      }
+      
+      profil.nom = nom;
+      
+      listesIdees[0].nomUtilisateur = nom;
+      for (let idUtilisateur of Object.keys(listesIdees)) {
+        listesIdees[+idUtilisateur].idees = listesIdees[+idUtilisateur].idees.map(
+          i => i.auteur === oldNom ? Object.assign(i, { auteur: nom }) : i
+        );
+      }
+      occasion.participants = occasion.participants.map(
+        p => p.id === 0 ? Object.assign(p, { nom }) : p
+      );
+    }
+    
+    if (mdp) profil.mdp = mdp;
   }
 
   async supprimeIdee(idUtilisateur: number, idIdee: number) {

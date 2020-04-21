@@ -1,6 +1,9 @@
 <ng-container *ngIf="occasion$|async as o">
   <h2>{{o.titre}}</h2>
   
+  <!-- TODO : participer au tirage si j'y ai été invité (fragment ?) et s'il n'est pas encore lancé -->
+  <!-- TODO : ne voir les participants d'un tirage que si j'y participe moi-même -->
+  
   <h3>Participants</h3>
   <ul>
     <li *ngFor="let p of o.participants"
