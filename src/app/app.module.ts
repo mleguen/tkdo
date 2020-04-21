@@ -1,5 +1,5 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
+import { NgModule, isDevMode } from '@angular/core';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -9,6 +9,8 @@ import { IdeesComponent } from './idees/idees.component';
 import { ConnexionComponent } from './connexion/connexion.component';
 import { MenuComponent } from './menu/menu.component';
 import { ProfilComponent } from './profil/profil.component';
+import { devBackendProvider } from './dev-backend.interceptor';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -23,9 +25,12 @@ import { ProfilComponent } from './profil/profil.component';
     BrowserModule,
     AppRoutingModule,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    HttpClientModule
   ],
-  providers: [],
+  providers: [
+    ...(isDevMode ? [devBackendProvider] : [])
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
