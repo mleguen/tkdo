@@ -3,8 +3,6 @@ import { BackendService } from './backend.service';
 import { Router, NavigationStart } from '@angular/router';
 import { filter } from 'rxjs/operators';
 
-// TODO: fix TU: TypeError: You provided 'undefined' where a stream was expected. You can provide an Observable, Promise, Array, or Iterable.
-
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',

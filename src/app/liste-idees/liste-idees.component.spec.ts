@@ -20,7 +20,7 @@ describe('ListeIdeesComponent', () => {
       providers: [{
         provide: ActivatedRoute,
         useValue: {
-          params: of({ idUtilisateur: 0 })
+          paramMap: of({ get: () => '0' })
         }
       }],
       declarations: [ ListeIdeesComponent ]
