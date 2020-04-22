@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, isDevMode, Provider } from '@angular/core';
 import {
   HttpRequest,
   HttpHandler,
@@ -8,7 +8,7 @@ import {
   HttpResponse,
   HttpErrorResponse
 } from '@angular/common/http';
-import { Observable, of, throwError } from 'rxjs';
+import { Observable, of, throwError, onErrorResumeNext } from 'rxjs';
 import { mergeMap, materialize, dematerialize, delay } from 'rxjs/operators';
 import { ListeIdees, Profil, Occasion } from './backend.service';
 import * as moment from 'moment';
@@ -65,8 +65,6 @@ const token = 'fake-jwt-token';
 @Injectable()
 export class DevBackendInterceptor implements HttpInterceptor {
 
-  constructor() {}
-
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
     const { url, method, headers, body } = request;
 
@@ -118,7 +116,7 @@ export class DevBackendInterceptor implements HttpInterceptor {
     function postConnexion() {
       const { identifiant, mdp } = body as any;
 
-      if ((identifiant !== alice.identifiant) || (mdp !== alice.mdp)) return badRequest('Identifiant ou mot de passe invalide');
+      if ((identifiant !== alice.identifiant) || (mdp !== alice.mdp)) return badRequest('identifiants invalides');
       return ok({ token });
     }
 
@@ -202,7 +200,7 @@ export class DevBackendInterceptor implements HttpInterceptor {
     }
 
     function badRequest(message: string) {
-      return throwError(new HttpErrorResponse({ url, status: 400, statusText: 'Bad request' }));
+      return throwError(new HttpErrorResponse({ url, status: 400, statusText: 'Bad request', error: { message } }));
     }
 
     function unauthorized() {
@@ -219,9 +217,11 @@ export class DevBackendInterceptor implements HttpInterceptor {
   }
 }
 
-export const devBackendInterceptorProvider = {
+const noopInterceptor: HttpInterceptor = { intercept: (request: HttpRequest<unknown>, next: HttpHandler) => next.handle(request) };
+
+export const devBackendInterceptorProvider: Provider = {
   // use fake backend in place of Http service for backend-less development
   provide: HTTP_INTERCEPTORS,
-  useClass: DevBackendInterceptor,
+  useFactory: () => isDevMode() ? new DevBackendInterceptor() : noopInterceptor,
   multi: true
 };

@@ -16,7 +16,8 @@
     </label>
   </p>  
 
-  <div *ngIf="erreurConnexion" class="alert alert-danger">{{erreurConnexion}}</div>
   <button class="button" type="submit" [disabled]="!formConnexion.valid">Se connecter</button>
 </form>
+
+<div *ngIf="erreurConnexion" class="alert alert-danger">{{erreurConnexion}}</div>
 

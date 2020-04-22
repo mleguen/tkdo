@@ -22,3 +22,5 @@
     <button class="button" type="submit" [disabled]="!formAjout.valid">Ajouter</button>
   </form>
 </ng-container>
+
+<div *ngIf="erreurAjoutSuppression" class="alert alert-danger">{{erreurAjoutSuppression}}</div>

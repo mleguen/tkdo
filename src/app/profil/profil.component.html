@@ -1,9 +1,6 @@
 <h2>Mon profil</h2>
 
 <form [formGroup]="formProfil" (ngSubmit)="modifie()">
-  <div *ngIf="enregistre" class="alert alert-success">Votre profil a été enregistré.</div>
-  <div *ngIf="erreurModification" class="alert alert-danger">{{erreurModification}}</div>
-
   <!-- TODO: changer mon identifiant -->
   <p>
     <label>
@@ -38,3 +35,6 @@
     <button class="button" type="submit" [disabled]="!formProfil.valid">Modifier</button>
   </div>
 </form>
+
+<div *ngIf="enregistre" class="alert alert-success">Votre profil a été enregistré.</div>
+<div *ngIf="erreurModification" class="alert alert-danger">{{erreurModification}}</div>

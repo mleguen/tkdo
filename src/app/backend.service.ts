@@ -1,7 +1,7 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
-import { first } from 'rxjs/operators';
+import { BehaviorSubject, of } from 'rxjs';
+import { first, catchError } from 'rxjs/operators';
 import { Router } from '@angular/router';
 
 export interface Profil {
@@ -63,18 +63,10 @@ export class BackendService {
   }
 
   async connecte(identifiant: string, mdp: string) {
-    try {
-      const { token } = await this.http.post<{ token: string }>(URL_CONNEXION, { identifiant, mdp }).toPromise();
-      this.token = token;
-      localStorage.setItem(TOKEN_KEY, token);
-      this.estConnecte$.next(true);
-    }
-    catch (err) {
-      if ((err instanceof HttpErrorResponse) && (err.status === 400)) {
-        throw new Error('identifiants invalides');
-      }
-      throw new Error('connexion impossible');
-    }
+    const { token } = await this.http.post<{ token: string }>(URL_CONNEXION, { identifiant, mdp }).toPromise();
+    this.token = token;
+    localStorage.setItem(TOKEN_KEY, token);
+    this.estConnecte$.next(true);
   }
 
   async deconnecte() {

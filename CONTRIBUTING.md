@@ -1,32 +1,60 @@
 # Manuel du développeur
 
-## Development server
+## Serveurs de développement
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+### Frontend uniquement
 
-## Code scaffolding
+Démarrer le serveur de développement frontend seul :
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+```bash
+npm start
+```
 
-## Build
+Le backend est alors bouchonné en interceptant les requêtes qui lui sont destinées
+(cf. [src/app/dev-backend.interceptor.ts](./src/app/dev-backend.interceptor.ts)).
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
+### Frontend et backend
 
-## Running tests
+Commencer par démarrer le serveur de développement backend :
 
-Prerequisites:
-- chrome/chromium installed
-- CHROME_BIN environment variable pointing to chrome/chromium binary
-- run `npm run chrome-webdriver-update` to force protractor's chrome webdriver's version to match your chrome/chromium version
+```bash
+(cd api && composer start)
+```
 
-### Unit tests
+puis démarrer le serveur de développement frontend en mode production :
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+```bash
+npm start -- --prod
+```
 
-### End-to-end tests
+Les requêtes destinées au backend sont alors redirigées
+par le serveur de développement frontend vers le serveur de développement backend
+(cf. [src/proxy.conf.json](./src/proxy.conf.json)).
 
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
+## Tests
 
-## Further help
+### Frontend
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+Pré-requis:
+- chrome/chromium installé
+- variable d'environnement CHROME_BIN pointant vers le binaire de chrome/chromium
+- `npm run chrome-webdriver-update` lancé pour forcer la version de webdriver chrome de protractor
+  à correspondre à celle du chrome/chromium installé
+
+### Tests unitaires
+
+```bash
+npm test
+```
+
+### Tests de bout en bout
+
+```bash
+npm run e2e
+```
+
+## Backend
+
+```bash
+(cd api && composer test)
+```

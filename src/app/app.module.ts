@@ -33,7 +33,7 @@ import { erreurBackendInterceptorProvider } from './erreur-backend.interceptor';
   providers: [
     authBackendInterceptorProvider,
     erreurBackendInterceptorProvider,
-    ...(isDevMode ? [devBackendInterceptorProvider] : []),
+    devBackendInterceptorProvider
   ],
   bootstrap: [AppComponent]
 })

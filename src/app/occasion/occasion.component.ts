@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { BackendService, Occasion } from '../backend.service';
+import { catchError } from 'rxjs/operators';
 
 @Component({
   selector: 'app-occasion',
@@ -16,6 +17,9 @@ export class OccasionComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.occasion$ = this.backend.getOccasion$();
+    this.occasion$ = this.backend.getOccasion$().pipe(
+      // Les erreurs backend sont déjà affichées par AppComponent
+      catchError(() => of(undefined))
+    );
   }
 }

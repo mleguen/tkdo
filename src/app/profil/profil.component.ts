@@ -31,9 +31,11 @@ export class ProfilComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.backend.getProfil$().subscribe(({ nom }) => {
-      this.nom.setValue(nom);
-    });
+    this.backend.getProfil$().subscribe(
+      ({ nom }) => this.nom.setValue(nom),
+      // Les erreurs backend sont déjà affichées par AppComponent
+      () => {}
+    );
   }
 
   get nom() {
@@ -49,6 +51,7 @@ export class ProfilComponent implements OnInit {
     try {
       await this.backend.modifieProfil(nom, mdp);
       for (let champ of ['mdp', 'confirmeMdp']) this.formProfil.get(champ).reset();
+      this.erreurModification = undefined;
       this.enregistre = true;
     }
     catch (err) {

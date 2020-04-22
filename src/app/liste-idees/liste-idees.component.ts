@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { Observable, combineLatest, BehaviorSubject } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { Observable, combineLatest, BehaviorSubject, of } from 'rxjs';
+import { switchMap, catchError } from 'rxjs/operators';
 import { BackendService, ListeIdees } from '../backend.service';
 
 @Component({
@@ -12,10 +12,11 @@ import { BackendService, ListeIdees } from '../backend.service';
 })
 export class ListeIdeesComponent implements OnInit {
   
-  listeIdees$: Observable<ListeIdees>;
   formAjout = this.fb.group({
     desc: ['', Validators.required],
   });
+  erreurAjoutSuppression: string;
+  listeIdees$: Observable<ListeIdees>;
 
   private idUtilisateur: number;
   private actualisation$ = new BehaviorSubject(true);
@@ -33,7 +34,10 @@ export class ListeIdeesComponent implements OnInit {
     ).pipe(
       switchMap(([params]) => {
         this.idUtilisateur = +params.get('idUtilisateur');
-        return this.backend.getListeIdees$(this.idUtilisateur);
+        return this.backend.getListeIdees$(this.idUtilisateur).pipe(
+          // Les erreurs backend sont déjà affichées par AppComponent
+          catchError(() => of(undefined))
+        );
       })
     );
     this.actualise();
@@ -45,13 +49,25 @@ export class ListeIdeesComponent implements OnInit {
 
   async ajoute() {
     const { desc } = this.formAjout.value;
-    await this.backend.ajouteIdee(this.idUtilisateur, desc);
-    this.formAjout.reset();
-    this.actualise();
+    try {
+      await this.backend.ajouteIdee(this.idUtilisateur, desc);
+      this.erreurAjoutSuppression = undefined;
+      this.formAjout.reset();
+      this.actualise();
+    }
+    catch (err) {
+      this.erreurAjoutSuppression = err.message || 'ajout impossible';
+    }
   }
 
   async supprime(idIdee: number) {
-    await this.backend.supprimeIdee(this.idUtilisateur, idIdee);
-    this.actualise();
+    try {
+      await this.backend.supprimeIdee(this.idUtilisateur, idIdee);
+      this.erreurAjoutSuppression = undefined;
+      this.actualise();
+    }
+    catch (err) {
+      this.erreurAjoutSuppression = err.message || 'ajout impossible';
+    }
   }
 }
