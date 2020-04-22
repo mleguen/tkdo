@@ -1,6 +1,6 @@
 <!-- TODO: changer l'icône Angular -->
 <!-- TODO: mettre en forme l'application (bootstrap) -->
-<h1 [routerLink]="['/']">Tkdo</h1>
+<h1 [routerLink]="['/']">Tirage cadeaux</h1>
 
 <div *ngIf="erreurBackend$ | async as erreurBackend" class="alert alert-danger">Le serveur a répondu : "{{erreurBackend}}"</div>
 
@@ -10,4 +10,7 @@
 <ng-template #menu><app-menu></app-menu></ng-template>
 <ng-template #routeur><router-outlet></router-outlet></ng-template>
 
-<p class="credits"><a href="https://github.com/mleguen/tkdo">Maël Le Guen 2020</a></p>
+<p class="credits">
+  <a href="https://github.com/mleguen">@mleguen</a> 2020
+  - Powered by <a href="https://github.com/mleguen/tkdo">tkdo</a>
+</p>

@@ -5,7 +5,8 @@ import {
   HttpEvent,
   HttpInterceptor,
   HTTP_INTERCEPTORS,
-  HttpResponse
+  HttpResponse,
+  HttpErrorResponse
 } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
@@ -19,19 +20,21 @@ export class ErreurBackendInterceptor implements HttpInterceptor {
   ) {}
 
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
-    const { method } = request;
+    const { method, url } = request;
+    if (!this.backend.estUrlBackend(url)) return next.handle(request);
     
     return next.handle(request).pipe(
-      tap(httpEvent => {
-        if (!(httpEvent instanceof HttpResponse)) return;
-        const { url, ok, status, statusText } = httpEvent;
-        if (!this.backend.estUrlBackend(url)) return;
-        
-        // Une 400 doit être gérée par le code appelant
-        if (status === 400) return;
-        if (!ok) console.error({ method, url, status, statusText });
-        this.backend.setErreur(ok ? undefined : `${status} ${statusText}`);
-      })
+      tap(
+        // Réinitialise le message d'erreur backend en cas de succès
+        () => this.backend.setErreur(),
+        // Construit le message d'erreur backend en cas d'échec
+        (error: HttpErrorResponse) => {
+          console.error({ method, url, error });
+          // Une 400 doit être gérée par le code appelant
+          if (error.status === 400) return;
+          this.backend.setErreur(`${error.status} ${error.statusText}`);
+        }
+      )
     );
   }
 }

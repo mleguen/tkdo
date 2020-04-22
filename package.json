@@ -1,5 +1,6 @@
 {
   "name": "tkdo",
+  "description": "Tirage au sort de cadeaux, en famille ou entre amis",
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
@@ -8,7 +9,9 @@
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e --webdriver-update=false",
-    "update-chrome-driver": "cd node_modules/protractor && webdriver-manager clean && webdriver-manager update --versions.chrome $($CHROME_BIN --version|cut -d' ' -f2)"
+    "update-chrome-driver": "cd node_modules/protractor && webdriver-manager clean && webdriver-manager update --versions.chrome $($CHROME_BIN --version|cut -d' ' -f2)",
+    "apache-pack": "tar -cvf tkdo.tar ./.htaccess && npm run apache-pack-front && gzip -f tkdo.tar",
+    "apache-pack-front": "npm run build && tar -rvf tkdo.tar -C dist/tkdo ."
   },
   "private": true,
   "dependencies": {

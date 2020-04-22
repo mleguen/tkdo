@@ -5,9 +5,10 @@ import {
   HttpEvent,
   HttpInterceptor,
   HTTP_INTERCEPTORS,
-  HttpResponse
+  HttpResponse,
+  HttpErrorResponse
 } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 import { mergeMap, materialize, dematerialize, delay } from 'rxjs/operators';
 import { ListeIdees, Profil, Occasion } from './backend.service';
 import * as moment from 'moment';
@@ -201,15 +202,15 @@ export class DevBackendInterceptor implements HttpInterceptor {
     }
 
     function badRequest(message: string) {
-      return of(new HttpResponse({ url, status: 400, statusText: 'Bad request' }));
+      return throwError(new HttpErrorResponse({ url, status: 400, statusText: 'Bad request' }));
     }
 
     function unauthorized() {
-      return of(new HttpResponse({ url, status: 401, statusText: 'Unauthorized' }));
+      return throwError(new HttpErrorResponse({ url, status: 401, statusText: 'Unauthorized' }));
     }
 
     function notFound() {
-      return of(new HttpResponse({ url, status: 404, statusText: 'Not found' }));
+      return throwError(new HttpErrorResponse({ url, status: 404, statusText: 'Not found' }));
     }
 
     function isLoggedIn() {

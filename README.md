@@ -1,7 +1,27 @@
 # Tkdo
 
-Tirage au sort de cadeaux.
+Tirage au sort de cadeaux, en famille ou entre amis.
 
-## Documentation
+## Installation sur serveur Apache
+
+Dans les explications ci-dessous, le *répertoire cible* désigne le répertoire du serveur Apache
+où sera installé tkdo.
+
+Pré-requis :
+- le module `mod_rewrite` est installé sur votre serveur Apache
+- l'utilisation de fichiers `.htaccess` dans le répertoire cible est autorisée 
+  (à défaut, copier le contenu du fichier `.htaccess` dans une directive `Directory` dans la configuration Apache)
+- le répertoire cible correspond à la racine de votre hôte Apache
+  (à défaut, ajouter `--base-href /prefixe/du/repertoire/cible` à la fin du script `build` dans `package.json`)
+
+Construire et packager :
+
+```bash
+npm run apache-pack
+```
+
+Copier et décompresser ensuite l'archive `tkdo.tar.gz` générée dans le répertoire cible.
+
+## Autre documentation
 
 - [guide du développeur](./CONTRIBUTING.md)

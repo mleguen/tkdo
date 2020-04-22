@@ -1,7 +1,8 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { first } from 'rxjs/operators';
+import { Router } from '@angular/router';
 
 export interface Profil {
   identifiant: string;
@@ -54,6 +55,7 @@ export class BackendService {
 
   constructor(
     private readonly http: HttpClient,
+    private readonly router: Router,
   ) { }
 
   ajouteIdee(idUtilisateur: number, desc: string) {
@@ -61,16 +63,25 @@ export class BackendService {
   }
 
   async connecte(identifiant: string, mdp: string) {
-    const { token } = await this.http.post<{ token: string }>(URL_CONNEXION, { identifiant, mdp }).toPromise();
-    this.token = token;
-    localStorage.setItem(TOKEN_KEY, token);
-    this.estConnecte$.next(true);
+    try {
+      const { token } = await this.http.post<{ token: string }>(URL_CONNEXION, { identifiant, mdp }).toPromise();
+      this.token = token;
+      localStorage.setItem(TOKEN_KEY, token);
+      this.estConnecte$.next(true);
+    }
+    catch (err) {
+      if ((err instanceof HttpErrorResponse) && (err.status === 400)) {
+        throw new Error('identifiants invalides');
+      }
+      throw new Error('connexion impossible');
+    }
   }
 
   async deconnecte() {
     delete this.token;
     localStorage.removeItem(TOKEN_KEY);
     this.estConnecte$.next(false);
+    this.router.navigate([]);
   }
   
   estConnecte() {
@@ -97,7 +108,7 @@ export class BackendService {
     return this.http.put(URL_PROFIL, { nom, mdp }).toPromise();
   }
 
-  setErreur(message: string) {
+  setErreur(message?: string) {
     this.erreur$.next(message);
   }
 

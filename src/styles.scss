@@ -6,3 +6,7 @@
 .alert-success {
   color: green;
 }
+
+.alert::first-letter {
+  text-transform: uppercase;
+}
