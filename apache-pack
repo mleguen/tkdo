@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+# Fichiers communs
+tar -cvf tkdo.tar -C apache .
+
+# Fichiers front
+./npm-front run build
+tar -rvf tkdo.tar -C front/dist/tkdo .
+
+# Finalisation
+gzip -f tkdo.tar

@@ -1,20 +1,7 @@
 #!/usr/bin/env bash
-rm -r\
-  e2e\
-  src\
-  .editorconfig\
-  .gitignore\
-  angular.json\
-  browserslist\
-  karma.conf.js\
-  package-lock.json\
-  package.json\
-  README.md\
-  tsconfig.app.json\
-  tsconfig.json\
-  tsconfig.spec.json\
-  tslint.json
-ng new --directory . --routing --skip-git --style scss tkdo
+rm -r front
+ng new --directory front --routing --skip-git --style scss tkdo
+cd front
 ng generate component connexion
 ng generate component liste-idees
 ng generate component menu

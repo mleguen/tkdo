@@ -2,7 +2,7 @@
 
 Tirage au sort de cadeaux, en famille ou entre amis.
 
-## Installation sur serveur Apache
+## Déploiement sur serveur Apache
 
 Dans les explications ci-dessous, le *répertoire cible* désigne le répertoire du serveur Apache
 où sera installé tkdo.
@@ -16,14 +16,52 @@ Pré-requis :
 - votre hôte Apache est accessible en HTTPS
   (à défaut, commenter la règle de redirection vers HTTPS dans [.htaccess](./.htaccess))
 
-Construire et packager :
+Installer les dépendances, construire et packager :
 
 ```bash
-npm run apache-pack
+./npm-front install
+./composer-api install
+./apache-pack
 ```
 
-Copier et décompresser ensuite l'archive `tkdo.tar.gz` générée dans le répertoire cible.
+Décompresser ensuite dans le répertoire cible l'archive `tkdo.tar.gz` générée.
 
-## Autre documentation
+## Contribution
+
+Commencer par lire les README du [front](./front/README.md) et de l'[API](./api/README.md).
 
 - [guide du développeur](./CONTRIBUTING.md)
+
+### Utiliser le serveur de développement front seul
+
+Lorsque le serveur de développement front est lancé sans `--prod` :
+
+```bash
+./npm-front start
+```
+
+alors l'API est bouchonnée en interceptant les requêtes qui lui sont destinées
+(cf. [front/src/app/dev-backend.interceptor.ts](./front/src/app/dev-backend.interceptor.ts)).
+
+### Utiliser les serveurs de développement front et api ensemble
+
+Lorsque le serveur de développement front est lancé avec `--prod` :
+
+```bash
+./npm-front start -- --prod
+```
+
+alors les requêtes destinées à l'API sont redirigées vers le serveur de développement API
+(cf. [front/src/proxy.conf.json](./front/src/proxy.conf.json)),
+qui doit lui aussi être démarré :
+
+```bash
+./composer-api start
+```
+
+### Pré-requis au lancement des tests e2e front
+
+- chrome/chromium installé
+- variable d'environnement CHROME_BIN pointant vers le binaire de chrome/chromium
+- `npm run chrome-webdriver-update` lancé pour forcer la version de webdriver chrome de protractor
+  à correspondre à celle du chrome/chromium installé
