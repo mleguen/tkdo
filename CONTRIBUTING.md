@@ -18,7 +18,7 @@ Le backend est alors bouchonné en interceptant les requêtes qui lui sont desti
 Commencer par démarrer le serveur de développement backend :
 
 ```bash
-(cd api && composer start)
+composer start -d api
 ```
 
 puis démarrer le serveur de développement frontend en mode production :
@@ -56,5 +56,5 @@ npm run e2e
 ## Backend
 
 ```bash
-(cd api && composer test)
+composer test -d api
 ```
