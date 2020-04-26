@@ -96,8 +96,8 @@ export class BackendService {
     return this.http.get<Profil>(URL_PROFIL);
   }
 
-  modifieProfil(nom: string, mdp?: string) {
-    return this.http.put(URL_PROFIL, { nom, mdp }).toPromise();
+  modifieProfil(profil: Profil) {
+    return this.http.put(URL_PROFIL, profil).toPromise();
   }
 
   setErreur(message?: string) {

@@ -9,7 +9,7 @@ use App\Domain\Utilisateur\UtilisateurRepository;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Log\LoggerInterface;
 
-class GetProfilAction extends Action
+class PutProfilAction extends Action
 {
   /**
    * @var UtilisateurRepository
@@ -28,8 +28,12 @@ class GetProfilAction extends Action
 
   protected function action(): Response
   {
+    $profil = $this->getFormData();
     // TODO: lire l'id à renvoyer depuis le JWT
     $utilisateur = $this->utilisateurRepository->findUtilisateurOfId(0);
-    return $this->respondWithData($utilisateur->getUtilisateurSansMdp());
+    $utilisateur->setIdentifiant($profil->identifiant);
+    $utilisateur->setNom($profil->nom);
+    $utilisateur->setMdp($profil->mdp);
+    return $this->respondWithData();
   }
 }

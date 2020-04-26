@@ -34,30 +34,23 @@ Commencer par lire les README du [front](./front/README.md) et de l'[API](./api/
 
 ### Utiliser le serveur de développement front seul
 
-Lorsque le serveur de développement front est lancé sans `--prod` :
-
 ```bash
 ./npm-front start
 ```
 
-alors l'API est bouchonnée en interceptant les requêtes qui lui sont destinées
+Comme le serveur de développement front est lancé sans `--prod`,
+les requêtes destinées à l'API sont interceptées et bouchonnées
 (cf. [front/src/app/dev-backend.interceptor.ts](./front/src/app/dev-backend.interceptor.ts)).
 
 ### Utiliser les serveurs de développement front et api ensemble
 
-Lorsque le serveur de développement front est lancé avec `--prod` :
-
 ```bash
-./npm-front start -- --prod
+./npm-front start -- --prod & ./composer-api start
 ```
 
-alors les requêtes destinées à l'API sont redirigées vers le serveur de développement API
-(cf. [front/src/proxy.conf.json](./front/src/proxy.conf.json)),
-qui doit lui aussi être démarré :
-
-```bash
-./composer-api start
-```
+Comme le serveur de développement front est lancé avec `--prod`,
+les requêtes destinées à l'API sont redirigées vers le serveur de développement API
+(cf. [front/src/proxy.conf.json](./front/src/proxy.conf.json)).
 
 ### Pré-requis au lancement des tests e2e front
 

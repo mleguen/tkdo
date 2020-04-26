@@ -11,6 +11,8 @@ use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Psr\Log\LoggerInterface;
 use Slim\Exception\HttpUnauthorizedException;
 
+// TODO: à remplacer par Tuupola\Middleware\JwtAuthentication
+
 class AuthMiddleware implements Middleware
 {
     /**
@@ -19,11 +21,18 @@ class AuthMiddleware implements Middleware
     protected $logger;
 
     /**
-     * @param LoggerInterface $logger
+     * @var MockData
      */
-    public function __construct(LoggerInterface $logger)
+    protected $mock;
+
+    /**
+     * @param LoggerInterface $logger
+     * @param MockData  $mock
+     */
+    public function __construct(LoggerInterface $logger, MockData $mock)
     {
         $this->logger = $logger;
+        $this->mock = $mock;
     }
 
     /**
@@ -31,18 +40,11 @@ class AuthMiddleware implements Middleware
      */
     public function process(Request $request, RequestHandler $handler): Response
     {
-        // if (($request->getRequestTarget() !== '/api/connexion') &&
-        //     (!isset($_SERVER['HTTP_AUTHORIZATION']) ||
-        //     ($_SERVER['HTTP_AUTHORIZATION'] !== "Bearer ".MockData::token))) {
-        if ($request->getRequestTarget() !== '/api/connexion') {
-            if (isset($_SERVER['HTTP_AUTHORIZATION'])) {
-                $this->logger->info($_SERVER['HTTP_AUTHORIZATION']);
-            }
-
-            if (!isset($_SERVER['HTTP_AUTHORIZATION']) ||
-                ($_SERVER['HTTP_AUTHORIZATION'] !== "Bearer ".MockData::token)) {
-                throw new HttpUnauthorizedException($request);
-            }
+        if (($request->getRequestTarget() !== '/api/connexion') && (
+            !isset($_SERVER['HTTP_AUTHORIZATION']) ||
+            ($_SERVER['HTTP_AUTHORIZATION'] !== "Bearer ".$this->mock->getToken())
+        )) {
+            throw new HttpUnauthorizedException($request);
         }
 
         return $handler->handle($request);
