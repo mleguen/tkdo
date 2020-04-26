@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 use App\Application\Actions\Connexion\PostConnexionAction;
+use App\Application\Actions\ListeIdees\GetListeIdeesAction;
 use App\Application\Actions\Occasion\GetOccasionAction;
 // use App\Application\Actions\User\ListUsersAction;
 // use App\Application\Actions\User\ViewUserAction;
@@ -23,4 +24,5 @@ return function (App $app) {
 
     $app->post('/connexion', PostConnexionAction::class);
     $app->get('/occasion', GetOccasionAction::class);
+    $app->get('/liste-idees/{idUtilisateur}', GetListeIdeesAction::class);
 };
