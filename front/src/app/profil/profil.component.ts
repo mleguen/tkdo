@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Validators, FormBuilder, ValidatorFn } from '@angular/forms';
-import { BackendService, Profil } from '../backend.service';
+import { BackendService, Utilisateur } from '../backend.service';
 
 @Component({
   selector: 'app-profil',
@@ -24,7 +24,7 @@ export class ProfilComponent implements OnInit {
   );
   erreurModification: string;
   enregistre: boolean;
-  profil: Profil;
+  profil: Utilisateur;
 
   constructor(
     private readonly fb: FormBuilder,
@@ -32,7 +32,7 @@ export class ProfilComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.backend.getProfil$().subscribe(
+    this.backend.getUtilisateur$().subscribe(
       profil => {
         this.profil = profil;
         this.nom.setValue(profil.nom);
@@ -53,7 +53,7 @@ export class ProfilComponent implements OnInit {
   async modifie() {
     const { nom, mdp } = this.formProfil.value;
     try {
-      await this.backend.modifieProfil(Object.assign(this.profil, { nom, mdp }));
+      await this.backend.modifieUtilisateur(Object.assign(this.profil, { nom, mdp }));
       for (let champ of ['mdp', 'confirmeMdp']) this.formProfil.get(champ).reset();
       this.erreurModification = undefined;
       this.enregistre = true;

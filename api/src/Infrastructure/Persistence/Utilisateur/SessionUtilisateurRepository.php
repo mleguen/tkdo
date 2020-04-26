@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Infrastructure\Persistence\Utilisateur;
@@ -23,18 +24,18 @@ class SessionUtilisateurRepository implements UtilisateurRepository
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function findAll(): array
-    {
-        return array_values($_SESSION['utilisateurs']);
-    }
+    // /**
+    //  * {@inheritdoc}
+    //  */
+    // public function findAll(): array
+    // {
+    //     return array_values($_SESSION['utilisateurs']);
+    // }
 
     /**
      * {@inheritdoc}
      */
-    public function findUtilisateurOfId(int $id): Utilisateur
+    public function find(int $id): Utilisateur
     {
         if (!isset($_SESSION['utilisateurs'][$id])) {
             throw new UtilisateurInconnuException();
@@ -46,12 +47,12 @@ class SessionUtilisateurRepository implements UtilisateurRepository
     /**
      * {@inheritdoc}
      */
-    public function findUtilisateurOfIdentifiants(string $identifiant, string $mdp): ?Utilisateur
+    public function findByIdentifiants(string $identifiant, string $mdp): Utilisateur
     {
-        [ $utilisateur ] = array_filter($_SESSION['utilisateurs'], function ($u) use ($identifiant, $mdp) {
+        [$utilisateur] = array_filter($_SESSION['utilisateurs'], function ($u) use ($identifiant, $mdp) {
             return ($u->getIdentifiant() === $identifiant) && ($u->getMdp() === $mdp);
         });
-        
+
         if (!isset($utilisateur)) throw new UtilisateurInconnuException();
 
         return $utilisateur;

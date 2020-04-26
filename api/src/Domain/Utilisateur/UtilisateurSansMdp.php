@@ -54,9 +54,10 @@ class UtilisateurSansMdp implements JsonSerializable
     /**
      * @param string    $identifiant
      */
-    public function setIdentifiant(string $identifiant)
+    public function setIdentifiant(string $identifiant): UtilisateurSansMdp
     {
         $this->identifiant = $identifiant;
+        return $this;
     }
 
     /**
@@ -70,9 +71,10 @@ class UtilisateurSansMdp implements JsonSerializable
     /**
      * @param string    $nom
      */
-    public function setNom(string $nom)
+    public function setNom(string $nom): UtilisateurSansMdp
     {
         $this->nom = $nom;
+        return $this;
     }
 
     /**

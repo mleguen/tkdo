@@ -5,17 +5,17 @@ namespace App\Domain\Utilisateur;
 
 interface UtilisateurRepository
 {
-    /**
-     * @return Utilisateur[]
-     */
-    public function findAll(): array;
+    // /**
+    //  * @return Utilisateur[]
+    //  */
+    // public function findAll(): array;
 
     /**
      * @param int $id
      * @return Utilisateur
      * @throws UtilisateurInconnuException
      */
-    public function findUtilisateurOfId(int $id): Utilisateur;
+    public function find(int $id): Utilisateur;
 
     /**
      * @param string $identifiant
@@ -23,5 +23,5 @@ interface UtilisateurRepository
      * @return Utilisateur
      * @throws UtilisateurInconnuException
      */
-    public function findUtilisateurOfIdentifiants(string $identifiant, string $mdp): ?Utilisateur;
+    public function findByIdentifiants(string $identifiant, string $mdp): Utilisateur;
 }

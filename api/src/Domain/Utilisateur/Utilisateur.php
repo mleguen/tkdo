@@ -33,9 +33,10 @@ class Utilisateur extends UtilisateurSansMdp
     /**
      * @param string    $mdp
      */
-    public function setMdp(string $mdp)
+    public function setMdp(string $mdp): Utilisateur
     {
         $this->mdp = $mdp;
+        return $this;
     }
 
     /**

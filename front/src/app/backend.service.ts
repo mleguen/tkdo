@@ -1,10 +1,10 @@
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, of } from 'rxjs';
-import { first, catchError } from 'rxjs/operators';
+import { first } from 'rxjs/operators';
 import { Router } from '@angular/router';
 
-export interface Profil {
+export interface Utilisateur {
   identifiant: string;
   nom: string;
 }
@@ -21,7 +21,7 @@ interface Participant {
   aQuiOffrir?: boolean;
 }
 
-export interface ListeIdees {
+export interface Idees {
   nomUtilisateur: string;
   estMoi?: boolean;
   idees: Idee[];
@@ -38,11 +38,16 @@ export interface Idee {
 const URL_API = '/api';
 const URL_CONNEXION = `${URL_API}/connexion`;
 const URL_OCCASION = `${URL_API}/occasion`;
-const URL_PROFIL = `${URL_API}/profil`;
-const URL_LISTE_IDEES = (idUtilisateur: number) => `${URL_API}/liste-idees/${idUtilisateur}`;
-const URL_IDEE = (idUtilisateur: number, idIdee: number) => `${URL_LISTE_IDEES(idUtilisateur)}/idee/${idIdee}`;
+const URL_UTILISATEUR = (idUtilisateur: number) => `${URL_API}/utilisateur/${idUtilisateur}`;
+const URL_IDEES = (idUtilisateur: number) => `${URL_UTILISATEUR(idUtilisateur)}/idee`;
+const URL_IDEE = (idUtilisateur: number, idIdee: number) => `${URL_IDEES(idUtilisateur)}/${idIdee}`;
 
 const TOKEN_KEY = 'backend-token';
+
+interface PostConnexionDTO {
+  idUtilisateur: number;
+  token: string;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -52,6 +57,7 @@ export class BackendService {
   erreur$ = new BehaviorSubject<string>(undefined);
   token = localStorage.getItem(TOKEN_KEY);
   estConnecte$ = new BehaviorSubject(!!this.token);
+  idUtilisateur: number;
 
   constructor(
     private readonly http: HttpClient,
@@ -59,11 +65,12 @@ export class BackendService {
   ) { }
 
   ajouteIdee(idUtilisateur: number, desc: string) {
-    return this.http.post(URL_LISTE_IDEES(idUtilisateur), { desc }).toPromise();
+    return this.http.post(URL_IDEES(idUtilisateur), { desc }).toPromise();
   }
 
   async connecte(identifiant: string, mdp: string) {
-    const { token } = await this.http.post<{ token: string }>(URL_CONNEXION, { identifiant, mdp }).toPromise();
+    const { idUtilisateur, token } = await this.http.post<PostConnexionDTO>(URL_CONNEXION, { identifiant, mdp }).toPromise();
+    this.idUtilisateur = idUtilisateur;
     this.token = token;
     localStorage.setItem(TOKEN_KEY, token);
     this.estConnecte$.next(true);
@@ -71,6 +78,7 @@ export class BackendService {
 
   async deconnecte() {
     delete this.token;
+    delete this.idUtilisateur;
     localStorage.removeItem(TOKEN_KEY);
     this.estConnecte$.next(false);
     this.router.navigate([]);
@@ -84,20 +92,20 @@ export class BackendService {
     return !!url.match(new RegExp(`^${URL_API}`));
   }
 
-  getListeIdees$(idUtilisateur: number) {
-    return this.http.get<ListeIdees>(URL_LISTE_IDEES(idUtilisateur));
+  getIdees(idUtilisateur: number) {
+    return this.http.get<Idees>(URL_IDEES(idUtilisateur));
   }
 
   getOccasion$() {
     return this.http.get<Occasion>(URL_OCCASION);
   }
 
-  getProfil$() {
-    return this.http.get<Profil>(URL_PROFIL);
+  getUtilisateur$() {
+    return this.http.get<Utilisateur>(URL_UTILISATEUR(this.idUtilisateur));
   }
 
-  modifieProfil(profil: Profil) {
-    return this.http.put(URL_PROFIL, profil).toPromise();
+  modifieUtilisateur(utilisateur: Utilisateur) {
+    return this.http.put(URL_UTILISATEUR(this.idUtilisateur), utilisateur).toPromise();
   }
 
   setErreur(message?: string) {

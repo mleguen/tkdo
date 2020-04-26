@@ -5,6 +5,7 @@ namespace App\Application\Mock;
 
 use App\Domain\Utilisateur\UtilisateurRepository;
 
+// TODO : finir de passer en repository
 class MockData
 {
     /**
@@ -29,7 +30,7 @@ class MockData
         return [
             "titre" => 'Noël 2020',
             "participants" => [
-                $this->utilisateurRepository->findUtilisateurOfId(0),
+                $this->utilisateurRepository->find(0),
                 ["id" => 1, "nom" => 'Bob', "aQuiOffrir" => true],
                 ["id" => 2, "nom" => 'Charlie'],
                 ["id" => 3, "nom" => 'David'],
@@ -38,7 +39,7 @@ class MockData
     }
 
     public function getListeIdees(int $idUtilisateur) {
-        $nomAlice = $this->utilisateurRepository->findUtilisateurOfId(0)->getNom();
+        $nomAlice = $this->utilisateurRepository->find(0)->getNom();
         switch ($idUtilisateur) {
             case 0:
                 return [

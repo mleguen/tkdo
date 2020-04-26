@@ -3,7 +3,7 @@ import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Observable, combineLatest, BehaviorSubject, of } from 'rxjs';
 import { switchMap, catchError } from 'rxjs/operators';
-import { BackendService, ListeIdees } from '../backend.service';
+import { BackendService, Idees } from '../backend.service';
 
 @Component({
   selector: 'app-liste-idees',
@@ -16,7 +16,7 @@ export class ListeIdeesComponent implements OnInit {
     desc: ['', Validators.required],
   });
   erreurAjoutSuppression: string;
-  listeIdees$: Observable<ListeIdees>;
+  listeIdees$: Observable<Idees>;
 
   private idUtilisateur: number;
   private actualisation$ = new BehaviorSubject(true);
@@ -34,7 +34,7 @@ export class ListeIdeesComponent implements OnInit {
     ).pipe(
       switchMap(([params]) => {
         this.idUtilisateur = +params.get('idUtilisateur');
-        return this.backend.getListeIdees$(this.idUtilisateur).pipe(
+        return this.backend.getIdees(this.idUtilisateur).pipe(
           // Les erreurs backend sont déjà affichées par AppComponent
           catchError(() => of(undefined))
         );

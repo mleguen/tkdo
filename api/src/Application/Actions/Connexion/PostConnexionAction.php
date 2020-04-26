@@ -40,12 +40,15 @@ class PostConnexionAction extends Action
   {
     $identifiants = $this->getFormData();
     try {
-      $utilisateur = $this->utilisateurRepository->findUtilisateurOfIdentifiants($identifiants->identifiant, $identifiants->mdp);
+      $utilisateur = $this->utilisateurRepository->findByIdentifiants($identifiants->identifiant, $identifiants->mdp);
       $nom = $utilisateur->getNom();
       $this->logger->info("$nom connecté(e)");
 
       // TODO: construire le JWT
-      return $this->respondWithData(["token" => $this->mock->getToken()]);
+      return $this->respondWithData([
+        "idUtilisateur" => $utilisateur->getId(),
+        "token" => $this->mock->getToken()
+      ]);
     }
     catch (UtilisateurInconnuException $err) {
       throw new HttpBadRequestException($this->request, "identifiants invalides");
