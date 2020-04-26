@@ -38,7 +38,7 @@ export class ConnexionComponent implements OnInit {
       return this.router.navigateByUrl(this.retour);
     }
     catch (err) {
-      this.erreurConnexion = err.error?.error?.description || 'connexion impossible';
+      this.erreurConnexion = err.error?.description || 'connexion impossible';
     }
   }
 }

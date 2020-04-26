@@ -9,6 +9,9 @@ RewriteEngine On
 RewriteCond %{HTTPS} !on
 RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI}
 
+# Provide Authorization header as HTTP_AUTHORIZATION env var
+RewriteRule .* - [env=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
 # Excluded directories:
 RewriteRule ^api/?(.*) %{REQUEST_URI} [L,R=301]
 
