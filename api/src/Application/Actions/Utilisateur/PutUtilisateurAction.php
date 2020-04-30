@@ -11,13 +11,13 @@ class PutUtilisateurAction extends UtilisateurAction
   protected function action(): Response
   {
     parent::action();
-    $utilisateurModifie = $this->getFormData();
-    $utilisateur = $this->utilisateurRepository->find($this->idUtilisateur);
-    $utilisateur
-      ->setIdentifiant($utilisateurModifie->identifiant)
-      ->setNom($utilisateurModifie->nom);
-    if (isset($utilisateurModifie->mdp)) $utilisateur->setMdp($utilisateurModifie->mdp);
-    // TODO: persist()
+    // TODO: vérifier que l'id correspond à celui du JWT
+    $body = $this->getFormData();
+    $this->utilisateur
+      ->setIdentifiant($body->identifiant)
+      ->setNom($body->nom);
+    if (isset($body->mdp)) $this->utilisateur->setMdp($body->mdp);
+    $this->utilisateurRepository->persist($this->utilisateur);
     return $this->respondWithData();
   }
 }

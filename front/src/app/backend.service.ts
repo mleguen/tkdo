@@ -1,10 +1,11 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, of } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import { first } from 'rxjs/operators';
 import { Router } from '@angular/router';
 
 export interface Utilisateur {
+  id: number;
   identifiant: string;
   nom: string;
 }
@@ -22,17 +23,15 @@ interface Participant {
 }
 
 export interface Idees {
-  nomUtilisateur: string;
-  estMoi?: boolean;
+  utilisateur: Utilisateur;
   idees: Idee[];
 }
 
 export interface Idee {
   id: number;
-  desc: string;
-  auteur: string;
-  date: string;
-  estDeMoi?: boolean;
+  description: string;
+  auteur: Utilisateur;
+  dateProposition: string;
 }
 
 const URL_API = '/api';
@@ -43,6 +42,7 @@ const URL_IDEES = (idUtilisateur: number) => `${URL_UTILISATEUR(idUtilisateur)}/
 const URL_IDEE = (idUtilisateur: number, idIdee: number) => `${URL_IDEES(idUtilisateur)}/${idIdee}`;
 
 const TOKEN_KEY = 'backend-token';
+const ID_UTILISATEUR_KEY = 'id-utilisateur';
 
 interface PostConnexionDTO {
   idUtilisateur: number;
@@ -57,28 +57,30 @@ export class BackendService {
   erreur$ = new BehaviorSubject<string>(undefined);
   token = localStorage.getItem(TOKEN_KEY);
   estConnecte$ = new BehaviorSubject(!!this.token);
-  idUtilisateur: number;
+  idUtilisateur = +localStorage.getItem(ID_UTILISATEUR_KEY);
 
   constructor(
     private readonly http: HttpClient,
     private readonly router: Router,
   ) { }
 
-  ajouteIdee(idUtilisateur: number, desc: string) {
-    return this.http.post(URL_IDEES(idUtilisateur), { desc }).toPromise();
+  ajouteIdee(idUtilisateur: number, description: string) {
+    return this.http.post(URL_IDEES(idUtilisateur), { idAuteur: this.idUtilisateur, description }).toPromise();
   }
 
   async connecte(identifiant: string, mdp: string) {
     const { idUtilisateur, token } = await this.http.post<PostConnexionDTO>(URL_CONNEXION, { identifiant, mdp }).toPromise();
     this.idUtilisateur = idUtilisateur;
     this.token = token;
+    localStorage.setItem(ID_UTILISATEUR_KEY, idUtilisateur.toString());
     localStorage.setItem(TOKEN_KEY, token);
     this.estConnecte$.next(true);
   }
 
   async deconnecte() {
-    delete this.token;
     delete this.idUtilisateur;
+    delete this.token;
+    localStorage.removeItem(ID_UTILISATEUR_KEY);
     localStorage.removeItem(TOKEN_KEY);
     this.estConnecte$.next(false);
     this.router.navigate([]);
@@ -86,6 +88,10 @@ export class BackendService {
   
   estConnecte() {
     return this.estConnecte$.pipe(first()).toPromise();
+  }
+  
+  estUtilisateurConnecte(utilisateur: Utilisateur) {
+    return utilisateur.id === this.idUtilisateur;
   }
 
   estUrlBackend(url: string): boolean {

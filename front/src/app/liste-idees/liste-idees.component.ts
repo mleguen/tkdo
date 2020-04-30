@@ -3,7 +3,7 @@ import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Observable, combineLatest, BehaviorSubject, of } from 'rxjs';
 import { switchMap, catchError } from 'rxjs/operators';
-import { BackendService, Idees } from '../backend.service';
+import { BackendService, Idees, Utilisateur } from '../backend.service';
 
 @Component({
   selector: 'app-liste-idees',
@@ -13,7 +13,7 @@ import { BackendService, Idees } from '../backend.service';
 export class ListeIdeesComponent implements OnInit {
   
   formAjout = this.fb.group({
-    desc: ['', Validators.required],
+    description: ['', Validators.required],
   });
   erreurAjoutSuppression: string;
   listeIdees$: Observable<Idees>;
@@ -48,9 +48,9 @@ export class ListeIdeesComponent implements OnInit {
   }
 
   async ajoute() {
-    const { desc } = this.formAjout.value;
+    const { description } = this.formAjout.value;
     try {
-      await this.backend.ajouteIdee(this.idUtilisateur, desc);
+      await this.backend.ajouteIdee(this.idUtilisateur, description);
       this.erreurAjoutSuppression = undefined;
       this.formAjout.reset();
       this.actualise();
@@ -58,6 +58,10 @@ export class ListeIdeesComponent implements OnInit {
     catch (err) {
       this.erreurAjoutSuppression = err.message || 'ajout impossible';
     }
+  }
+
+  estUtilisateurConnecte(utilisateur: Utilisateur) {
+    return this.backend.estUtilisateurConnecte(utilisateur);
   }
 
   async supprime(idIdee: number) {

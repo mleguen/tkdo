@@ -24,4 +24,11 @@ interface UtilisateurRepository
      * @throws UtilisateurInconnuException
      */
     public function findByIdentifiants(string $identifiant, string $mdp): Utilisateur;
+
+    /**
+     * @param Utilisateur $utilisateur
+     * @return Utilisateur
+     * @throws UtilisateurInconnuException
+     */
+    public function persist(Utilisateur $utilisateur): Utilisateur;
 }

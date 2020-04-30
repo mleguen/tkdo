@@ -10,50 +10,64 @@ import {
 } from '@angular/common/http';
 import { Observable, of, throwError } from 'rxjs';
 import { mergeMap, materialize, dematerialize, delay } from 'rxjs/operators';
-import { Idees, Utilisateur, Occasion } from './backend.service';
+import { Idees, Occasion } from './backend.service';
 import * as moment from 'moment';
 
-interface UtilisateurAvecMdp extends Utilisateur {
-  mdp: string;
-}
-
-const alice: UtilisateurAvecMdp = {
+const alice = {
+  id: 0,
   identifiant: 'alice@tkdo.org',
   nom: 'Alice',
   mdp: 'Alice',
 };
 
+const bob = {
+  id: 1,
+  identifiant: 'bob@tkdo.org',
+  nom: 'Bob',
+};
+
+const charlie = {
+  id: 2,
+  identifiant: 'charlie@tkdo.org',
+  nom: 'Charlie',
+};
+
+const david = {
+  id: 3,
+  identifiant: 'david@tkdo.org',
+  nom: 'David',
+};
+
 const occasion: Occasion = {
   titre: 'Noël 2020',
   participants: [
-    { id: 0, nom: alice.nom, estMoi: true },
-    { id: 1, nom: 'Bob', aQuiOffrir: true },
-    { id: 2, nom: 'Charlie' },
-    { id: 3, nom: 'David' },
+    { id: alice.id, nom: alice.nom, estMoi: true },
+    { id: bob.id, nom: bob.nom, aQuiOffrir: true },
+    { id: charlie.id, nom: charlie.nom,  },
+    { id: david.id, nom: david.nom,  },
   ]
 }
 
 const listesIdees: { [id: number]: Idees } = {
   0: {
-    nomUtilisateur: alice.nom,
-    estMoi: true,
+    utilisateur: alice,
     idees: [
-      { id: 0, desc: 'un gauffrier', auteur: alice.nom, date: '19/04/2020', estDeMoi: true },
+      { id: 0, description: 'un gauffrier', auteur: alice, dateProposition: '19/04/2020' },
     ]
   },
   1: {
-    nomUtilisateur: 'Bob',
+    utilisateur: bob,
     idees: [
-      { id: 0, desc: 'une canne à pêche', auteur: alice.nom, date: '19/04/2020', estDeMoi: true },
-      { id: 1, desc: 'des gants de boxe', auteur: 'Bob', date: '07/04/2020' },
+      { id: 0, description: 'une canne à pêche', auteur: alice, dateProposition: '19/04/2020' },
+      { id: 1, description: 'des gants de boxe', auteur: bob, dateProposition: '07/04/2020' },
     ]
   },
   2: {
-    nomUtilisateur: 'Charlie',
+    utilisateur: charlie,
     idees: []
   },
   3: {
-    nomUtilisateur: 'David',
+    utilisateur: david,
     idees: []
   },
 };
@@ -118,7 +132,7 @@ export class DevBackendInterceptor implements HttpInterceptor {
       const { identifiant, mdp } = body as any;
 
       if ((identifiant !== alice.identifiant) || (mdp !== alice.mdp)) return badRequest('identifiants invalides');
-      return ok({ token });
+      return ok({ token, idUtilisateur: alice.id });
     }
 
     function getUtilisateur() {
@@ -144,13 +158,6 @@ export class DevBackendInterceptor implements HttpInterceptor {
         occasion.participants = occasion.participants.map(
           p => p.id === 0 ? Object.assign(p, { nom }) : p
         );
-
-        listesIdees[0].nomUtilisateur = nom;
-        for (let idUtilisateur of Object.keys(listesIdees)) {
-          listesIdees[+idUtilisateur].idees = listesIdees[+idUtilisateur].idees.map(
-            i => i.auteur === oldNom ? Object.assign(i, { auteur: nom }) : i
-          );
-        }
       }
 
       if (mdp) alice.mdp = mdp;
@@ -173,17 +180,21 @@ export class DevBackendInterceptor implements HttpInterceptor {
     function postIdee(idUtilisateur: number) {
       if (!isLoggedIn()) return unauthorized();
 
-      const {desc} = body as any;
+      const {description} = body as any;
 
+      console.log(Math.max(...listesIdees[idUtilisateur].idees.map(i => i.id)) + 1);
       listesIdees[idUtilisateur].idees.push({
-        id: Math.max(...listesIdees[idUtilisateur].idees.map(i => i.id)) + 1,
-        desc,
-        auteur: 'Alice',
-        date: moment().locale('fr').format('L'),
-        estDeMoi: true,
+        id: nextId(listesIdees[idUtilisateur].idees),
+        description,
+        auteur: alice,
+        dateProposition: moment().locale('fr').format('L'),
       });
 
       return ok();
+    }
+
+    function nextId(liste: { id: number }[]): number {
+      return liste.length === 0 ? 0 : Math.max(...liste.map(i => i.id)) + 1;
     }
 
     function deleteIdee(idUtilisateur: number, idIdee: number) {

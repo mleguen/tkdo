@@ -5,6 +5,7 @@ use App\Application\Actions\Connexion\PostConnexionAction;
 use App\Application\Actions\Occasion\GetOccasionAction;
 use App\Application\Actions\Utilisateur\GetUtilisateurAction;
 use App\Application\Actions\Utilisateur\Idee\GetUtilisateurIdeesAction;
+use App\Application\Actions\Utilisateur\Idee\PostUtilisateurIdeeAction;
 use App\Application\Actions\Utilisateur\PutUtilisateurAction;
 use Slim\App;
 use Slim\Interfaces\RouteCollectorProxyInterface as Group;
@@ -18,7 +19,7 @@ return function (App $app) {
         $groupUtilisateur->group('/idee', function (Group $groupIdee) {
             $groupIdee->get('', GetUtilisateurIdeesAction::class);
             // $groupIdee->delete('', DeleteIdeeAction::class);
-            // $groupIdee->post('', PostIdeeAction::class);
+            $groupIdee->post('', PostUtilisateurIdeeAction::class);
         });
     });
 };

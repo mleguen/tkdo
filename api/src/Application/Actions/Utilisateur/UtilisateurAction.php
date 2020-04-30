@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Application\Actions\Utilisateur;
 
 use App\Application\Actions\Action;
+use App\Domain\Utilisateur\Utilisateur;
 use App\Domain\Utilisateur\UtilisateurRepository;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Log\LoggerInterface;
@@ -17,9 +18,9 @@ class UtilisateurAction extends Action
   protected $utilisateurRepository;
 
   /**
-   * @var int
+   * @var Utilisateur
    */
-  protected $idUtilisateur;
+  protected $utilisateur;
 
   /**
    * @param LoggerInterface $logger
@@ -33,8 +34,7 @@ class UtilisateurAction extends Action
 
   protected function action(): Response
   {
-    // TODO: vérifier que l'id correspond à celui du JWT
-    $this->idUtilisateur = (int) $this->resolveArg('idUtilisateur');
+    $this->utilisateur = $this->utilisateurRepository->find((int) $this->resolveArg('idUtilisateur'));
     return $this->response;
   }
 }

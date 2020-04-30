@@ -38,9 +38,9 @@ class PostConnexionAction extends Action
 
   protected function action(): Response
   {
-    $identifiants = $this->getFormData();
+    $body = $this->getFormData();
     try {
-      $utilisateur = $this->utilisateurRepository->findByIdentifiants($identifiants->identifiant, $identifiants->mdp);
+      $utilisateur = $this->utilisateurRepository->findByIdentifiants($body->identifiant, $body->mdp);
       $nom = $utilisateur->getNom();
       $this->logger->info("$nom connecté(e)");
 
