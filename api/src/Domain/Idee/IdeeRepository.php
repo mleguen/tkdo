@@ -31,4 +31,11 @@ interface IdeeRepository
      * @throws IdeeInconnueException
      */
     public function persist(Idee $idee): Idee;
+
+    /**
+     * @param Idee $idee
+     * @return Idee
+     * @throws IdeeInconnueException
+     */
+    public function remove(Idee $idee);
 }

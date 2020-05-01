@@ -99,4 +99,14 @@ class SessionIdeeRepository extends SessionRepository implements IdeeRepository
             ->setAuteur($this->utilisateurRepository->findRaw($idee->getAuteur()->getId()));
         return clone $this->repository[$id];
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function remove(Idee $idee)
+    {
+        $id = $idee->getId();
+        if (!isset($this->repository[$id])) throw new IdeeInconnueException();
+        unset($this->repository[$id]);
+    }
 }
