@@ -1,5 +1,8 @@
 Allow from all
 
+# Provide Authorization header as HTTP_AUTHORIZATION env var
+SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1
+
 # Generated with ngx-htaccess-generator v1.0.1
 # https://julianpoemp.github.io/ngx-htaccess-generator/
 
@@ -9,11 +12,8 @@ RewriteEngine On
 RewriteCond %{HTTPS} !on
 RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI}
 
-# Provide Authorization header as HTTP_AUTHORIZATION env var
-RewriteRule .* - [env=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
-
-# Excluded directories:
-RewriteRule ^api/?(.*) %{REQUEST_URI} [L,R=301]
+# Redirection of API requests to index.php
+RewriteRule ^api/?(.*) api/public/index.php [NC,L]
 
 # Redirection of requests to index.html
 RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI} -f [OR]

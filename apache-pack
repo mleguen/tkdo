@@ -4,8 +4,12 @@
 tar -cvf tkdo.tar -C apache .
 
 # Fichiers front
-./npm-front run build
+./npm-front run build -- --prod
 tar -rvf tkdo.tar -C front/dist/tkdo .
+
+# Fichiers api
+./composer-api install
+tar -rvf tkdo.tar ./api/{app,logs/README.md,public,src,var,vendor,composer.{json,lock}}
 
 # Finalisation
 gzip -f tkdo.tar
