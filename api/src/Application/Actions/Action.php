@@ -74,7 +74,7 @@ abstract class Action
      */
     protected function getFormData()
     {
-        $input = json_decode(file_get_contents('php://input'));
+        $input = json_decode($this->request->getBody()->getContents());
 
         if (json_last_error() !== JSON_ERROR_NONE) {
             throw new HttpBadRequestException($this->request, 'Malformed JSON input.');

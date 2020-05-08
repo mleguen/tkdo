@@ -41,12 +41,16 @@ const david = {
 const occasion: Occasion = {
   titre: 'Noël 2020',
   participants: [
-    { id: alice.id, nom: alice.nom, estMoi: true },
-    { id: bob.id, nom: bob.nom, aQuiOffrir: true },
-    { id: charlie.id, nom: charlie.nom,  },
-    { id: david.id, nom: david.nom,  },
-  ]
-}
+    alice,
+    bob,
+    charlie,
+    david,
+  ],
+  resultatsTirage: [{
+    idQuiOffre: alice.id,
+    idQuiRecoit: bob.id,
+  }],
+};
 
 const listesIdees: { [id: number]: Idees } = {
   0: {

@@ -1,26 +1,26 @@
 <?php
 declare(strict_types=1);
 
-use App\Application\Actions\Connexion\PostConnexionAction;
-use App\Application\Actions\Occasion\GetOccasionAction;
-use App\Application\Actions\Utilisateur\GetUtilisateurAction;
-use App\Application\Actions\Utilisateur\Idee\DeleteUtilisateurIdeeAction;
-use App\Application\Actions\Utilisateur\Idee\GetUtilisateurIdeesAction;
-use App\Application\Actions\Utilisateur\Idee\PostUtilisateurIdeeAction;
-use App\Application\Actions\Utilisateur\PutUtilisateurAction;
+use App\Application\Actions\Connexion\ConnexionAction;
+use App\Application\Actions\Occasion\OccasionReadAction;
+use App\Application\Actions\Utilisateur\UtilisateurReadAction;
+use App\Application\Actions\Idee\IdeeDeleteAction;
+use App\Application\Actions\Idee\IdeeReadAllAction;
+use App\Application\Actions\Idee\IdeeCreateAction;
+use App\Application\Actions\Utilisateur\UtilisateurUpdateAction;
 use Slim\App;
 use Slim\Interfaces\RouteCollectorProxyInterface as Group;
 
 return function (App $app) {
-    $app->post('/connexion', PostConnexionAction::class);
-    $app->get('/occasion', GetOccasionAction::class);
+    $app->post('/connexion', ConnexionAction::class);
+    $app->get('/occasion', OccasionReadAction::class);
     $app->group('/utilisateur/{idUtilisateur}', function (Group $group) {
-        $group->get('', GetUtilisateurAction::class);
-        $group->put('', PutUtilisateurAction::class);
+        $group->get('', UtilisateurReadAction::class);
+        $group->put('', UtilisateurUpdateAction::class);
         $group->group('/idee', function (Group $group) {
-            $group->get('', GetUtilisateurIdeesAction::class);
-            $group->post('', PostUtilisateurIdeeAction::class);
-            $group->delete('/{idIdee}', DeleteUtilisateurIdeeAction::class);
+            $group->get('', IdeeReadAllAction::class);
+            $group->post('', IdeeCreateAction::class);
+            $group->delete('/{idIdee}', IdeeDeleteAction::class);
         });
     });
 };

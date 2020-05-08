@@ -36,7 +36,7 @@ class UtilisateurAction extends Action
   {
     // TODO: obtenir une référence à la place pour éviter une lecture en base
     // et faire la vraie lecture plus tard dans les classes filles qui le nécessitent
-    $this->utilisateur = $this->utilisateurRepository->find((int) $this->resolveArg('idUtilisateur'));
+    $this->utilisateur = $this->utilisateurRepository->read((int) $this->resolveArg('idUtilisateur'));
     return $this->response;
   }
 }

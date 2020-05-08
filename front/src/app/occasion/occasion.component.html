@@ -7,7 +7,7 @@
   <h3>Participants</h3>
   <ul>
     <li *ngFor="let p of o.participants"
-      [ngClass]="{ participant: true, estMoi: p.estMoi, aQuiOffrir: p.aQuiOffrir }"
+      [ngClass]="{ participant: true, estMoi: p.estMoi, estQuiRecoitDeMoi: p.estQuiRecoitDeMoi }"
       [routerLink]="['/liste-idees', p.id]">
       {{p.nom}}
     </li>

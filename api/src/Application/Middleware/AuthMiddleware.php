@@ -21,18 +21,11 @@ class AuthMiddleware implements Middleware
     protected $logger;
 
     /**
-     * @var MockData
-     */
-    protected $mock;
-
-    /**
      * @param LoggerInterface $logger
-     * @param MockData  $mock
      */
-    public function __construct(LoggerInterface $logger, MockData $mock)
+    public function __construct(LoggerInterface $logger)
     {
         $this->logger = $logger;
-        $this->mock = $mock;
     }
 
     /**
@@ -40,11 +33,13 @@ class AuthMiddleware implements Middleware
      */
     public function process(Request $request, RequestHandler $handler): Response
     {
-        if (($request->getRequestTarget() !== '/api/connexion') && (
-            !isset($_SERVER['HTTP_AUTHORIZATION']) ||
-            ($_SERVER['HTTP_AUTHORIZATION'] !== "Bearer ".$this->mock->getToken())
-        )) {
-            throw new HttpUnauthorizedException($request);
+        if ($request->getRequestTarget() !== '/api/connexion') {
+            $serverParams = $request->getServerParams();
+            if (!isset($serverParams['HTTP_AUTHORIZATION']) ||
+                ($serverParams['HTTP_AUTHORIZATION'] !== "Bearer ".MockData::getToken())
+            ) {
+                throw new HttpUnauthorizedException($request);
+            }
         }
 
         return $handler->handle($request);

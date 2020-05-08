@@ -1,16 +1,16 @@
 <ng-container *ngIf="listeIdees$|async as li">
-  <h2>Idées de cadeaux pour {{estUtilisateurConnecte(li.utilisateur) ? 'vous-même' : li.utilisateur.nom}}</h2>
+  <h2>Idées de cadeaux pour {{li.estPourMoi ? 'vous-même' : li.utilisateur.nom}}</h2>
   <p><button (click)="actualise()">Actualiser</button></p>
 
-  <p class="avertissement" *ngIf="estUtilisateurConnecte(li.utilisateur); then estMoi else estPasMoi"></p>
+  <p class="avertissement" *ngIf="li.estPourMoi; then estMoi else estPasMoi"></p>
   <ng-template #estMoi>Vous ne pouvez voir que les idées que vous avez vous-même proposées.</ng-template>
   <ng-template #estPasMoi>{{li.utilisateur.nom}} ne peut pas voir les idées proposées par les autres participants.</ng-template>
   
   <ul>
     <li *ngFor="let i of li.idees">
       <span class="idee">{{i.description}}</span>
-      <span class="auteur"> - idée proposée par {{estUtilisateurConnecte(i.auteur) ? 'vous' : i.auteur.nom}} le {{i.dateProposition}}</span>
-      <span class="suppression" *ngIf="estUtilisateurConnecte(i.auteur)"> - <button (click)="supprime(i.id)">Supprimer</button></span>
+      <span class="auteur"> - idée proposée par {{i.estDeMoi ? 'vous' : i.auteur.nom}} le {{i.dateProposition}}</span>
+      <span class="suppression" *ngIf="i.estDeMoi"> - <button (click)="supprime(i.id)">Supprimer</button></span>
     </li>
   </ul>
 

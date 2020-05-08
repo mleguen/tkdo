@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Observable, combineLatest, BehaviorSubject, of } from 'rxjs';
-import { switchMap, catchError } from 'rxjs/operators';
-import { BackendService, Idees, Utilisateur } from '../backend.service';
+import { switchMap, catchError, map } from 'rxjs/operators';
+import { BackendService, Idees, Utilisateur, Idee } from '../backend.service';
 
 @Component({
   selector: 'app-liste-idees',
@@ -16,7 +16,7 @@ export class ListeIdeesComponent implements OnInit {
     description: ['', Validators.required],
   });
   erreurAjoutSuppression: string;
-  listeIdees$: Observable<Idees>;
+  listeIdees$: Observable<IdeesAffichees>;
 
   private idUtilisateur: number;
   private actualisation$ = new BehaviorSubject(true);
@@ -35,6 +35,12 @@ export class ListeIdeesComponent implements OnInit {
       switchMap(([params]) => {
         this.idUtilisateur = +params.get('idUtilisateur');
         return this.backend.getIdees(this.idUtilisateur).pipe(
+          map(li => Object.assign({}, li, {
+            estPourMoi: li.utilisateur.id === this.backend.idUtilisateur,
+            idees: li.idees.map(i => Object.assign({}, i, {
+              estDeMoi: i.auteur.id === this.backend.idUtilisateur,
+            })),
+          })),
           // Les erreurs backend sont déjà affichées par AppComponent
           catchError(() => of(undefined))
         );
@@ -60,10 +66,6 @@ export class ListeIdeesComponent implements OnInit {
     }
   }
 
-  estUtilisateurConnecte(utilisateur: Utilisateur) {
-    return this.backend.estUtilisateurConnecte(utilisateur);
-  }
-
   async supprime(idIdee: number) {
     try {
       await this.backend.supprimeIdee(this.idUtilisateur, idIdee);
@@ -74,4 +76,13 @@ export class ListeIdeesComponent implements OnInit {
       this.erreurAjoutSuppression = err.message || 'ajout impossible';
     }
   }
+}
+
+interface IdeesAffichees extends Idees {
+  estPourMoi: boolean;
+  idees: IdeeAffichee[];
+}
+
+interface IdeeAffichee extends Idee {
+  estDeMoi: boolean;
 }

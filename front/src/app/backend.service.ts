@@ -4,22 +4,21 @@ import { BehaviorSubject } from 'rxjs';
 import { first } from 'rxjs/operators';
 import { Router } from '@angular/router';
 
+export interface Occasion {
+  titre: string;
+  participants: Utilisateur[];
+  resultatsTirage: ResultatTirage[]
+}
+
 export interface Utilisateur {
   id: number;
   identifiant: string;
   nom: string;
 }
 
-export interface Occasion {
-  titre: string;
-  participants: Participant[];
-}
-
-interface Participant {
-  id: number;
-  nom: string;
-  estMoi?: boolean;
-  aQuiOffrir?: boolean;
+export interface ResultatTirage {
+  idQuiOffre: number;
+  idQuiRecoit: number;
 }
 
 export interface Idees {
@@ -90,10 +89,6 @@ export class BackendService {
     return this.estConnecte$.pipe(first()).toPromise();
   }
   
-  estUtilisateurConnecte(utilisateur: Utilisateur) {
-    return utilisateur.id === this.idUtilisateur;
-  }
-
   estUrlBackend(url: string): boolean {
     return !!url.match(new RegExp(`^${URL_API}`));
   }

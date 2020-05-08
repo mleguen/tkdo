@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { BackendService, Occasion } from '../backend.service';
-import { catchError } from 'rxjs/operators';
+import { BackendService, Occasion, Utilisateur } from '../backend.service';
+import { catchError, map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-occasion',
@@ -10,7 +10,7 @@ import { catchError } from 'rxjs/operators';
 })
 export class OccasionComponent implements OnInit {
   
-  occasion$: Observable<Occasion>;
+  occasion$: Observable<OccasionAffichee>;
 
   constructor(
     private readonly backend: BackendService
@@ -18,8 +18,26 @@ export class OccasionComponent implements OnInit {
 
   ngOnInit(): void {
     this.occasion$ = this.backend.getOccasion$().pipe(
+      map(o => {
+        const idQuiRecoitDeMoi = o.resultatsTirage.find(rt => rt.idQuiOffre === this.backend.idUtilisateur)?.idQuiRecoit;
+        return Object.assign({}, o, {
+          participants: o.participants.map(p => Object.assign({}, p, {
+            estMoi: p.id === this.backend.idUtilisateur,
+            estQuiRecoitDeMoi: p.id === idQuiRecoitDeMoi,
+          })),
+        });
+      }),
       // Les erreurs backend sont déjà affichées par AppComponent
-      catchError(() => of(undefined))
+      catchError(() => of(undefined)),
     );
   }
+}
+
+interface OccasionAffichee extends Occasion {
+  participants: UtilisateurAffiche[];
+}
+
+interface UtilisateurAffiche extends Utilisateur {
+  estMoi: boolean;
+  estQuiRecoitDeMoi: boolean;
 }

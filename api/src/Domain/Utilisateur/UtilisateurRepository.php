@@ -3,19 +3,16 @@ declare(strict_types=1);
 
 namespace App\Domain\Utilisateur;
 
-interface UtilisateurRepository
-{
-    // /**
-    //  * @return Utilisateur[]
-    //  */
-    // public function findAll(): array;
+use App\Domain\Reference\ReferenceRepository;
 
+interface UtilisateurRepository extends ReferenceRepository
+{
     /**
      * @param int $id
      * @return Utilisateur
      * @throws UtilisateurInconnuException
      */
-    public function find(int $id): Utilisateur;
+    public function read(int $id): Utilisateur;
 
     /**
      * @param string $identifiant
@@ -23,12 +20,12 @@ interface UtilisateurRepository
      * @return Utilisateur
      * @throws UtilisateurInconnuException
      */
-    public function findByIdentifiants(string $identifiant, string $mdp): Utilisateur;
+    public function readOneByIdentifiants(string $identifiant, string $mdp): Utilisateur;
 
     /**
      * @param Utilisateur $utilisateur
      * @return Utilisateur
      * @throws UtilisateurInconnuException
      */
-    public function persist(Utilisateur $utilisateur): Utilisateur;
+    public function update(Utilisateur $utilisateur): Utilisateur;
 }
