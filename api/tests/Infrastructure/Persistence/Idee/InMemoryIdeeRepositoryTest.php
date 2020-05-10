@@ -3,32 +3,37 @@ declare(strict_types=1);
 
 namespace Tests\Infrastructure\Persistence\Idee;
 
-use App\Infrastructure\Persistence\Idee\InMemoryIdee;
+use App\Infrastructure\Persistence\Idee\DoctrineIdee;
 use App\Infrastructure\Persistence\Idee\InMemoryIdeeRepository;
-use App\Infrastructure\Persistence\Utilisateur\InMemoryUtilisateur;
+use App\Infrastructure\Persistence\Utilisateur\DoctrineUtilisateur;
 use Tests\TestCase;
 
 class InMemoryIdeeRepositoryTest extends TestCase
 {
     /**
-     * @var InMemoryUtilisateur
+     * @var DoctrineUtilisateur
      */
     private $alice;
 
     /**
-     * @var InMemoryUtilisateur
+     * @var DoctrineUtilisateur
      */
     private $bob;
 
     /**
-     * @var InMemoryIdee
+     * @var DoctrineIdee
      */
     private $ideeAlicePourAlice;
 
     /**
-     * @var InMemoryIdee
+     * @var DoctrineIdee
      */
     private $ideeBobPourAlice;
+
+    /**
+     * @var DoctrineIdee
+     */
+    private $ideeInconnue;
 
     /**
      * @var InMemoryIdeeRepository
@@ -37,42 +42,49 @@ class InMemoryIdeeRepositoryTest extends TestCase
 
     public function setUp()
     {
-        $this->alice = new InMemoryUtilisateur(0, 'alice@tkdo.org', 'mdpalice', 'Alice');
-        $this->bob = new InMemoryUtilisateur(1, 'bob@tkdo.org', 'Bob', 'Bob');
-        $this->ideeAlicePourAlice = new InMemoryIdee(
-            0,
-            $this->alice,
-            "un gauffrier",
-            $this->alice,
-            \DateTime::createFromFormat(\DateTimeInterface::ISO8601, '2020-04-19T00:00:00+0000')
-        );
-        $this->ideeBobPourAlice = new InMemoryIdee(
-            1,
-            $this->alice,
-            "une canne à pêche",
-            $this->bob,
-            \DateTime::createFromFormat(\DateTimeInterface::ISO8601, '2020-04-20T00:00:00+0000')
-        );
+        $this->alice = (new DoctrineUtilisateur(1))
+            ->setIdentifiant('alice@tkdo.org')
+            ->setNom('Alice')
+            ->setMdp('mdpalice');
+        $this->bob = (new DoctrineUtilisateur(2))
+            ->setIdentifiant('bob@tkdo.org')
+            ->setNom('Bob')
+            ->setMdp('mdpbob');
+
+        $this->ideeAlicePourAlice = (new DoctrineIdee(1))
+            ->setUtilisateur($this->alice)
+            ->setDescription('un gauffrier')
+            ->setAuteur($this->alice)
+            ->setDateProposition(\DateTime::createFromFormat(\DateTimeInterface::ISO8601, '2020-04-19T00:00:00+0000'));
+        $this->ideeBobPourAlice = (new DoctrineIdee(2))
+            ->setUtilisateur($this->alice)
+            ->setDescription('une canne à pêche')
+            ->setAuteur($this->bob)
+            ->setDateProposition(\DateTime::createFromFormat(\DateTimeInterface::ISO8601, '2020-04-20T00:00:00+0000'));
+        $this->ideeInconnue = (new DoctrineIdee(3))
+            ->setUtilisateur($this->bob)
+            ->setDescription('des gants de boxe')
+            ->setAuteur($this->bob)
+            ->setDateProposition(\DateTime::createFromFormat(\DateTimeInterface::ISO8601, '2020-04-07T00:00:00+0000'));
         $this->repository = new InMemoryIdeeRepository([
-            0 => $this->ideeAlicePourAlice,
-            1 => $this->ideeBobPourAlice,
+            $this->ideeAlicePourAlice->getId() => $this->ideeAlicePourAlice,
+            $this->ideeBobPourAlice->getId() => $this->ideeBobPourAlice,
         ]);
     }
 
     public function testCreate()
     {
-        $createParams = [
-            $this->bob,
-            "des gants de boxe",
-            $this->bob,
-            \DateTime::createFromFormat(\DateTimeInterface::ISO8601, '2020-04-07T00:00:00+0000')
-        ];
-        $this->assertEquals(new InMemoryIdee(2, ...$createParams), $this->repository->create(...$createParams));
+        $this->assertEquals($this->ideeInconnue, $this->repository->create(
+            $this->ideeInconnue->getUtilisateur(),
+            $this->ideeInconnue->getDescription(),
+            $this->ideeInconnue->getAuteur(),
+            $this->ideeInconnue->getDateProposition()
+        ));
     }
 
     public function testRead()
     {
-        $this->assertEquals($this->ideeAlicePourAlice, $this->repository->read(0));
+        $this->assertEquals($this->ideeAlicePourAlice, $this->repository->read($this->ideeAlicePourAlice->getId()));
     }
 
     /**
@@ -80,7 +92,7 @@ class InMemoryIdeeRepositoryTest extends TestCase
      */
     public function testReadIdeeInconnue()
     {
-        $this->repository->read(2);
+        $this->repository->read($this->ideeInconnue->getId());
     }
 
     public function testReadByUtilisateur()
@@ -101,7 +113,7 @@ class InMemoryIdeeRepositoryTest extends TestCase
 
     public function testDelete()
     {
-        $this->repository->delete($this->repository->getReference(0));
+        $this->repository->delete($this->ideeAlicePourAlice);
         $this->assertEquals([$this->ideeBobPourAlice], $this->repository->readByUtilisateur($this->alice));
     }
 
@@ -110,6 +122,6 @@ class InMemoryIdeeRepositoryTest extends TestCase
      */
     public function testDeleteIdeeInconnue()
     {
-        $this->repository->delete($this->repository->getReference(3));
+        $this->repository->delete($this->ideeInconnue);
     }
 }

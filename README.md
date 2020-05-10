@@ -42,15 +42,37 @@ Comme le serveur de développement front est lancé sans `--prod`,
 les requêtes destinées à l'API sont interceptées et bouchonnées
 (cf. [front/src/app/dev-backend.interceptor.ts](./front/src/app/dev-backend.interceptor.ts)).
 
-### Utiliser les serveurs de développement front et api ensemble
+### Utiliser le serveur de développement front avec l'API de développement docker
 
 ```bash
-./npm-front start -- --prod & ./composer-api start
+./docker-compose-api up -d
+./composer-api doctrine orm:schema-tool:update
+./composer-api doctrine fixtures:load
+./npm-front start --prod
 ```
 
-Comme le serveur de développement front est lancé avec `--prod`,
-les requêtes destinées à l'API sont redirigées vers le serveur de développement API
+Le serveur de développement front redirige les requêtes destinées à l'API
+vers l'API de développement docker
 (cf. [front/src/proxy.conf.json](./front/src/proxy.conf.json)).
+
+Pour initialiser la base de données de l'API de développement docker
+(une fois qu'elle a fini de démarrer) :
+
+```bash
+./composer-api doctrine orm:schema-tool:create
+```
+
+ou pour la mettre à jour :
+
+```bash
+./composer-api doctrine orm:schema-tool:update
+```
+
+Et pour la peupler de données de test :
+
+```bash
+./composer-api doctrine fixtures:load
+```
 
 ### Pré-requis au lancement des tests e2e front
 

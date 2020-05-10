@@ -3,23 +3,29 @@ declare(strict_types=1);
 
 namespace Tests\Infrastructure\Persistence\Occasion;
 
-use App\Infrastructure\Persistence\Occasion\InMemoryOccasion;
+use App\Infrastructure\Persistence\Occasion\DoctrineOccasion;
 use App\Infrastructure\Persistence\Occasion\InMemoryOccasionRepository;
-use App\Infrastructure\Persistence\Utilisateur\InMemoryUtilisateur;
+use App\Infrastructure\Persistence\Utilisateur\DoctrineUtilisateur;
 use Tests\TestCase;
 
 class InMemoryOccasionRepositoryTest extends TestCase
 {
     public function testReadLast()
     {
-        $alice = new InMemoryUtilisateur(0, 'alice@tkdo.org', 'mdpalice', 'Alice');
-        $bob = new InMemoryUtilisateur(1, 'bob@tkdo.org', 'Bob', 'Bob');
-        $noel2019 = new InMemoryOccasion(
+        $alice = (new DoctrineUtilisateur(1))
+            ->setIdentifiant('alice@tkdo.org')
+            ->setNom('Alice')
+            ->setMdp('mdpalice');
+        $bob = (new DoctrineUtilisateur(2))
+            ->setIdentifiant('bob@tkdo.org')
+            ->setNom('Bob')
+            ->setMdp('mdpbob');
+        $noel2019 = new DoctrineOccasion(
             0,
             "Noël 2019",
             [$alice, $bob]
         );
-        $noel2020 = new InMemoryOccasion(
+        $noel2020 = new DoctrineOccasion(
             1,
             "Noël 2020",
             [$alice, $bob]

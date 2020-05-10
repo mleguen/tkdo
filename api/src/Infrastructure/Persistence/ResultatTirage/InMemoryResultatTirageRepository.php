@@ -11,7 +11,7 @@ use App\Infrastructure\Persistence\Reference\InMemoryReferenceRepository;
 class InMemoryResultatTirageRepository extends InMemoryReferenceRepository implements ResultatTirageRepository
 {
     /**
-     * @var InMemoryResultatTirage[]
+     * @var DoctrineResultatTirage[]
      */
     private $resultats;
 

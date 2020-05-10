@@ -14,12 +14,12 @@ use App\Infrastructure\Persistence\Reference\InMemoryReferenceRepository;
 class InMemoryIdeeRepository extends InMemoryReferenceRepository implements IdeeRepository
 {
     /**
-     * @var InMemoryIdee[]
+     * @var DoctrineIdee[]
      */
     private $idees;
 
     /**
-     * @param InMemoryIdee[]
+     * @param DoctrineIdee[]
      */
     public function __construct(array $idees = [])
     {
@@ -34,9 +34,13 @@ class InMemoryIdeeRepository extends InMemoryReferenceRepository implements Idee
         string $description,
         Utilisateur $auteur,
         \DateTime $dateProposition
-    ) {
+    ): Idee {
         $id = max(array_keys($this->idees)) + 1;
-        $this->idees[$id] = new InMemoryIdee($id, $utilisateur, $description, $auteur, $dateProposition);
+        $this->idees[$id] = (new DoctrineIdee($id))
+            ->setUtilisateur($utilisateur)
+            ->setDescription($description)
+            ->setAuteur($auteur)
+            ->setDateProposition($dateProposition);
         return clone $this->idees[$id];
     }
 

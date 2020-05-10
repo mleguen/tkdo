@@ -10,13 +10,13 @@ import { ProfilComponent } from './profil/profil.component';
 const routes: Routes = [
   { path: '', redirectTo: '/occasion', pathMatch: 'full' },
   { path: 'connexion', component: ConnexionComponent },
-  { path: 'liste-idees/:idUtilisateur', component: ListeIdeesComponent, canActivate: [ConnexionGuard] },
-  { path: 'occasion', component: OccasionComponent, canActivate: [ConnexionGuard] },
-  { path: 'profil', component: ProfilComponent, canActivate: [ConnexionGuard] },
+  { path: 'liste-idees/:idUtilisateur', component: ListeIdeesComponent, canActivate: [ConnexionGuard], runGuardsAndResolvers: 'always' },
+  { path: 'occasion', component: OccasionComponent, canActivate: [ConnexionGuard], runGuardsAndResolvers: 'always' },
+  { path: 'profil', component: ProfilComponent, canActivate: [ConnexionGuard], runGuardsAndResolvers: 'always' },
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
+  imports: [RouterModule.forRoot(routes, { onSameUrlNavigation: 'reload' })],
   exports: [RouterModule]
 })
 export class AppRoutingModule { }

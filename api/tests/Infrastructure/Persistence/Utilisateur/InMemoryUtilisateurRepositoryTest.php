@@ -3,16 +3,21 @@ declare(strict_types=1);
 
 namespace Tests\Infrastructure\Persistence\Utilisateur;
 
-use App\Infrastructure\Persistence\Utilisateur\InMemoryUtilisateur;
+use App\Infrastructure\Persistence\Utilisateur\DoctrineUtilisateur;
 use App\Infrastructure\Persistence\Utilisateur\InMemoryUtilisateurRepository;
 use Tests\TestCase;
 
-class InMemoryUserRepositoryTest extends TestCase
+class InMemoryUtilisateurRepositoryTest extends TestCase
 {
     /**
-     * @var InMemoryUtilisateur
+     * @var DoctrineUtilisateur
      */
     private $alice;
+
+    /**
+     * @var DoctrineUtilisateur
+     */
+    private $inconnu;
 
     /**
      * @var InMemoryUtilisateurRepository
@@ -21,13 +26,20 @@ class InMemoryUserRepositoryTest extends TestCase
 
     public function setUp()
     {
-        $this->alice = new InMemoryUtilisateur(0, 'alice@tkdo.org', 'mdpalice', 'Alice');
-        $this->repository = new InMemoryUtilisateurRepository([0 => $this->alice]);
+        $this->alice = (new DoctrineUtilisateur(1))
+            ->setIdentifiant('alice@tkdo.org')
+            ->setNom('Alice')
+            ->setMdp('mdpalice');
+        $this->inconnu = (new DoctrineUtilisateur(2))
+            ->setIdentifiant('bob@tkdo.org')
+            ->setNom('Bob')
+            ->setMdp('mdpbob');
+        $this->repository = new InMemoryUtilisateurRepository([$this->alice->getId() => $this->alice]);
     }
     
     public function testRead()
     {
-        $this->assertEquals($this->alice, $this->repository->read(0));
+        $this->assertEquals($this->alice, $this->repository->read($this->alice->getId()));
     }
 
     /**
@@ -35,7 +47,7 @@ class InMemoryUserRepositoryTest extends TestCase
      */
     public function testReadUtilisateurInconnu()
     {
-        $this->repository->read(1);
+        $this->repository->read($this->inconnu->getId());
     }
 
     public function testReadOneByIdentifiants()
@@ -61,10 +73,13 @@ class InMemoryUserRepositoryTest extends TestCase
 
     public function testUpdate()
     {
-        $aliceModifiee = new InMemoryUtilisateur(0, 'alice2@tkdo.org', 'mdpalice2', 'Alice2');
+        $aliceModifiee = (clone $this->alice)
+            ->setIdentifiant('alice2@tkdo.org')
+            ->setNom('Alice2')
+            ->setMdp('nouveaumdpalice');
         $this->repository->update($aliceModifiee);
 
-        $this->assertEquals($aliceModifiee, $this->repository->read(0));
+        $this->assertEquals($aliceModifiee, $this->repository->read($this->alice->getId()));
     }
 
     /**
@@ -72,7 +87,6 @@ class InMemoryUserRepositoryTest extends TestCase
      */
     public function testUpdateUtilisateurInconnu()
     {
-        $bob = new InMemoryUtilisateur(1, 'bob@tkdo.org', 'Bob', 'Bob');
-        $this->repository->update($bob);
+        $this->repository->update($this->inconnu);
     }
 }

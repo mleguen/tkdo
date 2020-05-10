@@ -13,5 +13,10 @@ interface Occasion extends Reference
    * @return Utilisateur[]
    */
   public function getParticipants(): array;
+  public function setTitre (string $titre): Occasion;
+  /**
+   * @param Utilisateur[] $participants
+   */
+  public function setParticipants (array $participants): Occasion;
 }
 

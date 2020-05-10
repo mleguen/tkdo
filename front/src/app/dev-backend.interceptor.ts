@@ -191,7 +191,7 @@ export class DevBackendInterceptor implements HttpInterceptor {
         id: nextId(listesIdees[idUtilisateur].idees),
         description,
         auteur: alice,
-        dateProposition: moment().locale('fr').format('L'),
+        dateProposition: moment().locale('fr').format('YYYY-MM-DDTHH:mm:ssZ'),
       });
 
       return ok();

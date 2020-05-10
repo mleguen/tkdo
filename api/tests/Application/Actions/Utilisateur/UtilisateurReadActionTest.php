@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tests\Application\Actions\Utilisateur;
 
 use App\Domain\Utilisateur\UtilisateurInconnuException;
-use App\Infrastructure\Persistence\Utilisateur\InMemoryUtilisateur;
+use App\Infrastructure\Persistence\Utilisateur\DoctrineUtilisateur;
 use Tests\Application\Actions\ActionTestCase;
 
 class UtilisateurReadActionTest extends ActionTestCase
@@ -18,7 +18,10 @@ class UtilisateurReadActionTest extends ActionTestCase
     public function setUp()
     {
         parent::setUp();
-        $this->alice = new InMemoryUtilisateur(0, 'alice@tkdo.org', 'Alice', 'Alice');
+        $this->alice = (new DoctrineUtilisateur(1))
+            ->setIdentifiant('alice@tkdo.org')
+            ->setNom('Alice')
+            ->setMdp('mdpalice');
     }
 
     public function testAction()

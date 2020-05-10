@@ -6,8 +6,8 @@ namespace Tests\Application\Actions\Idee;
 
 use App\Domain\Utilisateur\Utilisateur;
 use App\Domain\Utilisateur\UtilisateurInconnuException;
-use App\Infrastructure\Persistence\Idee\InMemoryIdee;
-use App\Infrastructure\Persistence\Utilisateur\InMemoryUtilisateur;
+use App\Infrastructure\Persistence\Idee\DoctrineIdee;
+use App\Infrastructure\Persistence\Utilisateur\DoctrineUtilisateur;
 use Tests\Application\Actions\ActionTestCase;
 
 class IdeeReadAllActionTest extends ActionTestCase
@@ -20,12 +20,18 @@ class IdeeReadAllActionTest extends ActionTestCase
     public function setUp()
     {
         parent::setup();
-        $this->alice = new InMemoryUtilisateur(0, 'alice@tkdo.org', 'Alice', 'Alice');
+        $this->alice = (new DoctrineUtilisateur(1))
+            ->setIdentifiant('alice@tkdo.org')
+            ->setNom('Alice')
+            ->setMdp('mdpalice');
     }
 
     public function testAction()
     {
-        $bob = new InMemoryUtilisateur(1, 'bob@tkdo.org', 'Bob', 'Bob');
+        $bob = (new DoctrineUtilisateur(2))
+            ->setIdentifiant('bob@tkdo.org')
+            ->setNom('Bob')
+            ->setMdp('mdpbob');
 
         $this->utilisateurRepositoryProphecy
             ->read($this->alice->getId())
@@ -33,14 +39,11 @@ class IdeeReadAllActionTest extends ActionTestCase
             ->shouldBeCalledOnce();
 
         $dateProposition = '2020-04-19T00:00:00+0000';
-        $idee = new InMemoryIdee(
-            0,
-            $this->alice,
-            "un gauffrier",
-            $this->alice,
-            \DateTime::createFromFormat(\DateTimeInterface::ISO8601, $dateProposition)
-        );
-        
+        $idee = (new DoctrineIdee(1))
+            ->setUtilisateur($this->alice)
+            ->setDescription('un gauffrier')
+            ->setAuteur($bob)
+            ->setDateProposition(\DateTime::createFromFormat(\DateTimeInterface::ISO8601, $dateProposition));
         $this->ideeRepositoryProphecy
             ->readByUtilisateur($this->alice)
             ->willReturn([$idee])

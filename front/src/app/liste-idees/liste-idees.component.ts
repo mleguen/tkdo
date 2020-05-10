@@ -3,7 +3,8 @@ import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Observable, combineLatest, BehaviorSubject, of } from 'rxjs';
 import { switchMap, catchError, map } from 'rxjs/operators';
-import { BackendService, Idees, Utilisateur, Idee } from '../backend.service';
+import { BackendService, Idees, Idee } from '../backend.service';
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-liste-idees',
@@ -38,6 +39,7 @@ export class ListeIdeesComponent implements OnInit {
           map(li => Object.assign({}, li, {
             estPourMoi: li.utilisateur.id === this.backend.idUtilisateur,
             idees: li.idees.map(i => Object.assign({}, i, {
+              dateProposition: moment(i.dateProposition, 'YYYY-MM-DDTHH:mm:ssZ').locale('fr').format('L à LT'),
               estDeMoi: i.auteur.id === this.backend.idUtilisateur,
             })),
           })),

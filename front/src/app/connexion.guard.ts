@@ -16,7 +16,7 @@ export class ConnexionGuard implements CanActivate {
     next: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
   ): Promise<boolean | UrlTree> {
-    if (!await this.backend.estConnecte()) return this.router.createUrlTree(['connexion'], { queryParams: { retour: state.url }});  
+    if (!await this.backend.estConnecte()) return this.router.createUrlTree(['connexion'], { queryParams: { retour: state.url }});
     return true;
   }
 }

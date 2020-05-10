@@ -14,7 +14,7 @@ interface IdeeRepository extends ReferenceRepository
         string $description,
         Utilisateur $auteur,
         \DateTime $dateProposition
-    );
+    ): Idee;
 
     /**
      * @throws IdeeInconnueException

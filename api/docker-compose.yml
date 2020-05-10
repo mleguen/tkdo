@@ -1,12 +1,13 @@
-version: '3.7'
+version: '3.8'
 
 volumes:
     logs:
         driver: local
+    mysql-data:
 
 services:
     slim:
-        image: php:7-alpine
+        build: ./docker/slim
         working_dir: /var/www
         command: php -S 0.0.0.0:8080 -t public
         environment:
@@ -16,3 +17,15 @@ services:
         volumes:
             - .:/var/www
             - logs:/var/www/logs
+    mysql:
+        env_file: .env
+        environment:
+            MYSQL_DATABASE: ${MYSQL_DATABASE:-tkdo}
+            MYSQL_USER: ${MYSQL_USER:-tkdo}
+            MYSQL_PASSWORD: ${MYSQL_PASSWORD:-mdptkdo}
+            MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-mdproot}
+        image: mysql:5.6
+        ports:
+            - "${MYSQL_PORT:-3306}:3306"
+        volumes:
+            - mysql-data:/var/lib/mysql

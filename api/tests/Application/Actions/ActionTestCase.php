@@ -10,7 +10,6 @@ use App\Domain\Occasion\OccasionRepository;
 use App\Domain\ResultatTirage\ResultatTirageRepository;
 use App\Domain\Utilisateur\UtilisateurRepository;
 use DI\Container;
-use DI\ContainerBuilder;
 use Exception;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -23,12 +22,17 @@ use Slim\Psr7\Request as SlimRequest;
 use Slim\Psr7\Uri;
 use Tests\TestCase;
 
-class ActionTestCase extends TestCase
+    class ActionTestCase extends TestCase
 {
     /**
      * @var App
      */
     private $app;
+
+    /**
+     * @var Container
+     */
+    private $container;
 
     /**
      * @var ObjectProphecy
@@ -52,50 +56,28 @@ class ActionTestCase extends TestCase
 
     public function setUp()
     {
-        $this->app = $this->getAppInstance();
-
-        /** @var Container $container */
-        $container = $this->app->getContainer();
+        $this->container = require __DIR__ . '/../../../bootstrap.php';
+        $this->app = $this->getAppInstance($this->container);
 
         $this->ideeRepositoryProphecy = $this->prophesize(IdeeRepository::class);
-        $container->set(IdeeRepository::class, $this->ideeRepositoryProphecy->reveal());
+        $this->container->set(IdeeRepository::class, $this->ideeRepositoryProphecy->reveal());
 
         $this->occasionRepositoryProphecy = $this->prophesize(OccasionRepository::class);
-        $container->set(OccasionRepository::class, $this->occasionRepositoryProphecy->reveal());
+        $this->container->set(OccasionRepository::class, $this->occasionRepositoryProphecy->reveal());
 
         $this->resultatTirageRepositoryProphecy = $this->prophesize(ResultatTirageRepository::class);
-        $container->set(ResultatTirageRepository::class, $this->resultatTirageRepositoryProphecy->reveal());
+        $this->container->set(ResultatTirageRepository::class, $this->resultatTirageRepositoryProphecy->reveal());
 
         $this->utilisateurRepositoryProphecy = $this->prophesize(UtilisateurRepository::class);
-        $container->set(UtilisateurRepository::class, $this->utilisateurRepositoryProphecy->reveal());
+        $this->container->set(UtilisateurRepository::class, $this->utilisateurRepositoryProphecy->reveal());
     }
 
     /**
      * @return App
      * @throws Exception
      */
-    private function getAppInstance(): App
+    private function getAppInstance(Container $container): App
     {
-        // Instantiate PHP-DI ContainerBuilder
-        $containerBuilder = new ContainerBuilder();
-
-        // Container intentionally not compiled for tests.
-
-        // Set up settings
-        $settings = require __DIR__ . '/../../../app/settings.php';
-        $settings($containerBuilder);
-
-        // Set up dependencies
-        $dependencies = require __DIR__ . '/../../../app/dependencies.php';
-        $dependencies($containerBuilder);
-
-        // Set up repositories
-        $repositories = require __DIR__ . '/../../../app/repositories.php';
-        $repositories($containerBuilder);
-
-        // Build PHP-DI Container instance
-        $container = $containerBuilder->build();
-
         // Instantiate the app
         AppFactory::setContainer($container);
         $app = AppFactory::create();

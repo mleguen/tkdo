@@ -6,8 +6,8 @@ namespace Tests\Application\Actions\Idee;
 
 use App\Domain\Idee\IdeeInconnueException;
 use App\Domain\Utilisateur\UtilisateurInconnuException;
-use App\Infrastructure\Persistence\Reference\InMemoryReference;
-use App\Infrastructure\Persistence\Utilisateur\InMemoryUtilisateur;
+use App\Infrastructure\Persistence\Reference\DoctrineReference;
+use App\Infrastructure\Persistence\Utilisateur\DoctrineUtilisateur;
 use Tests\Application\Actions\ActionTestCase;
 
 class IdeeDeleteActionTest extends ActionTestCase
@@ -25,8 +25,11 @@ class IdeeDeleteActionTest extends ActionTestCase
     public function setUp()
     {
         parent::setup();
-        $this->alice = new InMemoryUtilisateur(0, 'alice@tkdo.org', 'Alice', 'Alice');        
-        $this->idee = new InMemoryReference(0);
+        $this->alice = (new DoctrineUtilisateur(1))
+            ->setIdentifiant('alice@tkdo.org')
+            ->setNom('Alice')
+            ->setMdp('mdpalice');        
+        $this->idee = new DoctrineReference(0);
     }
 
     public function testAction()

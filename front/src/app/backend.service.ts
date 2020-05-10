@@ -2,7 +2,6 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { first } from 'rxjs/operators';
-import { Router } from '@angular/router';
 
 export interface Occasion {
   titre: string;
@@ -60,7 +59,6 @@ export class BackendService {
 
   constructor(
     private readonly http: HttpClient,
-    private readonly router: Router,
   ) { }
 
   ajouteIdee(idUtilisateur: number, description: string) {
@@ -82,7 +80,6 @@ export class BackendService {
     localStorage.removeItem(ID_UTILISATEUR_KEY);
     localStorage.removeItem(TOKEN_KEY);
     this.estConnecte$.next(false);
-    this.router.navigate([]);
   }
   
   estConnecte() {

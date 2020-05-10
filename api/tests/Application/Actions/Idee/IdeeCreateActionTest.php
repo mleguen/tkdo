@@ -6,8 +6,8 @@ namespace Tests\Application\Actions\Idee;
 
 use App\Domain\Utilisateur\Utilisateur;
 use App\Domain\Utilisateur\UtilisateurInconnuException;
-use App\Infrastructure\Persistence\Idee\InMemoryIdee;
-use App\Infrastructure\Persistence\Utilisateur\InMemoryUtilisateur;
+use App\Infrastructure\Persistence\Idee\DoctrineIdee;
+use App\Infrastructure\Persistence\Utilisateur\DoctrineUtilisateur;
 use Prophecy\Argument;
 use Tests\Application\Actions\ActionTestCase;
 
@@ -21,12 +21,18 @@ class IdeeCreateActionTest extends ActionTestCase
     public function setUp()
     {
         parent::setUp();
-        $this->alice = new InMemoryUtilisateur(0, 'alice@tkdo.org', 'Alice', 'Alice');
+        $this->alice = (new DoctrineUtilisateur(1))
+            ->setIdentifiant('alice@tkdo.org')
+            ->setNom('Alice')
+            ->setMdp('mdpalice');
     }
 
     public function testAction()
     {
-        $bob = new InMemoryUtilisateur(1, 'bob@tkdo.org', 'Bob', 'Bob');
+        $bob = (new DoctrineUtilisateur(2))
+            ->setIdentifiant('bob@tkdo.org')
+            ->setNom('Bob')
+            ->setMdp('mdpbob');
 
         $this->utilisateurRepositoryProphecy
             ->read($this->alice->getId())
@@ -38,13 +44,12 @@ class IdeeCreateActionTest extends ActionTestCase
             ->willReturn($bob)
             ->shouldBeCalledOnce();
 
-        $nouvelleIdee = new InMemoryIdee(
-            0,
-            $this->alice,
-            "un gauffrier",
-            $bob,
-            new \DateTime()
-        );
+        $nouvelleIdee = (new DoctrineIdee(1));
+        $nouvelleIdee
+            ->setUtilisateur($this->alice)
+            ->setDescription('un gauffrier')
+            ->setAuteur($bob)
+            ->setDateProposition(new \DateTime);
         $callTime = new \DateTime();
         $this->ideeRepositoryProphecy
             ->create(

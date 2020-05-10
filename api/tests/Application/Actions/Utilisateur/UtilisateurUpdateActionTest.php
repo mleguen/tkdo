@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tests\Application\Actions\Utilisateur;
 
 use App\Domain\Utilisateur\UtilisateurInconnuException;
-use App\Infrastructure\Persistence\Utilisateur\InMemoryUtilisateur;
+use App\Infrastructure\Persistence\Utilisateur\DoctrineUtilisateur;
 use Tests\Application\Actions\ActionTestCase;
 
 class UtilisateurUpdateActionTest extends ActionTestCase
@@ -18,7 +18,10 @@ class UtilisateurUpdateActionTest extends ActionTestCase
     public function setUp()
     {
         parent::setUp();
-        $this->alice = new InMemoryUtilisateur(0, 'alice@tkdo.org', 'Alice', 'Alice');
+        $this->alice = (new DoctrineUtilisateur(1))
+            ->setIdentifiant('alice@tkdo.org')
+            ->setNom('Alice')
+            ->setMdp('mdpalice');
     }
 
     public function testAction()
@@ -28,17 +31,20 @@ class UtilisateurUpdateActionTest extends ActionTestCase
             ->willReturn($this->alice)
             ->shouldBeCalledOnce();
 
-        $aliceModifie = new InMemoryUtilisateur($this->alice->getId(), 'alice2@tkdo.org', 'nouveaumdpalice', 'Alice2');
+        $aliceModifiee = (new DoctrineUtilisateur(1))
+            ->setIdentifiant('alice2@tkdo.org')
+            ->setNom('Alice2')
+            ->setMdp('nouveaumdpalice');
         $this->utilisateurRepositoryProphecy
-            ->update($aliceModifie)
-            ->willReturn($aliceModifie)
+            ->update($aliceModifiee)
+            ->willReturn($aliceModifiee)
             ->shouldBeCalledOnce();
 
         $response = $this->handleAuthorizedRequest('PUT', "/utilisateur/{$this->alice->getId()}", <<<EOT
 {
-    "identifiant": "{$aliceModifie->getIdentifiant()}",
-    "mdp": "{$aliceModifie->getMdp()}",
-    "nom": "{$aliceModifie->getNom()}"
+    "identifiant": "{$aliceModifiee->getIdentifiant()}",
+    "mdp": "{$aliceModifiee->getMdp()}",
+    "nom": "{$aliceModifiee->getNom()}"
 }
 EOT
         );

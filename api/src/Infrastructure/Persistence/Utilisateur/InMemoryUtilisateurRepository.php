@@ -12,12 +12,12 @@ use App\Infrastructure\Persistence\Reference\InMemoryReferenceRepository;
 class InMemoryUtilisateurRepository extends InMemoryReferenceRepository implements UtilisateurRepository
 {
     /**
-     * @var InMemoryUtilisateur[]
+     * @var DoctrineUtilisateur[]
      */
     private $utilisateurs;
 
     /**
-     * @param ?InMemoryUtilisateur[] $utilisateurs
+     * @param ?DoctrineUtilisateur[] $utilisateurs
      */
     public function __construct(array $utilisateurs = [])
     {
@@ -39,13 +39,13 @@ class InMemoryUtilisateurRepository extends InMemoryReferenceRepository implemen
      */
     public function readOneByIdentifiants(string $identifiant, string $mdp): Utilisateur
     {
-        $utilisateurs = array_filter($this->utilisateurs, function ($u) use ($identifiant, $mdp) {
+        $id = array_key_first(array_filter($this->utilisateurs, function ($u) use ($identifiant, $mdp) {
             return ($u->getIdentifiant() === $identifiant) && ($u->getMdp() === $mdp);
-        });
+        }));
 
-        if (!isset($utilisateurs[0])) throw new UtilisateurInconnuException();
+        if (!isset($id)) throw new UtilisateurInconnuException();
 
-        return clone $utilisateurs[0];
+        return clone $this->utilisateurs[$id];
     }
 
     /**

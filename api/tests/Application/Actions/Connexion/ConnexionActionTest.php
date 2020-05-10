@@ -6,7 +6,7 @@ namespace Tests\Application\Actions\Idee;
 
 use App\Application\Mock\MockData;
 use App\Domain\Utilisateur\UtilisateurInconnuException;
-use App\Infrastructure\Persistence\Utilisateur\InMemoryUtilisateur;
+use App\Infrastructure\Persistence\Utilisateur\DoctrineUtilisateur;
 use Tests\Application\Actions\ActionTestCase;
 
 class ConnexionActionTest extends ActionTestCase
@@ -18,7 +18,10 @@ class ConnexionActionTest extends ActionTestCase
 
     public function setUp() {
         parent::setUp();
-        $this->alice = new InMemoryUtilisateur(0, 'alice@tkdo.org', 'Alice', 'mdpalice');
+        $this->alice = (new DoctrineUtilisateur(1))
+            ->setIdentifiant('alice@tkdo.org')
+            ->setNom('Alice')
+            ->setMdp('mdpalice');
     }
 
     public function testAction()

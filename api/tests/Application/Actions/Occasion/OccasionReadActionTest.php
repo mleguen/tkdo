@@ -5,28 +5,35 @@ declare(strict_types=1);
 namespace Tests\Application\Actions\Occasion;
 
 use App\Domain\Occasion\AucuneOccasionException;
-use App\Infrastructure\Persistence\Occasion\InMemoryOccasion;
-use App\Infrastructure\Persistence\ResultatTirage\InMemoryResultatTirage;
-use App\Infrastructure\Persistence\Utilisateur\InMemoryUtilisateur;
+use App\Infrastructure\Persistence\Occasion\DoctrineOccasion;
+use App\Infrastructure\Persistence\ResultatTirage\DoctrineResultatTirage;
+use App\Infrastructure\Persistence\Utilisateur\DoctrineUtilisateur;
 use Tests\Application\Actions\ActionTestCase;
 
 class OccasionReadActionTest extends ActionTestCase
 {
     public function testAction()
     {
-        $alice = new InMemoryUtilisateur(0, 'alice@tkdo.org', 'Alice', 'Alice');
-        $bob = new InMemoryUtilisateur(1, 'bob@tkdo.org', 'Bob', 'Bob');
-        $occasion = new InMemoryOccasion(
-            0,
-            "Noel 2020",
-            [$alice, $bob]
-        );
+        $alice = (new DoctrineUtilisateur(1))
+            ->setIdentifiant('alice@tkdo.org')
+            ->setNom('Alice')
+            ->setMdp('mdpalice');
+        $bob = (new DoctrineUtilisateur(2))
+            ->setIdentifiant('bob@tkdo.org')
+            ->setNom('Bob')
+            ->setMdp('mdpbob');
+        $occasion = (new DoctrineOccasion(1))
+            ->setTitre('Noel 2020')
+            ->setParticipants([$alice, $bob]);
         $this->occasionRepositoryProphecy
             ->readLast()
             ->willReturn($occasion)
             ->shouldBeCalledOnce();
 
-        $resultatTirage = new InMemoryResultatTirage($occasion, $alice, $bob);
+        $resultatTirage = (new DoctrineResultatTirage(1))
+            ->setOccasion($occasion)
+            ->setQuiOffre($alice)
+            ->setQuiRecoit($bob);
         $this->resultatTirageRepositoryProphecy
             ->readByOccasion($occasion)
             ->willReturn([$resultatTirage])

@@ -3,21 +3,21 @@ declare(strict_types=1);
 
 namespace Tests\Infrastructure\Persistence\ResultatTirage;
 
-use App\Infrastructure\Persistence\Occasion\InMemoryOccasion;
-use App\Infrastructure\Persistence\ResultatTirage\InMemoryResultatTirage;
+use App\Infrastructure\Persistence\Occasion\DoctrineOccasion;
+use App\Infrastructure\Persistence\ResultatTirage\DoctrineResultatTirage;
 use App\Infrastructure\Persistence\ResultatTirage\InMemoryResultatTirageRepository;
-use App\Infrastructure\Persistence\Utilisateur\InMemoryUtilisateur;
+use App\Infrastructure\Persistence\Utilisateur\DoctrineUtilisateur;
 use Tests\TestCase;
 
 class InMemoryResultatTirageRepositoryTest extends TestCase
 {
     /**
-     * @var InMemoryOccasion
+     * @var DoctrineOccasion
      */
     private $occasion;
 
     /**
-     * @var InMemoryResultatTirage
+     * @var DoctrineResultatTirage
      */
     private $resultatTirageAlice;
 
@@ -28,14 +28,23 @@ class InMemoryResultatTirageRepositoryTest extends TestCase
 
     public function setUp()
     {
-        $alice = new InMemoryUtilisateur(0, 'alice@tkdo.org', 'mdpalice', 'Alice');
-        $bob = new InMemoryUtilisateur(1, 'bob@tkdo.org', 'Bob', 'Bob');
-        $this->occasion = new InMemoryOccasion(
+        $alice = (new DoctrineUtilisateur(1))
+            ->setIdentifiant('alice@tkdo.org')
+            ->setNom('Alice')
+            ->setMdp('mdpalice');
+        $bob = (new DoctrineUtilisateur(2))
+            ->setIdentifiant('bob@tkdo.org')
+            ->setNom('Bob')
+            ->setMdp('mdpbob');
+        $this->occasion = new DoctrineOccasion(
             0,
             "Noël 2020",
             [$alice, $bob]
         );
-        $this->resultatTirageAlice = new InMemoryResultatTirage($this->occasion, $alice, $bob);
+        $this->resultatTirageAlice = (new DoctrineResultatTirage(1))
+            ->setOccasion($this->occasion)
+            ->setQuiOffre($alice)
+            ->setQuiRecoit($bob);
         $this->repository = new InMemoryResultatTirageRepository([
             0 => $this->resultatTirageAlice,
         ]);
@@ -51,7 +60,7 @@ class InMemoryResultatTirageRepositoryTest extends TestCase
 
     public function testReadByOccasionAucunResultat()
     {
-        $autreOccasion = new InMemoryOccasion(
+        $autreOccasion = new DoctrineOccasion(
             1,
             "Noël 2021",
             []

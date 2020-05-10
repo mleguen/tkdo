@@ -12,12 +12,12 @@ use App\Infrastructure\Persistence\Reference\InMemoryReferenceRepository;
 class InMemoryOccasionRepository extends InMemoryReferenceRepository implements OccasionRepository
 {
     /**
-     * @var InMemoryOccasion[]
+     * @var DoctrineOccasion[]
      */
     private $occasions;
 
     /**
-     * @param InMemoryOccasion[] $occasions
+     * @param DoctrineOccasion[] $occasions
      */
     public function __construct(array $occasions = [])
     {

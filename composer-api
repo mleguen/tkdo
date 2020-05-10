@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-composer $@ -d api
+composer $1 -d api -- "${@:2}"
