@@ -26,6 +26,44 @@ Installer les dépendances, construire et packager :
 
 Décompresser ensuite dans le répertoire cible l'archive `tkdo.tar.gz` générée.
 
+> **Attention** : certains hébergeurs proposent des fonctions d'upload d'archives les décompressant automatiquement,
+> mais qui peuvent parfois tronquer les noms de fichiers si l'arborescence est trop profonde (`api/vendor` par exemple).
+> Télécharger dans ce cas plutôt l'archive en tant que simple fichier, et la décompresser manuellement.
+
+Puis, sur le serveur, depuis le répertoire cible :
+
+```bash
+$ cd api
+$ php bin/doctrine.php orm:generate-proxies
+
+ Processing entity "xxx"
+[...]
+
+ Proxy classes generated to "/home/lgnby/www/tkdo/api/var/doctrine/proxy"
+$ php bin/doctrine.php orm:migrations:migrate
+[...]
+  ------------------------
+  ++ finished in xxxms
+  ++ used xxxM memory
+  ++ xxx migrations executed
+  ++ xxx sql queries
+# Si vous souhaitez charger des données de test
+php bin/doctrine.php fixtures:load
+Purge et chargement des fixtures...
+xxx créés.
+[...]
+OK
+```
+
+> **Note** : certains hébergeurs ne proposent pas d'accès ssh.
+> Utiliser dans ce cas des outils comme [Web Console](http://web-console.org/) pour accéder à la console.
+
+> **Note** : sur certains hébergements, le binaire php disponible dans le path est un binaire CGI et/ou en PHP 5.
+> Utiliser dans ce cas `phpinfo()` pour déterminer le chemin du binaire PHP 7 utilisé pour l'exécution des pages Web,
+> et exécuter `bin/doctrine.php` avec le binaire CLI correpondant (`/usr/local/php7.2/bin/php` par exemple).
+> L'utilisation de l'option `-n` peut aussi être nécessaire pour éviter l'utilisation du php.ini du serveur,
+> si ce dernier désactive par exemple l'affichage des exceptions.
+
 ## Contribution
 
 Commencer par lire les README du [front](./front/README.md) et de l'[API](./api/README.md).
