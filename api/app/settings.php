@@ -20,9 +20,9 @@ return function (ContainerBuilder $containerBuilder) {
 
                 // path where the compiled metadata info will be cached
                 // make sure the path exists and it is writable
-                'cache_dir' => APP_ROOT . '/var/doctrine/cache',
-
-                'proxy_dir' => APP_ROOT . '/var/doctrine/proxy',
+                'metadata_cache_dir' => APP_ROOT . '/var/doctrine/metadata',
+                'proxy_cache_dir' => APP_ROOT . '/var/doctrine/proxy',
+                'query_cache_dir' => APP_ROOT . '/var/doctrine/query',
 
                 // you should add any other path containing annotated entity classes
                 'metadata_dirs' => [APP_ROOT . '/src/Infrastructure/Persistence'],

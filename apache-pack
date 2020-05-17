@@ -10,7 +10,8 @@ tar -rvf tkdo.tar -C front/dist/tkdo .
 # Fichiers api
 ./composer-api install
 tar -rvf tkdo.tar --transform='s/\.prod$//' \
-  ./api/{app,bin,logs/README.md,public,src,var/{cache,doctrine/{cache,proxy}}/.gitignore,vendor,.env.prod,*.php,composer.{json,lock}}
+  ./api/{app,bin,logs/README.md,public,src,var/{cache,doctrine/{metadata,proxy,query}}/.gitignore,vendor} \
+  ./api/{.env.prod,*.php,composer.{json,lock}}
 
 # Finalisation
 gzip -f tkdo.tar
