@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Application\Actions\Utilisateur;
 
 use App\Application\Actions\Action;
-use App\Domain\Utilisateur\Utilisateur;
 use App\Domain\Utilisateur\UtilisateurRepository;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Log\LoggerInterface;
@@ -18,9 +17,9 @@ class UtilisateurAction extends Action
   protected $utilisateurRepository;
 
   /**
-   * @var Utilisateur
+   * @var int
    */
-  protected $utilisateur;
+  protected $idUtilisateur;
 
   /**
    * @param LoggerInterface $logger
@@ -34,9 +33,7 @@ class UtilisateurAction extends Action
 
   protected function action(): Response
   {
-    // TODO: obtenir une référence à la place pour éviter une lecture en base
-    // et faire la vraie lecture plus tard dans les classes filles qui le nécessitent
-    $this->utilisateur = $this->utilisateurRepository->read((int) $this->resolveArg('idUtilisateur'));
+    $this->idUtilisateur = (int) $this->resolveArg('idUtilisateur');
     return $this->response;
   }
 }

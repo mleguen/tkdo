@@ -6,7 +6,7 @@ namespace Tests\Application\Actions\Idee;
 
 use App\Domain\Idee\IdeeInconnueException;
 use App\Domain\Utilisateur\UtilisateurInconnuException;
-use App\Infrastructure\Persistence\Reference\DoctrineReference;
+use App\Infrastructure\Persistence\Idee\InMemoryIdeeReference;
 use App\Infrastructure\Persistence\Utilisateur\DoctrineUtilisateur;
 use Tests\Application\Actions\ActionTestCase;
 
@@ -18,7 +18,7 @@ class IdeeDeleteActionTest extends ActionTestCase
     private $alice;
 
     /**
-     * @var Reference
+     * @var Idee
      */
     private $idee;
 
@@ -29,18 +29,13 @@ class IdeeDeleteActionTest extends ActionTestCase
             ->setIdentifiant('alice@tkdo.org')
             ->setNom('Alice')
             ->setMdp('mdpalice');        
-        $this->idee = new DoctrineReference(0);
+        $this->idee = new InMemoryIdeeReference(0);
     }
 
     public function testAction()
     {
-        $this->utilisateurRepositoryProphecy
-            ->read($this->alice->getId())
-            ->willReturn($this->alice)
-            ->shouldBeCalledOnce();
-
         $this->ideeRepositoryProphecy
-            ->getReference($this->idee->getId())
+            ->read($this->idee->getId(), true)
             ->willReturn($this->idee)
             ->shouldBeCalledOnce();
 
@@ -63,39 +58,10 @@ EOT
         );
     }
 
-    public function testActionUtilisateurInconnu()
-    {
-        $this->utilisateurRepositoryProphecy
-            ->read($this->alice->getId())
-            ->willThrow(new UtilisateurInconnuException())
-            ->shouldBeCalledOnce();
-
-        $response = $this->handleAuthorizedRequest(
-            'DELETE',
-            "/utilisateur/{$this->alice->getId()}/idee/{$this->idee->getId()}"
-        );
-
-        $this->assertEqualsResponse(
-            404,
-            <<<'EOT'
-{
-    "type": "RESOURCE_NOT_FOUND",
-    "description": "utilisateur inconnu"
-}
-EOT
-            , $response
-        );
-    }
-
     public function testActionIdeeInconnue()
     {
-        $this->utilisateurRepositoryProphecy
-            ->read($this->alice->getId())
-            ->willReturn($this->alice)
-            ->shouldBeCalledOnce();
-
         $this->ideeRepositoryProphecy
-            ->getReference($this->idee->getId())
+            ->read($this->idee->getId(), true)
             ->willReturn($this->idee)
             ->shouldBeCalledOnce();
 

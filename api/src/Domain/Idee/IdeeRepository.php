@@ -3,11 +3,9 @@ declare(strict_types=1);
 
 namespace App\Domain\Idee;
 
-use App\Domain\Reference\Reference;
-use App\Domain\Reference\ReferenceRepository;
 use App\Domain\Utilisateur\Utilisateur;
 
-interface IdeeRepository extends ReferenceRepository
+interface IdeeRepository
 {
     public function create(
         Utilisateur $utilisateur,
@@ -19,7 +17,7 @@ interface IdeeRepository extends ReferenceRepository
     /**
      * @throws IdeeInconnueException
      */
-    public function read(int $id): Idee;
+    public function read(int $id, bool $reference = false): Idee;
 
     /**
      * @return Idee[]
@@ -29,5 +27,5 @@ interface IdeeRepository extends ReferenceRepository
     /**
      * @throws IdeeInconnueException
      */
-    public function delete(Reference $idee);
+    public function delete(Idee $idee);
 }

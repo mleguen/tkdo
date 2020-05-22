@@ -7,7 +7,6 @@ namespace App\Infrastructure\Persistence\ResultatTirage;
 use App\Domain\Occasion\Occasion;
 use App\Domain\ResultatTirage\ResultatTirage;
 use App\Domain\Utilisateur\Utilisateur;
-use App\Infrastructure\Persistence\Reference\DoctrineReference;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\ManyToOne;
 use Doctrine\ORM\Mapping\Table;
@@ -16,8 +15,17 @@ use Doctrine\ORM\Mapping\Table;
  * @Entity
  * @Table(name="tkdo_resultat_tirage")
  */
-class DoctrineResultatTirage extends DoctrineReference implements ResultatTirage
+class DoctrineResultatTirage implements ResultatTirage
 {
+    /**
+     * @var int
+     * @Id
+     * @Column(type="integer")
+     * @GeneratedValue
+     * @todo se débarasser de l'id (PK = occasion, quiOffre)
+     */
+    protected $id;
+
     /**
      * @var Occasion
      * @ManyToOne(targetEntity="App\Infrastructure\Persistence\Occasion\DoctrineOccasion")
@@ -35,6 +43,11 @@ class DoctrineResultatTirage extends DoctrineReference implements ResultatTirage
      * @ManyToOne(targetEntity="App\Infrastructure\Persistence\Utilisateur\DoctrineUtilisateur")
      */
     private $quiRecoit;
+
+    public function __construct(?int $id = NULL)
+    {
+        if (isset($id)) $this->id = $id;
+    }
 
     public function getOccasion(): Occasion
     {

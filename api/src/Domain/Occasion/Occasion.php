@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace App\Domain\Occasion;
 
-use App\Domain\Reference\Reference;
-
-interface Occasion extends Reference
+interface Occasion
 {
+  public function getId(): int;
   public function getTitre(): string;
   /**
    * @return Utilisateur[]

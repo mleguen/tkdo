@@ -3,9 +3,7 @@ declare(strict_types=1);
 
 namespace App\Domain\Occasion;
 
-use App\Domain\Reference\ReferenceRepository;
-
-interface OccasionRepository extends ReferenceRepository
+interface OccasionRepository
 {
     /**
      * @return Occasion

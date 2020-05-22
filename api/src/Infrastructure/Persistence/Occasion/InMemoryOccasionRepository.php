@@ -7,9 +7,8 @@ namespace App\Infrastructure\Persistence\Occasion;
 use App\Domain\Occasion\Occasion;
 use App\Domain\Occasion\AucuneOccasionException;
 use App\Domain\Occasion\OccasionRepository;
-use App\Infrastructure\Persistence\Reference\InMemoryReferenceRepository;
 
-class InMemoryOccasionRepository extends InMemoryReferenceRepository implements OccasionRepository
+class InMemoryOccasionRepository implements OccasionRepository
 {
     /**
      * @var DoctrineOccasion[]

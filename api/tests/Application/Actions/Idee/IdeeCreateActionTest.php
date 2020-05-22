@@ -8,6 +8,7 @@ use App\Domain\Utilisateur\Utilisateur;
 use App\Domain\Utilisateur\UtilisateurInconnuException;
 use App\Infrastructure\Persistence\Idee\DoctrineIdee;
 use App\Infrastructure\Persistence\Utilisateur\DoctrineUtilisateur;
+use App\Infrastructure\Persistence\Utilisateur\InMemoryUtilisateurReference;
 use Prophecy\Argument;
 use Tests\Application\Actions\ActionTestCase;
 
@@ -18,6 +19,16 @@ class IdeeCreateActionTest extends ActionTestCase
      */
     private $alice;
 
+    /**
+     * @var Utilisateur
+     */
+    private $bob;
+
+    /**
+     * @var DoctrineIdee
+     */
+    private $nouvelleIdee;
+
     public function setUp()
     {
         parent::setUp();
@@ -25,49 +36,49 @@ class IdeeCreateActionTest extends ActionTestCase
             ->setIdentifiant('alice@tkdo.org')
             ->setNom('Alice')
             ->setMdp('mdpalice');
+        $this->bob = (new DoctrineUtilisateur(2))
+            ->setIdentifiant('bob@tkdo.org')
+            ->setNom('Bob')
+            ->setMdp('mdpbob');
+        
+        $this->nouvelleIdee = (new DoctrineIdee(1));
+        $this->nouvelleIdee
+            ->setUtilisateur($this->alice)
+            ->setDescription('un gauffrier')
+            ->setAuteur($this->bob)
+            ->setDateProposition(new \DateTime);
     }
 
     public function testAction()
     {
-        $bob = (new DoctrineUtilisateur(2))
-            ->setIdentifiant('bob@tkdo.org')
-            ->setNom('Bob')
-            ->setMdp('mdpbob');
-
         $this->utilisateurRepositoryProphecy
-            ->read($this->alice->getId())
-            ->willReturn($this->alice)
+            ->read($this->alice->getId(), true)
+            ->willReturn(new InMemoryUtilisateurReference($this->alice->getId()))
             ->shouldBeCalledOnce();
 
         $this->utilisateurRepositoryProphecy
-            ->read($bob->getId())
-            ->willReturn($bob)
+            ->read($this->bob->getId(), true)
+            ->willReturn(new InMemoryUtilisateurReference($this->bob->getId()))
             ->shouldBeCalledOnce();
 
-        $nouvelleIdee = (new DoctrineIdee(1));
-        $nouvelleIdee
-            ->setUtilisateur($this->alice)
-            ->setDescription('un gauffrier')
-            ->setAuteur($bob)
-            ->setDateProposition(new \DateTime);
         $callTime = new \DateTime();
         $this->ideeRepositoryProphecy
             ->create(
-                $nouvelleIdee->getUtilisateur(),
-                $nouvelleIdee->getDescription(),
-                $nouvelleIdee->getAuteur(),
+                new InMemoryUtilisateurReference($this->nouvelleIdee->getUtilisateur()->getId()),
+                $this->nouvelleIdee->getDescription(),
+                new InMemoryUtilisateurReference($this->nouvelleIdee->getAuteur()->getId()),
                 Argument::that(function (\DateTime $dateProposition) use ($callTime) {
                     $now = new \DateTime();
                     return ($dateProposition >= $callTime) && ($dateProposition <= $now);
                 })
             )
-            ->willReturn($nouvelleIdee)
+            ->willReturn($this->nouvelleIdee)
             ->shouldBeCalledOnce();
 
         $response = $this->handleAuthorizedRequest('POST', "/utilisateur/{$this->alice->getId()}/idee", <<<EOT
 {
-    "description": "{$nouvelleIdee->getDescription()}",
-    "idAuteur": {$nouvelleIdee->getAuteur()->getId()}
+    "description": "{$this->nouvelleIdee->getDescription()}",
+    "idAuteur": {$this->nouvelleIdee->getAuteur()->getId()}
 }
 EOT
         );
@@ -84,11 +95,21 @@ EOT
     public function testActionUtilisateurInconnu()
     {
         $this->utilisateurRepositoryProphecy
-            ->read($this->alice->getId())
+            ->read($this->alice->getId(), true)
             ->willThrow(new UtilisateurInconnuException())
             ->shouldBeCalledOnce();
 
-        $response = $this->handleAuthorizedRequest('POST', "/utilisateur/{$this->alice->getId()}/idee");
+        $this->utilisateurRepositoryProphecy
+            ->read($this->bob->getId(), true)
+            ->willReturn(new InMemoryUtilisateurReference($this->bob->getId()));
+
+        $response = $this->handleAuthorizedRequest('POST', "/utilisateur/{$this->alice->getId()}/idee", <<<EOT
+{
+    "description": "{$this->nouvelleIdee->getDescription()}",
+    "idAuteur": {$this->nouvelleIdee->getAuteur()->getId()}
+}
+EOT
+        );
 
         $this->assertEqualsResponse(
             404,

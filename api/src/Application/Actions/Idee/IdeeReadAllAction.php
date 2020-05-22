@@ -15,13 +15,14 @@ class IdeeReadAllAction extends IdeeAction
   protected function action(): Response
   {
     parent::action();
+    $utilisateur = $this->utilisateurRepository->read($this->idUtilisateur);
     return $this->respondWithData([
-      "utilisateur" => new SerializableUtilisateur($this->utilisateur),
+      "utilisateur" => new SerializableUtilisateur($utilisateur),
       "idees" => array_map(
         function (Idee $i) {
           return new SerializableIdee($i);
         },
-        $this->ideeRepository->readByUtilisateur($this->utilisateur)
+        $this->ideeRepository->readByUtilisateur($utilisateur)
       ),
     ]);
   }

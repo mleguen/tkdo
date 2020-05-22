@@ -31,6 +31,9 @@ class UtilisateurUpdateActionTest extends ActionTestCase
             ->willReturn($this->alice)
             ->shouldBeCalledOnce();
 
+        /**
+         * @var DoctrineUtilisateur
+         */
         $aliceModifiee = (new DoctrineUtilisateur(1))
             ->setIdentifiant('alice2@tkdo.org')
             ->setNom('Alice2')
@@ -65,7 +68,7 @@ EOT
             ->willThrow(new UtilisateurInconnuException())
             ->shouldBeCalledOnce();
 
-        $response = $this->handleAuthorizedRequest('PUT', "/utilisateur/{$this->alice->getId()}");
+        $response = $this->handleAuthorizedRequest('PUT', "/utilisateur/{$this->alice->getId()}", "{}");
 
         $this->assertEqualsResponse(
             404,

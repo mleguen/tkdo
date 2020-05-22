@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Infrastructure\Persistence\Occasion;
 
 use App\Domain\Occasion\Occasion;
-use App\Infrastructure\Persistence\Reference\DoctrineReference;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
@@ -17,8 +16,16 @@ use Doctrine\ORM\Mapping\Table;
  * @Entity
  * @Table(name="tkdo_occasion")
  */
-class DoctrineOccasion extends DoctrineReference implements Occasion
+class DoctrineOccasion implements Occasion
 {
+    /**
+     * @var int
+     * @Id
+     * @Column(type="integer")
+     * @GeneratedValue
+     */
+    protected $id;
+
     /**
      * @var string
      * @Column()
@@ -31,6 +38,19 @@ class DoctrineOccasion extends DoctrineReference implements Occasion
      * @JoinTable(name="tkdo_participation")
      */
     private $participants;
+
+    public function __construct(?int $id = NULL)
+    {
+        if (isset($id)) $this->id = $id;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getId(): int
+    {
+        return $this->id;
+    }
 
     /**
      * {@inheritdoc}

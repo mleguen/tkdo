@@ -13,6 +13,7 @@ class UtilisateurReadAction extends UtilisateurAction
   {
     parent::action();
     // TODO: vérifier que l'id correspond à celui du JWT
-    return $this->respondWithData(new SerializableUtilisateur($this->utilisateur));
+    $utilisateur = $this->utilisateurRepository->read($this->idUtilisateur);
+    return $this->respondWithData(new SerializableUtilisateur($utilisateur));
   }
 }

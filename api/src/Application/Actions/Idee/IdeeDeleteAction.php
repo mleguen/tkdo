@@ -12,7 +12,7 @@ class IdeeDeleteAction extends IdeeAction
   protected function action(): Response
   {
     parent::action();
-    $idee = $this->ideeRepository->getReference((int) $this->resolveArg('idIdee'));
+    $idee = $this->ideeRepository->read((int) $this->resolveArg('idIdee'), true);
     $this->ideeRepository->delete($idee);
     return $this->respondWithData();
   }

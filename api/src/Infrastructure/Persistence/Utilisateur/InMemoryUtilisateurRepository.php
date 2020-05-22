@@ -7,9 +7,8 @@ namespace App\Infrastructure\Persistence\Utilisateur;
 use App\Domain\Utilisateur\Utilisateur;
 use App\Domain\Utilisateur\UtilisateurInconnuException;
 use App\Domain\Utilisateur\UtilisateurRepository;
-use App\Infrastructure\Persistence\Reference\InMemoryReferenceRepository;
 
-class InMemoryUtilisateurRepository extends InMemoryReferenceRepository implements UtilisateurRepository
+class InMemoryUtilisateurRepository implements UtilisateurRepository
 {
     /**
      * @var DoctrineUtilisateur[]
@@ -27,11 +26,17 @@ class InMemoryUtilisateurRepository extends InMemoryReferenceRepository implemen
     /**
      * {@inheritdoc}
      */
-    public function read(int $id): Utilisateur
+    public function read(int $id, bool $reference = false): Utilisateur
+    {
+        if ($reference) return new InMemoryUtilisateurReference($id);
+        return clone $this->readNoClone($id);
+    }
+
+    public function readNoClone(int $id): Utilisateur
     {
         if (!isset($this->utilisateurs[$id])) throw new UtilisateurInconnuException();
 
-        return clone $this->utilisateurs[$id];
+        return $this->utilisateurs[$id];
     }
 
     /**

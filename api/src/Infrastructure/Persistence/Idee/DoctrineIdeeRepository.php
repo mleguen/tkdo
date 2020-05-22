@@ -7,16 +7,19 @@ namespace App\Infrastructure\Persistence\Idee;
 use App\Domain\Idee\Idee;
 use App\Domain\Idee\IdeeInconnueException;
 use App\Domain\Idee\IdeeRepository;
-use App\Domain\Reference\Reference;
 use App\Domain\Utilisateur\Utilisateur;
-use App\Infrastructure\Persistence\Reference\DoctrineReferenceRepository;
 use Doctrine\ORM\EntityManager;
 
-class DoctrineIdeeRepository extends DoctrineReferenceRepository implements IdeeRepository
+class DoctrineIdeeRepository implements IdeeRepository
 {
+    /**
+     * @var EntityManager
+     */
+    protected $em;
+
     public function __construct(EntityManager $em)
     {
-        parent::__construct($em, __NAMESPACE__ . '\DoctrineIdee');
+        $this->em = $em;
     }
 
     /**
@@ -42,9 +45,10 @@ class DoctrineIdeeRepository extends DoctrineReferenceRepository implements Idee
     /**
      * {@inheritdoc}
      */
-    public function read(int $id): Idee
+    public function read(int $id, bool $reference = false): Idee
     {
-        $idee = $this->repository->find($id);
+        if ($reference) return $this->em->getReference(DoctrineIdee::class, $id);
+        $idee = $this->em->getRepository(DoctrineIdee::class)->find($id);
         if (is_null($idee)) throw new IdeeInconnueException();
         return $idee;
     }
@@ -54,7 +58,7 @@ class DoctrineIdeeRepository extends DoctrineReferenceRepository implements Idee
      */
     public function readByUtilisateur(Utilisateur $utilisateur): array
     {
-        return $this->repository->findBy([
+        return $this->em->getRepository(DoctrineIdee::class)->findBy([
             'utilisateur' => $utilisateur,
         ]);
     }
@@ -62,7 +66,7 @@ class DoctrineIdeeRepository extends DoctrineReferenceRepository implements Idee
     /**
      * {@inheritdoc}
      */
-    public function delete(Reference $idee)
+    public function delete(Idee $idee)
     {
         $this->em->remove($idee);
         $this->em->flush();

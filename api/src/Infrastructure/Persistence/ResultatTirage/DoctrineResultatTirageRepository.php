@@ -6,14 +6,19 @@ namespace App\Infrastructure\Persistence\ResultatTirage;
 
 use App\Domain\Occasion\Occasion;
 use App\Domain\ResultatTirage\ResultatTirageRepository;
-use App\Infrastructure\Persistence\Reference\DoctrineReferenceRepository;
+use App\Infrastructure\Persistence\Occasion\DoctrineOccasion;
 use Doctrine\ORM\EntityManager;
 
-class DoctrineResultatTirageRepository extends DoctrineReferenceRepository implements ResultatTirageRepository
+class DoctrineResultatTirageRepository implements ResultatTirageRepository
 {
+    /**
+     * @var EntityManager
+     */
+    protected $em;
+
     public function __construct(EntityManager $em)
     {
-        parent::__construct($em, __NAMESPACE__ . '\DoctrineResultatTirage');
+        $this->em = $em;
     }
 
     /**
@@ -21,7 +26,7 @@ class DoctrineResultatTirageRepository extends DoctrineReferenceRepository imple
      */
     public function readByOccasion(Occasion $occasion): array
     {
-        return $this->repository->findBy([
+        return $this->em->getRepository(DoctrineOccasion::class)->findBy([
             'occasion' => $occasion,
         ]);
     }

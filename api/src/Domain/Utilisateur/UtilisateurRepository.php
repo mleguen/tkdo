@@ -3,14 +3,12 @@ declare(strict_types=1);
 
 namespace App\Domain\Utilisateur;
 
-use App\Domain\Reference\ReferenceRepository;
-
-interface UtilisateurRepository extends ReferenceRepository
+interface UtilisateurRepository
 {
     /**
      * @throws UtilisateurInconnuException
      */
-    public function read(int $id): Utilisateur;
+    public function read(int $id, bool $reference = false): Utilisateur;
 
     /**
      * @throws UtilisateurInconnuException

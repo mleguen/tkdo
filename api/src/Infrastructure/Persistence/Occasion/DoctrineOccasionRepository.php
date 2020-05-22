@@ -7,14 +7,18 @@ namespace App\Infrastructure\Persistence\Occasion;
 use App\Domain\Occasion\Occasion;
 use App\Domain\Occasion\AucuneOccasionException;
 use App\Domain\Occasion\OccasionRepository;
-use App\Infrastructure\Persistence\Reference\DoctrineReferenceRepository;
 use Doctrine\ORM\EntityManager;
 
-class DoctrineOccasionRepository extends DoctrineReferenceRepository implements OccasionRepository
+class DoctrineOccasionRepository implements OccasionRepository
 {
+    /**
+     * @var EntityManager
+     */
+    protected $em;
+
     public function __construct(EntityManager $em)
     {
-        parent::__construct($em, __NAMESPACE__ . '\DoctrineOccasion');
+        $this->em = $em;
     }
 
     /**

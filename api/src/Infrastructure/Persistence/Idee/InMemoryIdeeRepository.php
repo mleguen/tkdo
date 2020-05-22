@@ -7,11 +7,10 @@ namespace App\Infrastructure\Persistence\Idee;
 use App\Domain\Idee\Idee;
 use App\Domain\Idee\IdeeInconnueException;
 use App\Domain\Idee\IdeeRepository;
-use App\Domain\Reference\Reference;
 use App\Domain\Utilisateur\Utilisateur;
-use App\Infrastructure\Persistence\Reference\InMemoryReferenceRepository;
+use App\Infrastructure\Persistence\Utilisateur\InMemoryUtilisateurRepository;
 
-class InMemoryIdeeRepository extends InMemoryReferenceRepository implements IdeeRepository
+class InMemoryIdeeRepository implements IdeeRepository
 {
     /**
      * @var DoctrineIdee[]
@@ -19,11 +18,20 @@ class InMemoryIdeeRepository extends InMemoryReferenceRepository implements Idee
     private $idees;
 
     /**
+     * @var InMemoryUtilisateurRepository
+     */
+    private $utilisateurRepository;
+
+    /**
      * @param DoctrineIdee[]
      */
-    public function __construct(array $idees = [])
+    public function __construct(
+        array $idees = [],
+        InMemoryUtilisateurRepository $utilisateurRepository
+    )
     {
         $this->idees = $idees;
+        $this->utilisateurRepository = $utilisateurRepository;
     }
 
     /**
@@ -37,9 +45,9 @@ class InMemoryIdeeRepository extends InMemoryReferenceRepository implements Idee
     ): Idee {
         $id = max(array_keys($this->idees)) + 1;
         $this->idees[$id] = (new DoctrineIdee($id))
-            ->setUtilisateur($utilisateur)
+            ->setUtilisateur($this->utilisateurRepository->readNoClone($utilisateur->getId()))
             ->setDescription($description)
-            ->setAuteur($auteur)
+            ->setAuteur($this->utilisateurRepository->readNoClone($auteur->getId()))
             ->setDateProposition($dateProposition);
         return clone $this->idees[$id];
     }
@@ -47,8 +55,9 @@ class InMemoryIdeeRepository extends InMemoryReferenceRepository implements Idee
     /**
      * {@inheritdoc}
      */
-    public function read(int $id): Idee
+    public function read(int $id, bool $reference = false): Idee
     {
+        if ($reference) return new DoctrineIdee($id);
         if (!isset($this->idees[$id])) throw new IdeeInconnueException();
         return clone $this->idees[$id];
     }
@@ -74,7 +83,7 @@ class InMemoryIdeeRepository extends InMemoryReferenceRepository implements Idee
     /**
      * {@inheritdoc}
      */
-    public function delete(Reference $idee)
+    public function delete(Idee $idee)
     {
         $id = $idee->getId();
         if (!isset($this->idees[$id])) throw new IdeeInconnueException();

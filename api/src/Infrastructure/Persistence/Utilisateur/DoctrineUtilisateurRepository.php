@@ -7,22 +7,27 @@ namespace App\Infrastructure\Persistence\Utilisateur;
 use App\Domain\Utilisateur\Utilisateur;
 use App\Domain\Utilisateur\UtilisateurInconnuException;
 use App\Domain\Utilisateur\UtilisateurRepository;
-use App\Infrastructure\Persistence\Reference\DoctrineReferenceRepository;
 use Doctrine\ORM\EntityManager;
 
-class DoctrineUtilisateurRepository extends DoctrineReferenceRepository implements UtilisateurRepository
+class DoctrineUtilisateurRepository implements UtilisateurRepository
 {
+    /**
+     * @var EntityManager
+     */
+    protected $em;
+
     public function __construct(EntityManager $em)
     {
-        parent::__construct($em, __NAMESPACE__ . '\DoctrineUtilisateur');
+        $this->em = $em;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function read(int $id): Utilisateur
+    public function read(int $id, bool $reference = false): Utilisateur
     {
-        $utilisateur = $this->repository->find($id);
+        if ($reference) return $this->em->getReference(DoctrineUtilisateur::class, $id);
+        $utilisateur = $this->em->getRepository(DoctrineUtilisateur::class)->find($id);
         if (is_null($utilisateur)) throw new UtilisateurInconnuException();
         return $utilisateur;
     }
@@ -32,7 +37,7 @@ class DoctrineUtilisateurRepository extends DoctrineReferenceRepository implemen
      */
     public function readOneByIdentifiants(string $identifiant, string $mdp): Utilisateur
     {        
-        $utilisateur = $this->repository->findOneBy([
+        $utilisateur = $this->em->getRepository(DoctrineUtilisateur::class)->findOneBy([
             'identifiant' => $identifiant,
             'mdp' => $mdp
         ]);

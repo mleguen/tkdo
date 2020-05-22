@@ -13,11 +13,11 @@ class UtilisateurUpdateAction extends UtilisateurAction
     parent::action();
     // TODO: vérifier que l'id correspond à celui du JWT
     $body = $this->getFormData();
-    $this->utilisateur
+    $utilisateur = $this->utilisateurRepository->read($this->idUtilisateur)
       ->setIdentifiant($body->identifiant)
       ->setNom($body->nom);
-    if (isset($body->mdp)) $this->utilisateur->setMdp($body->mdp);
-    $this->utilisateurRepository->update($this->utilisateur);
+    if (isset($body->mdp)) $utilisateur->setMdp($body->mdp);
+    $this->utilisateurRepository->update($utilisateur);
     return $this->respondWithData();
   }
 }

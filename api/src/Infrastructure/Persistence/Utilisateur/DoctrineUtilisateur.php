@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Infrastructure\Persistence\Utilisateur;
 
 use App\Domain\Utilisateur\Utilisateur;
-use App\Infrastructure\Persistence\Reference\DoctrineReference;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Table;
@@ -14,8 +13,16 @@ use Doctrine\ORM\Mapping\Table;
  * @Entity
  * @Table(name="tkdo_utilisateur")
  */
-class DoctrineUtilisateur extends DoctrineReference implements Utilisateur
+class DoctrineUtilisateur implements Utilisateur
 {
+  /**
+   * @var int
+   * @Id
+   * @Column(type="integer")
+   * @GeneratedValue
+   */
+  protected $id;
+
   /**
    * @var string
    * @Column()
@@ -33,6 +40,19 @@ class DoctrineUtilisateur extends DoctrineReference implements Utilisateur
    * @Column()
    */
   private $nom;
+
+  public function __construct(?int $id = NULL)
+  {
+    if (isset($id)) $this->id = $id;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getId(): int
+  {
+    return $this->id;
+  }
 
   /**
    * {@inheritdoc}

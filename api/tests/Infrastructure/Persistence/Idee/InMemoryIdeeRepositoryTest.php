@@ -6,6 +6,7 @@ namespace Tests\Infrastructure\Persistence\Idee;
 use App\Infrastructure\Persistence\Idee\DoctrineIdee;
 use App\Infrastructure\Persistence\Idee\InMemoryIdeeRepository;
 use App\Infrastructure\Persistence\Utilisateur\DoctrineUtilisateur;
+use App\Infrastructure\Persistence\Utilisateur\InMemoryUtilisateurRepository;
 use Tests\TestCase;
 
 class InMemoryIdeeRepositoryTest extends TestCase
@@ -66,10 +67,17 @@ class InMemoryIdeeRepositoryTest extends TestCase
             ->setDescription('des gants de boxe')
             ->setAuteur($this->bob)
             ->setDateProposition(\DateTime::createFromFormat(\DateTimeInterface::ISO8601, '2020-04-07T00:00:00+0000'));
-        $this->repository = new InMemoryIdeeRepository([
-            $this->ideeAlicePourAlice->getId() => $this->ideeAlicePourAlice,
-            $this->ideeBobPourAlice->getId() => $this->ideeBobPourAlice,
-        ]);
+
+        $utilisateurRepositoryProphecy = $this->prophesize(InMemoryUtilisateurRepository::class);
+        $utilisateurRepositoryProphecy->readNoClone($this->bob->getId())->willReturn($this->bob);
+
+        $this->repository = new InMemoryIdeeRepository(
+            [
+                $this->ideeAlicePourAlice->getId() => $this->ideeAlicePourAlice,
+                $this->ideeBobPourAlice->getId() => $this->ideeBobPourAlice,
+            ],
+            $utilisateurRepositoryProphecy->reveal()
+        );
     }
 
     public function testCreate()
@@ -85,6 +93,14 @@ class InMemoryIdeeRepositoryTest extends TestCase
     public function testRead()
     {
         $this->assertEquals($this->ideeAlicePourAlice, $this->repository->read($this->ideeAlicePourAlice->getId()));
+    }
+
+    public function testReadReference()
+    {
+        $this->assertEquals(
+            new DoctrineIdee($this->ideeAlicePourAlice->getId()),
+            $this->repository->read($this->ideeAlicePourAlice->getId(), true)
+        );
     }
 
     /**

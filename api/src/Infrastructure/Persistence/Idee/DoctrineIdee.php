@@ -6,7 +6,6 @@ namespace App\Infrastructure\Persistence\Idee;
 
 use App\Domain\Idee\Idee;
 use App\Domain\Utilisateur\Utilisateur;
-use App\Infrastructure\Persistence\Reference\DoctrineReference;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\ManyToOne;
@@ -16,11 +15,20 @@ use Doctrine\ORM\Mapping\Table;
  * @Entity
  * @Table(name="tkdo_idee")
  */
-class DoctrineIdee extends DoctrineReference implements Idee
+class DoctrineIdee implements Idee
 {
+    /**
+     * @var int
+     * @Id
+     * @Column(type="integer")
+     * @GeneratedValue
+     */
+    protected $id;
+
     /**
      * @var Utilisateur
      * @ManyToOne(targetEntity="App\Infrastructure\Persistence\Utilisateur\DoctrineUtilisateur")
+     * @todo intégrer à la PK (PK = utilisateur, id)
      */
     private $utilisateur;
 
@@ -41,6 +49,19 @@ class DoctrineIdee extends DoctrineReference implements Idee
      * @Column(type="datetime")
      */
     private $dateProposition;
+
+    public function __construct(?int $id = NULL)
+    {
+        if (isset($id)) $this->id = $id;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getId(): int
+    {
+        return $this->id;
+    }
 
     public function getUtilisateur(): Utilisateur
     {

@@ -6,9 +6,8 @@ namespace App\Infrastructure\Persistence\ResultatTirage;
 
 use App\Domain\Occasion\Occasion;
 use App\Domain\ResultatTirage\ResultatTirageRepository;
-use App\Infrastructure\Persistence\Reference\InMemoryReferenceRepository;
 
-class InMemoryResultatTirageRepository extends InMemoryReferenceRepository implements ResultatTirageRepository
+class InMemoryResultatTirageRepository implements ResultatTirageRepository
 {
     /**
      * @var DoctrineResultatTirage[]
