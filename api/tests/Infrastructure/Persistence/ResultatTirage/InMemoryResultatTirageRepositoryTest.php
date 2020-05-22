@@ -41,9 +41,7 @@ class InMemoryResultatTirageRepositoryTest extends TestCase
             "Noël 2020",
             [$alice, $bob]
         );
-        $this->resultatTirageAlice = (new DoctrineResultatTirage(1))
-            ->setOccasion($this->occasion)
-            ->setQuiOffre($alice)
+        $this->resultatTirageAlice = (new DoctrineResultatTirage($this->occasion, $alice))
             ->setQuiRecoit($bob);
         $this->repository = new InMemoryResultatTirageRepository([
             0 => $this->resultatTirageAlice,

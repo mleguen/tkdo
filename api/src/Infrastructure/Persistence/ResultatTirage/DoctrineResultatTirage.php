@@ -8,32 +8,33 @@ use App\Domain\Occasion\Occasion;
 use App\Domain\ResultatTirage\ResultatTirage;
 use App\Domain\Utilisateur\Utilisateur;
 use Doctrine\ORM\Mapping\Entity;
+use Doctrine\ORM\Mapping\Id;
+use Doctrine\ORM\Mapping\JoinColumn;
 use Doctrine\ORM\Mapping\ManyToOne;
 use Doctrine\ORM\Mapping\Table;
+use Doctrine\ORM\Mapping\UniqueConstraint;
 
 /**
  * @Entity
- * @Table(name="tkdo_resultat_tirage")
+ * @Table(
+ *      name="tkdo_resultat_tirage",
+ *      uniqueConstraints={
+ *          @UniqueConstraint(name="unique_quiRecoit_id_idx", columns={"occasion_id", "quiRecoit_id"})
+ *      }
+ * )
  */
 class DoctrineResultatTirage implements ResultatTirage
 {
     /**
-     * @var int
-     * @Id
-     * @Column(type="integer")
-     * @GeneratedValue
-     * @todo se débarasser de l'id (PK = occasion, quiOffre)
-     */
-    protected $id;
-
-    /**
      * @var Occasion
+     * @Id
      * @ManyToOne(targetEntity="App\Infrastructure\Persistence\Occasion\DoctrineOccasion")
      */
     private $occasion;
 
     /**
      * @var Utilisateur
+     * @Id
      * @ManyToOne(targetEntity="App\Infrastructure\Persistence\Utilisateur\DoctrineUtilisateur")
      */
     private $quiOffre;
@@ -41,12 +42,14 @@ class DoctrineResultatTirage implements ResultatTirage
     /**
      * @var Utilisateur
      * @ManyToOne(targetEntity="App\Infrastructure\Persistence\Utilisateur\DoctrineUtilisateur")
+     * @JoinColumn(nullable=false)
      */
     private $quiRecoit;
 
-    public function __construct(?int $id = NULL)
+    public function __construct(Occasion $occasion= NULL, Utilisateur $quiOffre = NULL)
     {
-        if (isset($id)) $this->id = $id;
+        if (isset($occasion)) $this->occasion = $occasion;
+        if (isset($quiOffre)) $this->quiOffre = $quiOffre;
     }
 
     public function getOccasion(): Occasion

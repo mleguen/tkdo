@@ -30,9 +30,7 @@ class OccasionReadActionTest extends ActionTestCase
             ->willReturn($occasion)
             ->shouldBeCalledOnce();
 
-        $resultatTirage = (new DoctrineResultatTirage(1))
-            ->setOccasion($occasion)
-            ->setQuiOffre($alice)
+        $resultatTirage = (new DoctrineResultatTirage($occasion, $alice))
             ->setQuiRecoit($bob);
         $this->resultatTirageRepositoryProphecy
             ->readByOccasion($occasion)
