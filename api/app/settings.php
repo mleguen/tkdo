@@ -7,7 +7,7 @@ use Monolog\Logger;
 if (!defined('APP_ROOT')) define('APP_ROOT', __DIR__ . '/..');
 
 return function (ContainerBuilder $containerBuilder) {
-    $devMode = php_sapi_name() == 'cli-server';
+    $devMode = (php_sapi_name() == 'cli') || (php_sapi_name() == 'cli-server');
     $docker = getenv('docker') !== false;
 
     // Global Settings Object
@@ -18,11 +18,9 @@ return function (ContainerBuilder $containerBuilder) {
                 // if true, metadata caching is forcefully disabled
                 'dev_mode' => $devMode,
 
-                // path where the compiled metadata info will be cached
-                // make sure the path exists and it is writable
-                'metadata_cache_dir' => APP_ROOT . '/var/doctrine/metadata',
-                'proxy_cache_dir' => APP_ROOT . '/var/doctrine/proxy',
-                'query_cache_dir' => APP_ROOT . '/var/doctrine/query',
+                // make sure the paths exists and are writable
+                'cache_dir' => APP_ROOT . '/var/doctrine/cache',
+                'proxy_dir' => APP_ROOT . '/var/doctrine/proxy',
 
                 // you should add any other path containing annotated entity classes
                 'metadata_dirs' => [APP_ROOT . '/src/Infrastructure/Persistence'],

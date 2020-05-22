@@ -10,10 +10,8 @@ use App\Infrastructure\Persistence\Occasion\DoctrineOccasionRepository;
 use App\Infrastructure\Persistence\ResultatTirage\DoctrineResultatTirageRepository;
 use App\Infrastructure\Persistence\Utilisateur\DoctrineUtilisateurRepository;
 use DI\ContainerBuilder;
-use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Cache\PhpFileCache;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\Tools\Setup;
 use Psr\Container\ContainerInterface;
 
@@ -21,29 +19,11 @@ return function (ContainerBuilder $containerBuilder) {
     $containerBuilder->addDefinitions([
         EntityManager::class => function (ContainerInterface $container) {
             $doctrineSettings = $container->get('settings')['doctrine'];
-            $config = Setup::createConfiguration(
-                $doctrineSettings['dev_mode']
-            );
-
-            $config->setMetadataDriverImpl(
-                new AnnotationDriver(
-                    new AnnotationReader(),
-                    $doctrineSettings['metadata_dirs']
-                )
-            );
-
-            $config->setMetadataCacheImpl(
-                new PhpFileCache(
-                    $doctrineSettings['metadata_cache_dir']
-                )
-            );
-
-            $config->setProxyDir($doctrineSettings['proxy_cache_dir']);
-
-            $config->setQueryCacheImpl(
-                new PhpFileCache(
-                    $doctrineSettings['query_cache_dir']
-                )
+            $config = Setup::createAnnotationMetadataConfiguration(
+                $doctrineSettings['metadata_dirs'],
+                $doctrineSettings['dev_mode'],
+                $doctrineSettings['proxy_dir'],
+                new PhpFileCache($doctrineSettings['cache_dir'])
             );
 
             return EntityManager::create(
