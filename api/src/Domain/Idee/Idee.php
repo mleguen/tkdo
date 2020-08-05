@@ -13,6 +13,11 @@ interface Idee
     /**
      * @throws ReferenceException
      */
+    public function getUtilisateur(): Utilisateur;
+
+    /**
+     * @throws ReferenceException
+     */
     public function getDescription(): string;
 
     /**

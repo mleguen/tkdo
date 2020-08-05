@@ -31,7 +31,7 @@ class ConnexionActionTest extends ActionTestCase
             ->willReturn($this->alice)
             ->shouldBeCalledOnce();
 
-        $response = $this->handleAuthorizedRequest('POST', '/connexion', <<<EOT
+        $response = $this->handleAuthorizedRequest('POST', '/connexion', '', <<<EOT
 {
     "identifiant": "{$this->alice->getIdentifiant()}",
     "mdp": "{$this->alice->getMdp()}"
@@ -62,6 +62,7 @@ EOT
         $response = $this->handleAuthorizedRequest(
             'POST',
             '/connexion',
+            '',
             <<<EOT
 {
     "identifiant": "{$this->alice->getIdentifiant()}",

@@ -20,12 +20,12 @@ export interface ResultatTirage {
   idQuiRecoit: number;
 }
 
-export interface Idees {
+export interface IdeesParUtilisateur {
   utilisateur: Utilisateur;
-  idees: Idee[];
+  idees: IdeeSansUtilisateur[];
 }
 
-export interface Idee {
+export interface IdeeSansUtilisateur {
   id: number;
   description: string;
   auteur: Utilisateur;
@@ -36,8 +36,8 @@ const URL_API = '/api';
 const URL_CONNEXION = `${URL_API}/connexion`;
 const URL_OCCASION = `${URL_API}/occasion`;
 const URL_UTILISATEUR = (idUtilisateur: number) => `${URL_API}/utilisateur/${idUtilisateur}`;
-const URL_IDEES = (idUtilisateur: number) => `${URL_UTILISATEUR(idUtilisateur)}/idee`;
-const URL_IDEE = (idUtilisateur: number, idIdee: number) => `${URL_IDEES(idUtilisateur)}/${idIdee}`;
+const URL_IDEES = `${URL_API}/idee`;
+const URL_IDEE = (idIdee: number) => `${URL_IDEES}/${idIdee}`;
 
 const TOKEN_KEY = 'backend-token';
 const ID_UTILISATEUR_KEY = 'id-utilisateur';
@@ -62,7 +62,7 @@ export class BackendService {
   ) { }
 
   ajouteIdee(idUtilisateur: number, description: string) {
-    return this.http.post(URL_IDEES(idUtilisateur), { idAuteur: this.idUtilisateur, description }).toPromise();
+    return this.http.post(URL_IDEES, { idUtilisateur, idAuteur: this.idUtilisateur, description }).toPromise();
   }
 
   async connecte(identifiant: string, mdp: string) {
@@ -91,7 +91,7 @@ export class BackendService {
   }
 
   getIdees(idUtilisateur: number) {
-    return this.http.get<Idees>(URL_IDEES(idUtilisateur));
+    return this.http.get<IdeesParUtilisateur>(`${URL_IDEES}?idUtilisateur=${idUtilisateur}`);
   }
 
   getOccasion$() {
@@ -110,7 +110,7 @@ export class BackendService {
     this.erreur$.next(message);
   }
 
-  supprimeIdee(idUtilisateur: number, idIdee: number) {
-    return this.http.delete(URL_IDEE(idUtilisateur, idIdee)).toPromise();
+  supprimeIdee(idIdee: number) {
+    return this.http.delete(URL_IDEE(idIdee)).toPromise();
   }
 }

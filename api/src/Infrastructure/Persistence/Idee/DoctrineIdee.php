@@ -10,6 +10,7 @@ use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\GeneratedValue;
 use Doctrine\ORM\Mapping\Id;
+use Doctrine\ORM\Mapping\JoinColumn;
 use Doctrine\ORM\Mapping\ManyToOne;
 use Doctrine\ORM\Mapping\Table;
 
@@ -30,7 +31,7 @@ class DoctrineIdee implements Idee
     /**
      * @var Utilisateur
      * @ManyToOne(targetEntity="App\Infrastructure\Persistence\Utilisateur\DoctrineUtilisateur")
-     * @todo intégrer à la PK (PK = utilisateur, id)
+     * @JoinColumn(nullable=false)
      */
     private $utilisateur;
 
@@ -43,6 +44,7 @@ class DoctrineIdee implements Idee
     /**
      * @var Utilisateur
      * @ManyToOne(targetEntity="App\Infrastructure\Persistence\Utilisateur\DoctrineUtilisateur")
+     * @JoinColumn(nullable=false)
      */
     private $auteur;
 
@@ -65,6 +67,9 @@ class DoctrineIdee implements Idee
         return $this->id;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getUtilisateur(): Utilisateur
     {
         return $this->utilisateur;

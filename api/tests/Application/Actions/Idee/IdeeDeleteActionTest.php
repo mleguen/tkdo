@@ -4,19 +4,12 @@ declare(strict_types=1);
 
 namespace Tests\Application\Actions\Idee;
 
-use App\Domain\Idee\IdeeInconnueException;
-use App\Domain\Utilisateur\UtilisateurInconnuException;
 use App\Infrastructure\Persistence\Idee\InMemoryIdeeReference;
-use App\Infrastructure\Persistence\Utilisateur\DoctrineUtilisateur;
+use Exception;
 use Tests\Application\Actions\ActionTestCase;
 
 class IdeeDeleteActionTest extends ActionTestCase
 {
-    /**
-     * @var Utilisateur
-     */
-    private $alice;
-
     /**
      * @var Idee
      */
@@ -25,20 +18,14 @@ class IdeeDeleteActionTest extends ActionTestCase
     public function setUp()
     {
         parent::setup();
-        $this->alice = (new DoctrineUtilisateur(1))
-            ->setIdentifiant('alice@tkdo.org')
-            ->setNom('Alice')
-            ->setMdp('mdpalice');        
         $this->idee = new InMemoryIdeeReference(0);
+        $this->ideeRepositoryProphecy
+            ->read($this->idee->getId(), true)
+            ->willReturn($this->idee);
     }
 
     public function testAction()
     {
-        $this->ideeRepositoryProphecy
-            ->read($this->idee->getId(), true)
-            ->willReturn($this->idee)
-            ->shouldBeCalledOnce();
-
         $this->ideeRepositoryProphecy
             ->delete($this->idee)
             ->willReturn()
@@ -46,7 +33,7 @@ class IdeeDeleteActionTest extends ActionTestCase
 
         $response = $this->handleAuthorizedRequest(
             'DELETE',
-            "/utilisateur/{$this->alice->getId()}/idee/{$this->idee->getId()}"
+            "/idee/{$this->idee->getId()}"
         );
 
         $this->assertEqualsResponse(
@@ -58,29 +45,24 @@ EOT
         );
     }
 
-    public function testActionIdeeInconnue()
+    public function testActionEchecDelete()
     {
         $this->ideeRepositoryProphecy
-            ->read($this->idee->getId(), true)
-            ->willReturn($this->idee)
-            ->shouldBeCalledOnce();
-
-        $this->ideeRepositoryProphecy
             ->delete($this->idee)
-            ->willThrow(new IdeeInconnueException())
+            ->willThrow(new Exception('échec de delete'))
             ->shouldBeCalledOnce();
 
         $response = $this->handleAuthorizedRequest(
             'DELETE',
-            "/utilisateur/{$this->alice->getId()}/idee/{$this->idee->getId()}"
+            "/idee/{$this->idee->getId()}"
         );
 
         $this->assertEqualsResponse(
-            404,
+            500,
             <<<'EOT'
 {
-    "type": "RESOURCE_NOT_FOUND",
-    "description": "id\u00e9e inconnue"
+    "type": "SERVER_ERROR",
+    "description": "\u00e9chec de delete"
 }
 EOT
             , $response
@@ -91,7 +73,7 @@ EOT
     {
         $response = $this->handleRequest(
             'DELETE',
-            "/utilisateur/{$this->alice->getId()}/idee/{$this->idee->getId()}"
+            "/idee/{$this->idee->getId()}"
         );
 
         $this->assertEqualsResponse(

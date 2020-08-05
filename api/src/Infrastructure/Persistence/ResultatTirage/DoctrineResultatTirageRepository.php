@@ -26,7 +26,7 @@ class DoctrineResultatTirageRepository implements ResultatTirageRepository
      */
     public function readByOccasion(Occasion $occasion): array
     {
-        return $this->em->getRepository(DoctrineOccasion::class)->findBy([
+        return $this->em->getRepository(DoctrineResultatTirage::class)->findBy([
             'occasion' => $occasion,
         ]);
     }

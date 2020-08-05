@@ -3,7 +3,7 @@ import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Observable, combineLatest, BehaviorSubject, of } from 'rxjs';
 import { switchMap, catchError, map } from 'rxjs/operators';
-import { BackendService, Idees, Idee } from '../backend.service';
+import { BackendService, IdeesParUtilisateur, IdeeSansUtilisateur } from '../backend.service';
 import * as moment from 'moment';
 
 @Component({
@@ -70,7 +70,7 @@ export class ListeIdeesComponent implements OnInit {
 
   async supprime(idIdee: number) {
     try {
-      await this.backend.supprimeIdee(this.idUtilisateur, idIdee);
+      await this.backend.supprimeIdee(idIdee);
       this.erreurAjoutSuppression = undefined;
       this.actualise();
     }
@@ -80,11 +80,11 @@ export class ListeIdeesComponent implements OnInit {
   }
 }
 
-interface IdeesAffichees extends Idees {
+interface IdeesAffichees extends IdeesParUtilisateur {
   estPourMoi: boolean;
   idees: IdeeAffichee[];
 }
 
-interface IdeeAffichee extends Idee {
+interface IdeeAffichee extends IdeeSansUtilisateur {
   estDeMoi: boolean;
 }

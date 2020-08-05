@@ -31,6 +31,14 @@ class InMemoryIdeeReference implements Idee
     /**
      * {@inheritdoc}
      */
+    public function getUtilisateur(): Utilisateur
+    {
+        throw new ReferenceException();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getDescription(): string
     {
         throw new ReferenceException();

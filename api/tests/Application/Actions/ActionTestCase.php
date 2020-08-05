@@ -113,12 +113,13 @@ use Tests\TestCase;
     protected function createRequest(
         string $method,
         string $path,
+        $query = '',
         $body = null,
         array $headers = ['HTTP_ACCEPT' => 'application/json'],
         array $serverParams = [],
         array $cookies = []
     ): Request {
-        $uri = new Uri('', '', 80, $path);
+        $uri = new Uri('', '', 80, $path, $query);
         $stream = (new StreamFactory())->createStream(($body) ?? '');
 
         $h = new Headers();
@@ -132,18 +133,20 @@ use Tests\TestCase;
     protected function handleRequest(
         string $method,
         string $path,
+        $query = '',
         $body = null
     ): ResponseInterface {
-        $request = $this->createRequest($method, $path, $body);
+        $request = $this->createRequest($method, $path, $query, $body);
         return $this->app->handle($request);
     }
 
     protected function handleAuthorizedRequest(
         string $method,
         string $path,
+        $query = '',
         $body = null
     ): ResponseInterface {
-        $request = $this->createRequest($method, $path, $body, [
+        $request = $this->createRequest($method, $path, $query, $body, [
             'HTTP_ACCEPT' => 'application/json',
         ], [
             'HTTP_AUTHORIZATION' => "Bearer ".MockData::getToken(),

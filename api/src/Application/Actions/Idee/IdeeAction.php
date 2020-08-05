@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace App\Application\Actions\Idee;
 
-use App\Application\Actions\Utilisateur\UtilisateurAction;
+use App\Application\Actions\Action;
 use App\Domain\Idee\IdeeRepository;
-use App\Domain\Utilisateur\UtilisateurRepository;
 use Psr\Log\LoggerInterface;
 
-class IdeeAction extends UtilisateurAction
+abstract class IdeeAction extends Action
 {
   /**
    * @var IdeeRepository
@@ -18,12 +17,11 @@ class IdeeAction extends UtilisateurAction
 
   /**
    * @param LoggerInterface $logger
-   * @param UtilisateurRepository  $utilisateurRepository
    * @param IdeeRepository  $ideeRepository
    */
-  public function __construct(LoggerInterface $logger, UtilisateurRepository $utilisateurRepository, IdeeRepository $ideeRepository)
+  public function __construct(LoggerInterface $logger, IdeeRepository $ideeRepository)
   {
-    parent::__construct($logger, $utilisateurRepository);
+    parent::__construct($logger);
     $this->ideeRepository = $ideeRepository;
   }
 }

@@ -27,9 +27,9 @@ class DoctrineOccasionRepository implements OccasionRepository
     public function readLast(): Occasion
     {
         $occasion = $this->em->createQueryBuilder()
-            ->select('e')
-            ->from($this->entityName, 'e')
-            ->orderBy('e.id', 'DESC')
+            ->select('o')
+            ->from(DoctrineOccasion::class, 'o')
+            ->orderBy('o.id', 'DESC')
             ->setMaxResults(1)
             ->getQuery()
             ->getOneOrNullResult();

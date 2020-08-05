@@ -10,14 +10,14 @@ import {
 } from '@angular/common/http';
 import { Observable, of, throwError } from 'rxjs';
 import { mergeMap, materialize, dematerialize, delay } from 'rxjs/operators';
-import { Idees, Occasion } from './backend.service';
+import { IdeesParUtilisateur, Occasion } from './backend.service';
 import * as moment from 'moment';
 
 const alice = {
   id: 0,
   identifiant: 'alice@tkdo.org',
   nom: 'Alice',
-  mdp: 'Alice',
+  mdp: 'mdpalice',
 };
 
 const bob = {
@@ -52,7 +52,7 @@ const occasion: Occasion = {
   }],
 };
 
-const listesIdees: { [id: number]: Idees } = {
+const listesIdees: { [id: number]: IdeesParUtilisateur } = {
   0: {
     utilisateur: alice,
     idees: [
@@ -103,22 +103,16 @@ export class DevBackendInterceptor implements HttpInterceptor {
         if (urlApi === '/connexion') {
           if (method === 'POST') return postConnexion();
         }
-        else if (match = urlApi.match(/\/utilisateur\/(\d+)(\/.+)?$/)) {
-          const [, idUtilisateur, urlUtilisateur] = match;
-          if (!urlUtilisateur) {
-            if (method === 'GET') return getUtilisateur();
-            if (method === 'PUT') return putUtilisateur();
-          } else {
-            if (match = urlApi.match(/\/idee(?:\/(\d+))?$/)) {
-              const [, idIdee] = match;
-              if (idIdee === undefined) {
-                if (method === 'GET') return getIdees(+idUtilisateur);
-                if (method === 'POST') return postIdee(+idUtilisateur);
-              } else {
-                if (method === 'DELETE') return deleteIdee(+idUtilisateur, +idIdee);
-              }
-            }
-          }
+        else if (match = urlApi.match(/\/utilisateur\/(\d+)$/)) {
+          const [, idUtilisateur] = match;
+          if (method === 'GET') return getUtilisateur();
+          if (method === 'PUT') return putUtilisateur();
+        }
+        else if (match = urlApi.match(/\/idee(?:(?:\/(\d+))|(?:\?idUtilisateur=(\d+)))?$/)) {
+          const [, idIdee, idUtilisateur] = match;
+          if ((method === 'GET') && (idIdee === undefined) && (idUtilisateur !== undefined)) return getIdees(+idUtilisateur);
+          if ((method === 'POST') && (idIdee === undefined) && (idUtilisateur === undefined)) return postIdee();
+          if ((method === 'DELETE') && (idIdee !== undefined) && (idUtilisateur === undefined)) return deleteIdee(+idUtilisateur, +idIdee);
         }
         else if (urlApi === '/occasion') {
           if (method === 'GET') return getOccasion();
@@ -181,10 +175,10 @@ export class DevBackendInterceptor implements HttpInterceptor {
       return ok(listesIdees[idUtilisateur]);
     }
 
-    function postIdee(idUtilisateur: number) {
+    function postIdee() {
       if (!isLoggedIn()) return unauthorized();
 
-      const {description} = body as any;
+      const {idUtilisateur, description} = body as any;
 
       console.log(Math.max(...listesIdees[idUtilisateur].idees.map(i => i.id)) + 1);
       listesIdees[idUtilisateur].idees.push({
