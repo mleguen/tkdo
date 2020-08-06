@@ -4,7 +4,7 @@
 
   <p class="avertissement" *ngIf="li.estPourMoi; then estMoi else estPasMoi"></p>
   <ng-template #estMoi>Vous ne pouvez voir que les idées que vous avez vous-même proposées.</ng-template>
-  <ng-template #estPasMoi>{{li.utilisateur.nom}} ne peut pas voir les idées proposées par les autres participants.</ng-template>
+  <ng-template #estPasMoi>{{li.utilisateur.nom}} ne peut pas voir les idées proposées par vous ou les autres participants.</ng-template>
   
   <ul>
     <li *ngFor="let i of li.idees">
