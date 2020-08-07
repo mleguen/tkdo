@@ -108,16 +108,22 @@ INNER JOIN tkdo_utilisateur u
 WHERE u.identifiant IN ('alice@tkdo.org', 'bob@tkdo.org')
 ```
 
-Ils doivent ensuite être déclarés comme participants de la dernière occasion créée,
-là encore pour l'instant directement en base de données, dans la table `tkdo_participation`.
+#### Tirage au sort
+
+Le tirage au sort pour la dernière occasion créée doit pour l'instant être fait en dehors de l'application,
+et injecté ensuite directement en base de données, dans la table `tkdo_resultat_tirage`,
+participant par participant.
 Par exemple :
 
 ```sql
-INSERT INTO tkdo_participation (doctrineoccasion_id, doctrineutilisateur_id)
-SELECT o.id, u.id
-FROM tkdo_occasion o INNER JOIN tkdo_utilisateur u
-WHERE o.titre = 'Noël 2020' AND u.identifiant = 'alice@tkdo.org'
+INSERT INTO tkdo_resultat_tirage (occasion_id, quiOffre_id, quiRecoit_id)
+SELECT o.lastid, offre.id, recoit.id
+FROM (SELECT MAX(id) lastid FROM tkdo_occasion) o
+INNER JOIN tkdo_utilisateur offre ON offre.identifiant = 'alice@tkdo.org'
+INNER JOIN tkdo_utilisateur recoit ON recoit.identifiant = 'bob@tkdo.org'
 ```
+
+Chaque participant à l'occasion doit offrir et recevoir une fois et une seule.
 
 ## Développement
 
