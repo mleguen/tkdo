@@ -4,6 +4,8 @@ Tirage au sort de cadeaux, en famille ou entre amis.
 
 ## Déploiement sur serveur Apache
 
+### Installation
+
 Dans les explications ci-dessous, le *répertoire cible* désigne le répertoire du serveur Apache
 où sera installé tkdo.
 
@@ -64,11 +66,60 @@ OK
 > L'utilisation de l'option `-n` peut aussi être nécessaire pour éviter l'utilisation du php.ini du serveur,
 > si ce dernier désactive par exemple l'affichage des exceptions.
 
-## Contribution
+### Exploitation
 
-Commencer par lire les README du [front](./front/README.md) et de l'[API](./api/README.md).
+#### Création de comptes utilisateurs
 
-- [guide du développeur](./CONTRIBUTING.md)
+Les comptes utilisateurs doivent pour l'instant être créés directement en base de données,
+dans la table `tkdo_utilisateur`. Par exemple :
+
+```sql
+INSERT INTO tkdo_utilisateur (identifiant, nom, mdp)
+VALUES ('alice@tkdo.org', 'Alice', 'mdpalice');
+```
+
+#### Création d'une occasion de s'offrir des cadeaux
+
+Les occasions doivent pour l'instant être créées directement en base de données,
+dans la table `tkdo_occasion`. Par exemple :
+
+```sql
+INSERT INTO tkdo_occasion (titre)
+VALUES ('Noël 2020');
+```
+
+Une première occasion doit impérativement être créée pour que tkdo fonctionne.
+
+Mais si plusieurs occasions existent, seule la dernière occasion créée
+(celle dont l'id est le plus élevé) sera prise en compte par tkdo.
+
+#### Ajout de participants à une occasion
+
+Un compte utilisateur doit avoir préalablement été créé pour chaque participant (voir plus haut).
+Ces comptes utilisateurs doivent ensuite être déclarés comme participant à la dernière occasion créée,
+là encore pour l'instant directement en base de données, dans la table `tkdo_participation`.
+Par exemple :
+
+```sql
+INSERT INTO tkdo_participation (doctrineoccasion_id, doctrineutilisateur_id)
+SELECT o.lastid, u.id
+FROM (SELECT MAX(id) lastid FROM tkdo_occasion) o
+INNER JOIN tkdo_utilisateur u
+WHERE u.identifiant IN ('alice@tkdo.org', 'bob@tkdo.org')
+```
+
+Ils doivent ensuite être déclarés comme participants de la dernière occasion créée,
+là encore pour l'instant directement en base de données, dans la table `tkdo_participation`.
+Par exemple :
+
+```sql
+INSERT INTO tkdo_participation (doctrineoccasion_id, doctrineutilisateur_id)
+SELECT o.id, u.id
+FROM tkdo_occasion o INNER JOIN tkdo_utilisateur u
+WHERE o.titre = 'Noël 2020' AND u.identifiant = 'alice@tkdo.org'
+```
+
+## Développement
 
 ### Utiliser le serveur de développement front seul
 
