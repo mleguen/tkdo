@@ -39,8 +39,11 @@ class ConnexionAction extends Action
 
       // TODO: construire le JWT
       return $this->respondWithData([
-        "idUtilisateur" => $utilisateur->getId(),
-        "token" => MockData::getToken()
+        "token" => MockData::getToken(),
+        "utilisateur" => [
+          "id" => $utilisateur->getId(),
+          "nom" => $utilisateur->getNom(),
+        ]
       ]);
     }
     catch (UtilisateurInconnuException $err) {

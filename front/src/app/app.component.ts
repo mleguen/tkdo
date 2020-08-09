@@ -11,7 +11,6 @@ import { filter } from 'rxjs/operators';
 export class AppComponent implements OnInit {
 
   erreurBackend$ = this.backend.erreur$;
-  estConnecte$ = this.backend.estConnecte$;
   menuOuvert = false;
 
   constructor(

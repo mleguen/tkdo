@@ -7,21 +7,23 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { ConnexionComponent } from './connexion/connexion.component';
 import { ListeIdeesComponent } from './liste-idees/liste-idees.component';
-import { MenuComponent } from './menu/menu.component';
+import { HeaderComponent } from './header/header.component';
 import { OccasionComponent } from './occasion/occasion.component';
 import { ProfilComponent } from './profil/profil.component';
 import { authBackendInterceptorProvider } from './auth-backend.interceptor';
 import { devBackendInterceptorProvider } from './dev-backend.interceptor';
 import { erreurBackendInterceptorProvider } from './erreur-backend.interceptor';
+import { DeconnexionComponent } from './deconnexion/deconnexion.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     ConnexionComponent,
     ListeIdeesComponent,
-    MenuComponent,
+    HeaderComponent,
     OccasionComponent,
-    ProfilComponent
+    ProfilComponent,
+    DeconnexionComponent
   ],
   imports: [
     BrowserModule,

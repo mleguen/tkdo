@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { first } from 'rxjs/operators';
+import { first, tap } from 'rxjs/operators';
 
 export interface Occasion {
   titre: string;
@@ -39,12 +39,13 @@ const URL_UTILISATEUR = (idUtilisateur: number) => `${URL_API}/utilisateur/${idU
 const URL_IDEES = `${URL_API}/idee`;
 const URL_IDEE = (idIdee: number) => `${URL_IDEES}/${idIdee}`;
 
-const TOKEN_KEY = 'backend-token';
-const ID_UTILISATEUR_KEY = 'id-utilisateur';
+const CLE_OCCASION = 'occasion';
+const CLE_TOKEN = 'backend-token';
+const CLE_UTILISATEUR = 'utilisateur';
 
 interface PostConnexionDTO {
-  idUtilisateur: number;
   token: string;
+  utilisateur: Pick<Utilisateur, 'id' | 'nom'>;
 }
 
 @Injectable({
@@ -52,38 +53,46 @@ interface PostConnexionDTO {
 })
 export class BackendService {
 
+  idUtilisateur: Utilisateur['id'];
+  utilisateurConnecte$: BehaviorSubject<Pick<Utilisateur, 'id'|'nom'>>;
+
   erreur$ = new BehaviorSubject<string>(undefined);
-  token = localStorage.getItem(TOKEN_KEY);
-  estConnecte$ = new BehaviorSubject(!!this.token);
-  idUtilisateur = +localStorage.getItem(ID_UTILISATEUR_KEY);
+  occasion$ = new BehaviorSubject<Occasion>(JSON.parse(localStorage.getItem(CLE_OCCASION)));
+  token = localStorage.getItem(CLE_TOKEN);
 
   constructor(
     private readonly http: HttpClient,
-  ) { }
+  ) {
+    let utilisateur = JSON.parse(localStorage.getItem(CLE_UTILISATEUR));
+    this.idUtilisateur = utilisateur.id;
+    this.utilisateurConnecte$ = new BehaviorSubject(utilisateur);
+  }
 
   ajouteIdee(idUtilisateur: number, description: string) {
     return this.http.post(URL_IDEES, { idUtilisateur, idAuteur: this.idUtilisateur, description }).toPromise();
   }
 
   async connecte(identifiant: string, mdp: string) {
-    const { idUtilisateur, token } = await this.http.post<PostConnexionDTO>(URL_CONNEXION, { identifiant, mdp }).toPromise();
-    this.idUtilisateur = idUtilisateur;
+    const { token, utilisateur } = await this.http.post<PostConnexionDTO>(URL_CONNEXION, { identifiant, mdp }).toPromise();
+    this.idUtilisateur = utilisateur.id;
     this.token = token;
-    localStorage.setItem(ID_UTILISATEUR_KEY, idUtilisateur.toString());
-    localStorage.setItem(TOKEN_KEY, token);
-    this.estConnecte$.next(true);
+    localStorage.setItem(CLE_TOKEN, token);
+    localStorage.setItem(CLE_UTILISATEUR, JSON.stringify(utilisateur));
+    this.utilisateurConnecte$.next(utilisateur);
   }
 
   async deconnecte() {
-    delete this.idUtilisateur;
     delete this.token;
-    localStorage.removeItem(ID_UTILISATEUR_KEY);
-    localStorage.removeItem(TOKEN_KEY);
-    this.estConnecte$.next(false);
+    delete this.idUtilisateur;
+    localStorage.removeItem(CLE_OCCASION);
+    localStorage.removeItem(CLE_TOKEN);
+    localStorage.removeItem(CLE_UTILISATEUR);
+    this.occasion$.next(null);
+    this.utilisateurConnecte$.next(null);
   }
   
   estConnecte() {
-    return this.estConnecte$.pipe(first()).toPromise();
+    return this.utilisateurConnecte$.pipe(first()).toPromise();
   }
   
   estUrlBackend(url: string): boolean {
@@ -95,7 +104,9 @@ export class BackendService {
   }
 
   getOccasion$() {
-    return this.http.get<Occasion>(URL_OCCASION);
+    return this.http.get<Occasion>(URL_OCCASION).pipe(
+      tap(occasion => this.occasion$.next(occasion))
+    );
   }
 
   getUtilisateur$() {

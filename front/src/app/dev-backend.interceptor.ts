@@ -130,7 +130,7 @@ export class DevBackendInterceptor implements HttpInterceptor {
       const { identifiant, mdp } = body as any;
 
       if ((identifiant !== alice.identifiant) || (mdp !== alice.mdp)) return badRequest('identifiants invalides');
-      return ok({ token, idUtilisateur: alice.id });
+      return ok({ token, utilisateur: { id: alice.id, nom: alice.nom } });
     }
 
     function getUtilisateur() {

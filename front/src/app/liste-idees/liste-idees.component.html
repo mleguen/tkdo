@@ -1,10 +1,11 @@
 <ng-container *ngIf="listeIdees$|async as li">
-  <h2>Idées de cadeaux pour {{li.estPourMoi ? 'vous-même' : li.utilisateur.nom}}</h2>
+  <h1>Idées de cadeaux</h1>
+  <h2>pour {{li.estPourMoi ? 'vous-même' : li.utilisateur.nom}}</h2>
   <p><button (click)="actualise()">Actualiser</button></p>
 
   <p class="avertissement" *ngIf="li.estPourMoi; then estMoi else estPasMoi"></p>
   <ng-template #estMoi>Vous ne pouvez voir que les idées que vous avez vous-même proposées.</ng-template>
-  <ng-template #estPasMoi>{{li.utilisateur.nom}} ne peut pas voir les idées proposées par vous ou les autres participants.</ng-template>
+  <ng-template #estPasMoi>{{li.utilisateur.nom}} ne peut pas voir les idées proposées par vous ou par les autres participants.</ng-template>
   
   <ul>
     <li *ngFor="let i of li.idees">

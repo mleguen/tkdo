@@ -44,8 +44,11 @@ EOT
             200,
             <<<EOT
 {
-    "idUtilisateur": {$this->alice->getId()},
-    "token": "{$token}"
+    "token": "{$token}",
+    "utilisateur": {
+        "id": {$this->alice->getId()},
+        "nom": "{$this->alice->getNom()}"
+    }
 }
 EOT
             , $response

@@ -1,19 +1,18 @@
-<!-- TODO: changer l'icône Angular -->
-<!-- TODO: mettre en forme l'application (bootstrap) -->
-<div>
-  <h1 [routerLink]="['/']">Tirage cadeaux</h1>
-  
-  <button *ngIf="estConnecte$ | async" (click)="toggleMenu()">{{ menuOuvert ? 'Fermer' : 'Menu' }}</button>
-  
-  <ng-container *ngIf="menuOuvert; then menu else routeur"></ng-container>
-  <ng-template #menu><app-menu></app-menu></ng-template>
-  <ng-template #routeur><router-outlet></router-outlet></ng-template>
-  
+<!-- Inspiré de https://getbootstrap.com/docs/4.5/examples/starter-template/ -->
+
+<app-header></app-header>
+
+<main role="main" class="container">
+
+  <div class="starter-template">
+    <router-outlet></router-outlet>
+  </div>
+
   <div *ngIf="erreurBackend$ | async as erreurBackend" class="alert alert-danger">
     Le serveur a répondu : "{{erreurBackend}}"
   </div>
-</div>
 
-<p class="credits">
-  Powered by <a href="https://github.com/mleguen/tkdo">tkdo</a>
-</p>
+  <p class="credits">
+    Powered by <a href="https://github.com/mleguen/tkdo">tkdo</a>
+  </p>
+</main>

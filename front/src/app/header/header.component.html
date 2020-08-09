@@ -1,0 +1,27 @@
+<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+  <a class="navbar-brand" href="#">Tirage cadeaux</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault"
+    aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div *ngIf="(utilisateurConnecte$ | async) as utilisateur" class="collapse navbar-collapse" id="navbarsExampleDefault">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item" *ngIf="utilisateurConnecte$ | async" [ngClass]="{'active': menuActif === '/occasion'}">
+        <a class="nav-link" [routerLink]="['/occasion']"
+          data-toggle="collapse" data-target=".navbar-collapse.show">{{(occasion$ | async)?.titre || 'Occasion'}}</a>
+      </li>
+      <li class="nav-item" *ngIf="utilisateurConnecte$ | async" [ngClass]="{'active': menuActif === '/profil'}">
+        <a class="nav-link" [routerLink]="['/profil']"
+        data-toggle="collapse" data-target=".navbar-collapse.show">Mon profil</a>
+      </li>
+    </ul>
+    
+    <form class="form-inline">
+      <span class="form-text mr-2"
+        data-toggle="collapse" data-target=".navbar-collapse.show">{{utilisateur.nom}}</span>
+      <button [routerLink]="['/deconnexion']" class="btn btn-secondary my-2 my-sm-0"
+        data-toggle="collapse" data-target=".navbar-collapse.show">Se déconnecter</button>
+    </form>
+  </div>
+</nav>
