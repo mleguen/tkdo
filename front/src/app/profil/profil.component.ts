@@ -11,6 +11,7 @@ export class ProfilComponent implements OnInit {
 
   formProfil = this.fb.group(
     {
+      'identifiant': [''],
       'nom': ['', [Validators.minLength(3)]],
       'mdp': ['', [Validators.minLength(8)]],
       'confirmeMdp': [''],
@@ -35,11 +36,16 @@ export class ProfilComponent implements OnInit {
     this.backend.getUtilisateur$().subscribe(
       utilisateur => {
         this.utilisateur = utilisateur;
+        this.identifiant.setValue(utilisateur.identifiant);
         this.nom.setValue(utilisateur.nom);
       },
       // Les erreurs backend sont déjà affichées par AppComponent
       () => {}
     );
+  }
+
+  get identifiant() {
+    return this.formProfil.get('identifiant');
   }
 
   get nom() {
