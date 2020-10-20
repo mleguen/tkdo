@@ -10,7 +10,7 @@ import {
 } from '@angular/common/http';
 import { Observable, of, throwError } from 'rxjs';
 import { mergeMap, materialize, dematerialize, delay } from 'rxjs/operators';
-import { IdeesParUtilisateur, Occasion } from './backend.service';
+import { IdeeSansUtilisateur, Occasion, Utilisateur } from './backend.service';
 import * as moment from 'moment';
 
 const alice = {
@@ -24,57 +24,39 @@ const bob = {
   id: 1,
   identifiant: 'bob@tkdo.org',
   nom: 'Bob',
+  mdp: 'mdpbob',
 };
 
 const charlie = {
   id: 2,
   identifiant: 'charlie@tkdo.org',
   nom: 'Charlie',
+  mdp: 'mdpcharlie',
 };
 
 const david = {
   id: 3,
   identifiant: 'david@tkdo.org',
   nom: 'David',
+  mdp: 'mdpdavid',
 };
+
+const utilisateurs = [alice, bob, charlie, david];
 
 const occasion: Occasion = {
   titre: 'Noël 2020',
-  participants: [
-    alice,
-    bob,
-    charlie,
-    david,
-  ],
+  participants: utilisateurs,
   resultatsTirage: [{
     idQuiOffre: alice.id,
     idQuiRecoit: bob.id,
   }],
 };
 
-const listesIdees: { [id: number]: IdeesParUtilisateur } = {
-  0: {
-    utilisateur: alice,
-    idees: [
-      { id: 0, description: 'un gauffrier', auteur: alice, dateProposition: '19/04/2020' },
-    ]
-  },
-  1: {
-    utilisateur: bob,
-    idees: [
-      { id: 0, description: 'une canne à pêche', auteur: alice, dateProposition: '19/04/2020' },
-      { id: 1, description: 'des gants de boxe', auteur: bob, dateProposition: '07/04/2020' },
-    ]
-  },
-  2: {
-    utilisateur: charlie,
-    idees: []
-  },
-  3: {
-    utilisateur: david,
-    idees: []
-  },
-};
+let idees = [
+  { idee: { id: 0, description: 'un gauffrier', auteur: alice, dateProposition: '19/04/2020' }, utilisateur: alice },
+  { idee: { id: 1, description: 'une canne à pêche', auteur: alice, dateProposition: '19/04/2020' }, utilisateur: bob },
+  { idee: { id: 2, description: 'des gants de boxe', auteur: bob, dateProposition: '07/04/2020' }, utilisateur: bob },
+];
 
 // inspired from: https://jasonwatmore.com/post/2019/05/02/angular-7-mock-backend-example-for-backendless-development
 
@@ -105,14 +87,14 @@ export class DevBackendInterceptor implements HttpInterceptor {
         }
         else if (match = urlApi.match(/\/utilisateur\/(\d+)$/)) {
           const [, idUtilisateur] = match;
-          if (method === 'GET') return getUtilisateur();
-          if (method === 'PUT') return putUtilisateur();
+          if (method === 'GET') return getUtilisateur(+idUtilisateur);
+          if (method === 'PUT') return putUtilisateur(+idUtilisateur);
         }
         else if (match = urlApi.match(/\/idee(?:(?:\/(\d+))|(?:\?idUtilisateur=(\d+)))?$/)) {
           const [, idIdee, idUtilisateur] = match;
           if ((method === 'GET') && (idIdee === undefined) && (idUtilisateur !== undefined)) return getIdees(+idUtilisateur);
           if ((method === 'POST') && (idIdee === undefined) && (idUtilisateur === undefined)) return postIdee();
-          if ((method === 'DELETE') && (idIdee !== undefined) && (idUtilisateur === undefined)) return deleteIdee(+idUtilisateur, +idIdee);
+          if ((method === 'DELETE') && (idIdee !== undefined) && (idUtilisateur === undefined)) return deleteIdee(+idIdee);
         }
         else if (urlApi === '/occasion') {
           if (method === 'GET') return getOccasion();
@@ -129,36 +111,33 @@ export class DevBackendInterceptor implements HttpInterceptor {
     function postConnexion() {
       const { identifiant, mdp } = body as any;
 
-      if ((identifiant !== alice.identifiant) || (mdp !== alice.mdp)) return badRequest('identifiants invalides');
-      return ok({ token, utilisateur: { id: alice.id, nom: alice.nom } });
+      const utilisateurComplet = utilisateurs.find(u => (u.identifiant === identifiant) && (u.mdp === mdp));
+      if (!utilisateurComplet) return badRequest('identifiants invalides');
+      return ok({ token, utilisateur: { id: utilisateurComplet.id, nom: utilisateurComplet.nom } });
     }
 
-    function getUtilisateur() {
+    function getUtilisateur(idUtilisateur: number) {
       if (!isLoggedIn()) return unauthorized();
 
-      const { mdp, ...profilSansMdp } = alice;
+      const { mdp, ...profilSansMdp } = utilisateurs[idUtilisateur];
       return ok(profilSansMdp);
     }
 
-    function putUtilisateur() {
+    function putUtilisateur(idUtilisateur: number) {
       if (!isLoggedIn()) return unauthorized();
 
+      const utilisateur = utilisateurs.find(u => u.id === idUtilisateur);
       const { nom, mdp } = body as any;
-      const oldNom = alice.nom;
 
-      if (nom !== oldNom) {
-        if (occasion.participants.filter(p => p.id !== 0).map(p => p.nom).includes(nom)) {
+      if (nom !== utilisateur.nom) {
+        if (utilisateurs.filter(p => p.id !== idUtilisateur).map(p => p.nom).includes(nom)) {
           return badRequest('Ce nom est déjà utilisé');
         }
 
-        alice.nom = nom;      
-
-        occasion.participants = occasion.participants.map(
-          p => p.id === 0 ? Object.assign(p, { nom }) : p
-        );
+        utilisateur.nom = nom;      
       }
 
-      if (mdp) alice.mdp = mdp;
+      if (mdp) utilisateur.mdp = mdp;
 
       return ok();
     }
@@ -172,7 +151,10 @@ export class DevBackendInterceptor implements HttpInterceptor {
     function getIdees(idUtilisateur: number) {
       if (!isLoggedIn()) return unauthorized();
 
-      return ok(listesIdees[idUtilisateur]);
+      return ok({
+        utilisateur: utilisateurs[idUtilisateur],
+        idees: idees.filter(i => i.utilisateur.id === idUtilisateur).map(i => i.idee),
+      });
     }
 
     function postIdee() {
@@ -180,12 +162,14 @@ export class DevBackendInterceptor implements HttpInterceptor {
 
       const {idUtilisateur, description} = body as any;
 
-      console.log(Math.max(...listesIdees[idUtilisateur].idees.map(i => i.id)) + 1);
-      listesIdees[idUtilisateur].idees.push({
-        id: nextId(listesIdees[idUtilisateur].idees),
-        description,
-        auteur: alice,
-        dateProposition: moment().locale('fr').format('YYYY-MM-DDTHH:mm:ssZ'),
+      idees.push({
+        utilisateur: utilisateurs[idUtilisateur],
+        idee: {
+          id: nextId(idees.map(i => i.idee)),
+          description,
+          auteur: alice,
+          dateProposition: moment().locale('fr').format('YYYY-MM-DDTHH:mm:ssZ'),
+        }
       });
 
       return ok();
@@ -195,10 +179,10 @@ export class DevBackendInterceptor implements HttpInterceptor {
       return liste.length === 0 ? 0 : Math.max(...liste.map(i => i.id)) + 1;
     }
 
-    function deleteIdee(idUtilisateur: number, idIdee: number) {
+    function deleteIdee(idIdee: number) {
       if (!isLoggedIn()) return unauthorized();
 
-      listesIdees[idUtilisateur].idees = listesIdees[idUtilisateur].idees.filter(i => i.id !== idIdee);
+      idees = idees.filter(i => i.idee.id !== idIdee);
 
       return ok();
     }
