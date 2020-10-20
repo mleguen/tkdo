@@ -1,8 +1,13 @@
+.router-outlet {
+  padding: 3rem 1.5rem;
+  text-align: center;
+}
+
 .credits {
   font-size: smaller;
   color: grey;
+  background-color: white;
   text-align: center;
   width: stretch;
-  position: absolute;
-  bottom: 0;
+  padding: 5px;
 }
