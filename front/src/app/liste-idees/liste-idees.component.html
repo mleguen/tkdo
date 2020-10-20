@@ -1,27 +1,53 @@
 <ng-container *ngIf="listeIdees$|async as li">
-  <h1>Idées de cadeaux</h1>
-  <h2>pour {{li.estPourMoi ? 'vous-même' : li.utilisateur.nom}}</h2>
-  <p><button (click)="actualise()">Actualiser</button></p>
+  <div class="container">
+    <div class="row justify-content-around align-items-center">
+      <h1 class="col-10">
+        Idées
+        <span class="pourQui">
+          pour {{li.utilisateur.nom}}
+          <span *ngIf="li.estPourMoi" class="text-muted">(c'est vous !)</span>
+        </span>
+      </h1>
+      <div class="col-auto">
+        <button (click)="actualise()" class="btn btn-secondary">Actualiser</button>
+      </div>
+    </div>
 
-  <p class="avertissement" *ngIf="li.estPourMoi; then estMoi else estPasMoi"></p>
-  <ng-template #estMoi>Vous ne pouvez voir que les idées que vous avez vous-même proposées.</ng-template>
-  <ng-template #estPasMoi>{{li.utilisateur.nom}} ne peut pas voir les idées proposées par vous ou par les autres participants.</ng-template>
+    <div class="row mt-3">
+      <div class="alert alert-warning col-12" role="alert">
+        <span *ngIf="li.estPourMoi; else estPasMoi">Vous ne pouvez voir que les idées que vous avez vous-même proposées.</span>
+        <ng-template #estPasMoi>{{li.utilisateur.nom}} ne peut voir que les idées qu'il ou elle a lui-même ou elle-même proposées.</ng-template>
+      </div>
+    </div>    
+
+    <div class="row mb-3 justify-content-center">
+      <div *ngFor="let i of li.idees" class="col-sm-6 col-md-4 col-lg-3 col-xl-2">
+        <div class="card">
+          <div class="card-header"><span class="auteur">{{i.estDeMoi ? 'Vous' : i.auteur.nom}}</span> le {{i.dateProposition}}</div>
+          <div class="card-body">
+            <h3 class="card-title">{{i.description}}</h3>
+            <button (click)="supprime(i.id)" class="btn btn-danger">Supprimer</button>
+          </div>
+        </div>
+      </div>
+    </div>
   
-  <ul>
-    <li *ngFor="let i of li.idees">
-      <span class="idee">{{i.description}}</span>
-      <span class="auteur"> - idée proposée par {{i.estDeMoi ? 'vous' : i.auteur.nom}} le {{i.dateProposition}}</span>
-      <span class="suppression" *ngIf="i.estDeMoi"> - <button (click)="supprime(i.id)">Supprimer</button></span>
-    </li>
-  </ul>
-
-  <form [formGroup]="formAjout" (ngSubmit)="ajoute()">
-    <label>
-      Nouvelle idée :
-      <input type="text" formControlName="description">
-    </label>
-    <button class="button" type="submit" [disabled]="!formAjout.valid">Ajouter</button>
-  </form>
+    <div class="row">
+      <div class="col-12">
+        <form [formGroup]="formAjout" (ngSubmit)="ajoute()">
+          <div class="form-row align-items-center">
+            <div class="col-11">
+              <label for="description" class="sr-only">Nouvelle idée</label>
+              <input id="description" type="text" formControlName="description" class="form-control" placeholder="Nouvelle idée">
+            </div>
+            <div class="col-auto">
+              <button type="submit" class="btn btn-primary" [disabled]="!formAjout.valid">Ajouter</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
 </ng-container>
 
 <div *ngIf="erreurAjoutSuppression" class="alert alert-danger">{{erreurAjoutSuppression}}</div>
