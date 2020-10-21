@@ -43,7 +43,7 @@ class UtilisateurUpdateActionTest extends ActionTestCase
             ->willReturn($aliceModifiee)
             ->shouldBeCalledOnce();
 
-        $response = $this->handleAuthorizedRequest(
+        $response = $this->handleAuthRequest(
             $this->alice->getId(),
             'PUT',
             "/utilisateur/{$this->alice->getId()}",
@@ -73,7 +73,7 @@ EOT
             ->willThrow(new UtilisateurInconnuException())
             ->shouldBeCalledOnce();
 
-        $response = $this->handleAuthorizedRequest(
+        $response = $this->handleAuthRequest(
             $this->alice->getId(),
             'PUT',
             "/utilisateur/{$this->alice->getId()}", '', "{}"

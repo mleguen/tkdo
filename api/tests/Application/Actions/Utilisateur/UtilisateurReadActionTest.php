@@ -31,7 +31,7 @@ class UtilisateurReadActionTest extends ActionTestCase
             ->willReturn($this->alice)
             ->shouldBeCalledOnce();
 
-        $response = $this->handleAuthorizedRequest(
+        $response = $this->handleAuthRequest(
             $this->alice->getId(),
             'GET',
             "/utilisateur/{$this->alice->getId()}"
@@ -57,7 +57,7 @@ EOT
             ->willThrow(new UtilisateurInconnuException())
             ->shouldBeCalledOnce();
 
-        $response = $this->handleAuthorizedRequest(
+        $response = $this->handleAuthRequest(
             $this->alice->getId(),
             'GET',
             "/utilisateur/{$this->alice->getId()}"

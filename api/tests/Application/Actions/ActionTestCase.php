@@ -148,8 +148,8 @@ use Tests\TestCase;
         return $this->app->handle($request);
     }
 
-    protected function handleAuthorizedRequest(
-        int $idUtilisateurAuth,
+    protected function handleRequestWithAuthHeader(
+        string $authHeader,
         string $method,
         string $path,
         $query = '',
@@ -158,9 +158,22 @@ use Tests\TestCase;
         $request = $this->createRequest($method, $path, $query, $body, [
             'HTTP_ACCEPT' => 'application/json',
         ], [
-            'HTTP_AUTHORIZATION' => "Bearer " . $this->tokenService->encode($idUtilisateurAuth),
+            'HTTP_AUTHORIZATION' => $authHeader,
         ]);
         return $this->app->handle($request);
+    }
+
+    protected function handleAuthRequest(
+        int $idUtilisateurAuth,
+        string $method,
+        string $path,
+        $query = '',
+        $body = null
+    ): ResponseInterface {
+        return $this->handleRequestWithAuthHeader(
+            "Bearer " . $this->tokenService->encode($idUtilisateurAuth),
+            $method, $path, $query, $body
+        );
     }
 
     protected function assertEqualsResponse(

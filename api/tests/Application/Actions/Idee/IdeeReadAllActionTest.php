@@ -52,7 +52,7 @@ class IdeeReadAllActionTest extends ActionTestCase
             ->willReturn([$this->idee])
             ->shouldBeCalledOnce();
 
-        $response = $this->handleAuthorizedRequest(
+        $response = $this->handleAuthRequest(
             $this->idee->getAuteur()->getId(),
             'GET',
             '/idee',
@@ -88,7 +88,7 @@ EOT
 
     public function testActionIdUtilisateurManquant()
     {
-        $response = $this->handleAuthorizedRequest(
+        $response = $this->handleAuthRequest(
             $this->idee->getAuteur()->getId(),
             'GET',
             '/idee',
@@ -114,7 +114,7 @@ EOT
             ->willThrow(new UtilisateurInconnuException())
             ->shouldBeCalledOnce();
 
-        $response = $this->handleAuthorizedRequest(
+        $response = $this->handleAuthRequest(
             $this->idee->getAuteur()->getId(),
             'GET',
             '/idee',
@@ -144,7 +144,7 @@ EOT
             ->willThrow(new Exception('erreur pendant readByUtilisateur'))
             ->shouldBeCalledOnce();
 
-        $response = $this->handleAuthorizedRequest(
+        $response = $this->handleAuthRequest(
             $this->idee->getAuteur()->getId(),
             'GET',
             '/idee',

@@ -60,7 +60,7 @@ class IdeeCreateActionTest extends ActionTestCase
             ->willReturn($this->idee)
             ->shouldBeCalledOnce();
 
-        $response = $this->handleAuthorizedRequest(
+        $response = $this->handleAuthRequest(
             $this->idee->getAuteur()->getId(),
             'POST',
             "/idee",
@@ -85,7 +85,7 @@ EOT
 
     public function testActionPasLAuteur()
     {
-        $response = $this->handleAuthorizedRequest(
+        $response = $this->handleAuthRequest(
             $this->idee->getUtilisateur()->getId(),
             'POST',
             "/idee",
@@ -118,7 +118,7 @@ EOT
             ->willThrow(new Exception('erreur pendant create'))
             ->shouldBeCalledOnce();
 
-        $response = $this->handleAuthorizedRequest(
+        $response = $this->handleAuthRequest(
             $this->idee->getAuteur()->getId(),
             'POST',
             "/idee",

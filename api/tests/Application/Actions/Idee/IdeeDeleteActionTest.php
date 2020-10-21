@@ -38,7 +38,7 @@ class IdeeDeleteActionTest extends ActionTestCase
             ->willReturn()
             ->shouldBeCalledOnce();
 
-        $response = $this->handleAuthorizedRequest(
+        $response = $this->handleAuthRequest(
             $this->idee->getAuteur()->getId(),
             'DELETE',
             "/idee/{$this->idee->getId()}"
@@ -60,7 +60,7 @@ EOT
             ->willReturn($this->idee)
             ->shouldBeCalledOnce();
 
-        $response = $this->handleAuthorizedRequest(
+        $response = $this->handleAuthRequest(
             $this->idee->getUtilisateur()->getId(),
             'DELETE',
             "/idee/{$this->idee->getId()}"
@@ -85,7 +85,7 @@ EOT
             ->willThrow(new IdeeInconnueException())
             ->shouldBeCalledOnce();
 
-        $response = $this->handleAuthorizedRequest(
+        $response = $this->handleAuthRequest(
             $this->idee->getAuteur()->getId(),
             'DELETE',
             "/idee/{$this->idee->getId()}"
@@ -111,7 +111,7 @@ EOT
             ->willThrow(new Exception('échec de read'))
             ->shouldBeCalledOnce();
 
-        $response = $this->handleAuthorizedRequest(
+        $response = $this->handleAuthRequest(
             $this->idee->getAuteur()->getId(),
             'DELETE',
             "/idee/{$this->idee->getId()}"
@@ -140,7 +140,7 @@ EOT
             ->willThrow(new Exception('échec de delete'))
             ->shouldBeCalledOnce();
 
-        $response = $this->handleAuthorizedRequest(
+        $response = $this->handleAuthRequest(
             $this->idee->getAuteur()->getId(),
             'DELETE',
             "/idee/{$this->idee->getId()}"

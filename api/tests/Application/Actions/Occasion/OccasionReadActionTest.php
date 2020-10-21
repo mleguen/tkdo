@@ -47,7 +47,7 @@ class OccasionReadActionTest extends ActionTestCase
             ->willReturn([$resultatTirage])
             ->shouldBeCalledOnce();
 
-        $response = $this->handleAuthorizedRequest(
+        $response = $this->handleAuthRequest(
             $this->alice->getId(),
             'GET',
             '/occasion'
@@ -90,7 +90,7 @@ EOT
             ->willThrow(new AucuneOccasionException())
             ->shouldBeCalledOnce();
 
-        $response = $this->handleAuthorizedRequest(
+        $response = $this->handleAuthRequest(
             $this->alice->getId(),
             'GET',
             '/occasion'
