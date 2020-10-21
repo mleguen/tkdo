@@ -30,7 +30,7 @@ class IdeeCreateAction extends IdeeAction
   protected function action(): Response
   {
     $body = $this->getFormData();
-    // TODO : exception si l'utilisateur connecté n'est pas l'auteur
+    $this->verifieUtilisateurAuthEstAuteur($body->idAuteur);
 
     $this->ideeRepository->create(
       $this->utilisateurRepository->read($body->idUtilisateur, true),

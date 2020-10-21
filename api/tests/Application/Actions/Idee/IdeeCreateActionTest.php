@@ -83,6 +83,34 @@ EOT
         );
     }
 
+    public function testActionPasLAuteur()
+    {
+        $response = $this->handleAuthorizedRequest(
+            $this->idee->getUtilisateur()->getId(),
+            'POST',
+            "/idee",
+            '',
+            <<<EOT
+{
+    "idUtilisateur": {$this->idee->getUtilisateur()->getId()},
+    "description": "{$this->idee->getDescription()}",
+    "idAuteur": {$this->idee->getAuteur()->getId()}
+}
+EOT
+        );
+
+        $this->assertEqualsResponse(
+            403,
+            <<<'EOT'
+{
+    "type": "INSUFFICIENT_PRIVILEGES",
+    "description": "Forbidden."
+}
+EOT
+            , $response
+        );
+    }
+
     public function testActionEchecCreation()
     {
         $this->ideeRepositoryProphecy

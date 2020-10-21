@@ -11,8 +11,9 @@ class IdeeDeleteAction extends IdeeAction
 {
   protected function action(): Response
   {
-    // TODO : exception si l'utilisateur connecté n'est pas l'auteur
-    $idee = $this->ideeRepository->read((int) $this->resolveArg('idIdee'), true);
+    $idee = $this->ideeRepository->read((int) $this->resolveArg('idIdee'));
+    $this->verifieUtilisateurAuthEstAuteur($idee->getAuteur()->getId());
+
     $this->ideeRepository->delete($idee);
     return $this->respondWithData();
   }
