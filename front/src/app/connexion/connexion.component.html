@@ -3,20 +3,15 @@
 <!-- TODO : créer mon compte si je n'en ai pas -->
 
 <form [formGroup]="formConnexion" (ngSubmit)="connecte()">
-  <p>
-    <label>
-      Identifiant :
-      <input type="text" formControlName="identifiant">
-    </label>
-  </p>
-  <p>
-    <label>
-      Mot de passe :
-      <input type="password" formControlName="mdp">
-    </label>
-  </p>  
-
-  <button class="button" type="submit" [disabled]="!formConnexion.valid">Se connecter</button>
+  <div class="form-group">
+    <label for="identifiant">Identifiant :</label>
+    <input id="identifiant" type="text" formControlName="identifiant" class="form-control">
+  </div>
+  <div class="form-group">
+    <label for="mdp">Mot de passe :</label>
+    <input id="mdp" type="password" formControlName="mdp" class="form-control">
+  </div>  
+  <button class="btn btn-primary" type="submit" [disabled]="!formConnexion.valid">Se connecter</button>
 </form>
 
 <div *ngIf="erreurConnexion" class="alert alert-danger">{{erreurConnexion}}</div>

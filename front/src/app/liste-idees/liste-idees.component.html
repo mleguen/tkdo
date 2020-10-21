@@ -15,18 +15,20 @@
 
     <div class="row mt-3">
       <div class="alert alert-warning col-12" role="alert">
-        <span *ngIf="li.estPourMoi; else estPasMoi">Vous ne pouvez voir que les idées que vous avez vous-même proposées.</span>
-        <ng-template #estPasMoi>{{li.utilisateur.nom}} ne peut voir que les idées qu'il ou elle a lui-même ou elle-même proposées.</ng-template>
+        <span *ngIf="li.estPourMoi; else estPasMoi">Vous ne pouvez voir que les idées que vous proposez vous-même.</span>
+        <ng-template #estPasMoi>{{li.utilisateur.nom}} ne peut pas voir les idées que vous proposez.</ng-template>
       </div>
     </div>    
 
-    <div class="row mb-3 justify-content-center">
-      <div *ngFor="let i of li.idees" class="col-sm-6 col-md-4 col-lg-3 col-xl-2">
-        <div class="card">
-          <div class="card-header"><span class="auteur">{{i.estDeMoi ? 'Vous' : i.auteur.nom}}</span> le {{i.dateProposition}}</div>
-          <div class="card-body">
-            <h3 class="card-title">{{i.description}}</h3>
-            <button (click)="supprime(i.id)" class="btn btn-danger">Supprimer</button>
+    <div class="row">
+      <div class="col-12">
+        <div class="card-columns">
+          <div *ngFor="let i of li.idees" class="card">
+            <div class="card-header"><span class="auteur">{{i.estDeMoi ? 'Vous' : i.auteur.nom}}</span> le {{i.dateProposition}}</div>
+            <div class="card-body">
+              <h3 class="card-title">{{i.description}}</h3>
+              <button (click)="supprime(i.id)" class="btn btn-danger">Supprimer</button>
+            </div>
           </div>
         </div>
       </div>

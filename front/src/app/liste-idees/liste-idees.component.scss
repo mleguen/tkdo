@@ -1,3 +1,6 @@
+@import "../../../node_modules/bootstrap/scss/functions";
+@import "../../../node_modules/bootstrap/scss/variables";
+@import "../../../node_modules/bootstrap/scss/mixins";
 
 .pourQui {
   font-size: 75%;
@@ -6,12 +9,20 @@
   }
 }
 
-.card {
-  margin-top: 15%;
-}
-
 .auteur {
   font-style: italic;
+}
+
+.card-columns {
+  @include media-breakpoint-only(sm) {
+    column-count: 2;
+  }
+  @include media-breakpoint-only(lg) {
+    column-count: 4;
+  }
+  @include media-breakpoint-only(xl) {
+    column-count: 5;
+  }
 }
 
 form {

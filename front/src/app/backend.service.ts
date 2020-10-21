@@ -64,7 +64,7 @@ export class BackendService {
     private readonly http: HttpClient,
   ) {
     let utilisateur = JSON.parse(localStorage.getItem(CLE_UTILISATEUR));
-    this.idUtilisateur = utilisateur.id;
+    this.idUtilisateur = utilisateur?.id;
     this.utilisateurConnecte$ = new BehaviorSubject(utilisateur);
   }
 
