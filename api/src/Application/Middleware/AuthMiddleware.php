@@ -3,7 +3,8 @@ declare(strict_types=1);
 
 namespace App\Application\Middleware;
 
-use App\Application\Mock\MockData;
+use App\Application\Service\TokenService;
+use Exception;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\MiddlewareInterface as Middleware;
@@ -21,11 +22,14 @@ class AuthMiddleware implements Middleware
     protected $logger;
 
     /**
-     * @param LoggerInterface $logger
+     * @var TokenService
      */
-    public function __construct(LoggerInterface $logger)
+    protected $tokenService;
+
+    public function __construct(LoggerInterface $logger, TokenService $tokenService)
     {
         $this->logger = $logger;
+        $this->tokenService = $tokenService;
     }
 
     /**
@@ -33,15 +37,25 @@ class AuthMiddleware implements Middleware
      */
     public function process(Request $request, RequestHandler $handler): Response
     {
-        if ($request->getRequestTarget() !== '/api/connexion') {
-            $serverParams = $request->getServerParams();
-            if (!isset($serverParams['HTTP_AUTHORIZATION']) ||
-                ($serverParams['HTTP_AUTHORIZATION'] !== "Bearer ".MockData::getToken())
-            ) {
+        if ($request->getRequestTarget() !== '/connexion') {
+            try {
+                $serverParams = $request->getServerParams();
+    
+                if (
+                    !isset($serverParams['HTTP_AUTHORIZATION']) ||
+                    (strpos($serverParams['HTTP_AUTHORIZATION'], "Bearer ") !== 0)
+                ) {
+                    throw new Exception('Token absent !');
+                }
+                $token = substr($serverParams['HTTP_AUTHORIZATION'], strlen("Bearer "));
+
+                $request = $request->withAttribute('idUtilisateurAuth', $this->tokenService->decode($token));
+            } catch (Exception $e) {
+                $this->logger->warning($e->getMessage());
                 throw new HttpUnauthorizedException($request);
             }
         }
-
+        
         return $handler->handle($request);
     }
 }

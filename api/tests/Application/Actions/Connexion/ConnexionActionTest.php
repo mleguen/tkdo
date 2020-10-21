@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Tests\Application\Actions\Idee;
 
-use App\Application\Mock\MockData;
 use App\Domain\Utilisateur\UtilisateurInconnuException;
 use App\Infrastructure\Persistence\Utilisateur\DoctrineUtilisateur;
 use Tests\Application\Actions\ActionTestCase;
@@ -31,7 +30,7 @@ class ConnexionActionTest extends ActionTestCase
             ->willReturn($this->alice)
             ->shouldBeCalledOnce();
 
-        $response = $this->handleAuthorizedRequest('POST', '/connexion', '', <<<EOT
+        $response = $this->handleRequest('POST', '/connexion', '', <<<EOT
 {
     "identifiant": "{$this->alice->getIdentifiant()}",
     "mdp": "{$this->alice->getMdp()}"
@@ -39,7 +38,7 @@ class ConnexionActionTest extends ActionTestCase
 EOT
         );
 
-        $token = MockData::getToken();
+        $token = json_decode((string) $response->getBody())->token;
         $this->assertEqualsResponse(
             200,
             <<<EOT
@@ -62,7 +61,7 @@ EOT
             ->willThrow(new UtilisateurInconnuException())
             ->shouldBeCalledOnce();
 
-        $response = $this->handleAuthorizedRequest(
+        $response = $this->handleRequest(
             'POST',
             '/connexion',
             '',

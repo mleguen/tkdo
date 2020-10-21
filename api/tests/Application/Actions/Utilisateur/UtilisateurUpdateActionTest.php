@@ -43,7 +43,12 @@ class UtilisateurUpdateActionTest extends ActionTestCase
             ->willReturn($aliceModifiee)
             ->shouldBeCalledOnce();
 
-        $response = $this->handleAuthorizedRequest('PUT', "/utilisateur/{$this->alice->getId()}", '', <<<EOT
+        $response = $this->handleAuthorizedRequest(
+            $this->alice->getId(),
+            'PUT',
+            "/utilisateur/{$this->alice->getId()}",
+            '',
+            <<<EOT
 {
     "identifiant": "{$aliceModifiee->getIdentifiant()}",
     "mdp": "{$aliceModifiee->getMdp()}",
@@ -68,7 +73,11 @@ EOT
             ->willThrow(new UtilisateurInconnuException())
             ->shouldBeCalledOnce();
 
-        $response = $this->handleAuthorizedRequest('PUT', "/utilisateur/{$this->alice->getId()}", '', "{}");
+        $response = $this->handleAuthorizedRequest(
+            $this->alice->getId(),
+            'PUT',
+            "/utilisateur/{$this->alice->getId()}", '', "{}"
+        );
 
         $this->assertEqualsResponse(
             404,

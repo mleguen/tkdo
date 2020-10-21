@@ -60,7 +60,12 @@ class IdeeCreateActionTest extends ActionTestCase
             ->willReturn($this->idee)
             ->shouldBeCalledOnce();
 
-        $response = $this->handleAuthorizedRequest('POST', "/idee", '', <<<EOT
+        $response = $this->handleAuthorizedRequest(
+            $this->idee->getAuteur()->getId(),
+            'POST',
+            "/idee",
+            '',
+            <<<EOT
 {
     "idUtilisateur": {$this->idee->getUtilisateur()->getId()},
     "description": "{$this->idee->getDescription()}",
@@ -85,7 +90,12 @@ EOT
             ->willThrow(new Exception('erreur pendant create'))
             ->shouldBeCalledOnce();
 
-        $response = $this->handleAuthorizedRequest('POST', "/idee", '', <<<EOT
+        $response = $this->handleAuthorizedRequest(
+            $this->idee->getAuteur()->getId(),
+            'POST',
+            "/idee",
+            '',
+            <<<EOT
 {
     "idUtilisateur": {$this->idee->getUtilisateur()->getId()},
     "description": "{$this->idee->getDescription()}",

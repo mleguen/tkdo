@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 
+use App\Application\Service\TokenService;
 use DI\ContainerBuilder;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
@@ -24,5 +25,8 @@ return function (ContainerBuilder $containerBuilder) {
 
             return $logger;
         },
+        TokenService::class => function () {
+            return new TokenService();
+        }
     ]);
 };

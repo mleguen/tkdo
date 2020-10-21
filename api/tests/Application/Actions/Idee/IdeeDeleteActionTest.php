@@ -18,10 +18,10 @@ class IdeeDeleteActionTest extends ActionTestCase
     public function setUp()
     {
         parent::setup();
-        $this->idee = new InMemoryIdeeReference(0);
-        $this->ideeRepositoryProphecy
-            ->read($this->idee->getId(), true)
-            ->willReturn($this->idee);
+
+        $this->idee = (new DoctrineIdee(1));
+        $this->idee
+            ->setAuteur(new DoctrineUtilisateur(1));
     }
 
     public function testAction()
@@ -32,6 +32,7 @@ class IdeeDeleteActionTest extends ActionTestCase
             ->shouldBeCalledOnce();
 
         $response = $this->handleAuthorizedRequest(
+            $this->idee->getAuteur()->getId(),
             'DELETE',
             "/idee/{$this->idee->getId()}"
         );
@@ -53,6 +54,7 @@ EOT
             ->shouldBeCalledOnce();
 
         $response = $this->handleAuthorizedRequest(
+            $this->idee->getAuteur()->getId(),
             'DELETE',
             "/idee/{$this->idee->getId()}"
         );

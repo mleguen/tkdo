@@ -12,32 +12,46 @@ use Tests\Application\Actions\ActionTestCase;
 
 class OccasionReadActionTest extends ActionTestCase
 {
-    public function testAction()
+    /**
+     * @var DoctrineUtilisateur
+     */
+    private $alice;
+
+    public function setUp()
     {
-        $alice = (new DoctrineUtilisateur(1))
+        parent::setUp();
+        $this->alice = (new DoctrineUtilisateur(1))
             ->setIdentifiant('alice@tkdo.org')
             ->setNom('Alice')
             ->setMdp('mdpalice');
+    }
+
+    public function testAction()
+    {
         $bob = (new DoctrineUtilisateur(2))
             ->setIdentifiant('bob@tkdo.org')
             ->setNom('Bob')
             ->setMdp('mdpbob');
         $occasion = (new DoctrineOccasion(1))
             ->setTitre('Noel 2020')
-            ->setParticipants([$alice, $bob]);
+            ->setParticipants([$this->alice, $bob]);
         $this->occasionRepositoryProphecy
             ->readLast()
             ->willReturn($occasion)
             ->shouldBeCalledOnce();
 
-        $resultatTirage = (new DoctrineResultatTirage($occasion, $alice))
+        $resultatTirage = (new DoctrineResultatTirage($occasion, $this->alice))
             ->setQuiRecoit($bob);
         $this->resultatTirageRepositoryProphecy
             ->readByOccasion($occasion)
             ->willReturn([$resultatTirage])
             ->shouldBeCalledOnce();
 
-        $response = $this->handleAuthorizedRequest('GET', '/occasion');
+        $response = $this->handleAuthorizedRequest(
+            $this->alice->getId(),
+            'GET',
+            '/occasion'
+        );
 
         $this->assertEqualsResponse(
             200,
@@ -47,9 +61,9 @@ class OccasionReadActionTest extends ActionTestCase
     "titre": "{$occasion->getTitre()}",
     "participants": [
         {
-            "id": {$alice->getId()},
-            "identifiant": "{$alice->getIdentifiant()}",
-            "nom": "{$alice->getNom()}"
+            "id": {$this->alice->getId()},
+            "identifiant": "{$this->alice->getIdentifiant()}",
+            "nom": "{$this->alice->getNom()}"
         },
         {
             "id": {$bob->getId()},
@@ -76,7 +90,11 @@ EOT
             ->willThrow(new AucuneOccasionException())
             ->shouldBeCalledOnce();
 
-        $response = $this->handleAuthorizedRequest('GET', '/occasion');
+        $response = $this->handleAuthorizedRequest(
+            $this->alice->getId(),
+            'GET',
+            '/occasion'
+        );
 
         $this->assertEqualsResponse(
             404,

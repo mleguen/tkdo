@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace App\Application\Actions\Connexion;
 
 use App\Application\Actions\Action;
-use App\Application\Mock\MockData;
+use App\Application\Service\TokenService;
 use App\Domain\Utilisateur\UtilisateurInconnuException;
 use App\Domain\Utilisateur\UtilisateurRepository;
+use Exception;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Log\LoggerInterface;
 use Slim\Exception\HttpBadRequestException;
@@ -20,13 +21,19 @@ class ConnexionAction extends Action
   protected $utilisateurRepository;
 
   /**
+   * @var TokenService
+   */
+  protected $tokenService;
+
+  /**
    * @param LoggerInterface $logger
    * @param UtilisateurRepository  $utilisateurRepository
    */
-  public function __construct(LoggerInterface $logger, UtilisateurRepository $utilisateurRepository)
+  public function __construct(LoggerInterface $logger, UtilisateurRepository $utilisateurRepository, TokenService $tokenService)
   {
     parent::__construct($logger);
     $this->utilisateurRepository = $utilisateurRepository;
+    $this->tokenService = $tokenService;
   }
 
   protected function action(): Response
@@ -37,9 +44,8 @@ class ConnexionAction extends Action
       $nom = $utilisateur->getNom();
       $this->logger->info("$nom connecté(e)");
 
-      // TODO: construire le JWT
       return $this->respondWithData([
-        "token" => MockData::getToken(),
+        "token" => $this->tokenService->encode($utilisateur->getId()),
         "utilisateur" => [
           "id" => $utilisateur->getId(),
           "nom" => $utilisateur->getNom(),
@@ -48,6 +54,10 @@ class ConnexionAction extends Action
     }
     catch (UtilisateurInconnuException $err) {
       throw new HttpBadRequestException($this->request, "identifiants invalides");
+    }
+    catch (Exception $e) {
+      $this->logger->error($e->getMessage());
+      throw $e;
     }
   }
 }

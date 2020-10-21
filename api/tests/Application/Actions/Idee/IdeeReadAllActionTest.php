@@ -52,7 +52,12 @@ class IdeeReadAllActionTest extends ActionTestCase
             ->willReturn([$this->idee])
             ->shouldBeCalledOnce();
 
-        $response = $this->handleAuthorizedRequest('GET', '/idee', "idUtilisateur={$this->idee->getUtilisateur()->getId()}");
+        $response = $this->handleAuthorizedRequest(
+            $this->idee->getAuteur()->getId(),
+            'GET',
+            '/idee',
+            "idUtilisateur={$this->idee->getUtilisateur()->getId()}"
+        );
 
         $this->assertEqualsResponse(
             200,
@@ -83,7 +88,12 @@ EOT
 
     public function testActionIdUtilisateurManquant()
     {
-        $response = $this->handleAuthorizedRequest('GET', '/idee', '');
+        $response = $this->handleAuthorizedRequest(
+            $this->idee->getAuteur()->getId(),
+            'GET',
+            '/idee',
+            ''
+        );
 
         $this->assertEqualsResponse(
             400,
@@ -104,7 +114,12 @@ EOT
             ->willThrow(new UtilisateurInconnuException())
             ->shouldBeCalledOnce();
 
-        $response = $this->handleAuthorizedRequest('GET', '/idee', "idUtilisateur={$this->idee->getUtilisateur()->getId()}");
+        $response = $this->handleAuthorizedRequest(
+            $this->idee->getAuteur()->getId(),
+            'GET',
+            '/idee',
+            "idUtilisateur={$this->idee->getUtilisateur()->getId()}"
+        );
 
         $this->assertEqualsResponse(
             404,
@@ -129,7 +144,12 @@ EOT
             ->willThrow(new Exception('erreur pendant readByUtilisateur'))
             ->shouldBeCalledOnce();
 
-        $response = $this->handleAuthorizedRequest('GET', '/idee', "idUtilisateur={$this->idee->getUtilisateur()->getId()}");
+        $response = $this->handleAuthorizedRequest(
+            $this->idee->getAuteur()->getId(),
+            'GET',
+            '/idee',
+            "idUtilisateur={$this->idee->getUtilisateur()->getId()}"
+        );
 
         $this->assertEqualsResponse(
             500,

@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Tests\Application\Actions;
 
 use App\Application\Handlers\HttpErrorHandler;
-use App\Application\Mock\MockData;
+use App\Application\Service\TokenService;
 use App\Domain\Idee\IdeeRepository;
 use App\Domain\Occasion\OccasionRepository;
 use App\Domain\ResultatTirage\ResultatTirageRepository;
@@ -54,6 +54,11 @@ use Tests\TestCase;
      */
     protected $utilisateurRepositoryProphecy;
 
+    /**
+     * @var TokenService
+     */
+    private $tokenService;
+
     public function setUp()
     {
         $this->container = require __DIR__ . '/../../../bootstrap.php';
@@ -70,6 +75,9 @@ use Tests\TestCase;
 
         $this->utilisateurRepositoryProphecy = $this->prophesize(UtilisateurRepository::class);
         $this->container->set(UtilisateurRepository::class, $this->utilisateurRepositoryProphecy->reveal());
+        
+        $this->tokenService = new TokenService();
+        $this->container->set(TokenService::class, $this->tokenService);
     }
 
     /**
@@ -141,6 +149,7 @@ use Tests\TestCase;
     }
 
     protected function handleAuthorizedRequest(
+        int $idUtilisateurAuth,
         string $method,
         string $path,
         $query = '',
@@ -149,7 +158,7 @@ use Tests\TestCase;
         $request = $this->createRequest($method, $path, $query, $body, [
             'HTTP_ACCEPT' => 'application/json',
         ], [
-            'HTTP_AUTHORIZATION' => "Bearer ".MockData::getToken(),
+            'HTTP_AUTHORIZATION' => "Bearer " . $this->tokenService->encode($idUtilisateurAuth),
         ]);
         return $this->app->handle($request);
     }

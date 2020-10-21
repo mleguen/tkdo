@@ -150,6 +150,13 @@ Le serveur de développement front redirige les requêtes destinées à l'API
 vers l'API de développement docker
 (cf. [front/src/proxy.conf.json](./front/src/proxy.conf.json)).
 
+Les logs sont affichés sur la sortie standard des conteneurs et collectés par docker-compose.
+Pour les consulter (par exemple ici pour les logs de l'API, au fil de l'eau) :
+
+```bash
+./docker-compose-api logs -f slim
+```
+
 Pour initialiser la base de données de l'API de développement docker
 (une fois qu'elle a fini de démarrer) :
 
