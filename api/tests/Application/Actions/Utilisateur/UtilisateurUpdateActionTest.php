@@ -10,20 +10,6 @@ use Tests\Application\Actions\ActionTestCase;
 
 class UtilisateurUpdateActionTest extends ActionTestCase
 {
-    /**
-     * @var Utilisateur
-     */
-    private $alice;
-
-    public function setUp()
-    {
-        parent::setUp();
-        $this->alice = (new DoctrineUtilisateur(1))
-            ->setIdentifiant('alice@tkdo.org')
-            ->setNom('Alice')
-            ->setMdp('mdpalice');
-    }
-
     public function testAction()
     {
         $this->utilisateurRepositoryProphecy
@@ -34,7 +20,7 @@ class UtilisateurUpdateActionTest extends ActionTestCase
         /**
          * @var DoctrineUtilisateur
          */
-        $aliceModifiee = (new DoctrineUtilisateur(1))
+        $aliceModifiee = (new DoctrineUtilisateur($this->alice->getId()))
             ->setIdentifiant('alice2@tkdo.org')
             ->setNom('Alice2')
             ->setMdp('nouveaumdpalice');

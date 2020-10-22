@@ -7,41 +7,22 @@ namespace Tests\Application\Actions\Occasion;
 use App\Domain\Occasion\AucuneOccasionException;
 use App\Infrastructure\Persistence\Occasion\DoctrineOccasion;
 use App\Infrastructure\Persistence\ResultatTirage\DoctrineResultatTirage;
-use App\Infrastructure\Persistence\Utilisateur\DoctrineUtilisateur;
 use Tests\Application\Actions\ActionTestCase;
 
 class OccasionReadActionTest extends ActionTestCase
 {
-    /**
-     * @var DoctrineUtilisateur
-     */
-    private $alice;
-
-    public function setUp()
-    {
-        parent::setUp();
-        $this->alice = (new DoctrineUtilisateur(1))
-            ->setIdentifiant('alice@tkdo.org')
-            ->setNom('Alice')
-            ->setMdp('mdpalice');
-    }
-
     public function testAction()
     {
-        $bob = (new DoctrineUtilisateur(2))
-            ->setIdentifiant('bob@tkdo.org')
-            ->setNom('Bob')
-            ->setMdp('mdpbob');
         $occasion = (new DoctrineOccasion(1))
             ->setTitre('Noel 2020')
-            ->setParticipants([$this->alice, $bob]);
+            ->setParticipants([$this->alice, $this->bob]);
         $this->occasionRepositoryProphecy
             ->readLast()
             ->willReturn($occasion)
             ->shouldBeCalledOnce();
 
         $resultatTirage = (new DoctrineResultatTirage($occasion, $this->alice))
-            ->setQuiRecoit($bob);
+            ->setQuiRecoit($this->bob);
         $this->resultatTirageRepositoryProphecy
             ->readByOccasion($occasion)
             ->willReturn([$resultatTirage])
@@ -66,9 +47,9 @@ class OccasionReadActionTest extends ActionTestCase
             "nom": "{$this->alice->getNom()}"
         },
         {
-            "id": {$bob->getId()},
-            "identifiant": "{$bob->getIdentifiant()}",
-            "nom": "{$bob->getNom()}"
+            "id": {$this->bob->getId()},
+            "identifiant": "{$this->bob->getIdentifiant()}",
+            "nom": "{$this->bob->getNom()}"
         }
     ],
     "resultatsTirage": [

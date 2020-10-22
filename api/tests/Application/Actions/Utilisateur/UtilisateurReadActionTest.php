@@ -5,25 +5,10 @@ declare(strict_types=1);
 namespace Tests\Application\Actions\Utilisateur;
 
 use App\Domain\Utilisateur\UtilisateurInconnuException;
-use App\Infrastructure\Persistence\Utilisateur\DoctrineUtilisateur;
 use Tests\Application\Actions\ActionTestCase;
 
 class UtilisateurReadActionTest extends ActionTestCase
 {
-    /**
-     * @var Utilisateur
-     */
-    private $alice;
-
-    public function setUp()
-    {
-        parent::setUp();
-        $this->alice = (new DoctrineUtilisateur(1))
-            ->setIdentifiant('alice@tkdo.org')
-            ->setNom('Alice')
-            ->setMdp('mdpalice');
-    }
-
     public function testAction()
     {
         $this->utilisateurRepositoryProphecy

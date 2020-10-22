@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Tests\Application\Actions\Idee;
 
+use App\Domain\Idee\Idee;
 use App\Domain\Utilisateur\UtilisateurInconnuException;
 use App\Infrastructure\Persistence\Idee\DoctrineIdee;
-use App\Infrastructure\Persistence\Utilisateur\DoctrineUtilisateur;
 use App\Infrastructure\Persistence\Utilisateur\InMemoryUtilisateurReference;
 use Exception;
 use Tests\Application\Actions\ActionTestCase;
@@ -16,47 +16,51 @@ class IdeeReadAllActionTest extends ActionTestCase
     /**
      * @var DoctrineIdee
      */
-    private $idee;
+    private $ideeDeBobPourAlice;
+
+    /**
+     * @var DoctrineIdee
+     */
+    private $ideeDeAlicePourElleMeme;
 
     public function setUp()
     {
         parent::setup();
-        $alice = (new DoctrineUtilisateur(1))
-            ->setIdentifiant('alice@tkdo.org')
-            ->setNom('Alice')
-            ->setMdp('mdpalice');
-        $bob = (new DoctrineUtilisateur(2))
-            ->setIdentifiant('bob@tkdo.org')
-            ->setNom('Bob')
-            ->setMdp('mdpbob');
         $this->utilisateurRepositoryProphecy
-            ->read($bob->getId(), true)
-            ->willReturn(new InMemoryUtilisateurReference($bob->getId()));
+            ->read($this->bob->getId(), true)
+            ->willReturn(new InMemoryUtilisateurReference($this->bob->getId()));
 
-        $dateProposition = '2020-04-19T00:00:00+0000';
-        $this->idee = (new DoctrineIdee(1))
-            ->setUtilisateur($alice)
-            ->setDescription('un gauffrier')
-            ->setAuteur($bob)
-            ->setDateProposition(\DateTime::createFromFormat(\DateTimeInterface::ISO8601, $dateProposition));
+        $this->ideeDeBobPourAlice = (new DoctrineIdee(1))
+            ->setUtilisateur($this->alice)
+            ->setDescription('une idee proposee par Bob')
+            ->setAuteur($this->bob)
+            ->setDateProposition(\DateTime::createFromFormat(\DateTimeInterface::ISO8601, '2020-04-19T00:00:00+0000'));
+        $this->ideeDeAlicePourElleMeme = (new DoctrineIdee(2))
+            ->setUtilisateur($this->alice)
+            ->setDescription('une idee proposee par Alice elle-meme')
+            ->setAuteur($this->alice)
+            ->setDateProposition(\DateTime::createFromFormat(\DateTimeInterface::ISO8601, '2020-10-22T00:00:00+0000'));
     }
 
-    public function testAction()
+    public function testActionTiers()
     {
         $this->utilisateurRepositoryProphecy
-            ->read($this->idee->getUtilisateur()->getId())
-            ->willReturn($this->idee->getUtilisateur())
+            ->read($this->alice->getId())
+            ->willReturn($this->alice)
             ->shouldBeCalledOnce();
         $this->ideeRepositoryProphecy
-            ->readByUtilisateur($this->idee->getUtilisateur())
-            ->willReturn([$this->idee])
+            ->readByUtilisateur($this->alice)
+            ->willReturn([
+                $this->ideeDeBobPourAlice,
+                $this->ideeDeAlicePourElleMeme,
+            ])
             ->shouldBeCalledOnce();
 
         $response = $this->handleAuthRequest(
-            $this->idee->getAuteur()->getId(),
+            $this->charlie->getId(),
             'GET',
             '/idee',
-            "idUtilisateur={$this->idee->getUtilisateur()->getId()}"
+            "idUtilisateur={$this->alice->getId()}"
         );
 
         $this->assertEqualsResponse(
@@ -64,21 +68,13 @@ class IdeeReadAllActionTest extends ActionTestCase
             <<<EOT
 {
     "utilisateur": {
-        "id": {$this->idee->getUtilisateur()->getId()},
-        "identifiant": "{$this->idee->getUtilisateur()->getIdentifiant()}",
-        "nom": "{$this->idee->getUtilisateur()->getNom()}"
+        "id": {$this->alice->getId()},
+        "identifiant": "{$this->alice->getIdentifiant()}",
+        "nom": "{$this->alice->getNom()}"
     },
     "idees": [
-        {
-            "id": {$this->idee->getId()},
-            "description": "{$this->idee->getDescription()}",
-            "auteur": {
-                "id": {$this->idee->getAuteur()->getId()},
-                "identifiant": "{$this->idee->getAuteur()->getIdentifiant()}",
-                "nom": "{$this->idee->getAuteur()->getNom()}"
-            },
-            "dateProposition": "{$this->idee->getDateProposition()->format(\DateTimeInterface::ISO8601)}"
-        }
+{$this->morceauReponseIdee($this->ideeDeBobPourAlice)},
+{$this->morceauReponseIdee($this->ideeDeAlicePourElleMeme)}
     ]
 }
 EOT
@@ -86,10 +82,105 @@ EOT
         );
     }
 
+    public function testActionAuteur()
+    {
+        $this->utilisateurRepositoryProphecy
+            ->read($this->alice->getId())
+            ->willReturn($this->alice)
+            ->shouldBeCalledOnce();
+        $this->ideeRepositoryProphecy
+            ->readByUtilisateur($this->alice)
+            ->willReturn([
+                $this->ideeDeBobPourAlice,
+                $this->ideeDeAlicePourElleMeme,
+            ])
+            ->shouldBeCalledOnce();
+
+        $response = $this->handleAuthRequest(
+            $this->bob->getId(),
+            'GET',
+            '/idee',
+            "idUtilisateur={$this->alice->getId()}"
+        );
+
+        $this->assertEqualsResponse(
+            200,
+            <<<EOT
+{
+    "utilisateur": {
+        "id": {$this->alice->getId()},
+        "identifiant": "{$this->alice->getIdentifiant()}",
+        "nom": "{$this->alice->getNom()}"
+    },
+    "idees": [
+{$this->morceauReponseIdee($this->ideeDeBobPourAlice)},
+{$this->morceauReponseIdee($this->ideeDeAlicePourElleMeme)}
+    ]
+}
+EOT
+            , $response
+        );
+    }
+
+    public function testActionUtilisateur()
+    {
+        $this->utilisateurRepositoryProphecy
+            ->read($this->alice->getId())
+            ->willReturn($this->alice)
+            ->shouldBeCalledOnce();
+        $this->ideeRepositoryProphecy
+            ->readByUtilisateur($this->alice)
+            ->willReturn([
+                $this->ideeDeBobPourAlice,
+                $this->ideeDeAlicePourElleMeme,
+            ])
+            ->shouldBeCalledOnce();
+
+        $response = $this->handleAuthRequest(
+            $this->alice->getId(),
+            'GET',
+            '/idee',
+            "idUtilisateur={$this->alice->getId()}"
+        );
+
+        $this->assertEqualsResponse(
+            200,
+            <<<EOT
+{
+    "utilisateur": {
+        "id": {$this->alice->getId()},
+        "identifiant": "{$this->alice->getIdentifiant()}",
+        "nom": "{$this->alice->getNom()}"
+    },
+    "idees": [
+{$this->morceauReponseIdee($this->ideeDeAlicePourElleMeme)}
+    ]
+}
+EOT
+            , $response
+        );
+    }
+
+    private function morceauReponseIdee(Idee $i)
+    {
+        return <<<EOT
+        {
+            "id": {$i->getId()},
+            "description": "{$i->getDescription()}",
+            "auteur": {
+                "id": {$i->getAuteur()->getId()},
+                "identifiant": "{$i->getAuteur()->getIdentifiant()}",
+                "nom": "{$i->getAuteur()->getNom()}"
+            },
+            "dateProposition": "{$i->getDateProposition()->format(\DateTimeInterface::ISO8601)}"
+        }
+EOT;
+    }
+
     public function testActionIdUtilisateurManquant()
     {
         $response = $this->handleAuthRequest(
-            $this->idee->getAuteur()->getId(),
+            $this->charlie->getId(),
             'GET',
             '/idee',
             ''
@@ -110,15 +201,15 @@ EOT
     public function testActionUtilisateurInconnu()
     {
         $this->utilisateurRepositoryProphecy
-            ->read($this->idee->getUtilisateur()->getId())
+            ->read($this->alice->getId())
             ->willThrow(new UtilisateurInconnuException())
             ->shouldBeCalledOnce();
 
         $response = $this->handleAuthRequest(
-            $this->idee->getAuteur()->getId(),
+            $this->charlie->getId(),
             'GET',
             '/idee',
-            "idUtilisateur={$this->idee->getUtilisateur()->getId()}"
+            "idUtilisateur={$this->alice->getId()}"
         );
 
         $this->assertEqualsResponse(
@@ -136,19 +227,19 @@ EOT
     public function testActionEchecReadByUtilisateur()
     {
         $this->utilisateurRepositoryProphecy
-            ->read($this->idee->getUtilisateur()->getId())
-            ->willReturn($this->idee->getUtilisateur())
+            ->read($this->alice->getId())
+            ->willReturn($this->alice)
             ->shouldBeCalledOnce();
         $this->ideeRepositoryProphecy
-            ->readByUtilisateur($this->idee->getUtilisateur())
+            ->readByUtilisateur($this->alice)
             ->willThrow(new Exception('erreur pendant readByUtilisateur'))
             ->shouldBeCalledOnce();
 
         $response = $this->handleAuthRequest(
-            $this->idee->getAuteur()->getId(),
+            $this->charlie->getId(),
             'GET',
             '/idee',
-            "idUtilisateur={$this->idee->getUtilisateur()->getId()}"
+            "idUtilisateur={$this->alice->getId()}"
         );
 
         $this->assertEqualsResponse(
@@ -165,7 +256,7 @@ EOT
 
     public function testActionNonAutorise()
     {
-        $response = $this->handleRequest('GET', '/idee', "idUtilisateur={$this->idee->getUtilisateur()->getId()}");
+        $response = $this->handleRequest('GET', '/idee', "idUtilisateur={$this->alice->getId()}");
 
         $this->assertEqualsResponse(
             401,

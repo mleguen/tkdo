@@ -35,6 +35,8 @@ class IdeeReadAllAction extends IdeeAction
     $queryParams = $this->request->getQueryParams();
     if (!isset($queryParams['idUtilisateur'])) throw new HttpBadRequestException($this->request, 'idUtilisateur manquant');
 
+    $idUtilisateurAuth = $this->request->getAttribute('idUtilisateurAuth');
+
     $utilisateur = $this->utilisateurRepository->read((int) $queryParams['idUtilisateur']);
     return $this->respondWithData([
       "utilisateur" => new SerializableUtilisateur($utilisateur),
@@ -42,7 +44,19 @@ class IdeeReadAllAction extends IdeeAction
         function (Idee $i) {
           return new SerializableIdee($i);
         },
-        $this->ideeRepository->readByUtilisateur($utilisateur)
+        array_values( // Obligatoire pour être encodé comme un tableau en JSON
+          array_filter(
+            $this->ideeRepository->readByUtilisateur($utilisateur),
+            function (Idee $i) use ($idUtilisateurAuth) {
+              return (
+                // L'utilisateur authentifié ne peut voir que les idées dont il est l'auteur
+                ($idUtilisateurAuth === $i->getAuteur()->getId()) ||
+                // ou qui ont été proposées pour quelqu'un d'autre que lui
+                ($idUtilisateurAuth !== $i->getUtilisateur()->getId())
+              );
+            }
+          )
+        )
       ),
     ]);
   }

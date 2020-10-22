@@ -9,6 +9,7 @@ use App\Domain\Idee\IdeeRepository;
 use App\Domain\Occasion\OccasionRepository;
 use App\Domain\ResultatTirage\ResultatTirageRepository;
 use App\Domain\Utilisateur\UtilisateurRepository;
+use App\Infrastructure\Persistence\Utilisateur\DoctrineUtilisateur;
 use DI\Container;
 use Exception;
 use Psr\Http\Message\ResponseInterface;
@@ -59,6 +60,21 @@ use Tests\TestCase;
      */
     private $tokenService;
 
+    /**
+     * @var DoctrineUtilisateur
+     */
+    protected $alice;
+
+    /**
+     * @var DoctrineUtilisateur
+     */
+    protected $bob;
+
+    /**
+     * @var DoctrineUtilisateur
+     */
+    protected $charlie;
+
     public function setUp()
     {
         $this->container = require __DIR__ . '/../../../bootstrap.php';
@@ -78,6 +94,19 @@ use Tests\TestCase;
         
         $this->tokenService = new TokenService();
         $this->container->set(TokenService::class, $this->tokenService);
+
+        $this->alice = (new DoctrineUtilisateur(1))
+            ->setIdentifiant('alice@tkdo.org')
+            ->setNom('Alice')
+            ->setMdp('mdpalice');
+        $this->bob = (new DoctrineUtilisateur(2))
+            ->setIdentifiant('bob@tkdo.org')
+            ->setNom('Bob')
+            ->setMdp('mdpbob');
+        $this->charlie = (new DoctrineUtilisateur(3))
+            ->setIdentifiant('charlie@tkdo.org')
+            ->setNom('Charlie')
+            ->setMdp('mdpcharlie');
     }
 
     /**

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Tests\Application\Actions\Idee;
 
 use App\Infrastructure\Persistence\Idee\DoctrineIdee;
-use App\Infrastructure\Persistence\Utilisateur\DoctrineUtilisateur;
 use App\Infrastructure\Persistence\Utilisateur\InMemoryUtilisateurReference;
 use Exception;
 use Prophecy\Argument;
@@ -21,26 +20,18 @@ class IdeeCreateActionTest extends ActionTestCase
     public function setUp()
     {
         parent::setUp();
-        $alice = (new DoctrineUtilisateur(1))
-            ->setIdentifiant('alice@tkdo.org')
-            ->setNom('Alice')
-            ->setMdp('mdpalice');
-        $bob = (new DoctrineUtilisateur(2))
-            ->setIdentifiant('bob@tkdo.org')
-            ->setNom('Bob')
-            ->setMdp('mdpbob');
         $this->utilisateurRepositoryProphecy
-            ->read($alice->getId(), true)
-            ->willReturn(new InMemoryUtilisateurReference($alice->getId()));
+            ->read($this->alice->getId(), true)
+            ->willReturn(new InMemoryUtilisateurReference($this->alice->getId()));
         $this->utilisateurRepositoryProphecy
-            ->read($bob->getId(), true)
-            ->willReturn(new InMemoryUtilisateurReference($bob->getId()));
+            ->read($this->bob->getId(), true)
+            ->willReturn(new InMemoryUtilisateurReference($this->bob->getId()));
         
         $this->idee = (new DoctrineIdee(1));
         $this->idee
-            ->setUtilisateur($alice)
+            ->setUtilisateur($this->alice)
             ->setDescription('un gauffrier')
-            ->setAuteur($bob)
+            ->setAuteur($this->bob)
             ->setDateProposition(new \DateTime);
     }
 
