@@ -37,7 +37,11 @@ class AuthMiddleware implements Middleware
      */
     public function process(Request $request, RequestHandler $handler): Response
     {
-        if ($request->getRequestTarget() !== '/connexion') {
+        /**
+         * @var \Slim\Routing\Route
+         */
+        $route = $request->getAttribute('__route__');
+        if (isset($route) && ($route->getPattern() !== '/connexion')) {
             try {
                 $serverParams = $request->getServerParams();
     

@@ -13,6 +13,7 @@ return function (ContainerBuilder $containerBuilder) {
     // Global Settings Object
     $containerBuilder->addDefinitions([
         'settings' => [
+            'determineRouteBeforeAppMiddleware' => true,
             'displayErrorDetails' => $devMode,
             'doctrine' => [
                 // if true, metadata caching is forcefully disabled
