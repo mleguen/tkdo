@@ -26,12 +26,7 @@ abstract class IdeeAction extends Action
     $this->ideeRepository = $ideeRepository;
   }
 
-  public function verifieUtilisateurAuthEstAuteur(int $idAuteur)
-  {
-    $idUtilisateurAuth = $this->request->getAttribute('idUtilisateurAuth');
-    if ($idAuteur !== $idUtilisateurAuth) {
-      $this->logger->warning("L'utilisateur authentifié ($idUtilisateurAuth) n'est pas l'auteur de l'idée ($idAuteur)");
-      throw new HttpForbiddenException($this->request);
-    }
+  protected function assertUtilisateurAuthEstAuteur($idAuteur) {
+    $this->assertUtilisateurAuthEst($idAuteur, "L'utilisateur authentifié n'est pas l'auteur de l'idée ($idAuteur)");
   }
 }

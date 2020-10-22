@@ -10,7 +10,6 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\MiddlewareInterface as Middleware;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Psr\Log\LoggerInterface;
-use Slim\Exception\HttpUnauthorizedException;
 
 // TODO: à remplacer par Tuupola\Middleware\JwtAuthentication
 
@@ -37,26 +36,21 @@ class AuthMiddleware implements Middleware
      */
     public function process(Request $request, RequestHandler $handler): Response
     {
-        /**
-         * @var \Slim\Routing\Route
-         */
-        $route = $request->getAttribute('__route__');
-        if (isset($route) && ($route->getPattern() !== '/connexion')) {
+        $serverParams = $request->getServerParams();
+        if (
+            !isset($serverParams['HTTP_AUTHORIZATION']) ||
+            (strpos($serverParams['HTTP_AUTHORIZATION'], "Bearer ") !== 0)
+        ) {
+            $this->logger->info('Bearer token absent');
+        }
+        else {
+            $token = substr($serverParams['HTTP_AUTHORIZATION'], strlen("Bearer "));
             try {
-                $serverParams = $request->getServerParams();
-    
-                if (
-                    !isset($serverParams['HTTP_AUTHORIZATION']) ||
-                    (strpos($serverParams['HTTP_AUTHORIZATION'], "Bearer ") !== 0)
-                ) {
-                    throw new Exception('Token absent !');
-                }
-                $token = substr($serverParams['HTTP_AUTHORIZATION'], strlen("Bearer "));
-
-                $request = $request->withAttribute('idUtilisateurAuth', $this->tokenService->decode($token));
+                $idUtilisateurAuth = $this->tokenService->decode($token);
+                $this->logger->info("Utilisateur $idUtilisateurAuth authentifié");
+                $request = $request->withAttribute('idUtilisateurAuth', $idUtilisateurAuth);
             } catch (Exception $e) {
                 $this->logger->warning($e->getMessage());
-                throw new HttpUnauthorizedException($request);
             }
         }
         

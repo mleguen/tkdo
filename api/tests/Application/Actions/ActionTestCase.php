@@ -28,7 +28,7 @@ use Tests\TestCase;
     /**
      * @var App
      */
-    private $app;
+    protected $app;
 
     /**
      * @var Container
@@ -92,7 +92,7 @@ use Tests\TestCase;
         $this->utilisateurRepositoryProphecy = $this->prophesize(UtilisateurRepository::class);
         $this->container->set(UtilisateurRepository::class, $this->utilisateurRepositoryProphecy->reveal());
         
-        $this->tokenService = new TokenService();
+        $this->tokenService = new TokenService(3600);
         $this->container->set(TokenService::class, $this->tokenService);
 
         $this->alice = (new DoctrineUtilisateur(1))

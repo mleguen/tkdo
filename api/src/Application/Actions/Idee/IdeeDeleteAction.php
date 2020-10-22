@@ -11,8 +11,9 @@ class IdeeDeleteAction extends IdeeAction
 {
   protected function action(): Response
   {
+    $this->assertAuth();
     $idee = $this->ideeRepository->read((int) $this->resolveArg('idIdee'));
-    $this->verifieUtilisateurAuthEstAuteur($idee->getAuteur()->getId());
+    $this->assertUtilisateurAuthEstAuteur($idee->getAuteur()->getId());
 
     $this->ideeRepository->delete($idee);
     return $this->respondWithData();

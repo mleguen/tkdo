@@ -13,7 +13,6 @@ return function (ContainerBuilder $containerBuilder) {
     // Global Settings Object
     $containerBuilder->addDefinitions([
         'settings' => [
-            'determineRouteBeforeAppMiddleware' => true,
             'displayErrorDetails' => $devMode,
             'doctrine' => [
                 // if true, metadata caching is forcefully disabled
@@ -40,6 +39,9 @@ return function (ContainerBuilder $containerBuilder) {
                 'name' => 'api',
                 'path' => $docker ? 'php://stdout' : APP_ROOT . '/logs/api.log',
                 'level' => Logger::DEBUG,
+            ],
+            'token' => [
+                'dureeDeVie' => 3600,
             ],
         ],
     ]);

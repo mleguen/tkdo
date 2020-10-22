@@ -36,6 +36,7 @@ class OccasionReadAction extends Action
 
   protected function action(): Response
   {
+    $this->assertAuth();
     $occasion = $this->occasionRepository->readLast(); 
     return $this->respondWithData(new SerializableOccasion(
       $occasion,

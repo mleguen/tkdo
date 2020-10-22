@@ -8,7 +8,9 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Log\LoggerInterface;
 use Slim\Exception\HttpBadRequestException;
+use Slim\Exception\HttpForbiddenException;
 use Slim\Exception\HttpNotFoundException;
+use Slim\Exception\HttpUnauthorizedException;
 
 abstract class Action
 {
@@ -116,5 +118,28 @@ abstract class Action
         $json = json_encode($payload, JSON_PRETTY_PRINT);
         $this->response->getBody()->write($json);
         return $this->response->withHeader('Content-Type', 'application/json');
+    }
+
+    /**
+     * Vérifie qu'un utilisateur s'est authentifié
+     */
+    protected function assertAuth()
+    {
+        if (is_null($this->request->getAttribute('idUtilisateurAuth'))) {
+            throw new HttpUnauthorizedException($this->request);
+        }
+    }
+
+    /**
+     * Vérifie qu'un utilisateur s'est authentifié
+     */
+    protected function assertUtilisateurAuthEst(int $idUtilisateurAttendu, $warning = null)
+    {
+        if ($this->request->getAttribute('idUtilisateurAuth') !== $idUtilisateurAttendu) {
+            if (!is_null($warning)) {
+                $this->logger->warning($warning);
+            }
+            throw new HttpForbiddenException($this->request);
+        }
     }
 }

@@ -6,28 +6,41 @@ namespace Tests\Application\Middleware;
 
 use App\Application\Mock\MockData;
 use Firebase\JWT\JWT;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Tests\Application\Actions\ActionTestCase;
 
 class AuthMiddlewareTest extends ActionTestCase
 {
+    public function setUp()
+    {
+        parent::setUp();
+        $this->app->get('/test-auth-middleware', function (ServerRequestInterface $request, ResponseInterface $response) {
+            $response->getBody()->write(json_encode($request->getAttribute('idUtilisateurAuth')));
+            return $response;
+        });
+    }
+
+    public function testAction()
+    {
+        $response = $this->handleRequestWithAuthHeader(
+            'Bearer ' . JWT::encode(["sub" => 1, "exp" => \time() + 10], MockData::getClePrive(), 'RS256'),
+            'GET',
+            '/test-auth-middleware'
+        );
+
+        $this->assertEqualsResponse(200, '1', $response);
+    }
+
     public function testActionPasUnBearerToken()
     {
         $response = $this->handleRequestWithAuthHeader(
             'pas un bearer token',
             'GET',
-            '/n-importe-quelle-route'
+            '/test-auth-middleware'
         );
 
-        $this->assertEqualsResponse(
-            401,
-            <<<'EOT'
-{
-    "type": "UNAUTHENTICATED",
-    "description": "Unauthorized."
-}
-EOT
-            , $response
-        );
+        $this->assertEqualsResponse(200, 'null', $response);
     }
 
     public function testActionPasUnJWT()
@@ -35,19 +48,21 @@ EOT
         $response = $this->handleRequestWithAuthHeader(
             'Bearer pas un JWT',
             'GET',
-            '/n-importe-quelle-route'
+            '/test-auth-middleware'
         );
 
-        $this->assertEqualsResponse(
-            401,
-            <<<'EOT'
-{
-    "type": "UNAUTHENTICATED",
-    "description": "Unauthorized."
-}
-EOT
-            , $response
+        $this->assertEqualsResponse(200, 'null', $response);
+    }
+
+    public function testActionUnJWTExpire()
+    {
+        $response = $this->handleRequestWithAuthHeader(
+            'Bearer ' . JWT::encode(["sub" => 1, "exp" => \time() - 10], MockData::getClePrive(), 'RS256'),
+            'GET',
+            '/test-auth-middleware'
         );
+
+        $this->assertEqualsResponse(200, 'null', $response);
     }
 
     public function testActionUnJWTCreeAvecUneMauvaiseCle()
@@ -82,40 +97,22 @@ LonNH8upjaTgg3DS6VuHWg/rJyr9qPzTNAfqEkv1pz6t7jqoIHRm5J4=
 -----END RSA PRIVATE KEY-----
 EOD;
         $response = $this->handleRequestWithAuthHeader(
-            'Bearer ' . JWT::encode(["id" => 0], $mauvaiseClePrivee, 'RS256'),
+            'Bearer ' . JWT::encode(["sub" => 1, "exp" => \time() + 10], $mauvaiseClePrivee, 'RS256'),
             'GET',
-            '/n-importe-quelle-route'
+            '/test-auth-middleware'
         );
 
-        $this->assertEqualsResponse(
-            401,
-            <<<'EOT'
-{
-    "type": "UNAUTHENTICATED",
-    "description": "Unauthorized."
-}
-EOT
-            , $response
-        );
+        $this->assertEqualsResponse(200, 'null', $response);
     }
 
-    public function testActionPasDIdDansLaPayload()
+    public function testActionPayloadSansSub()
     {
         $response = $this->handleRequestWithAuthHeader(
-            'Bearer ' . JWT::encode(["hello" => "world"], MockData::getClePrive(), 'RS256'),
+            'Bearer ' . JWT::encode(["exp" => \time() + 10], MockData::getClePrive(), 'RS256'),
             'GET',
-            '/n-importe-quelle-route'
+            '/test-auth-middleware'
         );
 
-        $this->assertEqualsResponse(
-            401,
-            <<<'EOT'
-{
-    "type": "UNAUTHENTICATED",
-    "description": "Unauthorized."
-}
-EOT
-            , $response
-        );
+        $this->assertEqualsResponse(200, 'null', $response);
     }
 }

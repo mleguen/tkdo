@@ -25,8 +25,9 @@ return function (ContainerBuilder $containerBuilder) {
 
             return $logger;
         },
-        TokenService::class => function () {
-            return new TokenService();
+        TokenService::class => function (ContainerInterface $c) {
+            $tokenSettings = $c->get('settings')['token'];
+            return new TokenService($tokenSettings['dureeDeVie']);
         }
     ]);
 };

@@ -32,6 +32,7 @@ class IdeeReadAllAction extends IdeeAction
 
   protected function action(): Response
   {
+    $this->assertAuth();
     $queryParams = $this->request->getQueryParams();
     if (!isset($queryParams['idUtilisateur'])) throw new HttpBadRequestException($this->request, 'idUtilisateur manquant');
 

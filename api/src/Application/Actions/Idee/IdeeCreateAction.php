@@ -29,8 +29,9 @@ class IdeeCreateAction extends IdeeAction
 
   protected function action(): Response
   {
+    $this->assertAuth();
     $body = $this->getFormData();
-    $this->verifieUtilisateurAuthEstAuteur($body->idAuteur);
+    $this->assertUtilisateurAuthEstAuteur($body->idAuteur);
 
     $this->ideeRepository->create(
       $this->utilisateurRepository->read($body->idUtilisateur, true),

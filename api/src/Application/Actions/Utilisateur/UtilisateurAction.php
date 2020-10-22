@@ -34,13 +34,9 @@ class UtilisateurAction extends Action
 
   protected function action(): Response
   {
+    $this->assertAuth();
     $this->idUtilisateur = (int) $this->resolveArg('idUtilisateur');
-
-    $idUtilisateurAuth = $this->request->getAttribute('idUtilisateurAuth');
-    if ($this->idUtilisateur !== $idUtilisateurAuth) {
-      $this->logger->warning("L'utilisateur authentifié ($idUtilisateurAuth) n'est pas l'utilisateur ($this->idUtilisateur)");
-      throw new HttpForbiddenException($this->request);
-    }
+    $this->assertUtilisateurAuthEst($this->idUtilisateur, "L'utilisateur authentifié n'est pas l'utilisateur ($this->idUtilisateur)");
 
     return $this->response;
   }
