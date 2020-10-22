@@ -52,6 +52,26 @@ EOT
         );
     }
 
+    public function testActionAutreUtilisateur()
+    {
+        $response = $this->handleAuthRequest(
+            $this->bob->getId(),
+            'PUT',
+            "/utilisateur/{$this->alice->getId()}", '', "{}"
+        );
+
+        $this->assertEqualsResponse(
+            403,
+            <<<'EOT'
+{
+    "type": "INSUFFICIENT_PRIVILEGES",
+    "description": "Forbidden."
+}
+EOT
+            , $response
+        );
+    }
+
     public function testActionUtilisateurInconnu()
     {
         $this->utilisateurRepositoryProphecy
