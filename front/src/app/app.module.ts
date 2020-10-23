@@ -6,24 +6,24 @@ import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { ConnexionComponent } from './connexion/connexion.component';
-import { ListeIdeesComponent } from './liste-idees/liste-idees.component';
+import { DeconnexionComponent } from './deconnexion/deconnexion.component';
 import { HeaderComponent } from './header/header.component';
+import { ListeIdeesComponent } from './liste-idees/liste-idees.component';
 import { OccasionComponent } from './occasion/occasion.component';
 import { ProfilComponent } from './profil/profil.component';
 import { authBackendInterceptorProvider } from './auth-backend.interceptor';
 import { devBackendInterceptorProvider } from './dev-backend.interceptor';
 import { erreurBackendInterceptorProvider } from './erreur-backend.interceptor';
-import { DeconnexionComponent } from './deconnexion/deconnexion.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     ConnexionComponent,
-    ListeIdeesComponent,
+    DeconnexionComponent,
     HeaderComponent,
+    ListeIdeesComponent,
     OccasionComponent,
-    ProfilComponent,
-    DeconnexionComponent
+    ProfilComponent
   ],
   imports: [
     BrowserModule,

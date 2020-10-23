@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
-rm -r front
+rm -rf front
 ng new --directory front --routing --skip-git --style scss tkdo
 cd front
 ng generate component connexion
+ng generate component deconnexion
+ng generate component header
 ng generate component liste-idees
-ng generate component menu
 ng generate component occasion
 ng generate component profil
 ng generate interceptor auth-backend

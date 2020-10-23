@@ -1,6 +1,5 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { SHA256 } from 'crypto-js';
 import { BehaviorSubject } from 'rxjs';
 import { first, tap } from 'rxjs/operators';
 
@@ -74,7 +73,7 @@ export class BackendService {
   }
 
   async connecte(identifiant: string, mdp: string) {
-    const { token, utilisateur } = await this.http.post<PostConnexionDTO>(URL_CONNEXION, { identifiant, mdp: SHA256(mdp).toString() }).toPromise();
+    const { token, utilisateur } = await this.http.post<PostConnexionDTO>(URL_CONNEXION, { identifiant, mdp }).toPromise();
     this.idUtilisateur = utilisateur.id;
     this.token = token;
     localStorage.setItem(CLE_TOKEN, token);

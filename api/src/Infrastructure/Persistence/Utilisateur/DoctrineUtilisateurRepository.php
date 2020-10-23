@@ -37,11 +37,18 @@ class DoctrineUtilisateurRepository implements UtilisateurRepository
      */
     public function readOneByIdentifiants(string $identifiant, string $mdp): Utilisateur
     {        
+        /**
+         * @var DoctrineUtilisateur
+         */
         $utilisateur = $this->em->getRepository(DoctrineUtilisateur::class)->findOneBy([
-            'identifiant' => $identifiant,
-            'mdp' => $mdp
+            'identifiant' => $identifiant
         ]);
-        if (is_null($utilisateur)) throw new UtilisateurInconnuException();
+        if (
+            is_null($utilisateur) ||
+            !password_verify($mdp, $utilisateur->getMdp())
+        ) {
+            throw new UtilisateurInconnuException();
+        }
         return $utilisateur;
     }
 

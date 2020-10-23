@@ -13,19 +13,19 @@ class DoctrineUtilisateurFixture extends DoctrineAbstractFixture
             'alice' => (new DoctrineUtilisateur())
                 ->setIdentifiant('alice@tkdo.org')
                 ->setNom('Alice')
-                ->setMdp(hash('sha256', 'mdpalice')),
+                ->setMdp(password_hash('mdpalice', PASSWORD_DEFAULT)),
             'bob' => (new DoctrineUtilisateur())
                 ->setIdentifiant('bob@tkdo.org')
                 ->setNom('Bob')
-                ->setMdp(hash('sha256', 'mdpbob')),
+                ->setMdp(password_hash('mdpbob', PASSWORD_DEFAULT)),
             'charlie' => (new DoctrineUtilisateur())
                 ->setIdentifiant('charlie@tkdo.org')
                 ->setNom('Charlie')
-                ->setMdp(hash('sha256', 'mdpcharlie')),
+                ->setMdp(password_hash('mdpcharlie', PASSWORD_DEFAULT)),
             'david' => (new DoctrineUtilisateur())
                 ->setIdentifiant('david@tkdo.org')
                 ->setNom('David')
-                ->setMdp(hash('sha256', 'mdpdavid')),
+                ->setMdp(password_hash('mdpdavid', PASSWORD_DEFAULT)),
         ] as $nom => $utilisateur) {
             $em->persist($utilisateur);
             $this->addReference($nom, $utilisateur);
