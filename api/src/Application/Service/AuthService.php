@@ -8,7 +8,7 @@ use App\Application\Mock\MockData;
 use Exception;
 use Firebase\JWT\JWT;
 
-class TokenService
+class AuthService
 {
   /**
    * Durée de vie du token en secondes

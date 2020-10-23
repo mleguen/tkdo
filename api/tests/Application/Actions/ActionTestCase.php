@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Tests\Application\Actions;
 
 use App\Application\Handlers\HttpErrorHandler;
-use App\Application\Service\TokenService;
+use App\Application\Service\AuthService;
 use App\Domain\Idee\IdeeRepository;
 use App\Domain\Occasion\OccasionRepository;
 use App\Domain\ResultatTirage\ResultatTirageRepository;
@@ -56,9 +56,9 @@ use Tests\TestCase;
     protected $utilisateurRepositoryProphecy;
 
     /**
-     * @var TokenService
+     * @var AuthService
      */
-    private $tokenService;
+    private $authService;
 
     /**
      * @var DoctrineUtilisateur
@@ -92,8 +92,8 @@ use Tests\TestCase;
         $this->utilisateurRepositoryProphecy = $this->prophesize(UtilisateurRepository::class);
         $this->container->set(UtilisateurRepository::class, $this->utilisateurRepositoryProphecy->reveal());
         
-        $this->tokenService = new TokenService(3600);
-        $this->container->set(TokenService::class, $this->tokenService);
+        $this->authService = new AuthService(3600);
+        $this->container->set(AuthService::class, $this->authService);
 
         $this->alice = (new DoctrineUtilisateur(1))
             ->setIdentifiant('alice@tkdo.org')
@@ -200,7 +200,7 @@ use Tests\TestCase;
         $body = null
     ): ResponseInterface {
         return $this->handleRequestWithAuthHeader(
-            "Bearer " . $this->tokenService->encode($idUtilisateurAuth),
+            "Bearer " . $this->authService->encode($idUtilisateurAuth),
             $method, $path, $query, $body
         );
     }

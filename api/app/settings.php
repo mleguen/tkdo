@@ -40,7 +40,7 @@ return function (ContainerBuilder $containerBuilder) {
                 'path' => $docker ? 'php://stdout' : APP_ROOT . '/logs/api.log',
                 'level' => Logger::DEBUG,
             ],
-            'token' => [
+            'auth' => [
                 'dureeDeVie' => 3600,
             ],
         ],

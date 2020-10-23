@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Application\Actions\Connexion;
 
 use App\Application\Actions\Action;
-use App\Application\Service\TokenService;
+use App\Application\Service\AuthService;
 use App\Domain\Utilisateur\UtilisateurInconnuException;
 use App\Domain\Utilisateur\UtilisateurRepository;
 use Exception;
@@ -21,19 +21,19 @@ class ConnexionAction extends Action
   protected $utilisateurRepository;
 
   /**
-   * @var TokenService
+   * @var AuthService
    */
-  protected $tokenService;
+  protected $authService;
 
   /**
    * @param LoggerInterface $logger
    * @param UtilisateurRepository  $utilisateurRepository
    */
-  public function __construct(LoggerInterface $logger, UtilisateurRepository $utilisateurRepository, TokenService $tokenService)
+  public function __construct(LoggerInterface $logger, UtilisateurRepository $utilisateurRepository, AuthService $authService)
   {
     parent::__construct($logger);
     $this->utilisateurRepository = $utilisateurRepository;
-    $this->tokenService = $tokenService;
+    $this->authService = $authService;
   }
 
   protected function action(): Response
@@ -45,7 +45,7 @@ class ConnexionAction extends Action
       $this->logger->info("$nom connecté(e)");
 
       return $this->respondWithData([
-        "token" => $this->tokenService->encode($utilisateur->getId()),
+        "token" => $this->authService->encode($utilisateur->getId()),
         "utilisateur" => [
           "id" => $utilisateur->getId(),
           "nom" => $utilisateur->getNom(),

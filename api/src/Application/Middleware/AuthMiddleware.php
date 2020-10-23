@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace App\Application\Middleware;
 
-use App\Application\Service\TokenService;
+use App\Application\Service\AuthService;
 use Exception;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -21,14 +21,14 @@ class AuthMiddleware implements Middleware
     protected $logger;
 
     /**
-     * @var TokenService
+     * @var AuthService
      */
-    protected $tokenService;
+    protected $authService;
 
-    public function __construct(LoggerInterface $logger, TokenService $tokenService)
+    public function __construct(LoggerInterface $logger, AuthService $authService)
     {
         $this->logger = $logger;
-        $this->tokenService = $tokenService;
+        $this->authService = $authService;
     }
 
     /**
@@ -46,7 +46,7 @@ class AuthMiddleware implements Middleware
         else {
             $token = substr($serverParams['HTTP_AUTHORIZATION'], strlen("Bearer "));
             try {
-                $idUtilisateurAuth = $this->tokenService->decode($token);
+                $idUtilisateurAuth = $this->authService->decode($token);
                 $this->logger->info("Utilisateur $idUtilisateurAuth authentifié");
                 $request = $request->withAttribute('idUtilisateurAuth', $idUtilisateurAuth);
             } catch (Exception $e) {

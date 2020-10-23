@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-use App\Application\Service\TokenService;
+use App\Application\Service\AuthService;
 use DI\ContainerBuilder;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
@@ -25,9 +25,9 @@ return function (ContainerBuilder $containerBuilder) {
 
             return $logger;
         },
-        TokenService::class => function (ContainerInterface $c) {
-            $tokenSettings = $c->get('settings')['token'];
-            return new TokenService($tokenSettings['dureeDeVie']);
+        AuthService::class => function (ContainerInterface $c) {
+            $authSettings = $c->get('settings')['auth'];
+            return new AuthService($authSettings['dureeDeVie']);
         }
     ]);
 };
