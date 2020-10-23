@@ -9,6 +9,7 @@ openssl pkey -in $AUTH_RSA.prod -pubout -out $AUTH_RSA.pub.prod
 tar -cvf tkdo.tar -C apache .
 
 # Fichiers front
+./npm-front install
 ./npm-front run build --prod
 tar -rvf tkdo.tar -C front/dist/tkdo .
 

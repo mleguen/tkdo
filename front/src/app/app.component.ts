@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { BackendService } from './backend.service';
 import { Router, NavigationStart } from '@angular/router';
 import { filter } from 'rxjs/operators';
+import { environment } from '../environments/environment';
 
 @Component({
   selector: 'app-root',
@@ -12,6 +13,7 @@ export class AppComponent implements OnInit {
 
   erreurBackend$ = this.backend.erreur$;
   menuOuvert = false;
+  version = environment.version;
 
   constructor(
     private readonly backend: BackendService,

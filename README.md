@@ -18,11 +18,9 @@ Pré-requis :
 - votre hôte Apache est accessible en HTTPS
   (à défaut, commenter la règle de redirection vers HTTPS dans [.htaccess](./.htaccess))
 
-Installer les dépendances, construire et packager :
+Construction du package d'installation :
 
 ```bash
-./npm-front install
-./composer-api install
 ./apache-pack
 ```
 
