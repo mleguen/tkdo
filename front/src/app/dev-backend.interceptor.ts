@@ -10,35 +10,36 @@ import {
 } from '@angular/common/http';
 import { Observable, of, throwError } from 'rxjs';
 import { mergeMap, materialize, dematerialize, delay } from 'rxjs/operators';
-import { IdeeSansUtilisateur, Occasion, Utilisateur } from './backend.service';
+import { Occasion } from './backend.service';
 import * as moment from 'moment';
+import { SHA256 } from 'crypto-js';
 
 const alice = {
   id: 0,
   identifiant: 'alice@tkdo.org',
   nom: 'Alice',
-  mdp: 'mdpalice',
+  mdp: SHA256('mdpalice').toString(),
 };
 
 const bob = {
   id: 1,
   identifiant: 'bob@tkdo.org',
   nom: 'Bob',
-  mdp: 'mdpbob',
+  mdp: SHA256('mdpbob').toString(),
 };
 
 const charlie = {
   id: 2,
   identifiant: 'charlie@tkdo.org',
   nom: 'Charlie',
-  mdp: 'mdpcharlie',
+  mdp: SHA256('mdpcharlie').toString(),
 };
 
 const david = {
   id: 3,
   identifiant: 'david@tkdo.org',
   nom: 'David',
-  mdp: 'mdpdavid',
+  mdp: SHA256('mdpdavid').toString(),
 };
 
 const utilisateurs = [alice, bob, charlie, david];

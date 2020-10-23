@@ -23,8 +23,10 @@
     "@angular/platform-browser-dynamic": "~9.1.2",
     "@angular/router": "~9.1.2",
     "@types/bootstrap": "^4.5.0",
+    "@types/crypto-js": "^4.0.1",
     "@types/jquery": "^3.5.1",
     "bootstrap": "^4.5.2",
+    "crypto-js": "^4.0.0",
     "git-describe": "^4.0.4",
     "jquery": "^3.5.1",
     "moment": "^2.24.0",
@@ -53,5 +55,8 @@
     "tslint": "~6.1.0",
     "typescript": "~3.8.3",
     "webdriver-manager": "^12.1.7"
+  },
+  "browser": {
+    "crypto": false
   }
 }
