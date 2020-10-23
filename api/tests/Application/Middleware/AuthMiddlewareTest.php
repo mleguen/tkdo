@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Tests\Application\Middleware;
 
-use App\Application\Mock\MockData;
-use Firebase\JWT\JWT;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Tests\Application\Actions\ActionTestCase;
@@ -24,7 +22,7 @@ class AuthMiddlewareTest extends ActionTestCase
     public function testAction()
     {
         $response = $this->handleRequestWithAuthHeader(
-            'Bearer ' . JWT::encode(["sub" => 1, "exp" => \time() + 10], MockData::getClePrive(), 'RS256'),
+            'Bearer ' . $this->authService->encodeBearerToken(1),
             'GET',
             '/test-auth-middleware'
         );
@@ -57,7 +55,7 @@ class AuthMiddlewareTest extends ActionTestCase
     public function testActionUnJWTExpire()
     {
         $response = $this->handleRequestWithAuthHeader(
-            'Bearer ' . JWT::encode(["sub" => 1, "exp" => \time() - 10], MockData::getClePrive(), 'RS256'),
+            'Bearer ' . $this->authService->encodeBearerToken(1, ["validite" => -10]),
             'GET',
             '/test-auth-middleware'
         );
@@ -97,18 +95,7 @@ LonNH8upjaTgg3DS6VuHWg/rJyr9qPzTNAfqEkv1pz6t7jqoIHRm5J4=
 -----END RSA PRIVATE KEY-----
 EOD;
         $response = $this->handleRequestWithAuthHeader(
-            'Bearer ' . JWT::encode(["sub" => 1, "exp" => \time() + 10], $mauvaiseClePrivee, 'RS256'),
-            'GET',
-            '/test-auth-middleware'
-        );
-
-        $this->assertEqualsResponse(200, 'null', $response);
-    }
-
-    public function testActionPayloadSansSub()
-    {
-        $response = $this->handleRequestWithAuthHeader(
-            'Bearer ' . JWT::encode(["exp" => \time() + 10], MockData::getClePrive(), 'RS256'),
+            'Bearer ' . $this->authService->encodeBearerToken(1, ["clePrivee" => $mauvaiseClePrivee]),
             'GET',
             '/test-auth-middleware'
         );

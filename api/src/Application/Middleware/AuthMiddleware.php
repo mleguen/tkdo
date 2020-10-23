@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace App\Application\Middleware;
 
+use App\Application\Service\AuthPasDeBearerTokenException;
 use App\Application\Service\AuthService;
-use Exception;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\MiddlewareInterface as Middleware;
@@ -37,21 +37,16 @@ class AuthMiddleware implements Middleware
     public function process(Request $request, RequestHandler $handler): Response
     {
         $serverParams = $request->getServerParams();
-        if (
-            !isset($serverParams['HTTP_AUTHORIZATION']) ||
-            (strpos($serverParams['HTTP_AUTHORIZATION'], "Bearer ") !== 0)
-        ) {
-            $this->logger->info('Bearer token absent');
+        try {
+            $idUtilisateurAuth = $this->authService->authentifie($serverParams['HTTP_AUTHORIZATION'] ?? '');
+            $this->logger->info("Utilisateur $idUtilisateurAuth authentifié");
+            $request = $request->withAttribute('idUtilisateurAuth', $idUtilisateurAuth);
         }
-        else {
-            $token = substr($serverParams['HTTP_AUTHORIZATION'], strlen("Bearer "));
-            try {
-                $idUtilisateurAuth = $this->authService->decode($token);
-                $this->logger->info("Utilisateur $idUtilisateurAuth authentifié");
-                $request = $request->withAttribute('idUtilisateurAuth', $idUtilisateurAuth);
-            } catch (Exception $e) {
-                $this->logger->warning($e->getMessage());
-            }
+        catch (AuthPasDeBearerTokenException $e) {
+            $this->logger->info($e->getMessage());
+        }
+        catch (\Exception $e) {
+            $this->logger->warning($e->getMessage());
         }
         
         return $handler->handle($request);

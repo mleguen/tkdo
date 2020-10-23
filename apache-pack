@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+# Génération des clés d'authentification (si pas déjà fait)
+AUTH_RSA=./api/var/auth/auth_rsa
+[ ! -f $AUTH_RSA.prod ] && openssl genrsa -out $AUTH_RSA.prod
+openssl pkey -in $AUTH_RSA.prod -pubout -out $AUTH_RSA.pub.prod
+
 # Fichiers communs
 tar -cvf tkdo.tar -C apache .
 
@@ -10,8 +15,18 @@ tar -rvf tkdo.tar -C front/dist/tkdo .
 # Fichiers api
 ./composer-api install
 tar -rvf tkdo.tar --transform='s/\.prod$//' \
-  ./api/{app,bin,logs/README.md,public,src,var/{cache,doctrine/{cache,proxy}}/.gitignore,vendor} \
-  ./api/{.env.prod,*.php,composer.{json,lock}}
+  ./api/app \
+  ./api/bin \
+  ./api/logs/README.md \
+  ./api/public \
+  ./api/src \
+  ./api/var/auth/*.prod \
+  ./api/var/cache/.gitignore \
+  ./api/var/doctrine/{cache,proxy}/.gitignore \
+  ./api/vendor \
+  ./api/.env.prod \
+  ./api/*.php \
+  ./api/composer.{json,lock}
 
 # Finalisation
 gzip -f tkdo.tar

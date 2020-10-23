@@ -41,14 +41,15 @@ class ConnexionAction extends Action
     $body = $this->getFormData();
     try {
       $utilisateur = $this->utilisateurRepository->readOneByIdentifiants($body->identifiant, $body->mdp);
+      $id = $utilisateur->getId();
       $nom = $utilisateur->getNom();
-      $this->logger->info("$nom connecté(e)");
+      $this->logger->info("Utilisateur $id ($nom) connecté");
 
       return $this->respondWithData([
-        "token" => $this->authService->encode($utilisateur->getId()),
+        "token" => $this->authService->encodeBearerToken($utilisateur->getId()),
         "utilisateur" => [
-          "id" => $utilisateur->getId(),
-          "nom" => $utilisateur->getNom(),
+          "id" => $id,
+          "nom" => $nom,
         ]
       ]);
     }

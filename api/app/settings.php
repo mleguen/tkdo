@@ -13,7 +13,6 @@ return function (ContainerBuilder $containerBuilder) {
     // Global Settings Object
     $containerBuilder->addDefinitions([
         'settings' => [
-            'displayErrorDetails' => $devMode,
             'doctrine' => [
                 // if true, metadata caching is forcefully disabled
                 'dev_mode' => $devMode,
@@ -35,13 +34,21 @@ return function (ContainerBuilder $containerBuilder) {
                     'charset' => 'utf8'
                 ]
             ],
+            'error' => [
+                'displayErrorDetails' => $devMode,
+                'logErrors' => true,
+                'logErrorDetails' => true
+            ],
             'logger' => [
                 'name' => 'api',
                 'path' => $docker ? 'php://stdout' : APP_ROOT . '/logs/api.log',
                 'level' => Logger::DEBUG,
             ],
             'auth' => [
-                'dureeDeVie' => 3600,
+                'algo' => 'RS256',
+                'fichierClePrivee' => APP_ROOT . '/var/auth/auth_rsa',
+                'fichierClePublique' => APP_ROOT . '/var/auth/auth_rsa.pub',
+                'validite' => 3600,
             ],
         ],
     ]);

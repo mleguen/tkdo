@@ -58,7 +58,7 @@ use Tests\TestCase;
     /**
      * @var AuthService
      */
-    private $authService;
+    protected $authService;
 
     /**
      * @var DoctrineUtilisateur
@@ -74,6 +74,16 @@ use Tests\TestCase;
      * @var DoctrineUtilisateur
      */
     protected $charlie;
+
+    /**
+     * @var string
+     */
+    protected $clePrivee;
+
+    /**
+     * @var string
+     */
+    protected $clePublique;
 
     public function setUp()
     {
@@ -92,7 +102,12 @@ use Tests\TestCase;
         $this->utilisateurRepositoryProphecy = $this->prophesize(UtilisateurRepository::class);
         $this->container->set(UtilisateurRepository::class, $this->utilisateurRepositoryProphecy->reveal());
         
-        $this->authService = new AuthService(3600);
+        $this->authService = new AuthService([
+            'algo' => 'RS256',
+            'fichierClePrivee' => __DIR__ . '/../../../var/auth/auth_rsa',
+            'fichierClePublique' => __DIR__ . '/../../../var/auth/auth_rsa.pub',
+            'validite' => 3600,
+        ]);
         $this->container->set(AuthService::class, $this->authService);
 
         $this->alice = (new DoctrineUtilisateur(1))
@@ -200,7 +215,7 @@ use Tests\TestCase;
         $body = null
     ): ResponseInterface {
         return $this->handleRequestWithAuthHeader(
-            "Bearer " . $this->authService->encode($idUtilisateurAuth),
+            "Bearer " . $this->authService->encodeBearerToken($idUtilisateurAuth),
             $method, $path, $query, $body
         );
     }

@@ -26,7 +26,11 @@ $routes = require __DIR__ . '/../app/routes.php';
 $routes($app);
 
 /** @var bool $displayErrorDetails */
-$displayErrorDetails = $container->get('settings')['displayErrorDetails'];
+$displayErrorDetails = $container->get('settings')['error']['displayErrorDetails'];
+/** @var bool $logError */
+$logErrors = $container->get('settings')['error']['logErrors'];
+/** @var bool $logErrorDetails */
+$logErrorDetails = $container->get('settings')['error']['logErrorDetails'];
 
 // Create Request object from globals
 $serverRequestCreator = ServerRequestCreatorFactory::create();
@@ -37,14 +41,14 @@ $responseFactory = $app->getResponseFactory();
 $errorHandler = new HttpErrorHandler($callableResolver, $responseFactory);
 
 // Create Shutdown Handler
-$shutdownHandler = new ShutdownHandler($request, $errorHandler, $displayErrorDetails);
+$shutdownHandler = new ShutdownHandler($request, $errorHandler, $displayErrorDetails, $logErrors, $logErrorDetails);
 register_shutdown_function($shutdownHandler);
 
 // Add Routing Middleware
 $app->addRoutingMiddleware();
 
 // Add Error Middleware
-$errorMiddleware = $app->addErrorMiddleware($displayErrorDetails, false, false);
+$errorMiddleware = $app->addErrorMiddleware($displayErrorDetails, $logErrors, $logErrorDetails);
 $errorMiddleware->setDefaultErrorHandler($errorHandler);
 
 // Run App & Emit Response

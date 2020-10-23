@@ -26,8 +26,7 @@ return function (ContainerBuilder $containerBuilder) {
             return $logger;
         },
         AuthService::class => function (ContainerInterface $c) {
-            $authSettings = $c->get('settings')['auth'];
-            return new AuthService($authSettings['dureeDeVie']);
+            return new AuthService($c->get('settings')['auth']);
         }
     ]);
 };
