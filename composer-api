@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-composer $1 -d api -- "${@:2}"
+php composer.phar $1 -d api -- "${@:2}"
