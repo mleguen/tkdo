@@ -1,5 +1,4 @@
 <?php
-
 declare(strict_types=1);
 
 namespace Tests\Application\Actions\Idee;
@@ -8,7 +7,6 @@ use App\Domain\Idee\Idee;
 use App\Domain\Utilisateur\UtilisateurNotFoundException;
 use App\Infrastructure\Persistence\Idee\DoctrineIdee;
 use App\Infrastructure\Persistence\Utilisateur\InMemoryUtilisateurReference;
-use Exception;
 use Tests\Application\Actions\ActionTestCase;
 
 class ListIdeeActionTest extends ActionTestCase
@@ -232,7 +230,7 @@ EOT
             ->shouldBeCalledOnce();
         $this->ideeRepositoryProphecy
             ->readByUtilisateur($this->alice)
-            ->willThrow(new Exception('erreur pendant readByUtilisateur'))
+            ->willThrow(new \Exception('erreur pendant readByUtilisateur'))
             ->shouldBeCalledOnce();
 
         $response = $this->handleAuthRequest(

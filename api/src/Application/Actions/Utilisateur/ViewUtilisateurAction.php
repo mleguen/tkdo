@@ -1,5 +1,4 @@
 <?php
-
 declare(strict_types=1);
 
 namespace App\Application\Actions\Utilisateur;
@@ -9,10 +8,10 @@ use Psr\Http\Message\ResponseInterface as Response;
 
 class ViewUtilisateurAction extends UtilisateurAction
 {
-  protected function action(): Response
-  {
-    parent::action();
-    $utilisateur = $this->utilisateurRepository->read($this->idUtilisateur);
-    return $this->respondWithData(new SerializableUtilisateur($utilisateur));
-  }
+    protected function action(): Response
+    {
+        parent::action();
+        $utilisateur = $this->utilisateurRepository->read($this->idUtilisateur);
+        return $this->respondWithData(new SerializableUtilisateur($utilisateur));
+    }
 }

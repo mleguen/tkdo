@@ -1,5 +1,4 @@
 <?php
-
 declare(strict_types=1);
 
 namespace App\Infrastructure\Persistence\Idee;
@@ -8,6 +7,7 @@ use App\Domain\Idee\Idee;
 use App\Domain\Idee\IdeeNotFoundException;
 use App\Domain\Idee\IdeeRepository;
 use App\Domain\Utilisateur\Utilisateur;
+use App\Infrastructure\Persistence\Idee\DoctrineIdee;
 use App\Infrastructure\Persistence\Utilisateur\InMemoryUtilisateurRepository;
 
 class InMemoryIdeeRepository implements IdeeRepository

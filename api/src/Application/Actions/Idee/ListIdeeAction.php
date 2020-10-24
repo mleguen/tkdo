@@ -1,5 +1,4 @@
 <?php
-
 declare(strict_types=1);
 
 namespace App\Application\Actions\Idee;
@@ -16,49 +15,50 @@ use Slim\Exception\HttpBadRequestException;
 
 class ListIdeeAction extends IdeeAction
 {
-  /**
-   * @var UtilisateurRepository
-   */
-  private $utilisateurRepository;
+    /**
+     * @var UtilisateurRepository
+     */
+    private $utilisateurRepository;
 
-  public function __construct(
-    LoggerInterface $logger,
-    IdeeRepository $ideeRepository,
-    UtilisateurRepository $utilisateurRepository
-  ) {
-    parent::__construct($logger, $ideeRepository);
-    $this->utilisateurRepository = $utilisateurRepository;
-  }
+    public function __construct(
+        LoggerInterface $logger,
+        IdeeRepository $ideeRepository,
+        UtilisateurRepository $utilisateurRepository
+    )
+    {
+        parent::__construct($logger, $ideeRepository);
+        $this->utilisateurRepository = $utilisateurRepository;
+    }
 
-  protected function action(): Response
-  {
-    $this->assertAuth();
-    $queryParams = $this->request->getQueryParams();
-    if (!isset($queryParams['idUtilisateur'])) throw new HttpBadRequestException($this->request, 'idUtilisateur manquant');
+    protected function action(): Response
+    {
+        $this->assertAuth();
+        $queryParams = $this->request->getQueryParams();
+        if (!isset($queryParams['idUtilisateur'])) throw new HttpBadRequestException($this->request, 'idUtilisateur manquant');
 
-    $idUtilisateurAuth = $this->request->getAttribute('idUtilisateurAuth');
+        $idUtilisateurAuth = $this->request->getAttribute('idUtilisateurAuth');
 
-    $utilisateur = $this->utilisateurRepository->read((int) $queryParams['idUtilisateur']);
-    return $this->respondWithData([
-      "utilisateur" => new SerializableUtilisateur($utilisateur),
-      "idees" => array_map(
-        function (Idee $i) {
-          return new SerializableIdee($i);
-        },
-        array_values( // Obligatoire pour être encodé comme un tableau en JSON
-          array_filter(
-            $this->ideeRepository->readByUtilisateur($utilisateur),
-            function (Idee $i) use ($idUtilisateurAuth) {
-              return (
-                // L'utilisateur authentifié ne peut voir que les idées dont il est l'auteur
-                ($idUtilisateurAuth === $i->getAuteur()->getId()) ||
-                // ou qui ont été proposées pour quelqu'un d'autre que lui
-                ($idUtilisateurAuth !== $i->getUtilisateur()->getId())
-              );
-            }
-          )
-        )
-      ),
-    ]);
-  }
+        $utilisateur = $this->utilisateurRepository->read((int) $queryParams['idUtilisateur']);
+        return $this->respondWithData([
+            "utilisateur" => new SerializableUtilisateur($utilisateur),
+            "idees" => array_map(
+                function (Idee $i) {
+                    return new SerializableIdee($i);
+                },
+                array_values( // Obligatoire pour être encodé comme un tableau en JSON
+                    array_filter(
+                        $this->ideeRepository->readByUtilisateur($utilisateur),
+                        function (Idee $i) use ($idUtilisateurAuth) {
+                            return (
+                                // L'utilisateur authentifié ne peut voir que les idées dont il est l'auteur
+                                ($idUtilisateurAuth === $i->getAuteur()->getId()) ||
+                                // ou qui ont été proposées pour quelqu'un d'autre que lui
+                                ($idUtilisateurAuth !== $i->getUtilisateur()->getId())
+                            );
+                        }
+                    )
+                )
+            ),
+        ]);
+    }
 }
