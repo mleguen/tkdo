@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Tests\Application\Actions\Idee;
 
-use App\Domain\Utilisateur\UtilisateurInconnuException;
+use App\Domain\Utilisateur\UtilisateurNotFoundException;
 use Tests\Application\Actions\ActionTestCase;
 
-class ConnexionActionTest extends ActionTestCase
+class CreateConnexionActionTest extends ActionTestCase
 {
     public function testAction()
     {
@@ -44,7 +44,7 @@ EOT
     {
         $this->utilisateurRepositoryProphecy
             ->readOneByIdentifiants($this->alice->getIdentifiant(), $this->alice->getMdp())
-            ->willThrow(new UtilisateurInconnuException())
+            ->willThrow(new UtilisateurNotFoundException())
             ->shouldBeCalledOnce();
 
         $response = $this->handleRequest(

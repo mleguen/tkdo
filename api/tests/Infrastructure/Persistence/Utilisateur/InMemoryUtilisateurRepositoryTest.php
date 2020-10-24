@@ -43,7 +43,7 @@ class InMemoryUtilisateurRepositoryTest extends TestCase
     }
 
     /**
-     * @expectedException \App\Domain\Utilisateur\UtilisateurInconnuException
+     * @expectedException \App\Domain\Utilisateur\UtilisateurNotFoundException
      */
     public function testReadUtilisateurInconnu()
     {
@@ -56,7 +56,7 @@ class InMemoryUtilisateurRepositoryTest extends TestCase
     }
 
     /**
-     * @expectedException \App\Domain\Utilisateur\UtilisateurInconnuException
+     * @expectedException \App\Domain\Utilisateur\UtilisateurNotFoundException
      */
     public function testReadOneByIdentifiantsMauvaisIdentifiant()
     {
@@ -64,7 +64,7 @@ class InMemoryUtilisateurRepositoryTest extends TestCase
     }
 
     /**
-     * @expectedException \App\Domain\Utilisateur\UtilisateurInconnuException
+     * @expectedException \App\Domain\Utilisateur\UtilisateurNotFoundException
      */
     public function testReadOneByIdentifiantsMauvaisMdp()
     {
@@ -83,7 +83,7 @@ class InMemoryUtilisateurRepositoryTest extends TestCase
     }
 
     /**
-     * @expectedException \App\Domain\Utilisateur\UtilisateurInconnuException
+     * @expectedException \App\Domain\Utilisateur\UtilisateurNotFoundException
      */
     public function testUpdateUtilisateurInconnu()
     {

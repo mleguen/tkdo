@@ -1,15 +1,15 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Domain\ResultatTirage;
+namespace App\Domain\Resultat;
 
 use App\Domain\Occasion\Occasion;
 
-interface ResultatTirageRepository
+interface ResultatRepository
 {
     /**
      * @param string $occasion
-     * @return ResultatTirage[]
+     * @return Resultat[]
      */
     public function readByOccasion(Occasion $occasion): array;
 }

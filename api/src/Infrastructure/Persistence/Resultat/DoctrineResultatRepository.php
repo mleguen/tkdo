@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace App\Infrastructure\Persistence\ResultatTirage;
+namespace App\Infrastructure\Persistence\Resultat;
 
 use App\Domain\Occasion\Occasion;
-use App\Domain\ResultatTirage\ResultatTirageRepository;
+use App\Domain\Resultat\ResultatRepository;
 use App\Infrastructure\Persistence\Occasion\DoctrineOccasion;
 use Doctrine\ORM\EntityManager;
 
-class DoctrineResultatTirageRepository implements ResultatTirageRepository
+class DoctrineResultatRepository implements ResultatRepository
 {
     /**
      * @var EntityManager
@@ -26,7 +26,7 @@ class DoctrineResultatTirageRepository implements ResultatTirageRepository
      */
     public function readByOccasion(Occasion $occasion): array
     {
-        return $this->em->getRepository(DoctrineResultatTirage::class)->findBy([
+        return $this->em->getRepository(DoctrineResultat::class)->findBy([
             'occasion' => $occasion,
         ]);
     }

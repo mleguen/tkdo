@@ -46,7 +46,7 @@ const utilisateurs = [alice, bob, charlie, david];
 const occasion: Occasion = {
   titre: 'Noël 2020',
   participants: utilisateurs,
-  resultatsTirage: [{
+  resultats: [{
     idQuiOffre: alice.id,
     idQuiRecoit: bob.id,
   }],

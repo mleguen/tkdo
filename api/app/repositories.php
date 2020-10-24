@@ -3,11 +3,11 @@ declare(strict_types=1);
 
 use App\Domain\Idee\IdeeRepository;
 use App\Domain\Occasion\OccasionRepository;
-use App\Domain\ResultatTirage\ResultatTirageRepository;
+use App\Domain\Resultat\ResultatRepository;
 use App\Domain\Utilisateur\UtilisateurRepository;
 use App\Infrastructure\Persistence\Idee\DoctrineIdeeRepository;
 use App\Infrastructure\Persistence\Occasion\DoctrineOccasionRepository;
-use App\Infrastructure\Persistence\ResultatTirage\DoctrineResultatTirageRepository;
+use App\Infrastructure\Persistence\Resultat\DoctrineResultatRepository;
 use App\Infrastructure\Persistence\Utilisateur\DoctrineUtilisateurRepository;
 use DI\ContainerBuilder;
 use Doctrine\Common\Cache\PhpFileCache;
@@ -34,6 +34,6 @@ return function (ContainerBuilder $containerBuilder) {
         UtilisateurRepository::class => \DI\autowire(DoctrineUtilisateurRepository::class),
         OccasionRepository::class => \DI\autowire(DoctrineOccasionRepository::class),
         IdeeRepository::class => \DI\autowire(DoctrineIdeeRepository::class),
-        ResultatTirageRepository::class => \DI\autowire(DoctrineResultatTirageRepository::class),
+        ResultatRepository::class => \DI\autowire(DoctrineResultatRepository::class),
     ]);
 };

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Infrastructure\Persistence\Utilisateur;
 
 use App\Domain\Utilisateur\Utilisateur;
-use App\Domain\Utilisateur\UtilisateurInconnuException;
+use App\Domain\Utilisateur\UtilisateurNotFoundException;
 use App\Domain\Utilisateur\UtilisateurRepository;
 
 class InMemoryUtilisateurRepository implements UtilisateurRepository
@@ -34,7 +34,7 @@ class InMemoryUtilisateurRepository implements UtilisateurRepository
 
     public function readNoClone(int $id): Utilisateur
     {
-        if (!isset($this->utilisateurs[$id])) throw new UtilisateurInconnuException();
+        if (!isset($this->utilisateurs[$id])) throw new UtilisateurNotFoundException();
 
         return $this->utilisateurs[$id];
     }
@@ -48,7 +48,7 @@ class InMemoryUtilisateurRepository implements UtilisateurRepository
             return ($u->getIdentifiant() === $identifiant) && ($u->getMdp() === $mdp);
         }));
 
-        if (!isset($id)) throw new UtilisateurInconnuException();
+        if (!isset($id)) throw new UtilisateurNotFoundException();
 
         return clone $this->utilisateurs[$id];
     }
@@ -59,7 +59,7 @@ class InMemoryUtilisateurRepository implements UtilisateurRepository
     public function update(Utilisateur $utilisateur): Utilisateur
     {
         $id = $utilisateur->getId();
-        if (!isset($this->utilisateurs[$utilisateur->getId()])) throw new UtilisateurInconnuException();
+        if (!isset($this->utilisateurs[$utilisateur->getId()])) throw new UtilisateurNotFoundException();
 
         $this->utilisateurs[$id] = clone $utilisateur;
         return clone $this->utilisateurs[$id];

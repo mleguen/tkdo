@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Infrastructure\Persistence\ResultatTirage;
+namespace App\Infrastructure\Persistence\Resultat;
 
 use App\Domain\Occasion\Occasion;
-use App\Domain\ResultatTirage\ResultatTirage;
+use App\Domain\Resultat\Resultat;
 use App\Domain\Utilisateur\Utilisateur;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Id;
@@ -17,13 +17,13 @@ use Doctrine\ORM\Mapping\UniqueConstraint;
 /**
  * @Entity
  * @Table(
- *      name="tkdo_resultat_tirage",
+ *      name="tkdo_resultat",
  *      uniqueConstraints={
  *          @UniqueConstraint(name="unique_quiRecoit_id_idx", columns={"occasion_id", "quiRecoit_id"})
  *      }
  * )
  */
-class DoctrineResultatTirage implements ResultatTirage
+class DoctrineResultat implements Resultat
 {
     /**
      * @var Occasion
@@ -76,7 +76,7 @@ class DoctrineResultatTirage implements ResultatTirage
     /**
      * {@inheritdoc}
      */
-    public function setOccasion(Occasion $occasion): ResultatTirage
+    public function setOccasion(Occasion $occasion): Resultat
     {
         $this->occasion = $occasion;
         return $this;
@@ -85,7 +85,7 @@ class DoctrineResultatTirage implements ResultatTirage
     /**
      * {@inheritdoc}
      */
-    public function setQuiOffre(Utilisateur $quiOffre): ResultatTirage
+    public function setQuiOffre(Utilisateur $quiOffre): Resultat
     {
         $this->quiOffre = $quiOffre;
         return $this;
@@ -94,7 +94,7 @@ class DoctrineResultatTirage implements ResultatTirage
     /**
      * {@inheritdoc}
      */
-    public function setQuiRecoit(Utilisateur $quiRecoit): ResultatTirage
+    public function setQuiRecoit(Utilisateur $quiRecoit): Resultat
     {
         $this->quiRecoit = $quiRecoit;
         return $this;

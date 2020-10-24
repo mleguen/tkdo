@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace App\Infrastructure\Persistence\ResultatTirage;
+namespace App\Infrastructure\Persistence\Resultat;
 
 use App\Domain\Occasion\Occasion;
-use App\Domain\ResultatTirage\ResultatTirageRepository;
+use App\Domain\Resultat\ResultatRepository;
 
-class InMemoryResultatTirageRepository implements ResultatTirageRepository
+class InMemoryResultatRepository implements ResultatRepository
 {
     /**
-     * @var DoctrineResultatTirage[]
+     * @var DoctrineResultat[]
      */
     private $resultats;
 

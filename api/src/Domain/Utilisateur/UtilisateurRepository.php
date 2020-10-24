@@ -6,17 +6,17 @@ namespace App\Domain\Utilisateur;
 interface UtilisateurRepository
 {
     /**
-     * @throws UtilisateurInconnuException
+     * @throws UtilisateurNotFoundException
      */
     public function read(int $id, bool $reference = false): Utilisateur;
 
     /**
-     * @throws UtilisateurInconnuException
+     * @throws UtilisateurNotFoundException
      */
     public function readOneByIdentifiants(string $identifiant, string $mdp): Utilisateur;
 
     /**
-     * @throws UtilisateurInconnuException
+     * @throws UtilisateurNotFoundException
      */
     public function update(Utilisateur $utilisateur): Utilisateur;
 }

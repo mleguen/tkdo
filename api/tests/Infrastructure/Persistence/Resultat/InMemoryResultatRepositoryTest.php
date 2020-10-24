@@ -1,15 +1,15 @@
 <?php
 declare(strict_types=1);
 
-namespace Tests\Infrastructure\Persistence\ResultatTirage;
+namespace Tests\Infrastructure\Persistence\Resultat;
 
 use App\Infrastructure\Persistence\Occasion\DoctrineOccasion;
-use App\Infrastructure\Persistence\ResultatTirage\DoctrineResultatTirage;
-use App\Infrastructure\Persistence\ResultatTirage\InMemoryResultatTirageRepository;
+use App\Infrastructure\Persistence\Resultat\DoctrineResultat;
+use App\Infrastructure\Persistence\Resultat\InMemoryResultatRepository;
 use App\Infrastructure\Persistence\Utilisateur\DoctrineUtilisateur;
 use Tests\TestCase;
 
-class InMemoryResultatTirageRepositoryTest extends TestCase
+class InMemoryResultatRepositoryTest extends TestCase
 {
     /**
      * @var DoctrineOccasion
@@ -17,12 +17,12 @@ class InMemoryResultatTirageRepositoryTest extends TestCase
     private $occasion;
 
     /**
-     * @var DoctrineResultatTirage
+     * @var DoctrineResultat
      */
-    private $resultatTirageAlice;
+    private $resultatAlice;
 
     /**
-     * @var InMemoryResultatTirageRepository
+     * @var InMemoryResultatRepository
      */
     private $repository;
 
@@ -41,17 +41,17 @@ class InMemoryResultatTirageRepositoryTest extends TestCase
             "Noël 2020",
             [$alice, $bob]
         );
-        $this->resultatTirageAlice = (new DoctrineResultatTirage($this->occasion, $alice))
+        $this->resultatAlice = (new DoctrineResultat($this->occasion, $alice))
             ->setQuiRecoit($bob);
-        $this->repository = new InMemoryResultatTirageRepository([
-            0 => $this->resultatTirageAlice,
+        $this->repository = new InMemoryResultatRepository([
+            0 => $this->resultatAlice,
         ]);
     }
 
     public function testReadByOccasion()
     {
         $this->assertEquals(
-            [$this->resultatTirageAlice],
+            [$this->resultatAlice],
             $this->repository->readByOccasion($this->occasion)
         );
     }

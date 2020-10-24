@@ -7,7 +7,7 @@ namespace App\Application\Actions\Idee;
 use App\Application\Actions\Idee\IdeeAction;
 use Psr\Http\Message\ResponseInterface as Response;
 
-class IdeeDeleteAction extends IdeeAction
+class DeleteIdeeAction extends IdeeAction
 {
   protected function action(): Response
   {

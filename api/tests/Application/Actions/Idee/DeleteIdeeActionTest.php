@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Tests\Application\Actions\Idee;
 
-use App\Domain\Idee\IdeeInconnueException;
+use App\Domain\Idee\IdeeNotFoundException;
 use App\Infrastructure\Persistence\Idee\DoctrineIdee;
 use App\Infrastructure\Persistence\Utilisateur\DoctrineUtilisateur;
 use Exception;
 use Tests\Application\Actions\ActionTestCase;
 
-class IdeeDeleteActionTest extends ActionTestCase
+class DeleteIdeeActionTest extends ActionTestCase
 {
     /**
      * @var Idee
@@ -82,7 +82,7 @@ EOT
     {
         $this->ideeRepositoryProphecy
             ->read($this->idee->getId())
-            ->willThrow(new IdeeInconnueException())
+            ->willThrow(new IdeeNotFoundException())
             ->shouldBeCalledOnce();
 
         $response = $this->handleAuthRequest(

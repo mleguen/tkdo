@@ -10,7 +10,7 @@ use Exception;
 use Prophecy\Argument;
 use Tests\Application\Actions\ActionTestCase;
 
-class IdeeCreateActionTest extends ActionTestCase
+class CreateIdeeActionTest extends ActionTestCase
 {
     /**
      * @var DoctrineIdee

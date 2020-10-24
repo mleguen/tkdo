@@ -38,7 +38,7 @@ class InMemoryOccasionRepositoryTest extends TestCase
     }
 
     /**
-     * @expectedException \App\Domain\Occasion\AucuneOccasionException
+     * @expectedException \App\Domain\Occasion\OccasionNotFoundException
      */
     public function testReadLastAucuneOccasion()
     {

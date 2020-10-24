@@ -5,7 +5,7 @@ namespace App\Domain\Utilisateur;
 
 use App\Domain\DomainException\DomainRecordNotFoundException;
 
-class UtilisateurInconnuException extends DomainRecordNotFoundException
+class UtilisateurNotFoundException extends DomainRecordNotFoundException
 {
     public $message = 'utilisateur inconnu';
 }

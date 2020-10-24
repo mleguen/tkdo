@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Tests\Application\Actions\Occasion;
 
-use App\Domain\Occasion\AucuneOccasionException;
+use App\Domain\Occasion\OccasionNotFoundException;
 use App\Infrastructure\Persistence\Occasion\DoctrineOccasion;
-use App\Infrastructure\Persistence\ResultatTirage\DoctrineResultatTirage;
+use App\Infrastructure\Persistence\Resultat\DoctrineResultat;
 use Tests\Application\Actions\ActionTestCase;
 
-class OccasionReadActionTest extends ActionTestCase
+class ViewOccasionActionTest extends ActionTestCase
 {
     public function testAction()
     {
@@ -21,11 +21,11 @@ class OccasionReadActionTest extends ActionTestCase
             ->willReturn($occasion)
             ->shouldBeCalledOnce();
 
-        $resultatTirage = (new DoctrineResultatTirage($occasion, $this->alice))
+        $resultat = (new DoctrineResultat($occasion, $this->alice))
             ->setQuiRecoit($this->bob);
-        $this->resultatTirageRepositoryProphecy
+        $this->resultatRepositoryProphecy
             ->readByOccasion($occasion)
-            ->willReturn([$resultatTirage])
+            ->willReturn([$resultat])
             ->shouldBeCalledOnce();
 
         $response = $this->handleAuthRequest(
@@ -52,10 +52,10 @@ class OccasionReadActionTest extends ActionTestCase
             "nom": "{$this->bob->getNom()}"
         }
     ],
-    "resultatsTirage": [
+    "resultats": [
         {
-            "idQuiOffre": {$resultatTirage->getQuiOffre()->getId()},
-            "idQuiRecoit": {$resultatTirage->getQuiRecoit()->getId()}
+            "idQuiOffre": {$resultat->getQuiOffre()->getId()},
+            "idQuiRecoit": {$resultat->getQuiRecoit()->getId()}
         }
     ]
 }
@@ -68,7 +68,7 @@ EOT
     {
         $this->occasionRepositoryProphecy
             ->readLast()
-            ->willThrow(new AucuneOccasionException())
+            ->willThrow(new OccasionNotFoundException())
             ->shouldBeCalledOnce();
 
         $response = $this->handleAuthRequest(

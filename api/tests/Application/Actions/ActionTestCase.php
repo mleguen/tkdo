@@ -7,7 +7,7 @@ use App\Application\Handlers\HttpErrorHandler;
 use App\Application\Service\AuthService;
 use App\Domain\Idee\IdeeRepository;
 use App\Domain\Occasion\OccasionRepository;
-use App\Domain\ResultatTirage\ResultatTirageRepository;
+use App\Domain\Resultat\ResultatRepository;
 use App\Domain\Utilisateur\UtilisateurRepository;
 use App\Infrastructure\Persistence\Utilisateur\DoctrineUtilisateur;
 use DI\Container;
@@ -23,7 +23,7 @@ use Slim\Psr7\Request as SlimRequest;
 use Slim\Psr7\Uri;
 use Tests\TestCase;
 
-    class ActionTestCase extends TestCase
+abstract class ActionTestCase extends TestCase
 {
     /**
      * @var App
@@ -48,7 +48,7 @@ use Tests\TestCase;
     /**
      * @var ObjectProphecy
      */
-    protected $resultatTirageRepositoryProphecy;
+    protected $resultatRepositoryProphecy;
 
     /**
      * @var ObjectProphecy
@@ -96,8 +96,8 @@ use Tests\TestCase;
         $this->occasionRepositoryProphecy = $this->prophesize(OccasionRepository::class);
         $this->container->set(OccasionRepository::class, $this->occasionRepositoryProphecy->reveal());
 
-        $this->resultatTirageRepositoryProphecy = $this->prophesize(ResultatTirageRepository::class);
-        $this->container->set(ResultatTirageRepository::class, $this->resultatTirageRepositoryProphecy->reveal());
+        $this->resultatRepositoryProphecy = $this->prophesize(ResultatRepository::class);
+        $this->container->set(ResultatRepository::class, $this->resultatRepositoryProphecy->reveal());
 
         $this->utilisateurRepositoryProphecy = $this->prophesize(UtilisateurRepository::class);
         $this->container->set(UtilisateurRepository::class, $this->utilisateurRepositoryProphecy->reveal());

@@ -10,7 +10,7 @@ use App\Domain\Utilisateur\UtilisateurRepository;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Log\LoggerInterface;
 
-class IdeeCreateAction extends IdeeAction
+class CreateIdeeAction extends IdeeAction
 {
   /**
    * @var UtilisateurRepository

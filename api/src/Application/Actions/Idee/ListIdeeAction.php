@@ -14,7 +14,7 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Log\LoggerInterface;
 use Slim\Exception\HttpBadRequestException;
 
-class IdeeReadAllAction extends IdeeAction
+class ListIdeeAction extends IdeeAction
 {
   /**
    * @var UtilisateurRepository

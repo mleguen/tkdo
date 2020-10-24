@@ -6,14 +6,13 @@ namespace App\Application\Actions\Connexion;
 
 use App\Application\Actions\Action;
 use App\Application\Service\AuthService;
-use App\Domain\Utilisateur\UtilisateurInconnuException;
+use App\Domain\Utilisateur\UtilisateurNotFoundException;
 use App\Domain\Utilisateur\UtilisateurRepository;
-use Exception;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Log\LoggerInterface;
 use Slim\Exception\HttpBadRequestException;
 
-class ConnexionAction extends Action
+class CreateConnexionAction extends Action
 {
   /**
    * @var UtilisateurRepository
@@ -53,10 +52,10 @@ class ConnexionAction extends Action
         ]
       ]);
     }
-    catch (UtilisateurInconnuException $err) {
+    catch (UtilisateurNotFoundException $err) {
       throw new HttpBadRequestException($this->request, "identifiants invalides");
     }
-    catch (Exception $e) {
+    catch (\Exception $e) {
       $this->logger->error($e->getMessage());
       throw $e;
     }

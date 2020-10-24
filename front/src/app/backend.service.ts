@@ -6,7 +6,7 @@ import { first, tap } from 'rxjs/operators';
 export interface Occasion {
   titre: string;
   participants: Utilisateur[];
-  resultatsTirage: ResultatTirage[]
+  resultats: Resultat[]
 }
 
 export interface Utilisateur {
@@ -15,7 +15,7 @@ export interface Utilisateur {
   nom: string;
 }
 
-export interface ResultatTirage {
+export interface Resultat {
   idQuiOffre: number;
   idQuiRecoit: number;
 }

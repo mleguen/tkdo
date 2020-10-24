@@ -104,7 +104,7 @@ class InMemoryIdeeRepositoryTest extends TestCase
     }
 
     /**
-     * @expectedException \App\Domain\Idee\IdeeInconnueException
+     * @expectedException \App\Domain\Idee\IdeeNotFoundException
      */
     public function testReadIdeeInconnue()
     {
@@ -134,7 +134,7 @@ class InMemoryIdeeRepositoryTest extends TestCase
     }
 
     /**
-     * @expectedException \App\Domain\Idee\IdeeInconnueException
+     * @expectedException \App\Domain\Idee\IdeeNotFoundException
      */
     public function testDeleteIdeeInconnue()
     {

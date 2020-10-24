@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Infrastructure\Persistence\Occasion;
 
 use App\Domain\Occasion\Occasion;
-use App\Domain\Occasion\AucuneOccasionException;
+use App\Domain\Occasion\OccasionNotFoundException;
 use App\Domain\Occasion\OccasionRepository;
 
 class InMemoryOccasionRepository implements OccasionRepository
@@ -28,7 +28,7 @@ class InMemoryOccasionRepository implements OccasionRepository
      */
     public function readLast(): Occasion
     {
-        if (empty($this->occasions)) throw new AucuneOccasionException();
+        if (empty($this->occasions)) throw new OccasionNotFoundException();
         $lastId = max(array_keys($this->occasions));
         return clone $this->occasions[$lastId];
     }

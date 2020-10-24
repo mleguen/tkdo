@@ -7,7 +7,7 @@ namespace App\Application\Actions\Utilisateur;
 use App\Application\Serializable\Utilisateur\SerializableUtilisateur;
 use Psr\Http\Message\ResponseInterface as Response;
 
-class UtilisateurReadAction extends UtilisateurAction
+class ViewUtilisateurAction extends UtilisateurAction
 {
   protected function action(): Response
   {

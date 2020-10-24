@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Application\Serializable\Occasion;
 
-use App\Application\Serializable\ResultatTirage\SerializableResultatTirage;
+use App\Application\Serializable\Resultat\SerializableResultat;
 use App\Application\Serializable\Utilisateur\SerializableUtilisateur;
 use App\Domain\Occasion\Occasion;
-use App\Domain\ResultatTirage\ResultatTirage;
+use App\Domain\Resultat\Resultat;
 use App\Domain\Utilisateur\Utilisateur;
 use JsonSerializable;
 
@@ -19,17 +19,17 @@ class SerializableOccasion implements JsonSerializable
   private $occasion;
 
   /**
-   * @var ResultatTirage[]
+   * @var Resultat[]
    */
-  private $resultatsTirage;
+  private $resultats;
 
   /**
-   * @param ResultatTirage $resultatsTirage
+   * @param Resultat $resultats
    */
-  public function __construct(Occasion $occasion, array $resultatsTirage)
+  public function __construct(Occasion $occasion, array $resultats)
   {
     $this->occasion = $occasion;
-    $this->resultatsTirage = $resultatsTirage;
+    $this->resultats = $resultats;
   }
 
   public function jsonSerialize(): array
@@ -43,11 +43,11 @@ class SerializableOccasion implements JsonSerializable
         },
         $this->occasion->getParticipants()
       ),
-      'resultatsTirage' => array_map(
-        function (ResultatTirage $rt) {
-          return new SerializableResultatTirage($rt);
+      'resultats' => array_map(
+        function (Resultat $rt) {
+          return new SerializableResultat($rt);
         },
-        $this->resultatsTirage
+        $this->resultats
       )
     ];
   }

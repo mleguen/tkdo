@@ -5,7 +5,7 @@ namespace App\Domain\Idee;
 
 use App\Domain\DomainException\DomainRecordNotFoundException;
 
-class IdeeInconnueException extends DomainRecordNotFoundException
+class IdeeNotFoundException extends DomainRecordNotFoundException
 {
     public $message = 'idée inconnue';
 }

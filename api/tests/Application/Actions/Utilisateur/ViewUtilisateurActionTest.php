@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace Tests\Application\Actions\Utilisateur;
 
-use App\Domain\Utilisateur\UtilisateurInconnuException;
-use App\Infrastructure\Persistence\Utilisateur\DoctrineUtilisateur;
+use App\Domain\Utilisateur\UtilisateurNotFoundException;
 use Tests\Application\Actions\ActionTestCase;
 
-class UtilisateurUpdateActionTest extends ActionTestCase
+class ViewUtilisateurActionTest extends ActionTestCase
 {
     public function testAction()
     {
@@ -17,36 +16,20 @@ class UtilisateurUpdateActionTest extends ActionTestCase
             ->willReturn($this->alice)
             ->shouldBeCalledOnce();
 
-        /**
-         * @var DoctrineUtilisateur
-         */
-        $aliceModifiee = (new DoctrineUtilisateur($this->alice->getId()))
-            ->setIdentifiant('alice2@tkdo.org')
-            ->setNom('Alice2')
-            ->setMdp('nouveaumdpalice');
-        $this->utilisateurRepositoryProphecy
-            ->update($aliceModifiee)
-            ->willReturn($aliceModifiee)
-            ->shouldBeCalledOnce();
-
         $response = $this->handleAuthRequest(
             $this->alice->getId(),
-            'PUT',
-            "/utilisateur/{$this->alice->getId()}",
-            '',
-            <<<EOT
-{
-    "identifiant": "{$aliceModifiee->getIdentifiant()}",
-    "mdp": "{$aliceModifiee->getMdp()}",
-    "nom": "{$aliceModifiee->getNom()}"
-}
-EOT
+            'GET',
+            "/utilisateur/{$this->alice->getId()}"
         );
 
         $this->assertEqualsResponse(
             200,
-            <<<'EOT'
-null
+            <<<EOT
+{
+    "id": {$this->alice->getId()},
+    "identifiant": "{$this->alice->getIdentifiant()}",
+    "nom": "{$this->alice->getNom()}"
+}
 EOT
             , $response
         );
@@ -56,8 +39,8 @@ EOT
     {
         $response = $this->handleAuthRequest(
             $this->bob->getId(),
-            'PUT',
-            "/utilisateur/{$this->alice->getId()}", '', "{}"
+            'GET',
+            "/utilisateur/{$this->alice->getId()}"
         );
 
         $this->assertEqualsResponse(
@@ -76,13 +59,13 @@ EOT
     {
         $this->utilisateurRepositoryProphecy
             ->read($this->alice->getId())
-            ->willThrow(new UtilisateurInconnuException())
+            ->willThrow(new UtilisateurNotFoundException())
             ->shouldBeCalledOnce();
 
         $response = $this->handleAuthRequest(
             $this->alice->getId(),
-            'PUT',
-            "/utilisateur/{$this->alice->getId()}", '', "{}"
+            'GET',
+            "/utilisateur/{$this->alice->getId()}"
         );
 
         $this->assertEqualsResponse(
@@ -99,7 +82,7 @@ EOT
 
     public function testActionNonAutorise()
     {
-        $response = $this->handleRequest('PUT', "/utilisateur/{$this->alice->getId()}");
+        $response = $this->handleRequest('GET', "/utilisateur/{$this->alice->getId()}");
 
         $this->assertEqualsResponse(
             401,

@@ -15,7 +15,7 @@ interface IdeeRepository
     ): Idee;
 
     /**
-     * @throws IdeeInconnueException
+     * @throws IdeeNotFoundException
      */
     public function read(int $id, bool $reference = false): Idee;
 
@@ -25,7 +25,7 @@ interface IdeeRepository
     public function readByUtilisateur(Utilisateur $utilisateur): array;
 
     /**
-     * @throws IdeeInconnueException
+     * @throws IdeeNotFoundException
      */
     public function delete(Idee $idee);
 }

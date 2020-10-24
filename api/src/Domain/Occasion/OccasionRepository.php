@@ -7,7 +7,7 @@ interface OccasionRepository
 {
     /**
      * @return Occasion
-     * @throws AucuneOccasionException
+     * @throws OccasionNotFoundException
      */
     public function readLast(): Occasion;
 }

@@ -19,7 +19,7 @@ export class OccasionComponent implements OnInit {
   ngOnInit(): void {
     this.occasion$ = this.backend.getOccasion$().pipe(
       map(o => {
-        const idQuiRecoitDeMoi = o.resultatsTirage.find(rt => rt.idQuiOffre === this.backend.idUtilisateur)?.idQuiRecoit;
+        const idQuiRecoitDeMoi = o.resultats.find(rt => rt.idQuiOffre === this.backend.idUtilisateur)?.idQuiRecoit;
         return Object.assign({}, o, {
           participants: o.participants.map(p => Object.assign({}, p, {
             estMoi: p.id === this.backend.idUtilisateur,

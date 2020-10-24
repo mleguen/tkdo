@@ -6,7 +6,7 @@ namespace App\Application\Actions\Utilisateur;
 
 use Psr\Http\Message\ResponseInterface as Response;
 
-class UtilisateurUpdateAction extends UtilisateurAction
+class EditUtilisateurAction extends UtilisateurAction
 {
   protected function action(): Response
   {

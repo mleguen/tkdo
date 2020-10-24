@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Infrastructure\Persistence\Utilisateur;
 
 use App\Domain\Utilisateur\Utilisateur;
-use App\Domain\Utilisateur\UtilisateurInconnuException;
+use App\Domain\Utilisateur\UtilisateurNotFoundException;
 use App\Domain\Utilisateur\UtilisateurRepository;
 use Doctrine\ORM\EntityManager;
 
@@ -28,7 +28,7 @@ class DoctrineUtilisateurRepository implements UtilisateurRepository
     {
         if ($reference) return $this->em->getReference(DoctrineUtilisateur::class, $id);
         $utilisateur = $this->em->getRepository(DoctrineUtilisateur::class)->find($id);
-        if (is_null($utilisateur)) throw new UtilisateurInconnuException();
+        if (is_null($utilisateur)) throw new UtilisateurNotFoundException();
         return $utilisateur;
     }
 
@@ -47,7 +47,7 @@ class DoctrineUtilisateurRepository implements UtilisateurRepository
             is_null($utilisateur) ||
             !password_verify($mdp, $utilisateur->getMdp())
         ) {
-            throw new UtilisateurInconnuException();
+            throw new UtilisateurNotFoundException();
         }
         return $utilisateur;
     }

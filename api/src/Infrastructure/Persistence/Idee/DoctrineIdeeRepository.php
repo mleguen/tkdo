@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Infrastructure\Persistence\Idee;
 
 use App\Domain\Idee\Idee;
-use App\Domain\Idee\IdeeInconnueException;
+use App\Domain\Idee\IdeeNotFoundException;
 use App\Domain\Idee\IdeeRepository;
 use App\Domain\Utilisateur\Utilisateur;
 use Doctrine\ORM\EntityManager;
@@ -49,7 +49,7 @@ class DoctrineIdeeRepository implements IdeeRepository
     {
         if ($reference) return $this->em->getReference(DoctrineIdee::class, $id);
         $idee = $this->em->getRepository(DoctrineIdee::class)->find($id);
-        if (is_null($idee)) throw new IdeeInconnueException();
+        if (is_null($idee)) throw new IdeeNotFoundException();
         return $idee;
     }
 

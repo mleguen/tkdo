@@ -109,12 +109,12 @@ WHERE u.identifiant IN ('alice@tkdo.org', 'bob@tkdo.org')
 #### Tirage au sort
 
 Le tirage au sort pour la dernière occasion créée doit pour l'instant être fait en dehors de l'application,
-et injecté ensuite directement en base de données, dans la table `tkdo_resultat_tirage`,
+et injecté ensuite directement en base de données, dans la table `tkdo_resultat`,
 participant par participant.
 Par exemple :
 
 ```sql
-INSERT INTO tkdo_resultat_tirage (occasion_id, quiOffre_id, quiRecoit_id)
+INSERT INTO tkdo_resultat (occasion_id, quiOffre_id, quiRecoit_id)
 SELECT o.lastid, offre.id, recoit.id
 FROM (SELECT MAX(id) lastid FROM tkdo_occasion) o
 INNER JOIN tkdo_utilisateur offre ON offre.identifiant = 'alice@tkdo.org'
@@ -180,3 +180,20 @@ Et pour la peupler de données de test :
 - variable d'environnement CHROME_BIN pointant vers le binaire de chrome/chromium
 - `npm run chrome-webdriver-update` lancé pour forcer la version de webdriver chrome de protractor
   à correspondre à celle du chrome/chromium installé
+
+### Créer une nouvelle migration de base de données
+
+```bash
+./docker-compose up -d
+./composer-api doctrine orm:schema-tool:drop --force
+./composer-api doctrine migrations:migrate
+./composer-api doctrine orm:clear-cache:metadata
+./composer-api doctrine migrations:diff
+```
+
+Puis après vérification/finalisation de la migration, la tester :
+
+```bash
+./composer-api doctrine migrations:migrate
+./composer-api doctrine fixtures:load
+```

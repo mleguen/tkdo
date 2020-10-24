@@ -7,11 +7,11 @@ namespace App\Application\Actions\Occasion;
 use App\Application\Actions\Action;
 use App\Application\Serializable\Occasion\SerializableOccasion;
 use App\Domain\Occasion\OccasionRepository;
-use App\Domain\ResultatTirage\ResultatTirageRepository;
+use App\Domain\Resultat\ResultatRepository;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Log\LoggerInterface;
 
-class OccasionReadAction extends Action
+class ViewOccasionAction extends Action
 {
   /**
    * @var OccasionRepository
@@ -19,19 +19,19 @@ class OccasionReadAction extends Action
   protected $occasionRepository;
 
   /**
-   * @var ResultatTirageRepository
+   * @var ResultatRepository
    */
-  protected $resultatTirageRepository;
+  protected $resultatRepository;
 
   /**
    * @param LoggerInterface     $logger
    * @param OccasionRepository  $occasionRepository
    */
-  public function __construct(LoggerInterface $logger, OccasionRepository $occasionRepository, ResultatTirageRepository $resultatTirageRepository)
+  public function __construct(LoggerInterface $logger, OccasionRepository $occasionRepository, ResultatRepository $resultatRepository)
   {
     parent::__construct($logger);
     $this->occasionRepository = $occasionRepository;
-    $this->resultatTirageRepository = $resultatTirageRepository;
+    $this->resultatRepository = $resultatRepository;
   }
 
   protected function action(): Response
@@ -40,7 +40,7 @@ class OccasionReadAction extends Action
     $occasion = $this->occasionRepository->readLast(); 
     return $this->respondWithData(new SerializableOccasion(
       $occasion,
-      $this->resultatTirageRepository->readByOccasion($occasion)
+      $this->resultatRepository->readByOccasion($occasion)
     ));
   }
 }

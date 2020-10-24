@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Infrastructure\Persistence\Idee;
 
 use App\Domain\Idee\Idee;
-use App\Domain\Idee\IdeeInconnueException;
+use App\Domain\Idee\IdeeNotFoundException;
 use App\Domain\Idee\IdeeRepository;
 use App\Domain\Utilisateur\Utilisateur;
 use App\Infrastructure\Persistence\Utilisateur\InMemoryUtilisateurRepository;
@@ -58,7 +58,7 @@ class InMemoryIdeeRepository implements IdeeRepository
     public function read(int $id, bool $reference = false): Idee
     {
         if ($reference) return new DoctrineIdee($id);
-        if (!isset($this->idees[$id])) throw new IdeeInconnueException();
+        if (!isset($this->idees[$id])) throw new IdeeNotFoundException();
         return clone $this->idees[$id];
     }
 
@@ -86,7 +86,7 @@ class InMemoryIdeeRepository implements IdeeRepository
     public function delete(Idee $idee)
     {
         $id = $idee->getId();
-        if (!isset($this->idees[$id])) throw new IdeeInconnueException();
+        if (!isset($this->idees[$id])) throw new IdeeNotFoundException();
         unset($this->idees[$id]);
     }
 }

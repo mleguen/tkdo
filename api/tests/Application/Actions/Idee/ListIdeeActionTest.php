@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace Tests\Application\Actions\Idee;
 
 use App\Domain\Idee\Idee;
-use App\Domain\Utilisateur\UtilisateurInconnuException;
+use App\Domain\Utilisateur\UtilisateurNotFoundException;
 use App\Infrastructure\Persistence\Idee\DoctrineIdee;
 use App\Infrastructure\Persistence\Utilisateur\InMemoryUtilisateurReference;
 use Exception;
 use Tests\Application\Actions\ActionTestCase;
 
-class IdeeReadAllActionTest extends ActionTestCase
+class ListIdeeActionTest extends ActionTestCase
 {
     /**
      * @var DoctrineIdee
@@ -202,7 +202,7 @@ EOT
     {
         $this->utilisateurRepositoryProphecy
             ->read($this->alice->getId())
-            ->willThrow(new UtilisateurInconnuException())
+            ->willThrow(new UtilisateurNotFoundException())
             ->shouldBeCalledOnce();
 
         $response = $this->handleAuthRequest(

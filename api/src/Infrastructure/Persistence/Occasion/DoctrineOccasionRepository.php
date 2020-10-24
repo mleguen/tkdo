@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Infrastructure\Persistence\Occasion;
 
 use App\Domain\Occasion\Occasion;
-use App\Domain\Occasion\AucuneOccasionException;
+use App\Domain\Occasion\OccasionNotFoundException;
 use App\Domain\Occasion\OccasionRepository;
 use Doctrine\ORM\EntityManager;
 
@@ -33,7 +33,7 @@ class DoctrineOccasionRepository implements OccasionRepository
             ->setMaxResults(1)
             ->getQuery()
             ->getOneOrNullResult();
-        if (is_null($occasion)) throw new AucuneOccasionException();
+        if (is_null($occasion)) throw new OccasionNotFoundException();
         return $occasion;
     }
 }
