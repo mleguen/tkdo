@@ -19,6 +19,21 @@ class InMemoryConnexionRepositoryTest extends TestCase
         $this->assertEquals([$connexion], $connexionRepository->findAll());
     }
 
+    public function testFindAllConnexionByDefault()
+    {
+        $connexions = [
+            1 => new Connexion(1, 'bill.gates', 'Bill', 'Gates'),
+            2 => new Connexion(2, 'steve.jobs', 'Steve', 'Jobs'),
+            3 => new Connexion(3, 'mark.zuckerberg', 'Mark', 'Zuckerberg'),
+            4 => new Connexion(4, 'evan.spiegel', 'Evan', 'Spiegel'),
+            5 => new Connexion(5, 'jack.dorsey', 'Jack', 'Dorsey'),
+        ];
+
+        $connexionRepository = new InMemoryConnexionRepository();
+
+        $this->assertEquals(array_values($connexions), $connexionRepository->findAll());
+    }
+
     public function testFindConnexionOfId()
     {
         $connexion = new Connexion(1, 'bill.gates', 'Bill', 'Gates');
@@ -28,12 +43,10 @@ class InMemoryConnexionRepositoryTest extends TestCase
         $this->assertEquals($connexion, $connexionRepository->findConnexionOfId(1));
     }
 
-    /**
-     * @expectedException \App\Domain\Connexion\ConnexionNotFoundException
-     */
     public function testFindConnexionOfIdThrowsNotFoundException()
     {
         $connexionRepository = new InMemoryConnexionRepository([]);
+        $this->expectException(ConnexionNotFoundException::class);
         $connexionRepository->findConnexionOfId(1);
     }
 }
