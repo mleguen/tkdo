@@ -26,7 +26,7 @@ class InMemoryResultatRepositoryTest extends TestCase
      */
     private $repository;
 
-    public function setUp()
+    public function setUp(): void
     {
         $alice = (new DoctrineUtilisateur(1))
             ->setIdentifiant('alice@tkdo.org')

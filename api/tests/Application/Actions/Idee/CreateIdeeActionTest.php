@@ -8,6 +8,8 @@ use App\Infrastructure\Persistence\Idee\DoctrineIdee;
 use App\Infrastructure\Persistence\Utilisateur\InMemoryUtilisateurReference;
 use Exception;
 use Prophecy\Argument;
+use Slim\Exception\HttpForbiddenException;
+use Slim\Exception\HttpUnauthorizedException;
 use Tests\Application\Actions\ActionTestCase;
 
 class CreateIdeeActionTest extends ActionTestCase
@@ -17,7 +19,7 @@ class CreateIdeeActionTest extends ActionTestCase
      */
     private $idee;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->utilisateurRepositoryProphecy
@@ -65,18 +67,13 @@ class CreateIdeeActionTest extends ActionTestCase
 EOT
         );
 
-        $this->assertEqualsResponse(
-            200,
-            <<<'EOT'
-null
-EOT
-            , $response
-        );
+        $this->assertEquals('null', $response->getBody());
     }
 
     public function testActionPasLAuteur()
     {
-        $response = $this->handleAuthRequest(
+        $this->expectException(HttpForbiddenException::class);
+        $this->handleAuthRequest(
             $this->idee->getUtilisateur()->getId(),
             'POST',
             "/idee",
@@ -89,17 +86,6 @@ EOT
 }
 EOT
         );
-
-        $this->assertEqualsResponse(
-            403,
-            <<<'EOT'
-{
-    "type": "INSUFFICIENT_PRIVILEGES",
-    "description": "Forbidden."
-}
-EOT
-            , $response
-        );
     }
 
     public function testActionEchecCreation()
@@ -109,7 +95,9 @@ EOT
             ->willThrow(new Exception('erreur pendant create'))
             ->shouldBeCalledOnce();
 
-        $response = $this->handleAuthRequest(
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('erreur pendant create');
+        $this->handleAuthRequest(
             $this->idee->getAuteur()->getId(),
             'POST',
             "/idee",
@@ -122,39 +110,18 @@ EOT
 }
 EOT
         );
-
-        $this->assertEqualsResponse(
-            500,
-            <<<'EOT'
-{
-    "type": "SERVER_ERROR",
-    "description": "erreur pendant create"
-}
-EOT
-            , $response
-        );
     }
 
     public function testActionNonAutorise()
     {
-        $response = $this->handleRequest('POST', "/idee", '', <<<EOT
+        $this->expectException(HttpUnauthorizedException::class);
+        $this->handleRequest('POST', "/idee", '', <<<EOT
 {
     "idUtilisateur": {$this->idee->getUtilisateur()->getId()},
     "description": "{$this->idee->getDescription()}",
     "idAuteur": {$this->idee->getAuteur()->getId()}
 }
 EOT
-        );
-
-        $this->assertEqualsResponse(
-            401,
-            <<<'EOT'
-{
-    "type": "UNAUTHENTICATED",
-    "description": "Unauthorized."
-}
-EOT
-            , $response
         );
     }
 }

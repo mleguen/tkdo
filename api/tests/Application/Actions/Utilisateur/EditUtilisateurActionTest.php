@@ -6,6 +6,9 @@ namespace Tests\Application\Actions\Utilisateur;
 
 use App\Domain\Utilisateur\UtilisateurNotFoundException;
 use App\Infrastructure\Persistence\Utilisateur\DoctrineUtilisateur;
+use Slim\Exception\HttpForbiddenException;
+use Slim\Exception\HttpNotFoundException;
+use Slim\Exception\HttpUnauthorizedException;
 use Tests\Application\Actions\ActionTestCase;
 
 class EditUtilisateurActionTest extends ActionTestCase
@@ -43,32 +46,16 @@ class EditUtilisateurActionTest extends ActionTestCase
 EOT
         );
 
-        $this->assertEqualsResponse(
-            200,
-            <<<'EOT'
-null
-EOT
-            , $response
-        );
+        $this->assertEquals('null', $response->getBody());
     }
 
     public function testActionAutreUtilisateur()
     {
-        $response = $this->handleAuthRequest(
+        $this->expectException(HttpForbiddenException::class);
+        $this->handleAuthRequest(
             $this->bob->getId(),
             'PUT',
             "/utilisateur/{$this->alice->getId()}", '', "{}"
-        );
-
-        $this->assertEqualsResponse(
-            403,
-            <<<'EOT'
-{
-    "type": "INSUFFICIENT_PRIVILEGES",
-    "description": "Forbidden."
-}
-EOT
-            , $response
         );
     }
 
@@ -79,37 +66,18 @@ EOT
             ->willThrow(new UtilisateurNotFoundException())
             ->shouldBeCalledOnce();
 
-        $response = $this->handleAuthRequest(
+        $this->expectException(HttpNotFoundException::class);
+        $this->expectExceptionMessage('utilisateur inconnu');
+        $this->handleAuthRequest(
             $this->alice->getId(),
             'PUT',
             "/utilisateur/{$this->alice->getId()}", '', "{}"
-        );
-
-        $this->assertEqualsResponse(
-            404,
-            <<<'EOT'
-{
-    "type": "RESOURCE_NOT_FOUND",
-    "description": "utilisateur inconnu"
-}
-EOT
-            , $response
         );
     }
 
     public function testActionNonAutorise()
     {
-        $response = $this->handleRequest('PUT', "/utilisateur/{$this->alice->getId()}");
-
-        $this->assertEqualsResponse(
-            401,
-            <<<'EOT'
-{
-    "type": "UNAUTHENTICATED",
-    "description": "Unauthorized."
-}
-EOT
-            , $response
-        );
+        $this->expectException(HttpUnauthorizedException::class);
+        $this->handleRequest('PUT', "/utilisateur/{$this->alice->getId()}");
     }
 }

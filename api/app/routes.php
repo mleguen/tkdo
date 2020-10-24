@@ -10,8 +10,15 @@ use App\Application\Actions\Idee\CreateIdeeAction;
 use App\Application\Actions\Utilisateur\EditUtilisateurAction;
 use Slim\App;
 use Slim\Interfaces\RouteCollectorProxyInterface as Group;
+use Slim\Psr7\Request;
+use Slim\Psr7\Response;
 
 return function (App $app) {
+    $app->options('/{routes:.*}', function (Request $request, Response $response) {
+        // CORS Pre-Flight OPTIONS Request Handler
+        return $response;
+    });
+
     $app->post('/connexion', CreateConnexionAction::class);
     $app->group('/idee', function (Group $group) {
         $group->get('', ListIdeeAction::class);

@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Tests\Infrastructure\Persistence\Idee;
 
+use App\Domain\Idee\IdeeNotFoundException;
 use App\Infrastructure\Persistence\Idee\DoctrineIdee;
 use App\Infrastructure\Persistence\Idee\InMemoryIdeeRepository;
 use App\Infrastructure\Persistence\Utilisateur\DoctrineUtilisateur;
@@ -41,7 +42,7 @@ class InMemoryIdeeRepositoryTest extends TestCase
      */
     private $repository;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->alice = (new DoctrineUtilisateur(1))
             ->setIdentifiant('alice@tkdo.org')
@@ -103,11 +104,9 @@ class InMemoryIdeeRepositoryTest extends TestCase
         );
     }
 
-    /**
-     * @expectedException \App\Domain\Idee\IdeeNotFoundException
-     */
     public function testReadIdeeInconnue()
     {
+        $this->expectException(IdeeNotFoundException::class);
         $this->repository->read($this->ideeInconnue->getId());
     }
 
@@ -133,11 +132,9 @@ class InMemoryIdeeRepositoryTest extends TestCase
         $this->assertEquals([$this->ideeBobPourAlice], $this->repository->readByUtilisateur($this->alice));
     }
 
-    /**
-     * @expectedException \App\Domain\Idee\IdeeNotFoundException
-     */
     public function testDeleteIdeeInconnue()
     {
+        $this->expectException(IdeeNotFoundException::class);
         $this->repository->delete($this->ideeInconnue);
     }
 }

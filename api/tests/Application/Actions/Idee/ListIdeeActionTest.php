@@ -7,6 +7,9 @@ use App\Domain\Idee\Idee;
 use App\Domain\Utilisateur\UtilisateurNotFoundException;
 use App\Infrastructure\Persistence\Idee\DoctrineIdee;
 use App\Infrastructure\Persistence\Utilisateur\InMemoryUtilisateurReference;
+use Slim\Exception\HttpBadRequestException;
+use Slim\Exception\HttpNotFoundException;
+use Slim\Exception\HttpUnauthorizedException;
 use Tests\Application\Actions\ActionTestCase;
 
 class ListIdeeActionTest extends ActionTestCase
@@ -21,7 +24,7 @@ class ListIdeeActionTest extends ActionTestCase
      */
     private $ideeDeAlicePourElleMeme;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setup();
         $this->utilisateurRepositoryProphecy
@@ -61,9 +64,7 @@ class ListIdeeActionTest extends ActionTestCase
             "idUtilisateur={$this->alice->getId()}"
         );
 
-        $this->assertEqualsResponse(
-            200,
-            <<<EOT
+        $json = <<<EOT
 {
     "utilisateur": {
         "id": {$this->alice->getId()},
@@ -75,9 +76,8 @@ class ListIdeeActionTest extends ActionTestCase
 {$this->morceauReponseIdee($this->ideeDeAlicePourElleMeme)}
     ]
 }
-EOT
-            , $response
-        );
+EOT;
+        $this->assertEquals($json, $response->getBody());
     }
 
     public function testActionAuteur()
@@ -101,9 +101,7 @@ EOT
             "idUtilisateur={$this->alice->getId()}"
         );
 
-        $this->assertEqualsResponse(
-            200,
-            <<<EOT
+        $json = <<<EOT
 {
     "utilisateur": {
         "id": {$this->alice->getId()},
@@ -115,9 +113,8 @@ EOT
 {$this->morceauReponseIdee($this->ideeDeAlicePourElleMeme)}
     ]
 }
-EOT
-            , $response
-        );
+EOT;
+        $this->assertEquals($json, $response->getBody());
     }
 
     public function testActionUtilisateur()
@@ -141,9 +138,7 @@ EOT
             "idUtilisateur={$this->alice->getId()}"
         );
 
-        $this->assertEqualsResponse(
-            200,
-            <<<EOT
+        $json = <<<EOT
 {
     "utilisateur": {
         "id": {$this->alice->getId()},
@@ -154,9 +149,8 @@ EOT
 {$this->morceauReponseIdee($this->ideeDeAlicePourElleMeme)}
     ]
 }
-EOT
-            , $response
-        );
+EOT;
+        $this->assertEquals($json, $response->getBody());
     }
 
     private function morceauReponseIdee(Idee $i)
@@ -177,22 +171,13 @@ EOT;
 
     public function testActionIdUtilisateurManquant()
     {
-        $response = $this->handleAuthRequest(
+        $this->expectException(HttpBadRequestException::class);
+        $this->expectExceptionMessage('idUtilisateur manquant');
+        $this->handleAuthRequest(
             $this->charlie->getId(),
             'GET',
             '/idee',
             ''
-        );
-
-        $this->assertEqualsResponse(
-            400,
-            <<<'EOT'
-{
-    "type": "BAD_REQUEST",
-    "description": "idUtilisateur manquant"
-}
-EOT
-            , $response
         );
     }
 
@@ -203,22 +188,13 @@ EOT
             ->willThrow(new UtilisateurNotFoundException())
             ->shouldBeCalledOnce();
 
-        $response = $this->handleAuthRequest(
+        $this->expectException(HttpNotFoundException::class);
+        $this->expectExceptionMessage('utilisateur inconnu');
+        $this->handleAuthRequest(
             $this->charlie->getId(),
             'GET',
             '/idee',
             "idUtilisateur={$this->alice->getId()}"
-        );
-
-        $this->assertEqualsResponse(
-            404,
-            <<<'EOT'
-{
-    "type": "RESOURCE_NOT_FOUND",
-    "description": "utilisateur inconnu"
-}
-EOT
-            , $response
         );
     }
 
@@ -233,38 +209,19 @@ EOT
             ->willThrow(new \Exception('erreur pendant readByUtilisateur'))
             ->shouldBeCalledOnce();
 
-        $response = $this->handleAuthRequest(
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('erreur pendant readByUtilisateur');
+        $this->handleAuthRequest(
             $this->charlie->getId(),
             'GET',
             '/idee',
             "idUtilisateur={$this->alice->getId()}"
         );
-
-        $this->assertEqualsResponse(
-            500,
-            <<<'EOT'
-{
-    "type": "SERVER_ERROR",
-    "description": "erreur pendant readByUtilisateur"
-}
-EOT
-            , $response
-        );
     }
 
     public function testActionNonAutorise()
     {
-        $response = $this->handleRequest('GET', '/idee', "idUtilisateur={$this->alice->getId()}");
-
-        $this->assertEqualsResponse(
-            401,
-            <<<'EOT'
-{
-    "type": "UNAUTHENTICATED",
-    "description": "Unauthorized."
-}
-EOT
-            , $response
-        );
+        $this->expectException(HttpUnauthorizedException::class);
+        $this->handleRequest('GET', '/idee', "idUtilisateur={$this->alice->getId()}");
     }
 }

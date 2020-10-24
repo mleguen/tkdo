@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Tests\Infrastructure\Persistence\Utilisateur;
 
+use App\Domain\Utilisateur\UtilisateurNotFoundException;
 use App\Infrastructure\Persistence\Utilisateur\DoctrineUtilisateur;
 use App\Infrastructure\Persistence\Utilisateur\InMemoryUtilisateurRepository;
 use Tests\TestCase;
@@ -24,7 +25,7 @@ class InMemoryUtilisateurRepositoryTest extends TestCase
      */
     private $repository;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->alice = (new DoctrineUtilisateur(1))
             ->setIdentifiant('alice@tkdo.org')
@@ -42,11 +43,9 @@ class InMemoryUtilisateurRepositoryTest extends TestCase
         $this->assertEquals($this->alice, $this->repository->read($this->alice->getId()));
     }
 
-    /**
-     * @expectedException \App\Domain\Utilisateur\UtilisateurNotFoundException
-     */
     public function testReadUtilisateurInconnu()
     {
+        $this->expectException(UtilisateurNotFoundException::class);
         $this->repository->read($this->inconnu->getId());
     }
 
@@ -55,19 +54,15 @@ class InMemoryUtilisateurRepositoryTest extends TestCase
         $this->assertEquals($this->alice, $this->repository->readOneByIdentifiants('alice@tkdo.org', 'mdpalice'));
     }
 
-    /**
-     * @expectedException \App\Domain\Utilisateur\UtilisateurNotFoundException
-     */
     public function testReadOneByIdentifiantsMauvaisIdentifiant()
     {
+        $this->expectException(UtilisateurNotFoundException::class);
         $this->repository->readOneByIdentifiants('mauvaisIdentifiant', 'mdpalice');
     }
 
-    /**
-     * @expectedException \App\Domain\Utilisateur\UtilisateurNotFoundException
-     */
     public function testReadOneByIdentifiantsMauvaisMdp()
     {
+        $this->expectException(UtilisateurNotFoundException::class);
         $this->repository->readOneByIdentifiants('alice@tkdo.org', 'mauvaisMdp');
     }
 
@@ -82,11 +77,9 @@ class InMemoryUtilisateurRepositoryTest extends TestCase
         $this->assertEquals($aliceModifiee, $this->repository->read($this->alice->getId()));
     }
 
-    /**
-     * @expectedException \App\Domain\Utilisateur\UtilisateurNotFoundException
-     */
     public function testUpdateUtilisateurInconnu()
     {
+        $this->expectException(UtilisateurNotFoundException::class);
         $this->repository->update($this->inconnu);
     }
 }

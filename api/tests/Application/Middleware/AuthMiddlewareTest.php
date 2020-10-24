@@ -10,7 +10,7 @@ use Tests\Application\Actions\ActionTestCase;
 
 class AuthMiddlewareTest extends ActionTestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->app->get('/test-auth-middleware', function (ServerRequestInterface $request, ResponseInterface $response) {
@@ -27,7 +27,7 @@ class AuthMiddlewareTest extends ActionTestCase
             '/test-auth-middleware'
         );
 
-        $this->assertEqualsResponse(200, '1', $response);
+        $this->assertEquals('1', $response->getBody());
     }
 
     public function testActionPasUnBearerToken()
@@ -38,7 +38,7 @@ class AuthMiddlewareTest extends ActionTestCase
             '/test-auth-middleware'
         );
 
-        $this->assertEqualsResponse(200, 'null', $response);
+        $this->assertEquals('null', $response->getBody());
     }
 
     public function testActionPasUnJWT()
@@ -49,7 +49,7 @@ class AuthMiddlewareTest extends ActionTestCase
             '/test-auth-middleware'
         );
 
-        $this->assertEqualsResponse(200, 'null', $response);
+        $this->assertEquals('null', $response->getBody());
     }
 
     public function testActionUnJWTExpire()
@@ -60,7 +60,7 @@ class AuthMiddlewareTest extends ActionTestCase
             '/test-auth-middleware'
         );
 
-        $this->assertEqualsResponse(200, 'null', $response);
+        $this->assertEquals('null', $response->getBody());
     }
 
     public function testActionUnJWTCreeAvecUneMauvaiseCle()
@@ -100,6 +100,6 @@ EOD;
             '/test-auth-middleware'
         );
 
-        $this->assertEqualsResponse(200, 'null', $response);
+        $this->assertEquals('null', $response->getBody());
     }
 }

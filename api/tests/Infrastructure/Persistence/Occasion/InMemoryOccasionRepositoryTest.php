@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Tests\Infrastructure\Persistence\Occasion;
 
+use App\Domain\Occasion\OccasionNotFoundException;
 use App\Infrastructure\Persistence\Occasion\DoctrineOccasion;
 use App\Infrastructure\Persistence\Occasion\InMemoryOccasionRepository;
 use App\Infrastructure\Persistence\Utilisateur\DoctrineUtilisateur;
@@ -37,11 +38,9 @@ class InMemoryOccasionRepositoryTest extends TestCase
         $this->assertEquals($noel2020, $repository->readLast());
     }
 
-    /**
-     * @expectedException \App\Domain\Occasion\OccasionNotFoundException
-     */
     public function testReadLastAucuneOccasion()
     {
+        $this->expectException(OccasionNotFoundException::class);
         $repository = new InMemoryOccasionRepository([]);
         $repository->readLast();
     }

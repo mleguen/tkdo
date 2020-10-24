@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Application\Actions\Idee;
 
 use App\Domain\Utilisateur\UtilisateurNotFoundException;
+use Slim\Exception\HttpBadRequestException;
 use Tests\Application\Actions\ActionTestCase;
 
 class CreateConnexionActionTest extends ActionTestCase
@@ -25,9 +26,7 @@ EOT
         );
 
         $token = json_decode((string) $response->getBody())->token;
-        $this->assertEqualsResponse(
-            200,
-            <<<EOT
+        $json = <<<EOT
 {
     "token": "{$token}",
     "utilisateur": {
@@ -35,9 +34,8 @@ EOT
         "nom": "{$this->alice->getNom()}"
     }
 }
-EOT
-            , $response
-        );
+EOT;
+        $this->assertEquals($json, $response->getBody());
     }
 
     public function testActionIdentifiantsInvalides()
@@ -47,7 +45,9 @@ EOT
             ->willThrow(new UtilisateurNotFoundException())
             ->shouldBeCalledOnce();
 
-        $response = $this->handleRequest(
+        $this->expectException(HttpBadRequestException::class);
+        $this->expectExceptionMessage('identifiants invalides');
+        $this->handleRequest(
             'POST',
             '/connexion',
             '',
@@ -57,17 +57,6 @@ EOT
     "mdp": "{$this->alice->getMdp()}"
 }
 EOT
-        );
-
-        $this->assertEqualsResponse(
-            400,
-            <<<'EOT'
-{
-    "type": "BAD_REQUEST",
-    "description": "identifiants invalides"
-}
-EOT
-            , $response
         );
     }
 }

@@ -6,6 +6,8 @@ namespace Tests\Application\Actions\Occasion;
 use App\Domain\Occasion\OccasionNotFoundException;
 use App\Infrastructure\Persistence\Occasion\DoctrineOccasion;
 use App\Infrastructure\Persistence\Resultat\DoctrineResultat;
+use Slim\Exception\HttpNotFoundException;
+use Slim\Exception\HttpUnauthorizedException;
 use Tests\Application\Actions\ActionTestCase;
 
 class ViewOccasionActionTest extends ActionTestCase
@@ -33,9 +35,7 @@ class ViewOccasionActionTest extends ActionTestCase
             '/occasion'
         );
 
-        $this->assertEqualsResponse(
-            200,
-            <<<EOT
+        $json = <<<EOT
 {
     "id": {$occasion->getId()},
     "titre": "{$occasion->getTitre()}",
@@ -58,9 +58,8 @@ class ViewOccasionActionTest extends ActionTestCase
         }
     ]
 }
-EOT
-            , $response
-        );
+EOT;
+        $this->assertEquals($json, $response->getBody());
     }
 
     public function testActionPasDOccasion()
@@ -70,37 +69,18 @@ EOT
             ->willThrow(new OccasionNotFoundException())
             ->shouldBeCalledOnce();
 
-        $response = $this->handleAuthRequest(
+        $this->expectException(HttpNotFoundException::class);
+        $this->expectExceptionMessage('aucune occasion');
+        $this->handleAuthRequest(
             $this->alice->getId(),
             'GET',
             '/occasion'
-        );
-
-        $this->assertEqualsResponse(
-            404,
-            <<<'EOT'
-{
-    "type": "RESOURCE_NOT_FOUND",
-    "description": "aucune occasion"
-}
-EOT
-            , $response
         );
     }
 
     public function testActionNonAutorise()
     {
-        $response = $this->handleRequest('GET', '/occasion');
-
-        $this->assertEqualsResponse(
-            401,
-            <<<'EOT'
-{
-    "type": "UNAUTHENTICATED",
-    "description": "Unauthorized."
-}
-EOT
-            , $response
-        );
+        $this->expectException(HttpUnauthorizedException::class);
+        $this->handleRequest('GET', '/occasion');
     }
 }

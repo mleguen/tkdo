@@ -8,6 +8,9 @@ use App\Domain\Idee\IdeeNotFoundException;
 use App\Infrastructure\Persistence\Idee\DoctrineIdee;
 use App\Infrastructure\Persistence\Utilisateur\DoctrineUtilisateur;
 use Exception;
+use Slim\Exception\HttpForbiddenException;
+use Slim\Exception\HttpNotFoundException;
+use Slim\Exception\HttpUnauthorizedException;
 use Tests\Application\Actions\ActionTestCase;
 
 class DeleteIdeeActionTest extends ActionTestCase
@@ -17,7 +20,7 @@ class DeleteIdeeActionTest extends ActionTestCase
      */
     private $idee;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setup();
 
@@ -44,13 +47,7 @@ class DeleteIdeeActionTest extends ActionTestCase
             "/idee/{$this->idee->getId()}"
         );
 
-        $this->assertEqualsResponse(
-            200,
-            <<<'EOT'
-null
-EOT
-            , $response
-        );
+        $this->assertEquals('null', $response->getBody());
     }
 
     public function testActionPasLAuteur()
@@ -60,21 +57,11 @@ EOT
             ->willReturn($this->idee)
             ->shouldBeCalledOnce();
 
-        $response = $this->handleAuthRequest(
+        $this->expectException(HttpForbiddenException::class);
+        $this->handleAuthRequest(
             $this->idee->getUtilisateur()->getId(),
             'DELETE',
             "/idee/{$this->idee->getId()}"
-        );
-
-        $this->assertEqualsResponse(
-            403,
-            <<<'EOT'
-{
-    "type": "INSUFFICIENT_PRIVILEGES",
-    "description": "Forbidden."
-}
-EOT
-            , $response
         );
     }
 
@@ -85,21 +72,12 @@ EOT
             ->willThrow(new IdeeNotFoundException())
             ->shouldBeCalledOnce();
 
-        $response = $this->handleAuthRequest(
+        $this->expectException(HttpNotFoundException::class);
+        $this->expectExceptionMessage('idée inconnue');
+        $this->handleAuthRequest(
             $this->idee->getAuteur()->getId(),
             'DELETE',
             "/idee/{$this->idee->getId()}"
-        );
-
-        $this->assertEqualsResponse(
-            404,
-            <<<'EOT'
-{
-    "type": "RESOURCE_NOT_FOUND",
-    "description": "id\u00e9e inconnue"
-}
-EOT
-            , $response
         );
     }
 
@@ -111,21 +89,12 @@ EOT
             ->willThrow(new Exception('échec de read'))
             ->shouldBeCalledOnce();
 
-        $response = $this->handleAuthRequest(
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('échec de read');
+        $this->handleAuthRequest(
             $this->idee->getAuteur()->getId(),
             'DELETE',
             "/idee/{$this->idee->getId()}"
-        );
-
-        $this->assertEqualsResponse(
-            500,
-            <<<'EOT'
-{
-    "type": "SERVER_ERROR",
-    "description": "\u00e9chec de read"
-}
-EOT
-            , $response
         );
     }
 
@@ -140,40 +109,21 @@ EOT
             ->willThrow(new Exception('échec de delete'))
             ->shouldBeCalledOnce();
 
-        $response = $this->handleAuthRequest(
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('échec de delete');
+        $this->handleAuthRequest(
             $this->idee->getAuteur()->getId(),
             'DELETE',
             "/idee/{$this->idee->getId()}"
-        );
-
-        $this->assertEqualsResponse(
-            500,
-            <<<'EOT'
-{
-    "type": "SERVER_ERROR",
-    "description": "\u00e9chec de delete"
-}
-EOT
-            , $response
         );
     }
 
     public function testActionNonAutorise()
     {
-        $response = $this->handleRequest(
+        $this->expectException(HttpUnauthorizedException::class);
+        $this->handleRequest(
             'DELETE',
             "/idee/{$this->idee->getId()}"
-        );
-
-        $this->assertEqualsResponse(
-            401,
-            <<<'EOT'
-{
-    "type": "UNAUTHENTICATED",
-    "description": "Unauthorized."
-}
-EOT
-            , $response
         );
     }
 }
