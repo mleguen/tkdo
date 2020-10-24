@@ -1,13 +1,25 @@
 <?php
 declare(strict_types=1);
 
-use App\Domain\User\UserRepository;
-use App\Infrastructure\Persistence\User\InMemoryUserRepository;
+use App\Domain\Connexion\ConnexionRepository;
+use App\Domain\Utilisateur\UtilisateurRepository;
+use App\Domain\Occasion\OccasionRepository;
+use App\Domain\Idee\IdeeRepository;
+use App\Domain\Resultat\ResultatRepository;
+use App\Infrastructure\Persistence\Connexion\DoctrineConnexionRepository;
+use App\Infrastructure\Persistence\Utilisateur\DoctrineUtilisateurRepository;
+use App\Infrastructure\Persistence\Occasion\DoctrineOccasionRepository;
+use App\Infrastructure\Persistence\Idee\DoctrineIdeeRepository;
+use App\Infrastructure\Persistence\Resultat\DoctrineResultatRepository;
 use DI\ContainerBuilder;
 
 return function (ContainerBuilder $containerBuilder) {
-    // Here we map our UserRepository interface to its in memory implementation
+    // Here we map our XxxRepository interface to its in memory implementation
     $containerBuilder->addDefinitions([
-        UserRepository::class => \DI\autowire(InMemoryUserRepository::class),
+        ConnexionRepository::class => \DI\autowire(DoctrineConnexionRepository::class),
+        UtilisateurRepository::class => \DI\autowire(DoctrineUtilisateurRepository::class),
+        OccasionRepository::class => \DI\autowire(DoctrineOccasionRepository::class),
+        IdeeRepository::class => \DI\autowire(DoctrineIdeeRepository::class),
+        ResultatRepository::class => \DI\autowire(DoctrineResultatRepository::class),
     ]);
 };
