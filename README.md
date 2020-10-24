@@ -40,15 +40,19 @@ $ php bin/doctrine.php orm:generate-proxies
 [...]
 
  Proxy classes generated to "/home/lgnby/www/tkdo/api/var/doctrine/proxy"
-$ php bin/doctrine.php orm:migrations:migrate
+$ php bin/doctrine.php migrations:migrate
 [...]
   ------------------------
   ++ finished in xxxms
   ++ used xxxM memory
   ++ xxx migrations executed
   ++ xxx sql queries
-# Si vous souhaitez charger des données de test
-php bin/doctrine.php fixtures:load
+```
+
+Et si vous souhaitez charger des données de test :
+
+```bash
+$ php bin/doctrine.php fixtures:load
 Purge et chargement des fixtures...
 xxx créés.
 [...]
