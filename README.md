@@ -77,7 +77,14 @@ dans la table `tkdo_utilisateur`. Par exemple :
 
 ```sql
 INSERT INTO tkdo_utilisateur (identifiant, nom, mdp)
-VALUES ('alice@tkdo.org', 'Alice', 'mdpalice');
+VALUES ('alice@tkdo.org', 'Alice', '$2y$10$swhlJf10LKG7KvOSJ5bRCeKhx0UTU5lnmMTECBa.aAx8b5k0ZEy5S');
+```
+
+avec le mot un hash généré par la fonction php `password_hash`, ici :
+
+```bash
+$ php -r 'echo password_hash("mdpalice", PASSWORD_DEFAULT)."\n";'
+$2y$10$swhlJf10LKG7KvOSJ5bRCeKhx0UTU5lnmMTECBa.aAx8b5k0ZEy5S
 ```
 
 #### Création d'une occasion de s'offrir des cadeaux
