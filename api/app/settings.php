@@ -8,7 +8,7 @@ if (!defined('APP_ROOT')) define('APP_ROOT', __DIR__ . '/..');
 
 return function (ContainerBuilder $containerBuilder) {
     $devMode = (php_sapi_name() == 'cli') || (php_sapi_name() == 'cli-server');
-    $docker = getenv('docker') !== false;
+    $docker = in_array('docker', $_ENV);
 
     // Global Settings Object
     $containerBuilder->addDefinitions([
@@ -26,11 +26,11 @@ return function (ContainerBuilder $containerBuilder) {
 
                 'connection' => [
                     'driver' => 'pdo_mysql',
-                    'host' => getenv('MYSQL_HOST') ?: ($docker ? 'mysql' : '127.0.0.1'),
-                    'port' => getenv('MYSQL_PORT') ?: '3306',
-                    'dbname' => getenv('MYSQL_DATABASE') ?: 'tkdo',
-                    'user' => getenv('MYSQL_USER') ?: 'tkdo',
-                    'password' => getenv('MYSQL_PASSWORD') ?: 'mdptkdo',
+                    'host' => $_ENV['MYSQL_HOST'] ?? ($docker ? 'mysql' : '127.0.0.1'),
+                    'port' => $_ENV['MYSQL_PORT'] ?? '3306',
+                    'dbname' => $_ENV['MYSQL_DATABASE'] ?? 'tkdo',
+                    'user' => $_ENV['MYSQL_USER'] ?? 'tkdo',
+                    'password' => $_ENV['MYSQL_PASSWORD'] ?? 'mdptkdo',
                     'charset' => 'utf8'
                 ]
             ],
