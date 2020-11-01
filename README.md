@@ -148,6 +148,14 @@ les requêtes destinées à l'API sont interceptées et bouchonnées
 
 ### Utiliser le serveur de développement front avec l'API de développement docker
 
+Paramétrer l'API de développement docker pour que Slim s'exécute avec l'utilisateur courant
+(permet d'éviter des conflits de droits sur les fichiers de cache créés par docker) :
+
+``` bash
+echo SLIM_UID=$(id -u) >> ./api/.env
+echo SLIM_GUID=$(id -g) >> ./api/.env
+```
+
 ```bash
 ./docker-compose-api up -d
 ./composer-api doctrine orm:schema-tool:update
@@ -194,11 +202,21 @@ Et pour la peupler de données de test :
 
 ### Créer une nouvelle migration de base de données
 
+Si nécessaire, commencer par remettre la base de données de l'environnement de développement
+au niveau de la dernière migration :
+
 ```bash
 ./docker-compose up -d
 ./composer-api doctrine orm:schema-tool:drop --force
 ./composer-api doctrine migrations:migrate
+```
+
+Puis :
+
+```bash
 ./composer-api doctrine orm:clear-cache:metadata
+./composer-api doctrine orm:clear-cache:query
+./composer-api doctrine orm:clear-cache:result
 ./composer-api doctrine migrations:diff
 ```
 

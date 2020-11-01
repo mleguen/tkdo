@@ -15,6 +15,7 @@ class EditUtilisateurAction extends UtilisateurAction
     $utilisateur = $this->utilisateurRepository->read($this->idUtilisateur)
       ->setIdentifiant($body->identifiant)
       ->setNom($body->nom);
+    if (isset($body->genre)) $utilisateur->setGenre($body->genre);
     if (isset($body->mdp)) $utilisateur->setMdp($body->mdp);
     $this->utilisateurRepository->update($utilisateur);
     return $this->respondWithData();

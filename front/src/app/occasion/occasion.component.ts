@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { BackendService, Occasion, Utilisateur } from '../backend.service';
+import { BackendService, Genre, Occasion, Utilisateur } from '../backend.service';
 import { catchError, map } from 'rxjs/operators';
 
 @Component({
@@ -9,7 +9,9 @@ import { catchError, map } from 'rxjs/operators';
   styleUrls: ['./occasion.component.scss']
 })
 export class OccasionComponent implements OnInit {
-  
+
+  Genre = Genre;
+
   occasion$: Observable<OccasionAffichee>;
 
   constructor(

@@ -30,6 +30,14 @@ class InMemoryUtilisateurReference implements Utilisateur
   /**
    * {@inheritdoc}
    */
+  public function getGenre(): string
+  {
+    throw new ReferenceException();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getIdentifiant(): string
   {
     throw new ReferenceException();
@@ -39,6 +47,14 @@ class InMemoryUtilisateurReference implements Utilisateur
    * {@inheritdoc}
    */
   public function getNom(): string
+  {
+    throw new ReferenceException();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setGenre(string $identifiant): Utilisateur
   {
     throw new ReferenceException();
   }

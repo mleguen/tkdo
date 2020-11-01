@@ -10,12 +10,22 @@ interface Utilisateur
     /**
      * @throws ReferenceException
      */
+    public function getGenre(): string;
+
+    /**
+     * @throws ReferenceException
+     */
     public function getIdentifiant(): string;
 
     /**
      * @throws ReferenceException
      */
     public function getNom(): string;
+
+    /**
+     * @throws ReferenceException
+     */
+    public function setGenre(string $genre): Utilisateur;
 
     /**
      * @throws ReferenceException

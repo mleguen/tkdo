@@ -1,9 +1,6 @@
 <ng-container *ngIf="occasion$|async as o">
   <h1>{{o.titre}}</h1>
   
-  <!-- TODO : participer au tirage si j'y ai été invité (fragment ?) et s'il n'est pas encore lancé -->
-  <!-- TODO : ne voir les participants d'un tirage que si j'y participe moi-même -->
-  
   <!-- <h2>Participants</h2> -->
   <div class="container">
     <div class="row justify-content-center">
@@ -22,7 +19,12 @@
           <div class="card-body">
             <h3 class="card-title">{{p.nom}}</h3>
             <div class="card-text" *ngIf="p.estMoi">C'est vous !</div>
-            <div class="card-text" *ngIf="p.estQuiRecoitDeMoi">C'est à elle/lui que vous faites un cadeau.</div>
+            <div class="card-text" *ngIf="p.estQuiRecoitDeMoi">
+              C'est à
+              <ng-container *ngIf="p.genre === Genre.Feminin">elle</ng-container>
+              <ng-container *ngIf="p.genre === Genre.Masculin">lui</ng-container>
+              que vous faites un cadeau.
+            </div>
           </div>
         </div>
       </div>

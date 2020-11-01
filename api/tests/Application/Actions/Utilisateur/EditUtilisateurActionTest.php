@@ -26,6 +26,7 @@ class EditUtilisateurActionTest extends ActionTestCase
         $aliceModifiee = (new DoctrineUtilisateur($this->alice->getId()))
             ->setIdentifiant('alice2@tkdo.org')
             ->setNom('Alice2')
+            ->setGenre('M')
             ->setMdp('nouveaumdpalice');
         $this->utilisateurRepositoryProphecy
             ->update($aliceModifiee)
@@ -39,6 +40,7 @@ class EditUtilisateurActionTest extends ActionTestCase
             '',
             <<<EOT
 {
+    "genre": "{$aliceModifiee->getGenre()}",
     "identifiant": "{$aliceModifiee->getIdentifiant()}",
     "mdp": "{$aliceModifiee->getMdp()}",
     "nom": "{$aliceModifiee->getNom()}"
@@ -46,7 +48,7 @@ class EditUtilisateurActionTest extends ActionTestCase
 EOT
         );
 
-        $this->assertEquals('null', $response->getBody());
+        $this->assertEquals('null', (string)$response->getBody());
     }
 
     public function testActionAutreUtilisateur()

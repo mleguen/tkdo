@@ -22,6 +22,7 @@ class SerializableUtilisateur implements JsonSerializable
   public function jsonSerialize(): array
   {
     return [
+      'genre' => $this->utilisateur->getGenre(),
       'id' => $this->utilisateur->getId(),
       'identifiant' => $this->utilisateur->getIdentifiant(),
       'nom' => $this->utilisateur->getNom(),

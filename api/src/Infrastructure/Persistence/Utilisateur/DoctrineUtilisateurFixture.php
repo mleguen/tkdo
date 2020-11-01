@@ -2,6 +2,7 @@
 
 namespace App\Infrastructure\Persistence\Utilisateur;
 
+use App\Domain\Utilisateur\Genre;
 use App\Infrastructure\Persistence\DoctrineAbstractFixture;
 use Doctrine\Persistence\ObjectManager;
 
@@ -13,19 +14,23 @@ class DoctrineUtilisateurFixture extends DoctrineAbstractFixture
             'alice' => (new DoctrineUtilisateur())
                 ->setIdentifiant('alice@tkdo.org')
                 ->setNom('Alice')
-                ->setMdp(password_hash('mdpalice', PASSWORD_DEFAULT)),
+                ->setMdp(password_hash('mdpalice', PASSWORD_DEFAULT))
+                ->setGenre(Genre::Feminin),
             'bob' => (new DoctrineUtilisateur())
                 ->setIdentifiant('bob@tkdo.org')
                 ->setNom('Bob')
-                ->setMdp(password_hash('mdpbob', PASSWORD_DEFAULT)),
+                ->setMdp(password_hash('mdpbob', PASSWORD_DEFAULT))
+                ->setGenre(Genre::Masculin),
             'charlie' => (new DoctrineUtilisateur())
                 ->setIdentifiant('charlie@tkdo.org')
                 ->setNom('Charlie')
-                ->setMdp(password_hash('mdpcharlie', PASSWORD_DEFAULT)),
+                ->setMdp(password_hash('mdpcharlie', PASSWORD_DEFAULT))
+                ->setGenre(Genre::Masculin),
             'david' => (new DoctrineUtilisateur())
                 ->setIdentifiant('david@tkdo.org')
                 ->setNom('David')
-                ->setMdp(password_hash('mdpdavid', PASSWORD_DEFAULT)),
+                ->setMdp(password_hash('mdpdavid', PASSWORD_DEFAULT))
+                ->setGenre(Genre::Masculin),
         ] as $nom => $utilisateur) {
             $em->persist($utilisateur);
             $this->addReference($nom, $utilisateur);

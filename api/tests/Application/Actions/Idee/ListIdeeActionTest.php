@@ -67,6 +67,7 @@ class ListIdeeActionTest extends ActionTestCase
         $json = <<<EOT
 {
     "utilisateur": {
+        "genre": "{$this->alice->getGenre()}",
         "id": {$this->alice->getId()},
         "identifiant": "{$this->alice->getIdentifiant()}",
         "nom": "{$this->alice->getNom()}"
@@ -77,7 +78,7 @@ class ListIdeeActionTest extends ActionTestCase
     ]
 }
 EOT;
-        $this->assertEquals($json, $response->getBody());
+        $this->assertEquals($json, (string)$response->getBody());
     }
 
     public function testActionAuteur()
@@ -104,6 +105,7 @@ EOT;
         $json = <<<EOT
 {
     "utilisateur": {
+        "genre": "{$this->alice->getGenre()}",
         "id": {$this->alice->getId()},
         "identifiant": "{$this->alice->getIdentifiant()}",
         "nom": "{$this->alice->getNom()}"
@@ -114,7 +116,7 @@ EOT;
     ]
 }
 EOT;
-        $this->assertEquals($json, $response->getBody());
+        $this->assertEquals($json, (string)$response->getBody());
     }
 
     public function testActionUtilisateur()
@@ -141,6 +143,7 @@ EOT;
         $json = <<<EOT
 {
     "utilisateur": {
+        "genre": "{$this->alice->getGenre()}",
         "id": {$this->alice->getId()},
         "identifiant": "{$this->alice->getIdentifiant()}",
         "nom": "{$this->alice->getNom()}"
@@ -150,7 +153,7 @@ EOT;
     ]
 }
 EOT;
-        $this->assertEquals($json, $response->getBody());
+        $this->assertEquals($json, (string)$response->getBody());
     }
 
     private function morceauReponseIdee(Idee $i)
@@ -160,6 +163,7 @@ EOT;
             "id": {$i->getId()},
             "description": "{$i->getDescription()}",
             "auteur": {
+                "genre": "{$i->getAuteur()->getGenre()}",
                 "id": {$i->getAuteur()->getId()},
                 "identifiant": "{$i->getAuteur()->getIdentifiant()}",
                 "nom": "{$i->getAuteur()->getNom()}"

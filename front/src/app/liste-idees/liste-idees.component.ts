@@ -3,7 +3,7 @@ import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Observable, combineLatest, BehaviorSubject, of } from 'rxjs';
 import { switchMap, catchError, map } from 'rxjs/operators';
-import { BackendService, IdeesParUtilisateur, IdeeSansUtilisateur } from '../backend.service';
+import { BackendService, IdeesParUtilisateur, IdeeSansUtilisateur, Genre } from '../backend.service';
 import * as moment from 'moment';
 
 @Component({
@@ -12,6 +12,8 @@ import * as moment from 'moment';
   styleUrls: ['./liste-idees.component.scss']
 })
 export class ListeIdeesComponent implements OnInit {
+
+  Genre = Genre;
   
   formAjout = this.fb.group({
     description: ['', Validators.required],

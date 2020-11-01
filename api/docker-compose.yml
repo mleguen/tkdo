@@ -7,6 +7,7 @@ services:
     slim:
         build: ./docker/slim
         working_dir: /var/www
+        user: "${SLIM_UID:-1000}:${SLIM_GUID:-1000}"
         command: php -S 0.0.0.0:8080 -t public
         environment:
             docker: "true"

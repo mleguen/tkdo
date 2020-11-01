@@ -11,8 +11,6 @@ use Psr\Http\Server\MiddlewareInterface as Middleware;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Psr\Log\LoggerInterface;
 
-// TODO: à remplacer par Tuupola\Middleware\JwtAuthentication
-
 class AuthMiddleware implements Middleware
 {
     /**

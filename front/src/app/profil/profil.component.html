@@ -10,7 +10,14 @@
   </div>
 
   <div class="form-group">
-    <!-- TODO: changer mon identifiant -->
+    <label for="genre">Genre :</label>
+    <select id="genre" formControlName="genre" class="form-control">
+      <option value="{{Genre.Feminin}}">Féminin</option>
+      <option value="{{Genre.Masculin}}">Masculin</option>
+    </select>
+  </div>
+
+  <div class="form-group">
     <label for="identifiant">Identifiant :</label>
     <input id="identifiant" type="text" readonly formControlName="identifiant" class="form-control">
   </div>

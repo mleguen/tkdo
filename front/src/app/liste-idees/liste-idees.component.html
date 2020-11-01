@@ -15,8 +15,13 @@
 
     <div class="row mt-3">
       <div class="alert alert-warning col-12" role="alert">
-        <span *ngIf="li.estPourMoi; else estPasMoi">Vous ne pouvez voir que les idées que vous proposez vous-même.</span>
-        <ng-template #estPasMoi>{{li.utilisateur.nom}} ne peut pas voir les idées que vous proposez.</ng-template>
+        <span *ngIf="li.estPourMoi; else estPasMoi">Vous ne pouvez voir que les idées que vous avec vous-même proposées.</span>
+        <ng-template #estPasMoi>
+          {{li.utilisateur.nom}} ne peut voir que les idées
+          <ng-container *ngIf="li.utilisateur.genre === Genre.Feminin">qu'elle a elle-même</ng-container>
+          <ng-container *ngIf="li.utilisateur.genre === Genre.Masculin">qu'il a lui-même</ng-container>
+          proposées.
+        </ng-template>
       </div>
     </div>    
 

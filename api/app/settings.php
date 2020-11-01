@@ -8,7 +8,7 @@ if (!defined('APP_ROOT')) define('APP_ROOT', __DIR__ . '/..');
 
 return function (ContainerBuilder $containerBuilder) {
     $devMode = (php_sapi_name() == 'cli') || (php_sapi_name() == 'cli-server');
-    $docker = in_array('docker', $_ENV);
+    $docker = in_array('docker', array_keys($_ENV));
 
     // Global Settings Object
     $containerBuilder->addDefinitions([

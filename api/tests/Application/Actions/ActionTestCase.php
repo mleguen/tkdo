@@ -7,6 +7,7 @@ use App\Application\Service\AuthService;
 use App\Domain\Idee\IdeeRepository;
 use App\Domain\Occasion\OccasionRepository;
 use App\Domain\Resultat\ResultatRepository;
+use App\Domain\Utilisateur\Genre;
 use App\Domain\Utilisateur\UtilisateurRepository;
 use App\Infrastructure\Persistence\Utilisateur\DoctrineUtilisateur;
 use Psr\Http\Message\ResponseInterface;
@@ -91,15 +92,18 @@ abstract class ActionTestCase extends TestCase
         $this->alice = (new DoctrineUtilisateur(1))
             ->setIdentifiant('alice@tkdo.org')
             ->setNom('Alice')
-            ->setMdp('mdpalice');
+            ->setMdp('mdpalice')
+            ->setGenre(Genre::Feminin);
         $this->bob = (new DoctrineUtilisateur(2))
             ->setIdentifiant('bob@tkdo.org')
             ->setNom('Bob')
-            ->setMdp('mdpbob');
+            ->setMdp('mdpbob')
+            ->setGenre(Genre::Masculin);
         $this->charlie = (new DoctrineUtilisateur(3))
             ->setIdentifiant('charlie@tkdo.org')
             ->setNom('Charlie')
-            ->setMdp('mdpcharlie');
+            ->setMdp('mdpcharlie')
+            ->setGenre(Genre::Masculin);
     }
 
     protected function handleRequest(

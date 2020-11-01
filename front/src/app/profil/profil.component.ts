@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Validators, FormBuilder, ValidatorFn } from '@angular/forms';
-import { BackendService, Utilisateur } from '../backend.service';
+import { BackendService, Genre, Utilisateur } from '../backend.service';
 
 @Component({
   selector: 'app-profil',
@@ -9,16 +9,19 @@ import { BackendService, Utilisateur } from '../backend.service';
 })
 export class ProfilComponent implements OnInit {
 
+  Genre = Genre;
+
   formProfil = this.fb.group(
     {
       'identifiant': [''],
       'nom': ['', [Validators.minLength(3)]],
+      'genre': [''],
       'mdp': ['', [Validators.minLength(8)]],
       'confirmeMdp': [''],
     },
     {
       validators: [
-        requireOne('nom', 'mdp'),
+        requireOne(['nom', 'genre'], ['mdp']),
         sameValueIfDefined('mdp', 'confirmeMdp'),
       ]
     },
@@ -38,6 +41,7 @@ export class ProfilComponent implements OnInit {
         this.utilisateur = utilisateur;
         this.identifiant.setValue(utilisateur.identifiant);
         this.nom.setValue(utilisateur.nom);
+        this.genre.setValue(utilisateur.genre);
       },
       // Les erreurs backend sont déjà affichées par AppComponent
       () => {}
@@ -52,14 +56,20 @@ export class ProfilComponent implements OnInit {
     return this.formProfil.get('nom');
   }
   
+  get genre() {
+    return this.formProfil.get('genre');
+  }
+  
   get mdp() {
     return this.formProfil.get('mdp');
   }
 
   async modifie() {
-    const { nom, mdp } = this.formProfil.value;
+    const { nom, genre, mdp } = this.formProfil.value;
     try {
-      await this.backend.modifieUtilisateur(Object.assign(this.utilisateur, { nom, mdp }));
+      Object.assign(this.utilisateur, { nom, genre });
+      if (mdp) Object.assign(this.utilisateur, { mdp });
+      await this.backend.modifieUtilisateur(this.utilisateur);
       for (let champ of ['mdp', 'confirmeMdp']) this.formProfil.get(champ).reset();
       this.erreurModification = undefined;
       this.enregistre = true;
@@ -71,14 +81,22 @@ export class ProfilComponent implements OnInit {
   }
 }
 
-function requireOne (...names: string[]): ValidatorFn {
+/**
+ * Validate that at least one list have all fields non-empty
+ */
+function requireOne (...lists: string[][]): ValidatorFn {
   return group => {
-    return names.every(name => Validators.required(group.get(name)) !== null)
-      ? { requireOne: names }
-      : null;
+    return lists.some(names =>
+      names.every(name => Validators.required(group.get(name)) === null)
+    )
+      ? null
+      : { requireOne: true };
   }
 }
 
+/**
+ * Validate the fields have the same value if non-empty
+ */
 function sameValueIfDefined (name1: string, name2: string): ValidatorFn {
   return group => {
     if (Validators.required(group.get(name1)) !== null) return null;

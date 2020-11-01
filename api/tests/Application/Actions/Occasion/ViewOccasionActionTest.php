@@ -41,11 +41,13 @@ class ViewOccasionActionTest extends ActionTestCase
     "titre": "{$occasion->getTitre()}",
     "participants": [
         {
+            "genre": "{$this->alice->getGenre()}",
             "id": {$this->alice->getId()},
             "identifiant": "{$this->alice->getIdentifiant()}",
             "nom": "{$this->alice->getNom()}"
         },
         {
+            "genre": "{$this->bob->getGenre()}",
             "id": {$this->bob->getId()},
             "identifiant": "{$this->bob->getIdentifiant()}",
             "nom": "{$this->bob->getNom()}"
@@ -59,7 +61,7 @@ class ViewOccasionActionTest extends ActionTestCase
     ]
 }
 EOT;
-        $this->assertEquals($json, $response->getBody());
+        $this->assertEquals($json, (string)$response->getBody());
     }
 
     public function testActionPasDOccasion()

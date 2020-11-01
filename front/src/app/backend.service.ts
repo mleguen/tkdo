@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { mkdtemp } from 'fs';
 import { BehaviorSubject } from 'rxjs';
 import { first, tap } from 'rxjs/operators';
 
@@ -13,6 +14,12 @@ export interface Utilisateur {
   id: number;
   identifiant: string;
   nom: string;
+  genre: Genre;
+}
+
+export enum Genre {
+  Feminin = 'F',
+  Masculin = 'M',
 }
 
 export interface Resultat {
@@ -54,7 +61,7 @@ interface PostConnexionDTO {
 export class BackendService {
 
   idUtilisateur: Utilisateur['id'];
-  utilisateurConnecte$: BehaviorSubject<Pick<Utilisateur, 'id'|'nom'>>;
+  utilisateurConnecte$: BehaviorSubject<PostConnexionDTO['utilisateur']>;
 
   erreur$ = new BehaviorSubject<string>(undefined);
   occasion$ = new BehaviorSubject<Occasion>(JSON.parse(localStorage.getItem(CLE_OCCASION)));
@@ -113,7 +120,7 @@ export class BackendService {
     return this.http.get<Utilisateur>(URL_UTILISATEUR(this.idUtilisateur));
   }
 
-  modifieUtilisateur(utilisateur: Utilisateur) {
+  modifieUtilisateur(utilisateur: Utilisateur & { mdp?: string }) {
     return this.http.put(URL_UTILISATEUR(this.idUtilisateur), utilisateur).toPromise();
   }
 

@@ -17,6 +17,13 @@ use Doctrine\ORM\Mapping\Table;
  */
 class DoctrineUtilisateur implements Utilisateur
 {
+
+  /**
+   * @var string
+   * @Column()
+   */
+  private $genre;
+
   /**
    * @var int
    * @Id
@@ -51,6 +58,14 @@ class DoctrineUtilisateur implements Utilisateur
   /**
    * {@inheritdoc}
    */
+  public function getGenre(): string
+  {
+    return $this->genre;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getId(): int
   {
     return $this->id;
@@ -75,6 +90,15 @@ class DoctrineUtilisateur implements Utilisateur
   public function getNom(): string
   {
     return $this->nom;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setGenre(string $genre): Utilisateur
+  {
+    $this->genre = $genre;
+    return $this;
   }
 
   /**

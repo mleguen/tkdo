@@ -10,7 +10,7 @@ import {
 } from '@angular/common/http';
 import { Observable, of, throwError } from 'rxjs';
 import { mergeMap, materialize, dematerialize, delay } from 'rxjs/operators';
-import { Occasion } from './backend.service';
+import { Genre, Occasion } from './backend.service';
 import * as moment from 'moment';
 
 const alice = {
@@ -18,6 +18,7 @@ const alice = {
   identifiant: 'alice@tkdo.org',
   nom: 'Alice',
   mdp: 'mdpalice',
+  genre: Genre.Feminin,
 };
 
 const bob = {
@@ -25,6 +26,7 @@ const bob = {
   identifiant: 'bob@tkdo.org',
   nom: 'Bob',
   mdp: 'mdpbob',
+  genre: Genre.Masculin,
 };
 
 const charlie = {
@@ -32,6 +34,7 @@ const charlie = {
   identifiant: 'charlie@tkdo.org',
   nom: 'Charlie',
   mdp: 'mdpcharlie',
+  genre: Genre.Masculin,
 };
 
 const david = {
@@ -39,6 +42,7 @@ const david = {
   identifiant: 'david@tkdo.org',
   nom: 'David',
   mdp: 'mdpdavid',
+  genre: Genre.Masculin,
 };
 
 const utilisateurs = [alice, bob, charlie, david];
@@ -127,7 +131,7 @@ export class DevBackendInterceptor implements HttpInterceptor {
       if (!isLoggedIn()) return unauthorized();
 
       const utilisateur = utilisateurs.find(u => u.id === idUtilisateur);
-      const { nom, mdp } = body as any;
+      const { nom, mdp, genre } = body as any;
 
       if (nom !== utilisateur.nom) {
         if (utilisateurs.filter(p => p.id !== idUtilisateur).map(p => p.nom).includes(nom)) {
@@ -138,6 +142,8 @@ export class DevBackendInterceptor implements HttpInterceptor {
       }
 
       if (mdp) utilisateur.mdp = mdp;
+
+      if (genre) utilisateur.genre = genre;
 
       return ok();
     }
