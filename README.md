@@ -226,3 +226,7 @@ Puis après vérification/finalisation de la migration, la tester :
 ./composer-api doctrine migrations:migrate
 ./composer-api doctrine fixtures:load
 ```
+
+## Historique des versions
+
+Voir [CHANGELOG.md](./CHANGELOG.md).
