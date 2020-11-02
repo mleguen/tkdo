@@ -13,6 +13,18 @@ class DoctrineResultatFixture extends DoctrineAbstractFixture
             (new DoctrineResultat($this->getReference('occasion'), $this->getReference('alice')))
                 ->setQuiRecoit($this->getReference('bob'))
         );
+        $em->persist(
+            (new DoctrineResultat($this->getReference('occasion'), $this->getReference('bob')))
+                ->setQuiRecoit($this->getReference('david'))
+        );
+        $em->persist(
+            (new DoctrineResultat($this->getReference('occasion'), $this->getReference('charlie')))
+                ->setQuiRecoit($this->getReference('alice'))
+        );
+        $em->persist(
+            (new DoctrineResultat($this->getReference('occasion'), $this->getReference('david')))
+                ->setQuiRecoit($this->getReference('charlie'))
+        );
         $em->flush();
         $this->output->writeln(['Résultats créés.']);
     }
