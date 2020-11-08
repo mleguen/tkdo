@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { first, tap } from 'rxjs/operators';
@@ -63,6 +63,7 @@ export class BackendService {
   utilisateurConnecte$: BehaviorSubject<PostConnexionDTO['utilisateur']>;
 
   erreur$ = new BehaviorSubject<string>(undefined);
+  aucuneOccasion$ = new BehaviorSubject<boolean>(false);
   occasion$ = new BehaviorSubject<Occasion>(JSON.parse(localStorage.getItem(CLE_OCCASION)));
   token = localStorage.getItem(CLE_TOKEN);
 
@@ -93,6 +94,7 @@ export class BackendService {
     localStorage.removeItem(CLE_OCCASION);
     localStorage.removeItem(CLE_TOKEN);
     localStorage.removeItem(CLE_UTILISATEUR);
+    this.aucuneOccasion$.next(false);
     this.occasion$.next(null);
     this.utilisateurConnecte$.next(null);
   }
@@ -111,7 +113,18 @@ export class BackendService {
 
   getOccasion$() {
     return this.http.get<Occasion>(URL_OCCASION).pipe(
-      tap(occasion => this.occasion$.next(occasion))
+      tap(
+        occasion => {
+          this.aucuneOccasion$.next(false);
+          this.occasion$.next(occasion);
+        },
+        (error: HttpErrorResponse) => {
+          if (error.status === 404) {
+            this.aucuneOccasion$.next(true);
+            this.occasion$.next(null);
+          }
+        }
+      )
     );
   }
 
@@ -123,8 +136,21 @@ export class BackendService {
     return this.http.put(URL_UTILISATEUR(this.idUtilisateur), utilisateur).toPromise();
   }
 
-  setErreur(message?: string) {
-    this.erreur$.next(message);
+  notifieErreurHTTP(url: string, error: HttpErrorResponse) {
+    switch (url) {
+      case URL_OCCASION:
+        // L'absence d'occasion pour un participant n'est pas à traiter comme une erreur
+        if (error.status === 404) return;
+
+      default:
+        // Les erreurs applicatives sont sensées être prises en compte
+        if (error.status === 400) return;
+    }
+    this.erreur$.next(`${error.status} ${error.statusText}`);
+  }
+
+  notifieSuccesHTTP() {
+    this.erreur$.next(undefined);
   }
 
   supprimeIdee(idIdee: number) {

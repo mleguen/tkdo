@@ -36,7 +36,7 @@ class ViewOccasionAction extends Action
     protected function action(): Response
     {
         $this->assertAuth();
-        $occasion = $this->occasionRepository->readLast();
+        $occasion = $this->occasionRepository->readLastByParticipant($this->request->getAttribute('idUtilisateurAuth'));
         return $this->respondWithData(new SerializableOccasion(
             $occasion,
             $this->resultatRepository->readByOccasion($occasion)

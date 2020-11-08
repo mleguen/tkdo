@@ -31,6 +31,11 @@ class DoctrineUtilisateurFixture extends DoctrineAbstractFixture
                 ->setNom('David')
                 ->setMdp(password_hash('mdpdavid', PASSWORD_DEFAULT))
                 ->setGenre(Genre::Masculin),
+            'eve' => (new DoctrineUtilisateur())
+                ->setIdentifiant('eve@tkdo.org')
+                ->setNom('Eve')
+                ->setMdp(password_hash('mdpeve', PASSWORD_DEFAULT))
+                ->setGenre(Genre::Feminin),
         ] as $nom => $utilisateur) {
             $em->persist($utilisateur);
             $this->addReference($nom, $utilisateur);

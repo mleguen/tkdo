@@ -1,4 +1,4 @@
-<ng-container *ngIf="occasion$|async as o">
+<ng-container *ngIf="occasion$|async as o; else elsePasDOccasion">
   <h1>{{o.titre}}</h1>
   
   <!-- <h2>Participants</h2> -->
@@ -31,3 +31,10 @@
     </div>
   </div>
 </ng-container>
+<ng-template #elsePasDOccasion>
+  <ng-container *ngIf="aucuneOccasion$|async">
+    <h1>Aucune occasion</h1>
+    <p class="alert alert-warning col-12">Vous ne participez pour l'instant à aucun tirage cadeaux.</p>
+    <p>Rapprochez-vous de l'organisateur d'un tirage pour lui demander de vous y faire participer.</p>
+  </ng-container>
+</ng-template>

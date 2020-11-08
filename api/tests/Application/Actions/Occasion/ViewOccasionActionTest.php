@@ -18,7 +18,7 @@ class ViewOccasionActionTest extends ActionTestCase
             ->setTitre('Noel 2020')
             ->setParticipants([$this->alice, $this->bob]);
         $this->occasionRepositoryProphecy
-            ->readLast()
+            ->readLastByParticipant($this->alice->getId())
             ->willReturn($occasion)
             ->shouldBeCalledOnce();
 
@@ -67,7 +67,7 @@ EOT;
     public function testActionPasDOccasion()
     {
         $this->occasionRepositoryProphecy
-            ->readLast()
+            ->readLastByParticipant($this->alice->getId())
             ->willThrow(new OccasionNotFoundException())
             ->shouldBeCalledOnce();
 

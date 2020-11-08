@@ -10,13 +10,20 @@ class DoctrineOccasionFixture extends DoctrineAbstractFixture
     public function load(ObjectManager $em)
     {
         foreach([
-            'occasion' => (new DoctrineOccasion())
-                ->setTitre('Noël 2020')
+            'noel2019' => (new DoctrineOccasion())
+                ->setTitre('Noël 2019')
                 ->setParticipants([
                     $this->getReference('alice'),
                     $this->getReference('bob'),
                     $this->getReference('charlie'),
                     $this->getReference('david'),
+                ]),
+            'noel2020' => (new DoctrineOccasion())
+                ->setTitre('Noël 2020')
+                ->setParticipants([
+                    $this->getReference('alice'),
+                    $this->getReference('bob'),
+                    $this->getReference('charlie'),
                 ]),
         ] as $nom => $occasion) {
             $em->persist($occasion);

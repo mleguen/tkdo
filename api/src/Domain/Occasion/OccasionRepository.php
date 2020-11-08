@@ -9,5 +9,5 @@ interface OccasionRepository
      * @return Occasion
      * @throws OccasionNotFoundException
      */
-    public function readLast(): Occasion;
+    public function readLastByParticipant(int $idParticipant): Occasion;
 }

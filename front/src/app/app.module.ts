@@ -33,8 +33,9 @@ import { erreurBackendInterceptorProvider } from './erreur-backend.interceptor';
     HttpClientModule
   ],
   providers: [
-    authBackendInterceptorProvider,
+    // agit après tous les autres intercepteurs, mais doit être appelé en premier
     erreurBackendInterceptorProvider,
+    authBackendInterceptorProvider,
     devBackendInterceptorProvider
   ],
   bootstrap: [AppComponent]

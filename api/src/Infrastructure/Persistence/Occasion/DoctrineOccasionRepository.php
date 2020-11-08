@@ -24,12 +24,14 @@ class DoctrineOccasionRepository implements OccasionRepository
     /**
      * {@inheritdoc}
      */
-    public function readLast(): Occasion
+    public function readLastByParticipant(int $idParticipant): Occasion
     {
         $occasion = $this->em->createQueryBuilder()
             ->select('o')
             ->from(DoctrineOccasion::class, 'o')
+            ->where(':idParticipant MEMBER OF o.participants')
             ->orderBy('o.id', 'DESC')
+            ->setParameter('idParticipant', $idParticipant)
             ->setMaxResults(1)
             ->getQuery()
             ->getOneOrNullResult();

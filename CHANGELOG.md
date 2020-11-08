@@ -1,5 +1,11 @@
 # Historique des versions
 
+## Prochaine version
+
+- un utilisateur ne peut voir que la dernière occasion à laquelle il participe.
+  S'il ne participe encore à aucune occasion, il est invité à attendre
+  que l'organisateur d'une occasion l'y fasse participer
+
 ## V1.0.0 (01/11/2020)
 
 Produit viable minimum :

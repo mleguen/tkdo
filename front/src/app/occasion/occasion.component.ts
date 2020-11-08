@@ -12,6 +12,7 @@ export class OccasionComponent implements OnInit {
 
   Genre = Genre;
 
+  aucuneOccasion$ = this.backend.aucuneOccasion$;
   occasion$: Observable<OccasionAffichee>;
 
   constructor(

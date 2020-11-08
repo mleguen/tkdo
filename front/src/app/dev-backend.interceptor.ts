@@ -10,7 +10,7 @@ import {
 } from '@angular/common/http';
 import { Observable, of, throwError } from 'rxjs';
 import { mergeMap, materialize, dematerialize, delay } from 'rxjs/operators';
-import { Genre, Occasion } from './backend.service';
+import { Genre, Occasion, Utilisateur } from './backend.service';
 import * as moment from 'moment';
 
 const alice = {
@@ -45,16 +45,60 @@ const david = {
   genre: Genre.Masculin,
 };
 
-const utilisateurs = [alice, bob, charlie, david];
-
-const occasion: Occasion = {
-  titre: 'Noël 2020',
-  participants: utilisateurs,
-  resultats: [{
-    idQuiOffre: alice.id,
-    idQuiRecoit: bob.id,
-  }],
+const eve = {
+  id: 4,
+  identifiant: 'eve@tkdo.org',
+  nom: 'Eve',
+  mdp: 'mdpeve',
+  genre: Genre.Feminin,
 };
+
+const utilisateurs = [alice, bob, charlie, david, eve];
+
+const noel2019: Occasion = {
+  titre: 'Noël 2019',
+  participants: [alice, bob, charlie, david],
+  resultats: [
+    {
+      idQuiOffre: alice.id,
+      idQuiRecoit: bob.id,
+    },
+    {
+      idQuiOffre: bob.id,
+      idQuiRecoit: david.id,
+    },
+    {
+      idQuiOffre: charlie.id,
+      idQuiRecoit: alice.id,
+    },
+    {
+      idQuiOffre: david.id,
+      idQuiRecoit: charlie.id,
+    },
+  ],
+};
+
+const noel2020: Occasion = {
+  titre: 'Noël 2020',
+  participants: [alice, bob, charlie],
+  resultats: [
+    {
+      idQuiOffre: alice.id,
+      idQuiRecoit: charlie.id,
+    },
+    {
+      idQuiOffre: bob.id,
+      idQuiRecoit: alice.id,
+    },
+    {
+      idQuiOffre: charlie.id,
+      idQuiRecoit: bob.id,
+    },
+  ],
+};
+
+// En ordre décroissant volontairement, pour que find trouve l'occasion la plus récente en 1er
+const occasions = [noel2020, noel2019];
 
 let idees = [
   { idee: { id: 0, description: 'un gauffrier', auteur: alice, dateProposition: '19/04/2020' }, utilisateur: alice },
@@ -63,8 +107,6 @@ let idees = [
 ];
 
 // inspired from: https://jasonwatmore.com/post/2019/05/02/angular-7-mock-backend-example-for-backendless-development
-
-const token = 'fake-jwt-token';
 
 @Injectable()
 export class DevBackendInterceptor implements HttpInterceptor {
@@ -117,18 +159,18 @@ export class DevBackendInterceptor implements HttpInterceptor {
 
       const utilisateurComplet = utilisateurs.find(u => (u.identifiant === identifiant) && (u.mdp === mdp));
       if (!utilisateurComplet) return badRequest('identifiants invalides');
-      return ok({ token, utilisateur: { id: utilisateurComplet.id, nom: utilisateurComplet.nom } });
+      return ok({ token: utilisateurComplet.identifiant, utilisateur: { id: utilisateurComplet.id, nom: utilisateurComplet.nom } });
     }
 
     function getUtilisateur(idUtilisateur: number) {
-      if (!isLoggedIn()) return unauthorized();
+      if (!authorizedUser()) return unauthorized();
 
       const { mdp, ...profilSansMdp } = utilisateurs[idUtilisateur];
       return ok(profilSansMdp);
     }
 
     function putUtilisateur(idUtilisateur: number) {
-      if (!isLoggedIn()) return unauthorized();
+      if (!authorizedUser()) return unauthorized();
 
       const utilisateur = utilisateurs.find(u => u.id === idUtilisateur);
       const { nom, mdp, genre } = body as any;
@@ -149,13 +191,15 @@ export class DevBackendInterceptor implements HttpInterceptor {
     }
 
     function getOccasion() {
-      if (!isLoggedIn()) return unauthorized();
+      const utilisateur = authorizedUser();
+      if (!utilisateur) return unauthorized();
 
-      return ok(occasion);
+      const occasion = occasions.find(o => o.participants.some(u => u.id === utilisateur.id));
+      return occasion ? ok(occasion) : notFound();
     }
 
     function getIdees(idUtilisateur: number) {
-      if (!isLoggedIn()) return unauthorized();
+      if (!authorizedUser()) return unauthorized();
 
       return ok({
         utilisateur: utilisateurs[idUtilisateur],
@@ -164,7 +208,7 @@ export class DevBackendInterceptor implements HttpInterceptor {
     }
 
     function postIdee() {
-      if (!isLoggedIn()) return unauthorized();
+      if (!authorizedUser()) return unauthorized();
 
       const {idUtilisateur, description} = body as any;
 
@@ -186,7 +230,7 @@ export class DevBackendInterceptor implements HttpInterceptor {
     }
 
     function deleteIdee(idIdee: number) {
-      if (!isLoggedIn()) return unauthorized();
+      if (!authorizedUser()) return unauthorized();
 
       idees = idees.filter(i => i.idee.id !== idIdee);
 
@@ -211,8 +255,10 @@ export class DevBackendInterceptor implements HttpInterceptor {
       return throwError(new HttpErrorResponse({ url, status: 404, statusText: 'Not found' }));
     }
 
-    function isLoggedIn() {
-      return headers.get('Authorization') === `Bearer ${token}`;
+    function authorizedUser(): Utilisateur | null {
+      let match = headers.get('Authorization').match(/Bearer (.*)/);
+      if (!match) return undefined;
+      return utilisateurs.find(u => u.identifiant === match[1]);
     }
   }
 }
