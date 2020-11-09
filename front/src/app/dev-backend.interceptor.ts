@@ -10,101 +10,116 @@ import {
 } from '@angular/common/http';
 import { Observable, of, throwError } from 'rxjs';
 import { mergeMap, materialize, dematerialize, delay } from 'rxjs/operators';
-import { Genre, Occasion, Utilisateur } from './backend.service';
+import { Genre, Idee, Occasion, Utilisateur, UtilisateurPrive } from './backend.service';
 import * as moment from 'moment';
 
-const alice = {
+interface UtilisateurAvecMdp extends UtilisateurPrive {
+  mdp: string;
+}
+
+const alice: UtilisateurAvecMdp = {
   id: 0,
   identifiant: 'alice@tkdo.org',
   nom: 'Alice',
   mdp: 'mdpalice',
   genre: Genre.Feminin,
+  estAdmin: true,
 };
 
-const bob = {
+const bob: UtilisateurAvecMdp = {
   id: 1,
   identifiant: 'bob@tkdo.org',
   nom: 'Bob',
   mdp: 'mdpbob',
   genre: Genre.Masculin,
+  estAdmin: false,
 };
 
-const charlie = {
+const charlie: UtilisateurAvecMdp = {
   id: 2,
   identifiant: 'charlie@tkdo.org',
   nom: 'Charlie',
   mdp: 'mdpcharlie',
   genre: Genre.Masculin,
+  estAdmin: false,
 };
 
-const david = {
+const david: UtilisateurAvecMdp = {
   id: 3,
   identifiant: 'david@tkdo.org',
   nom: 'David',
   mdp: 'mdpdavid',
   genre: Genre.Masculin,
+  estAdmin: false,
 };
 
-const eve = {
+const eve: UtilisateurAvecMdp = {
   id: 4,
   identifiant: 'eve@tkdo.org',
   nom: 'Eve',
   mdp: 'mdpeve',
   genre: Genre.Feminin,
+  estAdmin: false,
 };
 
-const utilisateurs = [alice, bob, charlie, david, eve];
-
-const noel2019: Occasion = {
-  titre: 'Noël 2019',
-  participants: [alice, bob, charlie, david],
-  resultats: [
-    {
-      idQuiOffre: alice.id,
-      idQuiRecoit: bob.id,
-    },
-    {
-      idQuiOffre: bob.id,
-      idQuiRecoit: david.id,
-    },
-    {
-      idQuiOffre: charlie.id,
-      idQuiRecoit: alice.id,
-    },
-    {
-      idQuiOffre: david.id,
-      idQuiRecoit: charlie.id,
-    },
-  ],
-};
-
-const noel2020: Occasion = {
-  titre: 'Noël 2020',
-  participants: [alice, bob, charlie],
-  resultats: [
-    {
-      idQuiOffre: alice.id,
-      idQuiRecoit: charlie.id,
-    },
-    {
-      idQuiOffre: bob.id,
-      idQuiRecoit: alice.id,
-    },
-    {
-      idQuiOffre: charlie.id,
-      idQuiRecoit: bob.id,
-    },
-  ],
-};
+const utilisateursAvecMdp = [alice, bob, charlie, david, eve];
 
 // En ordre décroissant volontairement, pour que find trouve l'occasion la plus récente en 1er
-const occasions = [noel2020, noel2019];
+const occasions: Occasion[] = [
+  {
+    titre: 'Noël 2020',
+    participants: [alice, bob, charlie],
+    resultats: [
+      {
+        idQuiOffre: alice.id,
+        idQuiRecoit: charlie.id,
+      },
+      {
+        idQuiOffre: bob.id,
+        idQuiRecoit: alice.id,
+      },
+      {
+        idQuiOffre: charlie.id,
+        idQuiRecoit: bob.id,
+      },
+    ],
+  },
+  {
+    titre: 'Noël 2019',
+    participants: [alice, bob, charlie, david],
+    resultats: [
+      {
+        idQuiOffre: alice.id,
+        idQuiRecoit: bob.id,
+      },
+      {
+        idQuiOffre: bob.id,
+        idQuiRecoit: david.id,
+      },
+      {
+        idQuiOffre: charlie.id,
+        idQuiRecoit: alice.id,
+      },
+      {
+        idQuiOffre: david.id,
+        idQuiRecoit: charlie.id,
+      },
+    ],
+  }
+].map(o => {
+  (o as Occasion).participants = o.participants.map(enleveDonneesPrivees);
+  return o;
+});
 
-let idees = [
+let idees: { idee: Idee, utilisateur: Utilisateur }[] = [
   { idee: { id: 0, description: 'un gauffrier', auteur: alice, dateProposition: '19/04/2020' }, utilisateur: alice },
   { idee: { id: 1, description: 'une canne à pêche', auteur: alice, dateProposition: '19/04/2020' }, utilisateur: bob },
   { idee: { id: 2, description: 'des gants de boxe', auteur: bob, dateProposition: '07/04/2020' }, utilisateur: bob },
-];
+].map(i => {
+  (i.idee as Idee).auteur = enleveDonneesPrivees(i.idee.auteur);
+  (i.utilisateur as Utilisateur) = enleveDonneesPrivees(i.utilisateur);
+  return i;
+});
 
 // inspired from: https://jasonwatmore.com/post/2019/05/02/angular-7-mock-backend-example-for-backendless-development
 
@@ -157,26 +172,27 @@ export class DevBackendInterceptor implements HttpInterceptor {
     function postConnexion() {
       const { identifiant, mdp } = body as any;
 
-      const utilisateurComplet = utilisateurs.find(u => (u.identifiant === identifiant) && (u.mdp === mdp));
-      if (!utilisateurComplet) return badRequest('identifiants invalides');
-      return ok({ token: utilisateurComplet.identifiant, utilisateur: { id: utilisateurComplet.id, nom: utilisateurComplet.nom } });
+      const utilisateur = utilisateursAvecMdp.find(u => (u.identifiant === identifiant) && (u.mdp === mdp));
+      if (!utilisateur) return badRequest('identifiants invalides');
+
+      const { id, nom, estAdmin } = utilisateur;
+      return ok({ token: identifiant, utilisateur: { id, nom, estAdmin } });
     }
 
     function getUtilisateur(idUtilisateur: number) {
       if (!authorizedUser()) return unauthorized();
 
-      const { mdp, ...profilSansMdp } = utilisateurs[idUtilisateur];
-      return ok(profilSansMdp);
+      return ok(enleveMdp(utilisateursAvecMdp[idUtilisateur]));
     }
 
     function putUtilisateur(idUtilisateur: number) {
       if (!authorizedUser()) return unauthorized();
 
-      const utilisateur = utilisateurs.find(u => u.id === idUtilisateur);
+      const utilisateur = utilisateursAvecMdp.find(u => u.id === idUtilisateur);
       const { nom, mdp, genre } = body as any;
 
       if (nom !== utilisateur.nom) {
-        if (utilisateurs.filter(p => p.id !== idUtilisateur).map(p => p.nom).includes(nom)) {
+        if (utilisateursAvecMdp.filter(p => p.id !== idUtilisateur).map(p => p.nom).includes(nom)) {
           return badRequest('Ce nom est déjà utilisé');
         }
 
@@ -202,22 +218,23 @@ export class DevBackendInterceptor implements HttpInterceptor {
       if (!authorizedUser()) return unauthorized();
 
       return ok({
-        utilisateur: utilisateurs[idUtilisateur],
+        utilisateur: enleveDonneesPrivees(utilisateursAvecMdp[idUtilisateur]),
         idees: idees.filter(i => i.utilisateur.id === idUtilisateur).map(i => i.idee),
       });
     }
 
     function postIdee() {
-      if (!authorizedUser()) return unauthorized();
+      const utilisateurConnecte = authorizedUser();
+      if (!utilisateurConnecte) return unauthorized();
 
       const {idUtilisateur, description} = body as any;
 
       idees.push({
-        utilisateur: utilisateurs[idUtilisateur],
+        utilisateur: enleveDonneesPrivees(utilisateursAvecMdp[idUtilisateur]),
         idee: {
           id: nextId(idees.map(i => i.idee)),
           description,
-          auteur: alice,
+          auteur: enleveDonneesPrivees(utilisateurConnecte),
           dateProposition: moment().locale('fr').format('YYYY-MM-DDTHH:mm:ssZ'),
         }
       });
@@ -255,10 +272,10 @@ export class DevBackendInterceptor implements HttpInterceptor {
       return throwError(new HttpErrorResponse({ url, status: 404, statusText: 'Not found' }));
     }
 
-    function authorizedUser(): Utilisateur | null {
+    function authorizedUser(): UtilisateurAvecMdp | null {
       let match = headers.get('Authorization').match(/Bearer (.*)/);
       if (!match) return undefined;
-      return utilisateurs.find(u => u.identifiant === match[1]);
+      return utilisateursAvecMdp.find(u => u.identifiant === match[1]);
     }
   }
 }
@@ -271,3 +288,13 @@ export const devBackendInterceptorProvider: Provider = {
   useFactory: () => isDevMode() ? new DevBackendInterceptor() : noopInterceptor,
   multi: true
 };
+
+function enleveDonneesPrivees(u: UtilisateurAvecMdp): Utilisateur {
+  let { estAdmin, identifiant, ...donneesPubliques } = enleveMdp(u);
+  return donneesPubliques;
+}
+
+function enleveMdp(u: UtilisateurAvecMdp): UtilisateurPrive {
+  let { mdp, ...donneesPrivees } = u;
+  return donneesPrivees;
+}

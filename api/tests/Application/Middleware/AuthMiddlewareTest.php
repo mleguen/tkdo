@@ -14,53 +14,72 @@ class AuthMiddlewareTest extends ActionTestCase
     {
         parent::setUp();
         $this->app->get('/test-auth-middleware', function (ServerRequestInterface $request, ResponseInterface $response) {
-            $response->getBody()->write(json_encode($request->getAttribute('idUtilisateurAuth')));
+            $response->getBody()->write(json_encode([
+                'idUtilisateurAuth' => $request->getAttribute('idUtilisateurAuth'),
+                'estAdmin' => $request->getAttribute('estAdmin'),
+            ]));
             return $response;
         });
     }
 
     public function testAction()
     {
-        $response = $this->handleRequestWithAuthHeader(
-            'Bearer ' . $this->authService->encodeBearerToken(1),
+        $body = json_decode((string) $this->handleRequestWithAuthHeader(
+            'Bearer ' . $this->authService->encodeBearerToken(1, false),
             'GET',
             '/test-auth-middleware'
-        );
+        )->getBody());
 
-        $this->assertEquals('1', $response->getBody());
+        $this->assertEquals(1, $body->idUtilisateurAuth);
+        $this->assertEquals(false, $body->estAdmin);
+    }
+
+    public function testActionAdmin()
+    {
+        $body = json_decode((string) $this->handleRequestWithAuthHeader(
+            'Bearer ' . $this->authService->encodeBearerToken(1, true),
+            'GET',
+            '/test-auth-middleware'
+        )->getBody());
+
+        $this->assertEquals(1, $body->idUtilisateurAuth);
+        $this->assertEquals(true, $body->estAdmin);
     }
 
     public function testActionPasUnBearerToken()
     {
-        $response = $this->handleRequestWithAuthHeader(
+        $body = json_decode((string) $this->handleRequestWithAuthHeader(
             'pas un bearer token',
             'GET',
             '/test-auth-middleware'
-        );
+        )->getBody());
 
-        $this->assertEquals('null', $response->getBody());
+        $this->assertEquals(null, $body->idUtilisateurAuth);
+        $this->assertEquals(null, $body->estAdmin);
     }
 
     public function testActionPasUnJWT()
     {
-        $response = $this->handleRequestWithAuthHeader(
+        $body = json_decode((string) $this->handleRequestWithAuthHeader(
             'Bearer pas un JWT',
             'GET',
             '/test-auth-middleware'
-        );
+        )->getBody());
 
-        $this->assertEquals('null', $response->getBody());
+        $this->assertEquals(null, $body->idUtilisateurAuth);
+        $this->assertEquals(null, $body->estAdmin);
     }
 
     public function testActionUnJWTExpire()
     {
-        $response = $this->handleRequestWithAuthHeader(
-            'Bearer ' . $this->authService->encodeBearerToken(1, ["validite" => -10]),
+        $body = json_decode((string) $this->handleRequestWithAuthHeader(
+            'Bearer ' . $this->authService->encodeBearerToken(1, false, ["validite" => -10]),
             'GET',
             '/test-auth-middleware'
-        );
+        )->getBody());
 
-        $this->assertEquals('null', $response->getBody());
+        $this->assertEquals(null, $body->idUtilisateurAuth);
+        $this->assertEquals(null, $body->estAdmin);
     }
 
     public function testActionUnJWTCreeAvecUneMauvaiseCle()
@@ -94,12 +113,13 @@ OntNhO592PxY1J9kraiYxIEq+SyZqlw1MrVqE0KXEtS+7JWTqBcE9piZ0G1J2jB/
 LonNH8upjaTgg3DS6VuHWg/rJyr9qPzTNAfqEkv1pz6t7jqoIHRm5J4=
 -----END RSA PRIVATE KEY-----
 EOD;
-        $response = $this->handleRequestWithAuthHeader(
-            'Bearer ' . $this->authService->encodeBearerToken(1, ["clePrivee" => $mauvaiseClePrivee]),
+        $body = json_decode((string) $this->handleRequestWithAuthHeader(
+            'Bearer ' . $this->authService->encodeBearerToken(1, false, ["clePrivee" => $mauvaiseClePrivee]),
             'GET',
             '/test-auth-middleware'
-        );
+        )->getBody());
 
-        $this->assertEquals('null', $response->getBody());
+        $this->assertEquals(null, $body->idUtilisateurAuth);
+        $this->assertEquals(null, $body->estAdmin);
     }
 }

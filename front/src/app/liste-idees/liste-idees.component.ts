@@ -3,7 +3,7 @@ import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Observable, combineLatest, BehaviorSubject, of } from 'rxjs';
 import { switchMap, catchError, map } from 'rxjs/operators';
-import { BackendService, IdeesParUtilisateur, IdeeSansUtilisateur, Genre } from '../backend.service';
+import { BackendService, IdeesPour, Idee, Genre } from '../backend.service';
 import * as moment from 'moment';
 
 @Component({
@@ -19,7 +19,7 @@ export class ListeIdeesComponent implements OnInit {
     description: ['', Validators.required],
   });
   erreurAjoutSuppression: string;
-  listeIdees$: Observable<IdeesAffichees>;
+  listeIdees$: Observable<IdeesAfficheesPour>;
 
   private idUtilisateur: number;
   private actualisation$ = new BehaviorSubject(true);
@@ -82,11 +82,11 @@ export class ListeIdeesComponent implements OnInit {
   }
 }
 
-interface IdeesAffichees extends IdeesParUtilisateur {
+interface IdeesAfficheesPour extends IdeesPour {
   estPourMoi: boolean;
   idees: IdeeAffichee[];
 }
 
-interface IdeeAffichee extends IdeeSansUtilisateur {
+interface IdeeAffichee extends Idee {
   estDeMoi: boolean;
 }

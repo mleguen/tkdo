@@ -34,7 +34,10 @@ class UtilisateurAction extends Action
     {
         $this->assertAuth();
         $this->idUtilisateur = (int) $this->resolveArg('idUtilisateur');
-        $this->assertUtilisateurAuthEst($this->idUtilisateur, "L'utilisateur authentifié n'est pas l'utilisateur ($this->idUtilisateur)");
+        $this->assertUtilisateurAuthEst(
+            $this->idUtilisateur,
+            "L'utilisateur authentifié n'est pas l'utilisateur ($this->idUtilisateur) et n'est pas admin"
+        );
 
         return $this->response;
     }

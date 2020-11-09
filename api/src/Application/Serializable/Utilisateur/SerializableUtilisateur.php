@@ -14,18 +14,31 @@ class SerializableUtilisateur implements JsonSerializable
    */
   private $utilisateur;
 
-  public function __construct(Utilisateur $utilisateur)
+  /**
+   * @var bool
+   */
+  private $complet;
+
+  public function __construct(Utilisateur $utilisateur, bool $complet = false)
   {
     $this->utilisateur = $utilisateur;
+    $this->complet = $complet;
   }
 
   public function jsonSerialize(): array
   {
-    return [
+    $data = [
       'genre' => $this->utilisateur->getGenre(),
       'id' => $this->utilisateur->getId(),
-      'identifiant' => $this->utilisateur->getIdentifiant(),
       'nom' => $this->utilisateur->getNom(),
     ];
+    if ($this->complet) {
+      $data = array_merge($data, [
+        'estAdmin' => $this->utilisateur->getEstAdmin(),
+        'identifiant' => $this->utilisateur->getIdentifiant(),
+      ]);
+      ksort($data);
+    }
+    return $data;
   }
 }

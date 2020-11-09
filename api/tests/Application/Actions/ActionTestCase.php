@@ -93,17 +93,20 @@ abstract class ActionTestCase extends TestCase
             ->setIdentifiant('alice@tkdo.org')
             ->setNom('Alice')
             ->setMdp('mdpalice')
-            ->setGenre(Genre::Feminin);
+            ->setGenre(Genre::Feminin)
+            ->setEstAdmin(true);
         $this->bob = (new DoctrineUtilisateur(2))
             ->setIdentifiant('bob@tkdo.org')
             ->setNom('Bob')
             ->setMdp('mdpbob')
-            ->setGenre(Genre::Masculin);
+            ->setGenre(Genre::Masculin)
+            ->setEstAdmin(false);
         $this->charlie = (new DoctrineUtilisateur(3))
             ->setIdentifiant('charlie@tkdo.org')
             ->setNom('Charlie')
             ->setMdp('mdpcharlie')
-            ->setGenre(Genre::Masculin);
+            ->setGenre(Genre::Masculin)
+            ->setEstAdmin(false);
     }
 
     protected function handleRequest(
@@ -137,13 +140,14 @@ abstract class ActionTestCase extends TestCase
 
     protected function handleAuthRequest(
         int $idUtilisateurAuth,
+        bool $estAdmin,
         string $method,
         string $path,
         $query = '',
         $body = null
     ): ResponseInterface {
         return $this->handleRequestWithAuthHeader(
-            "Bearer " . $this->authService->encodeBearerToken($idUtilisateurAuth),
+            "Bearer " . $this->authService->encodeBearerToken($idUtilisateurAuth, $estAdmin),
             $method, $path, $query, $body
         );
     }

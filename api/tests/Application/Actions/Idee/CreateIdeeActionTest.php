@@ -55,6 +55,7 @@ class CreateIdeeActionTest extends ActionTestCase
 
         $response = $this->handleAuthRequest(
             $this->idee->getAuteur()->getId(),
+            false,
             'POST',
             "/idee",
             '',
@@ -75,6 +76,7 @@ EOT
         $this->expectException(HttpForbiddenException::class);
         $this->handleAuthRequest(
             $this->idee->getUtilisateur()->getId(),
+            false,
             'POST',
             "/idee",
             '',
@@ -99,6 +101,7 @@ EOT
         $this->expectExceptionMessage('erreur pendant create');
         $this->handleAuthRequest(
             $this->idee->getAuteur()->getId(),
+            false,
             'POST',
             "/idee",
             '',

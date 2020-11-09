@@ -1,7 +1,7 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { first, tap } from 'rxjs/operators';
+import { first, map, tap } from 'rxjs/operators';
 
 export interface Occasion {
   titre: string;
@@ -11,9 +11,13 @@ export interface Occasion {
 
 export interface Utilisateur {
   id: number;
-  identifiant: string;
   nom: string;
   genre: Genre;
+}
+
+export interface UtilisateurPrive extends Utilisateur {
+  estAdmin: boolean;
+  identifiant: string;
 }
 
 export enum Genre {
@@ -26,12 +30,12 @@ export interface Resultat {
   idQuiRecoit: number;
 }
 
-export interface IdeesParUtilisateur {
+export interface IdeesPour {
   utilisateur: Utilisateur;
-  idees: IdeeSansUtilisateur[];
+  idees: Idee[];
 }
 
-export interface IdeeSansUtilisateur {
+export interface Idee {
   id: number;
   description: string;
   auteur: Utilisateur;
@@ -51,7 +55,7 @@ const CLE_UTILISATEUR = 'utilisateur';
 
 interface PostConnexionDTO {
   token: string;
-  utilisateur: Pick<Utilisateur, 'id' | 'nom'>;
+  utilisateur: Pick<UtilisateurPrive, 'id' | 'nom' | 'estAdmin'>;
 }
 
 @Injectable({
@@ -99,6 +103,13 @@ export class BackendService {
     this.utilisateurConnecte$.next(null);
   }
   
+  estAdmin() {
+    return this.utilisateurConnecte$.pipe(
+      first(),
+      map(u => u.estAdmin),
+    ).toPromise();
+  }
+  
   estConnecte() {
     return this.utilisateurConnecte$.pipe(first()).toPromise();
   }
@@ -108,7 +119,7 @@ export class BackendService {
   }
 
   getIdees(idUtilisateur: number) {
-    return this.http.get<IdeesParUtilisateur>(`${URL_IDEES}?idUtilisateur=${idUtilisateur}`);
+    return this.http.get<IdeesPour>(`${URL_IDEES}?idUtilisateur=${idUtilisateur}`);
   }
 
   getOccasion$() {
@@ -129,10 +140,10 @@ export class BackendService {
   }
 
   getUtilisateur$() {
-    return this.http.get<Utilisateur>(URL_UTILISATEUR(this.idUtilisateur));
+    return this.http.get<UtilisateurPrive>(URL_UTILISATEUR(this.idUtilisateur));
   }
 
-  modifieUtilisateur(utilisateur: Utilisateur & { mdp?: string }) {
+  modifieUtilisateur(utilisateur: Partial<UtilisateurPrive>) {
     return this.http.put(URL_UTILISATEUR(this.idUtilisateur), utilisateur).toPromise();
   }
 

@@ -135,11 +135,14 @@ abstract class Action
     }
 
     /**
-     * Vérifie qu'un utilisateur s'est authentifié
+     * Vérifie que l'utilisateur authentifié est bien celui attendu (ou est admin)
      */
     protected function assertUtilisateurAuthEst(int $idUtilisateurAttendu, $warning = null)
     {
-        if ($this->request->getAttribute('idUtilisateurAuth') !== $idUtilisateurAttendu) {
+        if (
+            !$this->request->getAttribute('estAdmin') &&
+            ($this->request->getAttribute('idUtilisateurAuth') !== $idUtilisateurAttendu)
+        ) {
             if (!is_null($warning)) {
                 $this->logger->warning($warning);
             }

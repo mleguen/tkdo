@@ -26,16 +26,18 @@ EOT
         );
 
         $token = json_decode((string) $response->getBody())->token;
+        $estAdmin = json_encode($this->alice->getEstAdmin());
         $json = <<<EOT
 {
     "token": "{$token}",
     "utilisateur": {
         "id": {$this->alice->getId()},
-        "nom": "{$this->alice->getNom()}"
+        "nom": "{$this->alice->getNom()}",
+        "estAdmin": $estAdmin
     }
 }
 EOT;
-        $this->assertEquals($json, $response->getBody());
+        $this->assertEquals($json, (string) $response->getBody());
     }
 
     public function testActionIdentifiantsInvalides()

@@ -59,6 +59,7 @@ class ListIdeeActionTest extends ActionTestCase
 
         $response = $this->handleAuthRequest(
             $this->charlie->getId(),
+            false,
             'GET',
             '/idee',
             "idUtilisateur={$this->alice->getId()}"
@@ -69,7 +70,6 @@ class ListIdeeActionTest extends ActionTestCase
     "utilisateur": {
         "genre": "{$this->alice->getGenre()}",
         "id": {$this->alice->getId()},
-        "identifiant": "{$this->alice->getIdentifiant()}",
         "nom": "{$this->alice->getNom()}"
     },
     "idees": [
@@ -97,6 +97,7 @@ EOT;
 
         $response = $this->handleAuthRequest(
             $this->bob->getId(),
+            false,
             'GET',
             '/idee',
             "idUtilisateur={$this->alice->getId()}"
@@ -107,7 +108,6 @@ EOT;
     "utilisateur": {
         "genre": "{$this->alice->getGenre()}",
         "id": {$this->alice->getId()},
-        "identifiant": "{$this->alice->getIdentifiant()}",
         "nom": "{$this->alice->getNom()}"
     },
     "idees": [
@@ -135,6 +135,7 @@ EOT;
 
         $response = $this->handleAuthRequest(
             $this->alice->getId(),
+            false,
             'GET',
             '/idee',
             "idUtilisateur={$this->alice->getId()}"
@@ -145,7 +146,6 @@ EOT;
     "utilisateur": {
         "genre": "{$this->alice->getGenre()}",
         "id": {$this->alice->getId()},
-        "identifiant": "{$this->alice->getIdentifiant()}",
         "nom": "{$this->alice->getNom()}"
     },
     "idees": [
@@ -165,7 +165,6 @@ EOT;
             "auteur": {
                 "genre": "{$i->getAuteur()->getGenre()}",
                 "id": {$i->getAuteur()->getId()},
-                "identifiant": "{$i->getAuteur()->getIdentifiant()}",
                 "nom": "{$i->getAuteur()->getNom()}"
             },
             "dateProposition": "{$i->getDateProposition()->format(\DateTimeInterface::ISO8601)}"
@@ -179,6 +178,7 @@ EOT;
         $this->expectExceptionMessage('idUtilisateur manquant');
         $this->handleAuthRequest(
             $this->charlie->getId(),
+            false,
             'GET',
             '/idee',
             ''
@@ -196,6 +196,7 @@ EOT;
         $this->expectExceptionMessage('utilisateur inconnu');
         $this->handleAuthRequest(
             $this->charlie->getId(),
+            false,
             'GET',
             '/idee',
             "idUtilisateur={$this->alice->getId()}"
@@ -217,6 +218,7 @@ EOT;
         $this->expectExceptionMessage('erreur pendant readByUtilisateur');
         $this->handleAuthRequest(
             $this->charlie->getId(),
+            false,
             'GET',
             '/idee',
             "idUtilisateur={$this->alice->getId()}"

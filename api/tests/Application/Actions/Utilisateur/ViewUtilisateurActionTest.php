@@ -20,12 +20,42 @@ class ViewUtilisateurActionTest extends ActionTestCase
 
         $response = $this->handleAuthRequest(
             $this->alice->getId(),
+            false,
             'GET',
             "/utilisateur/{$this->alice->getId()}"
         );
 
+        $estAdmin = json_encode($this->alice->getEstAdmin());
         $json = <<<EOT
 {
+    "estAdmin": $estAdmin,
+    "genre": "{$this->alice->getGenre()}",
+    "id": {$this->alice->getId()},
+    "identifiant": "{$this->alice->getIdentifiant()}",
+    "nom": "{$this->alice->getNom()}"
+}
+EOT;
+        $this->assertEquals($json, (string)$response->getBody());
+    }
+
+    public function testActionAdmin()
+    {
+        $this->utilisateurRepositoryProphecy
+            ->read($this->alice->getId())
+            ->willReturn($this->alice)
+            ->shouldBeCalledOnce();
+
+        $response = $this->handleAuthRequest(
+            $this->bob->getId(),
+            true,
+            'GET',
+            "/utilisateur/{$this->alice->getId()}"
+        );
+
+        $estAdmin = json_encode($this->alice->getEstAdmin());
+        $json = <<<EOT
+{
+    "estAdmin": $estAdmin,
     "genre": "{$this->alice->getGenre()}",
     "id": {$this->alice->getId()},
     "identifiant": "{$this->alice->getIdentifiant()}",
@@ -40,6 +70,7 @@ EOT;
         $this->expectException(HttpForbiddenException::class);
         $this->handleAuthRequest(
             $this->bob->getId(),
+            false,
             'GET',
             "/utilisateur/{$this->alice->getId()}"
         );
@@ -56,6 +87,7 @@ EOT;
         $this->expectExceptionMessage('utilisateur inconnu');
         $this->handleAuthRequest(
             $this->alice->getId(),
+            false,
             'GET',
             "/utilisateur/{$this->alice->getId()}"
         );

@@ -2,6 +2,7 @@
 
 ## Prochaine version
 
+- droits d'administration permettant d'accéder à une page d'administration
 - un utilisateur ne peut voir que la dernière occasion à laquelle il participe.
   S'il ne participe encore à aucune occasion, il est invité à attendre
   que l'organisateur d'une occasion l'y fasse participer

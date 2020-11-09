@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Application\Service;
 
-use Exception;
 use Firebase\JWT\JWT;
 
 class AuthService
@@ -35,7 +34,7 @@ class AuthService
   /**
    * Authentifie l'expéditeur d'une requête par son 'authorization' header
    */
-  public function authentifie(string $authorizationHeader): int
+  public function authentifie(string $authorizationHeader): array
   {
     if (strpos($authorizationHeader, "Bearer ") !== 0) {
       throw new AuthPasDeBearerTokenException();
@@ -47,23 +46,29 @@ class AuthService
 
   /**
    * Decode un bearer token et retourne l'id de l'utilisateur authentifié
+   * et s'il est ou non admin
    */
-  public function decodeBearerToken(string $token, $settings = null): int
+  public function decodeBearerToken(string $token, $settings = null): array
   {
     $settings = array_merge($this->defaultSettings, $settings ?: []);
     $payload = JWT::decode($token, $settings['clePublique'], [$settings['algo']]);
-    return $payload->sub;
+    return [
+      "idUtilisateurAuth" => $payload->sub,
+      "estAdmin" => isset($payload->estAdmin) && $payload->estAdmin,
+    ];
   }
 
   /**
    * Encode un bearer token contenant l'id de l'utilisateur authentifié
+   * et s'il est ou non admin
    */
-  public function encodeBearerToken(int $idUtilisateurAuth, $settings = null): string
+  public function encodeBearerToken(int $idUtilisateurAuth, bool $estAdmin, $settings = null): string
   {
     $settings = array_merge($this->defaultSettings, $settings ?: []);
     $payload = [
       "sub" => $idUtilisateurAuth,
       "exp" => \time() + $settings['validite'],
+      "estAdmin" => $estAdmin,
     ];
     return JWT::encode($payload, $settings['clePrivee'], $settings['algo']);
   }

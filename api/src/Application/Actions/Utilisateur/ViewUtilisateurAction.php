@@ -12,6 +12,6 @@ class ViewUtilisateurAction extends UtilisateurAction
     {
         parent::action();
         $utilisateur = $this->utilisateurRepository->read($this->idUtilisateur);
-        return $this->respondWithData(new SerializableUtilisateur($utilisateur));
+        return $this->respondWithData(new SerializableUtilisateur($utilisateur, true));
     }
 }

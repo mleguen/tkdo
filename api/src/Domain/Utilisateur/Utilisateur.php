@@ -10,6 +10,11 @@ interface Utilisateur
     /**
      * @throws ReferenceException
      */
+    public function getEstAdmin(): bool;
+
+    /**
+     * @throws ReferenceException
+     */
     public function getGenre(): string;
 
     /**
@@ -21,6 +26,11 @@ interface Utilisateur
      * @throws ReferenceException
      */
     public function getNom(): string;
+
+    /**
+     * @throws ReferenceException
+     */
+    public function setEstAdmin(bool $estAdmin): Utilisateur;
 
     /**
      * @throws ReferenceException

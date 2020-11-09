@@ -42,13 +42,15 @@ class CreateConnexionAction extends Action
       $utilisateur = $this->utilisateurRepository->readOneByIdentifiants($body->identifiant, $body->mdp);
       $id = $utilisateur->getId();
       $nom = $utilisateur->getNom();
-      $this->logger->info("Utilisateur $id ($nom) connecté");
+      $estAdmin = $utilisateur->getEstAdmin();
+      $this->logger->info("Utilisateur $id ($nom) connecté" . ($estAdmin ? " (admin)" : ""));
 
       return $this->respondWithData([
-        "token" => $this->authService->encodeBearerToken($utilisateur->getId()),
+        "token" => $this->authService->encodeBearerToken($utilisateur->getId(), $estAdmin),
         "utilisateur" => [
           "id" => $id,
           "nom" => $nom,
+          "estAdmin" => $estAdmin,
         ]
       ]);
     }

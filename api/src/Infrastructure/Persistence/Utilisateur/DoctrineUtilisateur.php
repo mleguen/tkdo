@@ -19,6 +19,12 @@ class DoctrineUtilisateur implements Utilisateur
 {
 
   /**
+   * @var bool
+   * @Column(type="boolean")
+   */
+  private $estAdmin = false;
+
+  /**
    * @var string
    * @Column()
    */
@@ -58,6 +64,14 @@ class DoctrineUtilisateur implements Utilisateur
   /**
    * {@inheritdoc}
    */
+  public function getEstAdmin(): bool
+  {
+    return $this->estAdmin;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getGenre(): string
   {
     return $this->genre;
@@ -90,6 +104,15 @@ class DoctrineUtilisateur implements Utilisateur
   public function getNom(): string
   {
     return $this->nom;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setEstAdmin(bool $estAdmin): Utilisateur
+  {
+    $this->estAdmin = $estAdmin;
+    return $this;
   }
 
   /**

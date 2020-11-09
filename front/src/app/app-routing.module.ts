@@ -6,10 +6,13 @@ import { ConnexionGuard } from './connexion.guard';
 import { ConnexionComponent } from './connexion/connexion.component';
 import { ProfilComponent } from './profil/profil.component';
 import { DeconnexionComponent } from './deconnexion/deconnexion.component';
+import { AdminComponent } from './admin/admin.component';
+import { AdminGuard } from './admin.guard';
 
 
 const routes: Routes = [
   { path: '', redirectTo: '/occasion', pathMatch: 'full' },
+  { path: 'admin', component: AdminComponent, canActivate: [ConnexionGuard, AdminGuard], runGuardsAndResolvers: 'always' },
   { path: 'connexion', component: ConnexionComponent },
   { path: 'deconnexion', component: DeconnexionComponent },
   { path: 'liste-idees/:idUtilisateur', component: ListeIdeesComponent, canActivate: [ConnexionGuard], runGuardsAndResolvers: 'always' },

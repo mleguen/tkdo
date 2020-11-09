@@ -15,7 +15,8 @@ class DoctrineUtilisateurFixture extends DoctrineAbstractFixture
                 ->setIdentifiant('alice@tkdo.org')
                 ->setNom('Alice')
                 ->setMdp(password_hash('mdpalice', PASSWORD_DEFAULT))
-                ->setGenre(Genre::Feminin),
+                ->setGenre(Genre::Feminin)
+                ->setEstAdmin(true),
             'bob' => (new DoctrineUtilisateur())
                 ->setIdentifiant('bob@tkdo.org')
                 ->setNom('Bob')

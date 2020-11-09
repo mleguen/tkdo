@@ -7,13 +7,17 @@
 
   <div *ngIf="(utilisateurConnecte$ | async) as utilisateur" class="collapse navbar-collapse" id="navbarsExampleDefault">
     <ul class="navbar-nav mr-auto">
-      <li class="nav-item" *ngIf="utilisateurConnecte$ | async" [ngClass]="{'active': menuActif === '/occasion'}">
+      <li class="nav-item" [ngClass]="{'active': menuActif === '/occasion'}">
         <a class="nav-link" [routerLink]="['/occasion']"
           data-toggle="collapse" data-target=".navbar-collapse.show">{{(occasion$ | async)?.titre || 'Occasion'}}</a>
       </li>
-      <li class="nav-item" *ngIf="utilisateurConnecte$ | async" [ngClass]="{'active': menuActif === '/profil'}">
+      <li class="nav-item" [ngClass]="{'active': menuActif === '/profil'}">
         <a class="nav-link" [routerLink]="['/profil']"
         data-toggle="collapse" data-target=".navbar-collapse.show">Mon profil</a>
+      </li>
+      <li class="nav-item" *ngIf="utilisateur.estAdmin" [ngClass]="{'active': menuActif === '/admin'}">
+        <a class="nav-link" [routerLink]="['/admin']"
+        data-toggle="collapse" data-target=".navbar-collapse.show">Administration</a>
       </li>
     </ul>
     

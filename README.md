@@ -206,7 +206,7 @@ Si nécessaire, commencer par remettre la base de données de l'environnement de
 au niveau de la dernière migration :
 
 ```bash
-./docker-compose up -d
+./docker-compose-api up -d
 ./composer-api doctrine orm:schema-tool:drop --force
 ./composer-api doctrine migrations:migrate
 ```
@@ -217,6 +217,7 @@ Puis :
 ./composer-api doctrine orm:clear-cache:metadata
 ./composer-api doctrine orm:clear-cache:query
 ./composer-api doctrine orm:clear-cache:result
+for d in $(find api/var/doctrine/cache -mindepth 1 -type d); do rm -rf "$d"; done
 ./composer-api doctrine migrations:diff
 ```
 

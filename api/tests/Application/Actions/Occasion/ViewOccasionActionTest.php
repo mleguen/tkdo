@@ -31,6 +31,7 @@ class ViewOccasionActionTest extends ActionTestCase
 
         $response = $this->handleAuthRequest(
             $this->alice->getId(),
+            false,
             'GET',
             '/occasion'
         );
@@ -43,13 +44,11 @@ class ViewOccasionActionTest extends ActionTestCase
         {
             "genre": "{$this->alice->getGenre()}",
             "id": {$this->alice->getId()},
-            "identifiant": "{$this->alice->getIdentifiant()}",
             "nom": "{$this->alice->getNom()}"
         },
         {
             "genre": "{$this->bob->getGenre()}",
             "id": {$this->bob->getId()},
-            "identifiant": "{$this->bob->getIdentifiant()}",
             "nom": "{$this->bob->getNom()}"
         }
     ],
@@ -75,6 +74,7 @@ EOT;
         $this->expectExceptionMessage('aucune occasion');
         $this->handleAuthRequest(
             $this->alice->getId(),
+            false,
             'GET',
             '/occasion'
         );

@@ -43,6 +43,7 @@ class DeleteIdeeActionTest extends ActionTestCase
 
         $response = $this->handleAuthRequest(
             $this->idee->getAuteur()->getId(),
+            false,
             'DELETE',
             "/idee/{$this->idee->getId()}"
         );
@@ -60,6 +61,7 @@ class DeleteIdeeActionTest extends ActionTestCase
         $this->expectException(HttpForbiddenException::class);
         $this->handleAuthRequest(
             $this->idee->getUtilisateur()->getId(),
+            false,
             'DELETE',
             "/idee/{$this->idee->getId()}"
         );
@@ -76,6 +78,7 @@ class DeleteIdeeActionTest extends ActionTestCase
         $this->expectExceptionMessage('idée inconnue');
         $this->handleAuthRequest(
             $this->idee->getAuteur()->getId(),
+            false,
             'DELETE',
             "/idee/{$this->idee->getId()}"
         );
@@ -93,6 +96,7 @@ class DeleteIdeeActionTest extends ActionTestCase
         $this->expectExceptionMessage('échec de read');
         $this->handleAuthRequest(
             $this->idee->getAuteur()->getId(),
+            false,
             'DELETE',
             "/idee/{$this->idee->getId()}"
         );
@@ -113,6 +117,7 @@ class DeleteIdeeActionTest extends ActionTestCase
         $this->expectExceptionMessage('échec de delete');
         $this->handleAuthRequest(
             $this->idee->getAuteur()->getId(),
+            false,
             'DELETE',
             "/idee/{$this->idee->getId()}"
         );

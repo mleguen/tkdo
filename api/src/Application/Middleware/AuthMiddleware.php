@@ -36,9 +36,11 @@ class AuthMiddleware implements Middleware
     {
         $serverParams = $request->getServerParams();
         try {
-            $idUtilisateurAuth = $this->authService->authentifie($serverParams['HTTP_AUTHORIZATION'] ?? '');
-            $this->logger->info("Utilisateur $idUtilisateurAuth authentifié");
-            $request = $request->withAttribute('idUtilisateurAuth', $idUtilisateurAuth);
+            $auth = $this->authService->authentifie($serverParams['HTTP_AUTHORIZATION'] ?? '');
+            $this->logger->info("Utilisateur {$auth['idUtilisateurAuth']} authentifié" . ($auth['estAdmin'] ? ' (admin)' : ''));
+            $request = $request
+                ->withAttribute('idUtilisateurAuth', $auth['idUtilisateurAuth'])
+                ->withAttribute('estAdmin', $auth['estAdmin']);
         }
         catch (AuthPasDeBearerTokenException $e) {
             $this->logger->info($e->getMessage());
