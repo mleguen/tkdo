@@ -3,6 +3,7 @@ rm -rf front
 npm install
 ./node_modules/.bin/ng new --directory front --routing --skip-git --style scss tkdo-front
 cd front
+./node_modules/.bin/ng generate component admin
 ./node_modules/.bin/ng generate component connexion
 ./node_modules/.bin/ng generate component deconnexion
 ./node_modules/.bin/ng generate component header
