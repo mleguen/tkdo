@@ -1,0 +1,17 @@
+{
+  "name": "tkdo",
+  "version": "0.0.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mleguen/tkdo.git"
+  },
+  "author": "Mael Le Guen",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/mleguen/tkdo/issues"
+  },
+  "homepage": "https://github.com/mleguen/tkdo#readme",
+  "devDependencies": {
+    "@angular/cli": "^10.2.0"
+  }
+}

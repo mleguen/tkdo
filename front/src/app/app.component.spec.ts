@@ -20,16 +20,16 @@ describe('AppComponent', () => {
     expect(app).toBeTruthy();
   });
 
-  it(`should have as title 'tkdo'`, () => {
+  it(`should have as title 'tkdo-front'`, () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.componentInstance;
-    expect(app.title).toEqual('tkdo');
+    expect(app.title).toEqual('tkdo-front');
   });
 
   it('should render title', () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
     const compiled = fixture.nativeElement;
-    expect(compiled.querySelector('.content span').textContent).toContain('tkdo app is running!');
+    expect(compiled.querySelector('.content span').textContent).toContain('tkdo-front app is running!');
   });
 });
