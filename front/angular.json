@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "tkdo": {
+    "tkdo-front": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -17,7 +17,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/tkdo",
+            "outputPath": "dist/tkdo-front",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
@@ -71,19 +71,19 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "tkdo:build",
+            "browserTarget": "tkdo-front:build",
             "proxyConfig": "src/proxy.conf.json"
           },
           "configurations": {
             "production": {
-              "browserTarget": "tkdo:build:production"
+              "browserTarget": "tkdo-front:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "tkdo:build"
+            "browserTarget": "tkdo-front:build"
           }
         },
         "test": {
@@ -121,15 +121,15 @@
           "builder": "@angular-devkit/build-angular:protractor",
           "options": {
             "protractorConfig": "e2e/protractor.conf.js",
-            "devServerTarget": "tkdo:serve"
+            "devServerTarget": "tkdo-front:serve"
           },
           "configurations": {
             "production": {
-              "devServerTarget": "tkdo:serve:production"
+              "devServerTarget": "tkdo-front:serve:production"
             }
           }
         }
       }
     }},
-  "defaultProject": "tkdo"
+  "defaultProject": "tkdo-front"
 }
