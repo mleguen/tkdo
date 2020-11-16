@@ -48,7 +48,7 @@ class DeleteIdeeActionTest extends ActionTestCase
             "/idee/{$this->idee->getId()}"
         );
 
-        $this->assertEquals('null', $response->getBody());
+        $this->assertEquals("null\n", $response->getBody());
     }
 
     public function testActionPasLAuteur()

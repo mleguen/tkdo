@@ -76,9 +76,12 @@ class TestCase extends PHPUnit_TestCase
         string $path,
         $query = '',
         $body = null,
-        array $headers = ['HTTP_ACCEPT' => 'application/json'],
-        array $cookies = [],
-        array $serverParams = []
+        array $serverParams = [],
+        array $headers = [
+            'Content-type' => 'application/json',
+            'HTTP_ACCEPT' => 'application/json',
+        ],
+        array $cookies = []
     ): Request {
         $uri = new Uri('', '', 80, $path, $query);
         $stream = (new StreamFactory())->createStream(($body) ?? '');

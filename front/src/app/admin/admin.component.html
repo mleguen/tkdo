@@ -1,3 +1,32 @@
 <h1>Administration</h1>
 
-<p>Token à utiliser pour vous authentifier auprès de l'API&nbsp;: {{token}}</p>
+<h2>Se connecter en ligne de commande à l'API</h2>
+
+<p>L'API est accessible en ligne de commande, avec la commande <a href="https://curl.se/docs/manpage.html">curl</a>,
+en vous authentifiant avec le token d'authentification ci-dessous (valable uniquement pour votre session en cours) :</p>
+
+<pre><code>
+{{token}}
+</code></pre>
+
+<h2>Gestion des utilisateurs</h2>
+
+<h3>Afficher un utilisateur</h3>
+
+<pre><code>
+curl -u {{token}}:\
+  {{urlApi}}/utilisateur/{{idUtilisateur}}
+  
+</code></pre>
+
+<h3>Modifier un utilisateur</h3>
+
+<pre><code>
+curl -u {{token}}:\
+  -d nom='nouveau nom'\
+  -X PUT {{urlApi}}/utilisateur/{{idUtilisateur}}
+</code></pre>
+
+<div class="alert alert-danger" role="alert">
+  Attention : même en tant qu'administrateur, vous ne pouvez pas modifier le mot de passe d'un autre utilisateur.
+</div>

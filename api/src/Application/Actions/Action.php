@@ -76,10 +76,14 @@ abstract class Action
      */
     protected function getFormData()
     {
-        $input = json_decode($this->request->getBody()->getContents());
+        if (in_array('application/json', $this->request->getHeader('Content-type'))) {
+            $input = json_decode($this->request->getBody()->getContents(), true);
 
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new HttpBadRequestException($this->request, 'Malformed JSON input.');
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new HttpBadRequestException($this->request, 'Malformed JSON input.');
+            }
+        } else {
+            $input = $this->request->getParsedBody();
         }
 
         return $input;
@@ -116,7 +120,7 @@ abstract class Action
      */
     protected function respond(ActionPayload $payload): Response
     {
-        $json = json_encode($payload, JSON_PRETTY_PRINT);
+        $json = json_encode($payload, JSON_PRETTY_PRINT)."\n";
         $this->response->getBody()->write($json);
 
         return $this->response

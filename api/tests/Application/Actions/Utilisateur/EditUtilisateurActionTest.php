@@ -49,10 +49,11 @@ class EditUtilisateurActionTest extends ActionTestCase
     "nom": "{$aliceModifiee->getNom()}",
     "estAdmin": $estAdmin
 }
+
 EOT
         );
 
-        $this->assertEquals('null', (string)$response->getBody());
+        $this->assertEquals("null\n", (string)$response->getBody());
     }
 
     public function testActionAdmin()
@@ -90,10 +91,11 @@ EOT
     "nom": "{$aliceModifiee->getNom()}",
     "estAdmin": $estAdmin
 }
+
 EOT
         );
 
-        $this->assertEquals('null', (string)$response->getBody());
+        $this->assertEquals("null\n", (string)$response->getBody());
     }
 
     public function testActionChangeEstAdmin()
@@ -128,6 +130,7 @@ EOT
     "nom": "{$aliceModifiee->getNom()}",
     "estAdmin": "{$aliceModifiee->getEstAdmin()}"
 }
+
 EOT
         );
     }
@@ -163,6 +166,7 @@ EOT
     "mdp": "{$aliceModifiee->getMdp()}",
     "nom": "{$aliceModifiee->getNom()}"
 }
+
 EOT
         );
     }

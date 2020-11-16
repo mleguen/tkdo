@@ -77,6 +77,7 @@ class ListIdeeActionTest extends ActionTestCase
 {$this->morceauReponseIdee($this->ideeDeAlicePourElleMeme)}
     ]
 }
+
 EOT;
         $this->assertEquals($json, (string)$response->getBody());
     }
@@ -115,6 +116,7 @@ EOT;
 {$this->morceauReponseIdee($this->ideeDeAlicePourElleMeme)}
     ]
 }
+
 EOT;
         $this->assertEquals($json, (string)$response->getBody());
     }
@@ -152,6 +154,7 @@ EOT;
 {$this->morceauReponseIdee($this->ideeDeAlicePourElleMeme)}
     ]
 }
+
 EOT;
         $this->assertEquals($json, (string)$response->getBody());
     }

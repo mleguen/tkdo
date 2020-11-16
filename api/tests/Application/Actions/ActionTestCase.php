@@ -131,8 +131,6 @@ abstract class ActionTestCase extends TestCase
             $path,
             $query,
             $body,
-            ['HTTP_ACCEPT' => 'application/json'],
-            [],
             ['HTTP_AUTHORIZATION' => $authHeader]
         );
         return $this->app->handle($request);
@@ -147,7 +145,7 @@ abstract class ActionTestCase extends TestCase
         $body = null
     ): ResponseInterface {
         return $this->handleRequestWithAuthHeader(
-            "Bearer " . $this->authService->encodeBearerToken($idUtilisateurAuth, $estAdmin),
+            "Bearer " . $this->authService->encodeAuthToken($idUtilisateurAuth, $estAdmin),
             $method, $path, $query, $body
         );
     }

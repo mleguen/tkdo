@@ -1,5 +1,6 @@
+import { DOCUMENT } from '@angular/common';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Inject, Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { first, map, tap } from 'rxjs/operators';
 
@@ -73,6 +74,7 @@ export class BackendService {
 
   constructor(
     private readonly http: HttpClient,
+    @Inject(DOCUMENT) private document: Document,
   ) {
     let utilisateur = JSON.parse(localStorage.getItem(CLE_UTILISATEUR));
     this.idUtilisateur = utilisateur?.id;
@@ -137,6 +139,10 @@ export class BackendService {
         }
       )
     );
+  }
+
+  getAbsUrlApi() {
+    return new URL(URL_API, this.document.baseURI).href;
   }
 
   getUtilisateur$() {

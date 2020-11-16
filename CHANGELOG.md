@@ -2,10 +2,19 @@
 
 ## Prochaine version
 
-- droits d'administration permettant d'accéder à une page d'administration
 - un utilisateur ne peut voir que la dernière occasion à laquelle il participe.
   S'il ne participe encore à aucune occasion, il est invité à attendre
   que l'organisateur d'une occasion l'y fasse participer
+- possibilité d'appeler l'API directement en ligne de commande avec curl
+  (avec `-u $token:` pour fournir le token d'authentification
+  et `-d cle=valeur` pour passer un à un les paramètres)
+- droits d'administration permettant :
+  - côté API :
+    - un accès étendu à certaines routes standard
+      (GET /api/utilisateur/:id pour d'autres id que le sien, par exemple)
+    - un accès futur à des routes réservées aux administrateurs
+  - côté front : l'accès à une page d'administration
+    détaillant ces accès étendus/réservés pour les administrateurs
 
 ## V1.0.0 (01/11/2020)
 

@@ -31,12 +31,12 @@ class CreateIdeeAction extends IdeeAction
   {
     $this->assertAuth();
     $body = $this->getFormData();
-    $this->assertUtilisateurAuthEstAuteur($body->idAuteur);
+    $this->assertUtilisateurAuthEstAuteur($body['idAuteur']);
 
     $this->ideeRepository->create(
-      $this->utilisateurRepository->read($body->idUtilisateur, true),
-      $body->description,
-      $this->utilisateurRepository->read($body->idAuteur, true),
+      $this->utilisateurRepository->read($body['idUtilisateur'], true),
+      $body['description'],
+      $this->utilisateurRepository->read($body['idAuteur'], true),
       new \DateTime()
     );
 

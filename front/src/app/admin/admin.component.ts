@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { BackendService } from '../backend.service';
 
 @Component({
@@ -6,14 +6,12 @@ import { BackendService } from '../backend.service';
   templateUrl: './admin.component.html',
   styleUrls: ['./admin.component.scss']
 })
-export class AdminComponent /*implements OnInit*/ {
+export class AdminComponent {
+  idUtilisateur = this.backend.idUtilisateur;
   token = this.backend.token;
+  urlApi = this.backend.getAbsUrlApi();
 
   constructor(
-    private readonly backend: BackendService
+    private readonly backend: BackendService,
   ) { }
-
-  // ngOnInit(): void {
-  // }
-
 }

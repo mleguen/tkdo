@@ -34,6 +34,7 @@ class ViewUtilisateurActionTest extends ActionTestCase
     "identifiant": "{$this->alice->getIdentifiant()}",
     "nom": "{$this->alice->getNom()}"
 }
+
 EOT;
         $this->assertEquals($json, (string)$response->getBody());
     }
@@ -61,6 +62,7 @@ EOT;
     "identifiant": "{$this->alice->getIdentifiant()}",
     "nom": "{$this->alice->getNom()}"
 }
+
 EOT;
         $this->assertEquals($json, (string)$response->getBody());
     }

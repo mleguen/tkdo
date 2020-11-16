@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace App\Application\Middleware;
 
-use App\Application\Service\AuthPasDeBearerTokenException;
+use App\Application\Service\AuthPasDeTokenException;
 use App\Application\Service\AuthService;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -42,7 +42,7 @@ class AuthMiddleware implements Middleware
                 ->withAttribute('idUtilisateurAuth', $auth['idUtilisateurAuth'])
                 ->withAttribute('estAdmin', $auth['estAdmin']);
         }
-        catch (AuthPasDeBearerTokenException $e) {
+        catch (AuthPasDeTokenException $e) {
             $this->logger->info($e->getMessage());
         }
         catch (\Exception $e) {

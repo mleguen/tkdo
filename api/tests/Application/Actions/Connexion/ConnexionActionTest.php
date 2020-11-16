@@ -22,6 +22,7 @@ class CreateConnexionActionTest extends ActionTestCase
     "identifiant": "{$this->alice->getIdentifiant()}",
     "mdp": "{$this->alice->getMdp()}"
 }
+
 EOT
         );
 
@@ -36,6 +37,7 @@ EOT
         "estAdmin": $estAdmin
     }
 }
+
 EOT;
         $this->assertEquals($json, (string) $response->getBody());
     }
@@ -58,6 +60,7 @@ EOT;
     "identifiant": "{$this->alice->getIdentifiant()}",
     "mdp": "{$this->alice->getMdp()}"
 }
+
 EOT
         );
     }

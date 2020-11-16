@@ -65,10 +65,11 @@ class CreateIdeeActionTest extends ActionTestCase
     "description": "{$this->idee->getDescription()}",
     "idAuteur": {$this->idee->getAuteur()->getId()}
 }
+
 EOT
         );
 
-        $this->assertEquals('null', $response->getBody());
+        $this->assertEquals("null\n", $response->getBody());
     }
 
     public function testActionPasLAuteur()
@@ -86,6 +87,7 @@ EOT
     "description": "{$this->idee->getDescription()}",
     "idAuteur": {$this->idee->getAuteur()->getId()}
 }
+
 EOT
         );
     }
@@ -111,6 +113,7 @@ EOT
     "description": "{$this->idee->getDescription()}",
     "idAuteur": {$this->idee->getAuteur()->getId()}
 }
+
 EOT
         );
     }
@@ -124,6 +127,7 @@ EOT
     "description": "{$this->idee->getDescription()}",
     "idAuteur": {$this->idee->getAuteur()->getId()}
 }
+
 EOT
         );
     }

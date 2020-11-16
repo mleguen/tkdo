@@ -59,6 +59,7 @@ class ViewOccasionActionTest extends ActionTestCase
         }
     ]
 }
+
 EOT;
         $this->assertEquals($json, (string)$response->getBody());
     }

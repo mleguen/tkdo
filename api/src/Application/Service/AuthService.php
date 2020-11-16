@@ -36,25 +36,32 @@ class AuthService
    */
   public function authentifie(string $authorizationHeader): array
   {
-    if (strpos($authorizationHeader, "Bearer ") !== 0) {
-      throw new AuthPasDeBearerTokenException();
+    if (
+      preg_match('/^Bearer (.+)$/', $authorizationHeader, $matches) ||
+      // Le token peut également fourni comme utilisateur (sans mot de passe)
+      // d'une authentification basique (par exemple avec `curl -u $token:`)
+      (
+        preg_match('/^Basic ([^:]+)$/', $authorizationHeader, $matches) &&
+        preg_match('/^([^:]+):$/', base64_decode($matches[1]), $matches)
+      )
+    ) {
+      return $this->decodeAuthToken($matches[1]);
     }
 
-    $token = substr($authorizationHeader, strlen("Bearer "));
-    return $this->decodeBearerToken($token);
+    throw new AuthPasDeTokenException();
   }
 
   /**
    * Decode un bearer token et retourne l'id de l'utilisateur authentifié
    * et s'il est ou non admin
    */
-  public function decodeBearerToken(string $token, $settings = null): array
+  public function decodeAuthToken(string $token, $settings = null): array
   {
     $settings = array_merge($this->defaultSettings, $settings ?: []);
     $payload = JWT::decode($token, $settings['clePublique'], [$settings['algo']]);
     return [
       "idUtilisateurAuth" => $payload->sub,
-      "estAdmin" => isset($payload->estAdmin) && $payload->estAdmin,
+      "estAdmin" => isset($payload->adm) && $payload->adm,
     ];
   }
 
@@ -62,13 +69,13 @@ class AuthService
    * Encode un bearer token contenant l'id de l'utilisateur authentifié
    * et s'il est ou non admin
    */
-  public function encodeBearerToken(int $idUtilisateurAuth, bool $estAdmin, $settings = null): string
+  public function encodeAuthToken(int $idUtilisateurAuth, bool $estAdmin, $settings = null): string
   {
     $settings = array_merge($this->defaultSettings, $settings ?: []);
     $payload = [
       "sub" => $idUtilisateurAuth,
       "exp" => \time() + $settings['validite'],
-      "estAdmin" => $estAdmin,
+      "adm" => $estAdmin,
     ];
     return JWT::encode($payload, $settings['clePrivee'], $settings['algo']);
   }
