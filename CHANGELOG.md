@@ -11,11 +11,12 @@
 - droits d'administration permettant :
   - côté API :
     - un accès étendu à certaines routes standard
-      (GET /api/utilisateur/:id pour d'autres id que le sien, par exemple)
-    - un accès à de nouvelles routes réservées aux administrateurs :
-      - création d'un nouvel utilisateur
+      (GET /api/utilisateur/:idUtilisateur pour d'autres id que le sien, par exemple)
+    - un accès à de nouvelles routes réservées aux administrateurs
+      (et non accessibles par le front) :
+      - GET et POST /api/utilisateur
   - côté front : l'accès à une page d'administration
-    détaillant ces accès étendus/réservés pour les administrateurs
+    détaillant l'utilisation de ces routes en ligne de commande
 
 ## V1.0.0 (01/11/2020)
 

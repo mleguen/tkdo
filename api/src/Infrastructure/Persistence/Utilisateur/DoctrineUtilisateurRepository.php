@@ -56,6 +56,15 @@ class DoctrineUtilisateurRepository implements UtilisateurRepository
     /**
      * {@inheritdoc}
      */
+    public function readAll(): array
+    {
+        $utilisateurs = $this->em->getRepository(DoctrineUtilisateur::class)->findAll();
+        return $utilisateurs;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function readOneByIdentifiants(string $identifiant, string $mdp): Utilisateur
     {        
         /**

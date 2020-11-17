@@ -11,6 +11,27 @@ en vous authentifiant avec le token d'authentification ci-dessous (valable uniqu
 
 <h2>Gestion des utilisateurs</h2>
 
+<h3>Lister les utilisateurs</h3>
+
+<pre><samp>
+curl -u {{token}}: \
+{{urlApi}}/utilisateur
+</samp></pre>
+
+<p>Renvoie :</p>
+
+<pre><samp>
+[
+  {{'{'}}
+    "estAdmin": true,
+    "genre": "M",
+    "id": {{idUtilisateur}},
+    "identifiant": "admin",
+    "nom": "Administrateur"
+  }
+]
+</samp></pre>
+
 <h3>Créer un nouvel utilisateur</h3>
 
 <pre><samp>

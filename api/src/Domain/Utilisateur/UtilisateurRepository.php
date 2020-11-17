@@ -15,6 +15,12 @@ interface UtilisateurRepository
 
     /**
      * @throws UtilisateurNotFoundException
+     * @return Utilisateur[]
+     */
+    public function readAll(): array;
+
+    /**
+     * @throws UtilisateurNotFoundException
      */
     public function read(int $id, bool $reference = false): Utilisateur;
 

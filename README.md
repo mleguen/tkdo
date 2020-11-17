@@ -66,13 +66,16 @@ OK
 
 ### Administration
 
-La base de données est initialisée avec un 1er utilisateur (identifiant `admin`, mot de passe `admin`),
-avec lequel vous pouvez vous connecter pour créer d'autres comptes utilisateurs.
+La base de données est initialisée avec un 1er compte utilisateur (identifiant `admin`, mot de passe `admin`),
+avec lequel vous pouvez vous connecter pour créer ensuite d'autres comptes.
 
-Il est recommandé de commencer par changer le mot de passe du compte `admin`.
+Pour des raisons de sécurité, il est fortement recommandé
+de changer le mot de passe du compte `admin` dès la fin de l'installation.
 
-La page d'administration de l'application vous indique ensuite :
-- comment gérer les comptes utilisateurs (création, consultation, modification)
+La page d'administration de l'application permet ensuite :
+- de gérer les comptes utilisateurs (création, consultation, modification)
+
+Pour les autres tâches d'administration, voir ci-dessous.
 
 #### Création d'une occasion de s'offrir des cadeaux
 
@@ -91,7 +94,7 @@ Mais si plusieurs occasions existent, seule la dernière occasion créée
 
 #### Ajout de participants à une occasion
 
-Un compte utilisateur doit avoir préalablement été créé pour chaque participant (voir plus haut).
+Un compte utilisateur doit avoir préalablement été créé pour chaque participant.
 Ces comptes utilisateurs doivent ensuite être déclarés comme participant à la dernière occasion créée,
 là encore pour l'instant directement en base de données, dans la table `tkdo_participation`.
 Par exemple :

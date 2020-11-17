@@ -51,6 +51,14 @@ class InMemoryUtilisateurRepository implements UtilisateurRepository
         return clone $this->readNoClone($id);
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function readAll(): array
+    {
+        return clone $this->utilisateurs;
+    }
+
     public function readNoClone(int $id): Utilisateur
     {
         if (!isset($this->utilisateurs[$id])) throw new UtilisateurNotFoundException();
