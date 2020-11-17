@@ -12,7 +12,8 @@
   - côté API :
     - un accès étendu à certaines routes standard
       (GET /api/utilisateur/:id pour d'autres id que le sien, par exemple)
-    - un accès futur à des routes réservées aux administrateurs
+    - un accès à de nouvelles routes réservées aux administrateurs :
+      - création d'un nouvel utilisateur
   - côté front : l'accès à une page d'administration
     détaillant ces accès étendus/réservés pour les administrateurs
 

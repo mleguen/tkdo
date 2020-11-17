@@ -5,28 +5,88 @@
 <p>L'API est accessible en ligne de commande, avec la commande <a href="https://curl.se/docs/manpage.html">curl</a>,
 en vous authentifiant avec le token d'authentification ci-dessous (valable uniquement pour votre session en cours) :</p>
 
-<pre><code>
+<pre>
 {{token}}
-</code></pre>
+</pre>
 
 <h2>Gestion des utilisateurs</h2>
 
+<h3>Créer un nouvel utilisateur</h3>
+
+<pre><samp>
+$ curl -u {{token}}: \
+-d identifiant='utilisatrice01' \
+-d nom='Utilisatrice 1' \
+-d genre=F \
+-d estAdmin=0 \
+-X POST {{urlApi}}/utilisateur
+</samp></pre>
+
+<p>Renvoie :</p>
+
+<pre><samp>
+{{'{'}}
+  "estAdmin": false,
+  "genre": "F",
+  "id": 71,
+  "identifiant": "utilisatrice01",
+  "mdp": "G@x3Pjke",
+  "nom": "Utilisatrice 1"
+}
+</samp></pre>
+
+<div class="alert alert-primary" role="alert">
+  Note : le mot de passe est généré automatiquement et fourni dans la réponse,
+  et ne sera plus fourni par la suite (même à un administrateur).
+</div>
+
 <h3>Afficher un utilisateur</h3>
 
-<pre><code>
-curl -u {{token}}:\
-  {{urlApi}}/utilisateur/{{idUtilisateur}}
-  
-</code></pre>
+<pre><samp>
+curl -u {{token}}: \
+{{urlApi}}/utilisateur/{{idUtilisateur}}
+</samp></pre>
+
+<p>Renvoie :</p>
+
+<pre><samp>
+{{'{'}}
+  "estAdmin": true,
+  "genre": "M",
+  "id": 70,
+  "identifiant": "admin",
+  "nom": "Administrateur"
+}
+</samp></pre>
 
 <h3>Modifier un utilisateur</h3>
 
-<pre><code>
-curl -u {{token}}:\
-  -d nom='nouveau nom'\
-  -X PUT {{urlApi}}/utilisateur/{{idUtilisateur}}
-</code></pre>
+<pre><samp>
+curl -u {{token}}: \
+-d identifiant='admin2' \
+-d mdp='Akjunz12' \
+-d nom='Administrateur 2' \
+-d genre=M \
+-d estAdmin=1 \
+-X PUT {{urlApi}}/utilisateur/{{idUtilisateur}}
+</samp></pre>
 
-<div class="alert alert-danger" role="alert">
-  Attention : même en tant qu'administrateur, vous ne pouvez pas modifier le mot de passe d'un autre utilisateur.
+<p>Renvoie :</p>
+
+<pre><samp>
+{{'{'}}
+  "estAdmin": true,
+  "genre": "M",
+  "id": {{idUtilisateur}},
+  "identifiant": "admin2",
+  "nom": "Administrateur 2"
+}
+</samp></pre>
+
+<div class="alert alert-primary" role="alert">
+  Note 1 : tous les champs en entrée sont facultatifs.
+</div>
+
+<div class="alert alert-primary" role="alert">
+  Note 2 : même un administrateur ne peut pas modifier le mot de passe d'un autre utilisateur.
 </div>

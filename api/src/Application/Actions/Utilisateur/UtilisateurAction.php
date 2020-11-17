@@ -16,11 +16,6 @@ class UtilisateurAction extends Action
     protected $utilisateurRepository;
 
     /**
-     * @var int
-     */
-    protected $idUtilisateur;
-
-    /**
      * @param LoggerInterface $logger
      * @param UtilisateurRepository  $utilisateurRepository
      */
@@ -33,11 +28,6 @@ class UtilisateurAction extends Action
     protected function action(): Response
     {
         $this->assertAuth();
-        $this->idUtilisateur = (int) $this->resolveArg('idUtilisateur');
-        $this->assertUtilisateurAuthEst(
-            $this->idUtilisateur,
-            "L'utilisateur authentifié n'est pas l'utilisateur ($this->idUtilisateur) et n'est pas admin"
-        );
 
         return $this->response;
     }

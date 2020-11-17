@@ -7,6 +7,7 @@ use App\Application\Actions\Utilisateur\ViewUtilisateurAction;
 use App\Application\Actions\Idee\DeleteIdeeAction;
 use App\Application\Actions\Idee\ListIdeeAction;
 use App\Application\Actions\Idee\CreateIdeeAction;
+use App\Application\Actions\Utilisateur\CreateUtilisateurAction;
 use App\Application\Actions\Utilisateur\EditUtilisateurAction;
 use Slim\App;
 use Slim\Interfaces\RouteCollectorProxyInterface as Group;
@@ -26,8 +27,11 @@ return function (App $app) {
         $group->delete('/{idIdee}', DeleteIdeeAction::class);
     });
     $app->get('/occasion', ViewOccasionAction::class);
-    $app->group('/utilisateur/{idUtilisateur}', function (Group $group) {
-        $group->get('', ViewUtilisateurAction::class);
-        $group->put('', EditUtilisateurAction::class);
+    $app->group('/utilisateur', function (Group $group) {
+        $group->post('', CreateUtilisateurAction::class);
+        $group->group('/{idUtilisateur}', function (Group $group) {
+            $group->get('', ViewUtilisateurAction::class);
+            $group->put('', EditUtilisateurAction::class);
+        });
     });
 };

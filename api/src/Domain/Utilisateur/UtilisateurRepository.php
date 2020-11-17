@@ -5,6 +5,14 @@ namespace App\Domain\Utilisateur;
 
 interface UtilisateurRepository
 {
+    public function create(
+        string $identifiant,
+        string $mdp,
+        string $nom,
+        string $genre,
+        bool $estAdmin
+    ): Utilisateur;
+
     /**
      * @throws UtilisateurNotFoundException
      */

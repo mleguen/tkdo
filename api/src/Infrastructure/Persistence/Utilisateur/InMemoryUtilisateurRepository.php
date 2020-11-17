@@ -25,6 +25,26 @@ class InMemoryUtilisateurRepository implements UtilisateurRepository
     /**
      * {@inheritdoc}
      */
+    public function create(
+        string $identifiant,
+        string $mdp,
+        string $nom,
+        string $genre,
+        bool $estAdmin
+    ): Utilisateur {
+        $id = max(array_keys($this->utilisateurs)) + 1;
+        $this->utilisateurs[$id] = (new DoctrineUtilisateur($id))
+            ->setIdentifiant($identifiant)
+            ->setMdp($mdp)
+            ->setNom($nom)
+            ->setGenre($genre)
+            ->setEstAdmin($estAdmin);
+        return clone $this->utilisateurs[$id];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function read(int $id, bool $reference = false): Utilisateur
     {
         if ($reference) return new InMemoryUtilisateurReference($id);

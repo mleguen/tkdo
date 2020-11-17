@@ -9,20 +9,15 @@ use JsonSerializable;
 
 class SerializableUtilisateur implements JsonSerializable
 {
-  /**
-   * @var Utilisateur
-   */
   private $utilisateur;
-
-  /**
-   * @var bool
-   */
   private $complet;
+  private $mdp;
 
-  public function __construct(Utilisateur $utilisateur, bool $complet = false)
+  public function __construct(Utilisateur $utilisateur, bool $complet = false, string $mdp = null)
   {
     $this->utilisateur = $utilisateur;
     $this->complet = $complet;
+    $this->mdp = $mdp;
   }
 
   public function jsonSerialize(): array
@@ -37,6 +32,7 @@ class SerializableUtilisateur implements JsonSerializable
         'estAdmin' => $this->utilisateur->getEstAdmin(),
         'identifiant' => $this->utilisateur->getIdentifiant(),
       ]);
+      if (isset($this->mdp)) $data['mdp'] = $this->mdp;
       ksort($data);
     }
     return $data;

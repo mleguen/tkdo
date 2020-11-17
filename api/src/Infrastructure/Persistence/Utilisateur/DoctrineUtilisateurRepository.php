@@ -24,6 +24,27 @@ class DoctrineUtilisateurRepository implements UtilisateurRepository
     /**
      * {@inheritdoc}
      */
+    public function create(
+        string $identifiant,
+        string $mdp,
+        string $nom,
+        string $genre,
+        bool $estAdmin
+    ): Utilisateur {
+        $utilisateur = (new DoctrineUtilisateur())
+            ->setIdentifiant($identifiant)
+            ->setMdp($mdp)
+            ->setNom($nom)
+            ->setGenre($genre)
+            ->setEstAdmin($estAdmin);
+        $this->em->persist($utilisateur);
+        $this->em->flush();
+        return $utilisateur;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function read(int $id, bool $reference = false): Utilisateur
     {
         if ($reference) return $this->em->getReference(DoctrineUtilisateur::class, $id);

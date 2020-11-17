@@ -76,16 +76,23 @@ abstract class Action
      */
     protected function getFormData()
     {
-        if (in_array('application/json', $this->request->getHeader('Content-type'))) {
-            $input = json_decode($this->request->getBody()->getContents(), true);
+        $contentTypes = $this->request->getHeader('Content-type');
+        switch (end($contentTypes)) {
+            case 'application/json':
+                $input = json_decode($this->request->getBody()->getContents(), true);
 
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                throw new HttpBadRequestException($this->request, 'Malformed JSON input.');
-            }
-        } else {
-            $input = $this->request->getParsedBody();
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    throw new HttpBadRequestException($this->request, 'Malformed JSON input.');
+                }
+            break;
+
+            case 'application/x-www-form-urlencoded':
+                parse_str($this->request->getBody()->getContents(), $input);
+            break;
+
+            default:
+                $input = $this->request->getParsedBody();
         }
-
         return $input;
     }
 
@@ -147,6 +154,19 @@ abstract class Action
             !$this->request->getAttribute('estAdmin') &&
             ($this->request->getAttribute('idUtilisateurAuth') !== $idUtilisateurAttendu)
         ) {
+            if (!is_null($warning)) {
+                $this->logger->warning($warning);
+            }
+            throw new HttpForbiddenException($this->request);
+        }
+    }
+
+    /**
+     * Vérifie que l'utilisateur authentifié est admin
+     */
+    protected function assertUtilisateurAuthEstAdmin($warning = null)
+    {
+        if (!$this->request->getAttribute('estAdmin')) {
             if (!is_null($warning)) {
                 $this->logger->warning($warning);
             }

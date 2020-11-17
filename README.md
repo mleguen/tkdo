@@ -47,13 +47,9 @@ $ php bin/doctrine.php migrations:migrate
   ++ used xxxM memory
   ++ xxx migrations executed
   ++ xxx sql queries
-```
 
-Et si vous souhaitez charger des données de test :
-
-```bash
-$ php bin/doctrine.php fixtures:load
-Purge et chargement des fixtures...
+$ php bin/doctrine.php fixtures:load --prod
+Initialisation ou réinitialisation de la base de données (production)...
 xxx créés.
 [...]
 OK
@@ -68,24 +64,15 @@ OK
 > L'utilisation de l'option `-n` peut aussi être nécessaire pour éviter l'utilisation du php.ini du serveur,
 > si ce dernier désactive par exemple l'affichage des exceptions.
 
-### Exploitation
+### Administration
 
-#### Création de comptes utilisateurs
+La base de données est initialisée avec un 1er utilisateur (identifiant `admin`, mot de passe `admin`),
+avec lequel vous pouvez vous connecter pour créer d'autres comptes utilisateurs.
 
-Les comptes utilisateurs doivent pour l'instant être créés directement en base de données,
-dans la table `tkdo_utilisateur`. Par exemple :
+Il est recommandé de commencer par changer le mot de passe du compte `admin`.
 
-```sql
-INSERT INTO tkdo_utilisateur (identifiant, nom, mdp)
-VALUES ('alice@tkdo.org', 'Alice', '$2y$10$swhlJf10LKG7KvOSJ5bRCeKhx0UTU5lnmMTECBa.aAx8b5k0ZEy5S');
-```
-
-avec le mot un hash généré par la fonction php `password_hash`, ici :
-
-```bash
-$ php -r 'echo password_hash("mdpalice", PASSWORD_DEFAULT)."\n";'
-$2y$10$swhlJf10LKG7KvOSJ5bRCeKhx0UTU5lnmMTECBa.aAx8b5k0ZEy5S
-```
+La page d'administration de l'application vous indique ensuite :
+- comment gérer les comptes utilisateurs (création, consultation, modification)
 
 #### Création d'une occasion de s'offrir des cadeaux
 
