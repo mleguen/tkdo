@@ -16,59 +16,33 @@ use Tests\TestCase;
 
 abstract class ActionTestCase extends TestCase
 {
-    /**
-     * @var App
-     */
+    /** @var App */
     protected $app;
-
-    /**
-     * @var ObjectProphecy
-     */
+    /** @var ObjectProphecy */
     protected $ideeRepositoryProphecy;
-
-    /**
-     * @var ObjectProphecy
-     */
+    /** @var ObjectProphecy */
     protected $occasionRepositoryProphecy;
-
-    /**
-     * @var ObjectProphecy
-     */
+    /** @var ObjectProphecy */
     protected $resultatRepositoryProphecy;
-
-    /**
-     * @var ObjectProphecy
-     */
+    /** @var ObjectProphecy */
     protected $utilisateurRepositoryProphecy;
-
-    /**
-     * @var AuthService
-     */
+    /** @var AuthService */
     protected $authService;
-
-    /**
-     * @var DoctrineUtilisateur
-     */
+    /** @var DoctrineUtilisateur */
     protected $alice;
-
-    /**
-     * @var DoctrineUtilisateur
-     */
+    /** @var DoctrineUtilisateur */
     protected $bob;
-
-    /**
-     * @var DoctrineUtilisateur
-     */
+    /** @var DoctrineUtilisateur */
     protected $charlie;
-
-    /**
-     * @var string
-     */
+    /** @var string */
+    protected $mdpalice;
+    /** @var string */
+    protected $mdpbob;
+    /** @var string */
+    protected $mdpcharlie;
+    /** @var string */
     protected $clePrivee;
-
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $clePublique;
 
     public function setUp(): void
@@ -89,22 +63,25 @@ abstract class ActionTestCase extends TestCase
         
         $this->authService = $this->container->get(AuthService::class);
 
+        $this->mdpalice = 'mdpalice';
         $this->alice = (new DoctrineUtilisateur(1))
             ->setIdentifiant('alice@tkdo.org')
             ->setNom('Alice')
-            ->setMdp('mdpalice')
+            ->setMdp(password_hash($this->mdpalice, PASSWORD_DEFAULT))
             ->setGenre(Genre::Feminin)
             ->setEstAdmin(true);
+        $this->mdpbob = 'mdpbob';
         $this->bob = (new DoctrineUtilisateur(2))
             ->setIdentifiant('bob@tkdo.org')
             ->setNom('Bob')
-            ->setMdp('mdpbob')
+            ->setMdp(password_hash($this->mdpbob, PASSWORD_DEFAULT))
             ->setGenre(Genre::Masculin)
             ->setEstAdmin(false);
+        $this->mdpcharlie = 'mdpcharlie';
         $this->charlie = (new DoctrineUtilisateur(3))
             ->setIdentifiant('charlie@tkdo.org')
             ->setNom('Charlie')
-            ->setMdp('mdpcharlie')
+            ->setMdp(password_hash($this->mdpcharlie, PASSWORD_DEFAULT))
             ->setGenre(Genre::Masculin)
             ->setEstAdmin(false);
     }

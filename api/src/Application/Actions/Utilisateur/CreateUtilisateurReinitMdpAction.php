@@ -10,7 +10,7 @@ use App\Domain\Utilisateur\UtilisateurRepository;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Log\LoggerInterface;
 
-class CreateUtilisateurAction extends UtilisateurAction
+class CreateUtilisateurReinitMdpAction extends OneUtilisateurAction
 {
   private $passwordService;
 
@@ -18,7 +18,8 @@ class CreateUtilisateurAction extends UtilisateurAction
     LoggerInterface $logger,
     UtilisateurRepository $utilisateurRepository,
     PasswordService $passwordService
-  ) {
+  )
+  {
     parent::__construct($logger, $utilisateurRepository);
     $this->passwordService = $passwordService;
   }
@@ -26,18 +27,13 @@ class CreateUtilisateurAction extends UtilisateurAction
   protected function action(): Response
   {
     parent::action();
-    $this->assertUtilisateurAuthEstAdmin();
-    $body = $this->getFormData();
+    $utilisateur = $this->utilisateurRepository->read($this->idUtilisateur);
 
     $mdp = $this->passwordService->randomPassword();
-    $utilisateur = $this->utilisateurRepository->create(
-      $body['identifiant'],
-      password_hash($mdp, PASSWORD_DEFAULT),
-      $body['nom'],
-      $body['genre'],
-      boolval($body['estAdmin'])
-    );
+    $utilisateur->setMdp(password_hash($mdp, PASSWORD_DEFAULT));
+    $this->utilisateurRepository->update($utilisateur);
 
     return $this->respondWithData(new SerializableUtilisateur($utilisateur, true, $mdp));
   }
+
 }

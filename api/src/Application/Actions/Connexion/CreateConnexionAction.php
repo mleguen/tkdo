@@ -39,7 +39,11 @@ class CreateConnexionAction extends Action
   {
     $body = $this->getFormData();
     try {
-      $utilisateur = $this->utilisateurRepository->readOneByIdentifiants($body['identifiant'], $body['mdp']);
+      $utilisateur = $this->utilisateurRepository->readOneByIdentifiant($body['identifiant']);
+      if (!password_verify($body['mdp'], $utilisateur->getMdp())) {
+        throw new UtilisateurNotFoundException();
+      }
+      
       $id = $utilisateur->getId();
       $nom = $utilisateur->getNom();
       $estAdmin = $utilisateur->getEstAdmin();

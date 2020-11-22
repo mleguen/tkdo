@@ -73,7 +73,7 @@ Pour des raisons de sécurité, il est fortement recommandé
 de changer le mot de passe du compte `admin` dès la fin de l'installation.
 
 La page d'administration de l'application permet ensuite :
-- de gérer les comptes utilisateurs (création, consultation, modification)
+- de gérer les comptes utilisateurs (création, consultation, modification, réinitialisation du mot de passe)
 
 Pour les autres tâches d'administration, voir ci-dessous.
 

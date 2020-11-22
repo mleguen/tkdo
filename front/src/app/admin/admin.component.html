@@ -1,6 +1,9 @@
 <h1>Administration</h1>
 
+
 <h2>Se connecter en ligne de commande à l'API</h2>
+
+<h3>En utilisant le token courant</h3>
 
 <p>L'API est accessible en ligne de commande, avec la commande <a href="https://curl.se/docs/manpage.html">curl</a>,
 en vous authentifiant avec le token d'authentification ci-dessous (valable uniquement pour votre session en cours) :</p>
@@ -8,6 +11,31 @@ en vous authentifiant avec le token d'authentification ci-dessous (valable uniqu
 <pre>
 {{token}}
 </pre>
+
+<h3>En créant un nouveau token</h3>
+
+<p>Vous pouvez également créer un nouveau token :</p>
+
+<pre><samp>
+$ curl \
+-d identifiant='utilisatrice01' \
+-d mdp='********' \
+-X POST {{urlApi}}/connexion
+</samp></pre>
+
+<p>Renvoie :</p>
+
+<pre><samp>
+{{'{'}}
+  "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOjczLCJleHAiOjE2MDYwODM0MjIsImFkbSI6dHJ1ZX0.UTliyT--bAJfOxMTL2i1w_ufhRwhVW8ExjW3Z2XMiDHuT5d16lx7fhFapvUBy8sIEUoN9Y7iIWCUoZXm7hJUNjlikq5u6jBQjnqUvophLwmP1cJAk6Mqwtnzncc2yuGjDNeB0_7VrcoyyZxUiPxtuE_Kr6bABQ7AoUyMJDxufxA",
+  "utilisateur": {{'{'}}
+    "id": {{idUtilisateur}},
+    "nom": "Alice",
+    "estAdmin": true
+  }
+}
+</samp></pre>
+
 
 <h2>Gestion des utilisateurs</h2>
 
@@ -110,4 +138,30 @@ curl -u {{token}}: \
 
 <div class="alert alert-primary" role="alert">
   Note 2 : même un administrateur ne peut pas modifier le mot de passe d'un autre utilisateur.
+</div>
+
+<h3>Réinitialiser le mot de passe d'un utilisateur</h3>
+
+<pre><samp>
+$ curl -u {{token}}: \
+-X POST {{urlApi}}/utilisateur/{{idUtilisateur}}/reinitmdp
+</samp></pre>
+
+<p>Renvoie :</p>
+
+<pre><samp>
+{{'{'}}
+  "estAdmin": false,
+  "genre": "F",
+  "id": 71,
+  "identifiant": "utilisatrice01",
+  "mdp": "G@x3Pjke",
+  "nom": "Utilisatrice 1"
+}
+</samp></pre>
+
+<div class="alert alert-primary" role="alert">
+  Note : comme lors de la création d'un nouvel utilisateur,
+  le mot de passe est généré automatiquement et fourni dans la réponse,
+  et ne sera plus fourni par la suite (même à un administrateur).
 </div>

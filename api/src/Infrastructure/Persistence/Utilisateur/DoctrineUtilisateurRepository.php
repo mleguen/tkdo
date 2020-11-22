@@ -65,7 +65,7 @@ class DoctrineUtilisateurRepository implements UtilisateurRepository
     /**
      * {@inheritdoc}
      */
-    public function readOneByIdentifiants(string $identifiant, string $mdp): Utilisateur
+    public function readOneByIdentifiant(string $identifiant): Utilisateur
     {        
         /**
          * @var DoctrineUtilisateur
@@ -73,10 +73,7 @@ class DoctrineUtilisateurRepository implements UtilisateurRepository
         $utilisateur = $this->em->getRepository(DoctrineUtilisateur::class)->findOneBy([
             'identifiant' => $identifiant
         ]);
-        if (
-            is_null($utilisateur) ||
-            !password_verify($mdp, $utilisateur->getMdp())
-        ) {
+        if (is_null($utilisateur)) {
             throw new UtilisateurNotFoundException();
         }
         return $utilisateur;

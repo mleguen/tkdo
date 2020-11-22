@@ -27,7 +27,7 @@ interface UtilisateurRepository
     /**
      * @throws UtilisateurNotFoundException
      */
-    public function readOneByIdentifiants(string $identifiant, string $mdp): Utilisateur;
+    public function readOneByIdentifiant(string $identifiant): Utilisateur;
 
     /**
      * @throws UtilisateurNotFoundException

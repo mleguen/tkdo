@@ -25,6 +25,11 @@ interface Utilisateur
     /**
      * @throws ReferenceException
      */
+    public function getMdp(): string;
+
+    /**
+     * @throws ReferenceException
+     */
     public function getNom(): string;
 
     /**

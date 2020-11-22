@@ -49,21 +49,15 @@ class InMemoryUtilisateurRepositoryTest extends TestCase
         $this->repository->read($this->inconnu->getId());
     }
 
-    public function testReadOneByIdentifiants()
+    public function testReadOneByIdentifiant()
     {
-        $this->assertEquals($this->alice, $this->repository->readOneByIdentifiants('alice@tkdo.org', 'mdpalice'));
+        $this->assertEquals($this->alice, $this->repository->readOneByIdentifiant('alice@tkdo.org'));
     }
 
-    public function testReadOneByIdentifiantsMauvaisIdentifiant()
+    public function testReadOneByIdentifiantMauvaisIdentifiant()
     {
         $this->expectException(UtilisateurNotFoundException::class);
-        $this->repository->readOneByIdentifiants('mauvaisIdentifiant', 'mdpalice');
-    }
-
-    public function testReadOneByIdentifiantsMauvaisMdp()
-    {
-        $this->expectException(UtilisateurNotFoundException::class);
-        $this->repository->readOneByIdentifiants('alice@tkdo.org', 'mauvaisMdp');
+        $this->repository->readOneByIdentifiant('mauvaisIdentifiant');
     }
 
     public function testUpdate()

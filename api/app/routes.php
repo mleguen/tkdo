@@ -8,6 +8,7 @@ use App\Application\Actions\Idee\DeleteIdeeAction;
 use App\Application\Actions\Idee\ListIdeeAction;
 use App\Application\Actions\Idee\CreateIdeeAction;
 use App\Application\Actions\Utilisateur\CreateUtilisateurAction;
+use App\Application\Actions\Utilisateur\CreateUtilisateurReinitMdpAction;
 use App\Application\Actions\Utilisateur\EditUtilisateurAction;
 use App\Application\Actions\Utilisateur\ListUtilisateurAction;
 use Slim\App;
@@ -34,6 +35,7 @@ return function (App $app) {
         $group->group('/{idUtilisateur}', function (Group $group) {
             $group->get('', ViewUtilisateurAction::class);
             $group->put('', EditUtilisateurAction::class);
+            $group->post('/reinitmdp', CreateUtilisateurReinitMdpAction::class);
         });
     });
 };

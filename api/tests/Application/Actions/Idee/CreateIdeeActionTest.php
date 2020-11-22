@@ -69,7 +69,20 @@ class CreateIdeeActionTest extends ActionTestCase
 EOT
         );
 
-        $this->assertEquals("null\n", $response->getBody());
+        $json = <<<EOT
+{
+    "id": {$this->idee->getId()},
+    "description": "{$this->idee->getDescription()}",
+    "auteur": {
+        "genre": "{$this->idee->getAuteur()->getGenre()}",
+        "id": {$this->idee->getAuteur()->getId()},
+        "nom": "{$this->idee->getAuteur()->getNom()}"
+    },
+    "dateProposition": "{$this->idee->getDateProposition()->format(\DateTimeInterface::ISO8601)}"
+}
+
+EOT;
+        $this->assertEquals($json, (string)$response->getBody());
     }
 
     public function testActionPasLAuteur()

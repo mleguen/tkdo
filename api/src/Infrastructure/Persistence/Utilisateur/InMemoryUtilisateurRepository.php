@@ -69,10 +69,10 @@ class InMemoryUtilisateurRepository implements UtilisateurRepository
     /**
      * {@inheritdoc}
      */
-    public function readOneByIdentifiants(string $identifiant, string $mdp): Utilisateur
+    public function readOneByIdentifiant(string $identifiant): Utilisateur
     {
-        $id = array_key_first(array_filter($this->utilisateurs, function ($u) use ($identifiant, $mdp) {
-            return ($u->getIdentifiant() === $identifiant) && ($u->getMdp() === $mdp);
+        $id = array_key_first(array_filter($this->utilisateurs, function ($u) use ($identifiant) {
+            return ($u->getIdentifiant() === $identifiant);
         }));
 
         if (!isset($id)) throw new UtilisateurNotFoundException();

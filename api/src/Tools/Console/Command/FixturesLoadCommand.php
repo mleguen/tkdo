@@ -35,7 +35,7 @@ class FixturesLoadCommand extends DoctrineCommand {
 
   protected function execute(InputInterface $input, OutputInterface $output): int
   {
-    $prod = $input->hasOption('prod');
+    $prod = $input->getOption('prod');
     
     /**
      * @var EntityManager

@@ -13,14 +13,14 @@ class CreateConnexionActionTest extends ActionTestCase
     public function testAction()
     {
         $this->utilisateurRepositoryProphecy
-            ->readOneByIdentifiants($this->alice->getIdentifiant(), $this->alice->getMdp())
+            ->readOneByIdentifiant($this->alice->getIdentifiant())
             ->willReturn($this->alice)
             ->shouldBeCalledOnce();
 
         $response = $this->handleRequest('POST', '/connexion', '', <<<EOT
 {
     "identifiant": "{$this->alice->getIdentifiant()}",
-    "mdp": "{$this->alice->getMdp()}"
+    "mdp": "{$this->mdpalice}"
 }
 
 EOT
@@ -42,10 +42,10 @@ EOT;
         $this->assertEquals($json, (string) $response->getBody());
     }
 
-    public function testActionIdentifiantsInvalides()
+    public function testActionIdentifiantInvalides()
     {
         $this->utilisateurRepositoryProphecy
-            ->readOneByIdentifiants($this->alice->getIdentifiant(), $this->alice->getMdp())
+            ->readOneByIdentifiant($this->alice->getIdentifiant())
             ->willThrow(new UtilisateurNotFoundException())
             ->shouldBeCalledOnce();
 
@@ -58,7 +58,30 @@ EOT;
             <<<EOT
 {
     "identifiant": "{$this->alice->getIdentifiant()}",
-    "mdp": "{$this->alice->getMdp()}"
+    "mdp": "{$this->mdpalice}"
+}
+
+EOT
+        );
+    }
+
+    public function testActionMdpInvalides()
+    {
+        $this->utilisateurRepositoryProphecy
+            ->readOneByIdentifiant($this->alice->getIdentifiant())
+            ->willReturn($this->alice)
+            ->shouldBeCalledOnce();
+
+        $this->expectException(HttpBadRequestException::class);
+        $this->expectExceptionMessage('identifiants invalides');
+        $this->handleRequest(
+            'POST',
+            '/connexion',
+            '',
+            <<<EOT
+{
+    "identifiant": "{$this->alice->getIdentifiant()}",
+    "mdp": "mauvaismdp"
 }
 
 EOT

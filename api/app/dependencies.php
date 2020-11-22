@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 use App\Application\Service\AuthService;
+use App\Application\Service\PasswordService;
 use DI\ContainerBuilder;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
@@ -27,6 +28,9 @@ return function (ContainerBuilder $containerBuilder) {
         },
         AuthService::class => function (ContainerInterface $c) {
             return new AuthService($c->get('settings')['auth']);
-        }
+        },
+        PasswordService::class => function () {
+            return new PasswordService();
+        },
     ]);
 };
