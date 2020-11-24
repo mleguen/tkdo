@@ -26,6 +26,6 @@ abstract class IdeeAction extends Action
 
     protected function assertUtilisateurAuthEstAuteur($idAuteur)
     {
-        $this->assertUtilisateurAuthEst($idAuteur, "L'utilisateur authentifié n'est pas l'auteur de l'idée ($idAuteur)");
+        $this->assertUtilisateurAuthEst([$idAuteur], "L'utilisateur authentifié n'est pas l'auteur de l'idée ($idAuteur)");
     }
 }

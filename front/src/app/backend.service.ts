@@ -5,6 +5,7 @@ import { BehaviorSubject } from 'rxjs';
 import { first, map, tap } from 'rxjs/operators';
 
 export interface Occasion {
+  id: number;
   titre: string;
   participants: Utilisateur[];
   resultats: Resultat[]
@@ -45,12 +46,13 @@ export interface Idee {
 
 const URL_API = '/api';
 const URL_CONNEXION = `${URL_API}/connexion`;
-const URL_OCCASION = `${URL_API}/occasion`;
+const URL_LISTE_OCCASIONS = `${URL_API}/occasion`;
+const URL_OCCASION = (idOccasion: number) => `${URL_API}/occasion/${idOccasion}`;
 const URL_UTILISATEUR = (idUtilisateur: number) => `${URL_API}/utilisateur/${idUtilisateur}`;
 const URL_IDEES = `${URL_API}/idee`;
 const URL_IDEE = (idIdee: number) => `${URL_IDEES}/${idIdee}`;
 
-const CLE_OCCASION = 'occasion';
+const CLE_LISTE_OCCASIONS = 'occasions';
 const CLE_TOKEN = 'backend-token';
 const CLE_UTILISATEUR = 'utilisateur';
 
@@ -68,8 +70,7 @@ export class BackendService {
   utilisateurConnecte$: BehaviorSubject<PostConnexionDTO['utilisateur']>;
 
   erreur$ = new BehaviorSubject<string>(undefined);
-  aucuneOccasion$ = new BehaviorSubject<boolean>(false);
-  occasion$ = new BehaviorSubject<Occasion>(JSON.parse(localStorage.getItem(CLE_OCCASION)));
+  occasions$ = new BehaviorSubject<Occasion[]>(JSON.parse(localStorage.getItem(CLE_LISTE_OCCASIONS)));
   token = localStorage.getItem(CLE_TOKEN);
 
   constructor(
@@ -97,11 +98,10 @@ export class BackendService {
   async deconnecte() {
     delete this.token;
     delete this.idUtilisateur;
-    localStorage.removeItem(CLE_OCCASION);
+    localStorage.removeItem(CLE_LISTE_OCCASIONS);
     localStorage.removeItem(CLE_TOKEN);
     localStorage.removeItem(CLE_UTILISATEUR);
-    this.aucuneOccasion$.next(false);
-    this.occasion$.next(null);
+    this.occasions$.next(null);
     this.utilisateurConnecte$.next(null);
   }
   
@@ -124,21 +124,20 @@ export class BackendService {
     return this.http.get<IdeesPour>(`${URL_IDEES}?idUtilisateur=${idUtilisateur}`);
   }
 
-  getOccasion$() {
-    return this.http.get<Occasion>(URL_OCCASION).pipe(
+  getOccasion(idOccasion: number) {
+    return this.http.get<Occasion>(URL_OCCASION(idOccasion)).pipe(first()).toPromise();
+  }
+
+  getOccasions() {
+    return this.http.get<Occasion[]>(`${URL_LISTE_OCCASIONS}?idParticipant=${this.idUtilisateur}`).pipe(
       tap(
-        occasion => {
-          this.aucuneOccasion$.next(false);
-          this.occasion$.next(occasion);
-        },
-        (error: HttpErrorResponse) => {
-          if (error.status === 404) {
-            this.aucuneOccasion$.next(true);
-            this.occasion$.next(null);
-          }
+        occasions => {
+          this.occasions$.next(occasions);
+          localStorage.setItem(CLE_LISTE_OCCASIONS, JSON.stringify(occasions));
         }
-      )
-    );
+      ),
+      first()
+    ).toPromise();
   }
 
   getAbsUrlApi() {
@@ -153,16 +152,10 @@ export class BackendService {
     return this.http.put(URL_UTILISATEUR(this.idUtilisateur), utilisateur).toPromise();
   }
 
-  notifieErreurHTTP(url: string, error: HttpErrorResponse) {
-    switch (url) {
-      case URL_OCCASION:
-        // L'absence d'occasion pour un participant n'est pas à traiter comme une erreur
-        if (error.status === 404) return;
+  notifieErreurHTTP(error: HttpErrorResponse) {
+    // Les erreurs applicatives sont sensées être prises en compte
+    if (error.status === 400) return;
 
-      default:
-        // Les erreurs applicatives sont sensées être prises en compte
-        if (error.status === 400) return;
-    }
     this.erreur$.next(`${error.status} ${error.statusText}`);
   }
 

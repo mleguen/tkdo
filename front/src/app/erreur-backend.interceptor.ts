@@ -30,7 +30,7 @@ export class ErreurBackendInterceptor implements HttpInterceptor {
         // et construit le message d'erreur backend si l'erreur est non applicative
         (error: HttpErrorResponse) => {
           if (isDevMode()) console.error({ method, url, error });
-          this.backend.notifieErreurHTTP(url, error);
+          this.backend.notifieErreurHTTP(error);
         }
       )
     );

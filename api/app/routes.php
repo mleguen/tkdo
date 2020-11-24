@@ -2,15 +2,16 @@
 declare(strict_types=1);
 
 use App\Application\Actions\Connexion\CreateConnexionAction;
-use App\Application\Actions\Occasion\ViewOccasionAction;
-use App\Application\Actions\Utilisateur\ViewUtilisateurAction;
+use App\Application\Actions\Idee\CreateIdeeAction;
 use App\Application\Actions\Idee\DeleteIdeeAction;
 use App\Application\Actions\Idee\ListIdeeAction;
-use App\Application\Actions\Idee\CreateIdeeAction;
+use App\Application\Actions\Occasion\ListOccasionAction;
+use App\Application\Actions\Occasion\ViewOccasionAction;
 use App\Application\Actions\Utilisateur\CreateUtilisateurAction;
 use App\Application\Actions\Utilisateur\CreateUtilisateurReinitMdpAction;
 use App\Application\Actions\Utilisateur\EditUtilisateurAction;
 use App\Application\Actions\Utilisateur\ListUtilisateurAction;
+use App\Application\Actions\Utilisateur\ViewUtilisateurAction;
 use Slim\App;
 use Slim\Interfaces\RouteCollectorProxyInterface as Group;
 use Slim\Psr7\Request;
@@ -28,7 +29,10 @@ return function (App $app) {
         $group->post('', CreateIdeeAction::class);
         $group->delete('/{idIdee}', DeleteIdeeAction::class);
     });
-    $app->get('/occasion', ViewOccasionAction::class);
+    $app->group('/occasion', function (Group $group) {
+        $group->get('', ListOccasionAction::class);
+        $group->get('/{idOccasion}', ViewOccasionAction::class);
+    });
     $app->group('/utilisateur', function (Group $group) {
         $group->get('', ListUtilisateurAction::class);
         $group->post('', CreateUtilisateurAction::class);

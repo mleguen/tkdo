@@ -2,9 +2,8 @@
 
 ## Prochaine version
 
-- un utilisateur ne peut voir que la dernière occasion à laquelle il participe.
-  S'il ne participe encore à aucune occasion, il est invité à attendre
-  que l'organisateur d'une occasion l'y fasse participer
+- accès à toutes les occasions auxquelles l'utilisateur participe
+  ou a participé (et seulement celles-là)
 - possibilité d'appeler l'API directement en ligne de commande avec curl
   (avec `-u $token:` pour fournir le token d'authentification
   et `-d cle=valeur` pour passer un à un les paramètres)

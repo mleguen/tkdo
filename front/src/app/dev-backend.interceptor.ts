@@ -67,24 +67,7 @@ const utilisateursAvecMdp = [alice, bob, charlie, david, eve];
 // En ordre décroissant volontairement, pour que find trouve l'occasion la plus récente en 1er
 const occasions: Occasion[] = [
   {
-    titre: 'Noël 2020',
-    participants: [alice, bob, charlie],
-    resultats: [
-      {
-        idQuiOffre: alice.id,
-        idQuiRecoit: charlie.id,
-      },
-      {
-        idQuiOffre: bob.id,
-        idQuiRecoit: alice.id,
-      },
-      {
-        idQuiOffre: charlie.id,
-        idQuiRecoit: bob.id,
-      },
-    ],
-  },
-  {
+    id: 0,
     titre: 'Noël 2019',
     participants: [alice, bob, charlie, david],
     resultats: [
@@ -105,7 +88,26 @@ const occasions: Occasion[] = [
         idQuiRecoit: charlie.id,
       },
     ],
-  }
+  },
+  {
+    id: 1,
+    titre: 'Noël 2020',
+    participants: [alice, bob, charlie],
+    resultats: [
+      {
+        idQuiOffre: alice.id,
+        idQuiRecoit: charlie.id,
+      },
+      {
+        idQuiOffre: bob.id,
+        idQuiRecoit: alice.id,
+      },
+      {
+        idQuiOffre: charlie.id,
+        idQuiRecoit: bob.id,
+      },
+    ],
+  },
 ].map(o => {
   (o as Occasion).participants = o.participants.map(enleveDonneesPrivees);
   return o;
@@ -157,8 +159,13 @@ export class DevBackendInterceptor implements HttpInterceptor {
           if ((method === 'POST') && (idIdee === undefined) && (idUtilisateur === undefined)) return postIdee();
           if ((method === 'DELETE') && (idIdee !== undefined) && (idUtilisateur === undefined)) return deleteIdee(+idIdee);
         }
-        else if (urlApi === '/occasion') {
-          if (method === 'GET') return getOccasion();
+        else if (match = urlApi.match(/\/occasion\?idParticipant=(\d+)$/)) {
+          const [, idParticipant] = match;
+          if (method === 'GET') return getListeOccasions(+idParticipant);
+        }
+        else if (match = urlApi.match(/\/occasion\/(\d+)$/)) {
+          const [, idOccasion] = match;
+          if (method === 'GET') return getOccasion(+idOccasion);
         }
 
         // all other api routes are unknown
@@ -206,11 +213,18 @@ export class DevBackendInterceptor implements HttpInterceptor {
       return ok();
     }
 
-    function getOccasion() {
+    function getListeOccasions(idParticipant: number) {
       const utilisateur = authorizedUser();
       if (!utilisateur) return unauthorized();
 
-      const occasion = occasions.find(o => o.participants.some(u => u.id === utilisateur.id));
+      return ok(occasions.filter(o => o.participants.some(u => u.id === idParticipant)));
+    }
+
+    function getOccasion(idOccasion: number) {
+      const utilisateur = authorizedUser();
+      if (!utilisateur) return unauthorized();
+
+      const occasion = occasions.find(o => o.id === idOccasion);
       return occasion ? ok(occasion) : notFound();
     }
 

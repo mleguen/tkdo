@@ -6,6 +6,7 @@ namespace Tests\Application\Actions\Occasion;
 use App\Domain\Occasion\OccasionNotFoundException;
 use App\Infrastructure\Persistence\Occasion\DoctrineOccasion;
 use App\Infrastructure\Persistence\Resultat\DoctrineResultat;
+use Slim\Exception\HttpForbiddenException;
 use Slim\Exception\HttpNotFoundException;
 use Slim\Exception\HttpUnauthorizedException;
 use Tests\Application\Actions\ActionTestCase;
@@ -18,7 +19,7 @@ class ViewOccasionActionTest extends ActionTestCase
             ->setTitre('Noel 2020')
             ->setParticipants([$this->alice, $this->bob]);
         $this->occasionRepositoryProphecy
-            ->readLastByParticipant($this->alice->getId())
+            ->read($occasion->getId())
             ->willReturn($occasion)
             ->shouldBeCalledOnce();
 
@@ -33,7 +34,7 @@ class ViewOccasionActionTest extends ActionTestCase
             $this->alice->getId(),
             false,
             'GET',
-            '/occasion'
+            "/occasion/{$occasion->getId()}"
         );
 
         $json = <<<EOT
@@ -64,26 +65,45 @@ EOT;
         $this->assertEquals($json, (string)$response->getBody());
     }
 
-    public function testActionPasDOccasion()
+    public function testActionOccasionInconnue()
     {
         $this->occasionRepositoryProphecy
-            ->readLastByParticipant($this->alice->getId())
+            ->read(1)
             ->willThrow(new OccasionNotFoundException())
             ->shouldBeCalledOnce();
 
         $this->expectException(HttpNotFoundException::class);
-        $this->expectExceptionMessage('aucune occasion');
+        $this->expectExceptionMessage('occasion inconnue');
         $this->handleAuthRequest(
             $this->alice->getId(),
             false,
             'GET',
-            '/occasion'
+            '/occasion/1'
+        );
+    }
+
+    public function testActionPasParticipant()
+    {
+        $occasion = (new DoctrineOccasion(1))
+            ->setTitre('Noel 2020')
+            ->setParticipants([$this->bob]);
+        $this->occasionRepositoryProphecy
+            ->read($occasion->getId())
+            ->willReturn($occasion)
+            ->shouldBeCalledOnce();
+
+        $this->expectException(HttpForbiddenException::class);
+        $this->handleAuthRequest(
+            $this->alice->getId(),
+            false,
+            'GET',
+            '/occasion/1'
         );
     }
 
     public function testActionNonAutorise()
     {
         $this->expectException(HttpUnauthorizedException::class);
-        $this->handleRequest('GET', '/occasion');
+        $this->handleRequest('GET', '/occasion/1');
     }
 }

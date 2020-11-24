@@ -15,4 +15,4 @@ export class DeconnexionComponent implements OnInit {
   async ngOnInit() {
     await this.backend.deconnecte();
   }
-y}
+}

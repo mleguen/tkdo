@@ -31,10 +31,10 @@ export class ListeIdeesComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.listeIdees$ = combineLatest(
+    this.listeIdees$ = combineLatest([
       this.route.paramMap,
       this.actualisation$      
-    ).pipe(
+    ]).pipe(
       switchMap(([params]) => {
         this.idUtilisateur = +params.get('idUtilisateur');
         return this.backend.getIdees(this.idUtilisateur).pipe(

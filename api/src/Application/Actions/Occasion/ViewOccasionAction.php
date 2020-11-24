@@ -4,28 +4,18 @@ declare(strict_types=1);
 namespace App\Application\Actions\Occasion;
 
 use App\Application\Actions\Action;
-use App\Application\Serializable\Occasion\SerializableOccasion;
+use App\Application\Serializable\Occasion\SerializableOccasionDetaillee;
 use App\Domain\Occasion\OccasionRepository;
 use App\Domain\Resultat\ResultatRepository;
+use App\Domain\Utilisateur\Utilisateur;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Log\LoggerInterface;
 
 class ViewOccasionAction extends Action
 {
-    /**
-     * @var OccasionRepository
-     */
     protected $occasionRepository;
-
-    /**
-     * @var ResultatRepository
-     */
     protected $resultatRepository;
 
-    /**
-     * @param LoggerInterface     $logger
-     * @param OccasionRepository  $occasionRepository
-     */
     public function __construct(LoggerInterface $logger, OccasionRepository $occasionRepository, ResultatRepository $resultatRepository)
     {
         parent::__construct($logger);
@@ -36,8 +26,19 @@ class ViewOccasionAction extends Action
     protected function action(): Response
     {
         $this->assertAuth();
-        $occasion = $this->occasionRepository->readLastByParticipant($this->request->getAttribute('idUtilisateurAuth'));
-        return $this->respondWithData(new SerializableOccasion(
+        $occasion = $this->occasionRepository->read((int) $this->resolveArg('idOccasion'));
+
+        $this->assertUtilisateurAuthEst(
+            array_map(
+                function (Utilisateur $u) {
+                    return $u->getId();
+                },
+                $occasion->getParticipants()
+            ),
+            "L'utilisateur authentifié ne participe pas à l'occasion et n'est pas admin"
+        );
+
+        return $this->respondWithData(new SerializableOccasionDetaillee(
             $occasion,
             $this->resultatRepository->readByOccasion($occasion)
         ));

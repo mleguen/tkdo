@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { BackendService, Genre, Occasion, Utilisateur } from '../backend.service';
-import { catchError, map } from 'rxjs/operators';
+import { catchError, switchMap } from 'rxjs/operators';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-occasion',
@@ -12,16 +13,17 @@ export class OccasionComponent implements OnInit {
 
   Genre = Genre;
 
-  aucuneOccasion$ = this.backend.aucuneOccasion$;
   occasion$: Observable<OccasionAffichee>;
 
   constructor(
-    private readonly backend: BackendService
+    private readonly backend: BackendService,
+    private readonly route: ActivatedRoute,
   ) { }
 
   ngOnInit(): void {
-    this.occasion$ = this.backend.getOccasion$().pipe(
-      map(o => {
+    this.occasion$ = this.route.paramMap.pipe(
+      switchMap(async (params) => {
+        let o = await this.backend.getOccasion(+params.get('idOccasion'));
         const idQuiRecoitDeMoi = o.resultats.find(rt => rt.idQuiOffre === this.backend.idUtilisateur)?.idQuiRecoit;
         return Object.assign({}, o, {
           participants: o.participants.map(p => Object.assign({}, p, {

@@ -1,1 +1,9 @@
-<p>liste-occasions works!</p>
+<ng-container *ngIf="chargement; else elsePasDOccasion">
+  <h1>Veuillez patienter...</h1>
+</ng-container>
+
+<ng-template #elsePasDOccasion>
+  <h1>Aucune occasion</h1>
+  <p class="alert alert-warning col-12">Vous ne participez pour l'instant à aucun tirage cadeaux.</p>
+  <p>Rapprochez-vous de l'organisateur d'un tirage pour lui demander de vous y faire participer.</p>
+</ng-template>

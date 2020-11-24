@@ -7,5 +7,5 @@ use App\Domain\DomainException\DomainRecordNotFoundException;
 
 class OccasionNotFoundException extends DomainRecordNotFoundException
 {
-    public $message = 'aucune occasion';
+    public $message = 'occasion inconnue';
 }

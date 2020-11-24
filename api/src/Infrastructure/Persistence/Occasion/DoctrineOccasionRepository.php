@@ -11,9 +11,6 @@ use Doctrine\ORM\EntityManager;
 
 class DoctrineOccasionRepository implements OccasionRepository
 {
-    /**
-     * @var EntityManager
-     */
     protected $em;
 
     public function __construct(EntityManager $em)
@@ -24,18 +21,28 @@ class DoctrineOccasionRepository implements OccasionRepository
     /**
      * {@inheritdoc}
      */
-    public function readLastByParticipant(int $idParticipant): Occasion
+    public function read(int $id): Occasion
     {
-        $occasion = $this->em->createQueryBuilder()
+        /** @var \Doctrine\ORM\EntityRepository */
+        $repository = $this->em->getRepository(DoctrineOccasion::class);
+        $occasion = $repository->find($id);
+        if (is_null($occasion)) throw new OccasionNotFoundException();
+        return $occasion;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function readByParticipant(int $idParticipant): array
+    {
+        $occasions = $this->em->createQueryBuilder()
             ->select('o')
             ->from(DoctrineOccasion::class, 'o')
             ->where(':idParticipant MEMBER OF o.participants')
-            ->orderBy('o.id', 'DESC')
+            ->orderBy('o.id', 'ASC')
             ->setParameter('idParticipant', $idParticipant)
-            ->setMaxResults(1)
             ->getQuery()
-            ->getOneOrNullResult();
-        if (is_null($occasion)) throw new OccasionNotFoundException();
-        return $occasion;
+            ->getResult();
+        return $occasions;
     }
 }

@@ -17,7 +17,7 @@ class OneUtilisateurAction extends UtilisateurAction
         parent::action();
         $this->idUtilisateur = (int) $this->resolveArg('idUtilisateur');
         $this->assertUtilisateurAuthEst(
-            $this->idUtilisateur,
+            [$this->idUtilisateur],
             "L'utilisateur authentifié n'est pas l'utilisateur ($this->idUtilisateur) et n'est pas admin"
         );
 

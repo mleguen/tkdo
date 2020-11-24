@@ -147,12 +147,13 @@ abstract class Action
 
     /**
      * Vérifie que l'utilisateur authentifié est bien celui attendu (ou est admin)
+     * @param int[] idUtilisateursAttendus
      */
-    protected function assertUtilisateurAuthEst(int $idUtilisateurAttendu, $warning = null)
+    protected function assertUtilisateurAuthEst(array $idUtilisateursAttendus, $warning = null)
     {
         if (
             !$this->request->getAttribute('estAdmin') &&
-            ($this->request->getAttribute('idUtilisateurAuth') !== $idUtilisateurAttendu)
+            !in_array($this->request->getAttribute('idUtilisateurAuth'), $idUtilisateursAttendus)
         ) {
             if (!is_null($warning)) {
                 $this->logger->warning($warning);

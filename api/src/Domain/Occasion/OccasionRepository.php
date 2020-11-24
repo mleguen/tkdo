@@ -6,8 +6,13 @@ namespace App\Domain\Occasion;
 interface OccasionRepository
 {
     /**
-     * @return Occasion
      * @throws OccasionNotFoundException
      */
-    public function readLastByParticipant(int $idParticipant): Occasion;
+    public function read(int $idOccasion): Occasion;
+
+    /**
+     * @return Occasion[]
+     * @throws OccasionNotFoundException
+     */
+    public function readByParticipant(int $idParticipant): array;
 }

@@ -9,9 +9,10 @@ import { BackendService } from '../backend.service';
   styleUrls: ['./header.component.scss']
 })
 export class HeaderComponent {
-  occasion$ = this.backend.occasion$;
+  occasions$ = this.backend.occasions$;
   utilisateurConnecte$ = this.backend.utilisateurConnecte$;
   menuActif: string;
+  idOccasionActive: number;
 
   constructor(
     private readonly backend: BackendService,
@@ -20,8 +21,11 @@ export class HeaderComponent {
     router.events.pipe(
       filter((e: Event): e is NavigationEnd => e instanceof NavigationEnd)
     ).subscribe(e => {
-      if (/\/liste-idees\/[0-9]+/.test(e.urlAfterRedirects)) {
-        this.menuActif = '/occasion';
+      let match: string[] | null;
+      if (match = e.urlAfterRedirects.match(/(\/occasion)\/([0-9]+)$/)) {
+        const [, menuActif, idOccasionActive] = match;
+        this.menuActif = menuActif;
+        this.idOccasionActive = +idOccasionActive;
       } else {
         this.menuActif = e.urlAfterRedirects;
       }
