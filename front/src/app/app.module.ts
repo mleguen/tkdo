@@ -8,6 +8,7 @@ import { ConnexionComponent } from './connexion/connexion.component';
 import { DeconnexionComponent } from './deconnexion/deconnexion.component';
 import { HeaderComponent } from './header/header.component';
 import { ListeIdeesComponent } from './liste-idees/liste-idees.component';
+import { ListeOccasionsComponent } from './liste-occasions/liste-occasions.component';
 import { OccasionComponent } from './occasion/occasion.component';
 import { ProfilComponent } from './profil/profil.component';
 
@@ -19,6 +20,7 @@ import { ProfilComponent } from './profil/profil.component';
     DeconnexionComponent,
     HeaderComponent,
     ListeIdeesComponent,
+    ListeOccasionsComponent,
     OccasionComponent,
     ProfilComponent
   ],
