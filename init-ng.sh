@@ -8,6 +8,7 @@ cd front
 ./node_modules/.bin/ng generate component deconnexion
 ./node_modules/.bin/ng generate component header
 ./node_modules/.bin/ng generate component liste-idees
+./node_modules/.bin/ng generate component liste-occasions
 ./node_modules/.bin/ng generate component occasion
 ./node_modules/.bin/ng generate component profil
 ./node_modules/.bin/ng generate interceptor auth-backend
