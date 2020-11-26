@@ -5,6 +5,8 @@ namespace App\Domain\Occasion;
 
 interface OccasionRepository
 {
+    public function create(string $titre): Occasion;
+
     /**
      * @throws OccasionNotFoundException
      */

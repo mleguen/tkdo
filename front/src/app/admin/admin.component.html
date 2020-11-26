@@ -180,13 +180,30 @@ curl -u {{token}}: \
 
 <pre><samp>
 [
-  {
+  {{'{'}}
     "id": 5,
     "titre": "No\u00ebl 2019"
   },
-  {
+  {{'{'}}
     "id": 6,
     "titre": "No\u00ebl 2020"
   }
 ]
+</samp></pre>
+
+<h3>Créer une nouvelle occasion</h3>
+
+<pre><samp>
+$ curl -u {{token}}: \
+-d titre='Nouvelle occasion' \
+-X POST {{urlApi}}/occasion
+</samp></pre>
+
+<p>Renvoie :</p>
+
+<pre><samp>
+{{'{'}}
+  "id": 7,
+  "titre": "Nouvelle occasion"
+}
 </samp></pre>

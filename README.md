@@ -74,23 +74,9 @@ de changer le mot de passe du compte `admin` dès la fin de l'installation.
 
 La page d'administration de l'application permet ensuite :
 - de gérer les comptes utilisateurs (création, consultation, modification, réinitialisation du mot de passe)
+- de gérer les occasions (création, consultation)
 
 Pour les autres tâches d'administration, voir ci-dessous.
-
-#### Création d'une occasion de s'offrir des cadeaux
-
-Les occasions doivent pour l'instant être créées directement en base de données,
-dans la table `tkdo_occasion`. Par exemple :
-
-```sql
-INSERT INTO tkdo_occasion (titre)
-VALUES ('Noël 2020');
-```
-
-Une première occasion doit impérativement être créée pour que tkdo fonctionne.
-
-Mais si plusieurs occasions existent, seule la dernière occasion créée
-(celle dont l'id est le plus élevé) sera prise en compte par tkdo.
 
 #### Ajout de participants à une occasion
 

@@ -30,7 +30,8 @@ class DoctrineUtilisateurRepository implements UtilisateurRepository
         string $nom,
         string $genre,
         bool $estAdmin
-    ): Utilisateur {
+    ): Utilisateur
+    {
         $utilisateur = (new DoctrineUtilisateur())
             ->setIdentifiant($identifiant)
             ->setMdp($mdp)

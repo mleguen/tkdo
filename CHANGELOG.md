@@ -16,6 +16,7 @@
       (et non accessibles par le front) :
       - GET et POST /api/utilisateur
       - POST /api/utilisateur/:idUtilisateur/reinitmdp
+      - POST /api/occasion
   - côté front : l'accès à une page d'administration
     détaillant l'utilisation de ces routes en ligne de commande
 

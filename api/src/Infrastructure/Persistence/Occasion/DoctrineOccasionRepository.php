@@ -18,6 +18,15 @@ class DoctrineOccasionRepository implements OccasionRepository
         $this->em = $em;
     }
 
+    public function create(string $titre): Occasion
+    {
+        $occasion = (new DoctrineOccasion())
+            ->setTitre($titre);
+        $this->em->persist($occasion);
+        $this->em->flush();
+        return $occasion;
+    }
+
     /**
      * {@inheritdoc}
      */
