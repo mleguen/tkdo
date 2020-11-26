@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Router, Event, NavigationEnd } from '@angular/router';
-import { filter } from 'rxjs/operators';
+import { filter, map } from 'rxjs/operators';
 import { BackendService } from '../backend.service';
 
 @Component({
@@ -9,7 +9,7 @@ import { BackendService } from '../backend.service';
   styleUrls: ['./header.component.scss']
 })
 export class HeaderComponent {
-  occasions$ = this.backend.occasions$;
+  occasions$ = this.backend.occasions$.pipe(map(occasions => occasions?.reverse()));
   utilisateurConnecte$ = this.backend.utilisateurConnecte$;
   menuActif: string;
   idOccasionActive: number;
