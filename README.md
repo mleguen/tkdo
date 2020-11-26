@@ -78,6 +78,9 @@ La page d'administration de l'application permet ensuite :
 
 ## Développement
 
+- [Historique des changements](./CHANGELOG.md).
+- [Travaux futurs](./BACKLOG.md).
+
 ### Utiliser le serveur de développement front seul
 
 ```bash
@@ -169,7 +172,3 @@ Puis après vérification/finalisation de la migration, la tester :
 ./composer-api doctrine migrations:migrate
 ./composer-api doctrine fixtures:load
 ```
-
-## Historique des versions
-
-Voir [CHANGELOG.md](./CHANGELOG.md).

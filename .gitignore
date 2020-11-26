@@ -1,4 +1,3 @@
 node_modules
-/tkdo.tar
-/tkdo.tar.gz
-TODO.md
+/tkdo-*.tar
+/tkdo-*.tar.gz

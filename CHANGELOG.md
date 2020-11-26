@@ -1,4 +1,4 @@
-# Historique des versions
+# Historique des changements
 
 ## Prochaine version
 
