@@ -35,7 +35,7 @@ class EditUtilisateurAction extends OneUtilisateurAction
       $utilisateur->setEstAdmin(boolval($body['estAdmin']));
     }
     
-    $this->utilisateurRepository->update($utilisateur);
+    $utilisateur = $this->utilisateurRepository->update($utilisateur);
     return $this->respondWithData(new SerializableUtilisateur($utilisateur, true));
   }
 }

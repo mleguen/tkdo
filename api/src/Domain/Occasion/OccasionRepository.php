@@ -21,4 +21,6 @@ interface OccasionRepository
      * @return Occasion[]
      */
     public function readByParticipant(int $idParticipant): array;
+    
+    public function update(Occasion $occasion): Occasion;
 }

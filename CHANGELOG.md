@@ -3,7 +3,7 @@
 ## Prochaine version
 
 - accès à toutes les occasions auxquelles l'utilisateur participe
-  ou a participé (et seulement celles-là)
+  ou a participé (mais seulement celles-là)
 - possibilité d'appeler l'API directement en ligne de commande avec curl
   (avec `-u $token:` pour fournir le token d'authentification
   et `-d cle=valeur` pour passer un à un les paramètres)
@@ -16,9 +16,9 @@
       (et non accessibles par le front) :
       - GET et POST /api/utilisateur
       - POST /api/utilisateur/:idUtilisateur/reinitmdp
-      - POST /api/occasion
+      - POST et PUT /api/occasion
   - côté front : l'accès à une page d'administration
-    détaillant l'utilisation de ces routes en ligne de commande
+    détaillant l'utilisation de l'API en ligne de commande
 
 ## V1.0.0 (01/11/2020)
 

@@ -6,6 +6,7 @@ use App\Application\Actions\Idee\CreateIdeeAction;
 use App\Application\Actions\Idee\DeleteIdeeAction;
 use App\Application\Actions\Idee\ListIdeeAction;
 use App\Application\Actions\Occasion\CreateOccasionAction;
+use App\Application\Actions\Occasion\EditOccasionAction;
 use App\Application\Actions\Occasion\ListOccasionAction;
 use App\Application\Actions\Occasion\ViewOccasionAction;
 use App\Application\Actions\Utilisateur\CreateUtilisateurAction;
@@ -33,7 +34,10 @@ return function (App $app) {
     $app->group('/occasion', function (Group $group) {
         $group->get('', ListOccasionAction::class);
         $group->post('', CreateOccasionAction::class);
-        $group->get('/{idOccasion}', ViewOccasionAction::class);
+        $group->group('/{idOccasion}', function (Group $group) {
+            $group->get('', ViewOccasionAction::class);
+            $group->put('', EditOccasionAction::class);
+        });
     });
     $app->group('/utilisateur', function (Group $group) {
         $group->get('', ListUtilisateurAction::class);

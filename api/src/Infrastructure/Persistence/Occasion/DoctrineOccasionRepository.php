@@ -64,4 +64,11 @@ class DoctrineOccasionRepository implements OccasionRepository
             ->getResult();
         return $occasions;
     }
+
+    public function update(Occasion $occasion): Occasion
+    {
+        $this->em->persist($occasion);
+        $this->em->flush();
+        return $occasion;
+    }
 }

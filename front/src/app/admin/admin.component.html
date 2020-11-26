@@ -207,3 +207,71 @@ $ curl -u {{token}}: \
   "titre": "Nouvelle occasion"
 }
 </samp></pre>
+
+<h3>Afficher une occasion</h3>
+
+<pre><samp>
+curl -u {{token}}: \
+{{urlApi}}/occasion/6
+</samp></pre>
+
+<p>Renvoie :</p>
+
+<pre><samp>
+{{'{'}}
+  "id": 6,
+  "titre": "No\u00ebl 2020",
+  "participants": [
+    {{'{'}}
+      "genre": "F",
+      "id": 83,
+      "nom": "Alice"
+    },
+    {{'{'}}
+      "genre": "M",
+      "id": 84,
+      "nom": "Bob"
+    },
+    {{'{'}}
+      "genre": "M",
+      "id": 85,
+      "nom": "Charlie"
+    }
+  ],
+  "resultats": [
+    {{'{'}}
+      "idQuiOffre": 84,
+      "idQuiRecoit": 83
+    },
+    {{'{'}}
+      "idQuiOffre": 85,
+      "idQuiRecoit": 84
+    },
+    {{'{'}}
+      "idQuiOffre": 83,
+      "idQuiRecoit": 85
+    }
+  ]
+}
+</samp></pre>
+
+<h3>Modifier une occasion</h3>
+
+<pre><samp>
+curl -u {{token}}: \
+-d titre='Titre modifié' \
+-X PUT {{urlApi}}/occasion/7
+</samp></pre>
+
+<p>Renvoie :</p>
+
+<pre><samp>
+{{'{'}}
+  "id": 7,
+  "titre": "Titre modifi\u00e9"
+}
+</samp></pre>
+
+<div class="alert alert-primary" role="alert">
+  Note : voir plus bas pour modifier les participants ou les résultats du tirage
+</div>
