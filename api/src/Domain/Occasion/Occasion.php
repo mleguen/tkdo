@@ -7,16 +7,13 @@ use App\Domain\Utilisateur\Utilisateur;
 
 interface Occasion
 {
+    public function addParticipant(Utilisateur $participant): Occasion;
     public function getId(): int;
     public function getTitre(): string;
-    /**
-     * @return Utilisateur[]
-     */
+    /** @return Utilisateur[] */
     public function getParticipants(): array;
     public function setTitre (string $titre): Occasion;
-    /**
-     * @param Utilisateur[] $participants
-     */
+    /** @param Utilisateur[] $participants */
     public function setParticipants (array $participants): Occasion;
 }
 

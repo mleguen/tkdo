@@ -6,6 +6,7 @@ use App\Application\Actions\Idee\CreateIdeeAction;
 use App\Application\Actions\Idee\DeleteIdeeAction;
 use App\Application\Actions\Idee\ListIdeeAction;
 use App\Application\Actions\Occasion\CreateOccasionAction;
+use App\Application\Actions\Occasion\CreateParticipationOccasionAction;
 use App\Application\Actions\Occasion\EditOccasionAction;
 use App\Application\Actions\Occasion\ListOccasionAction;
 use App\Application\Actions\Occasion\ViewOccasionAction;
@@ -37,6 +38,7 @@ return function (App $app) {
         $group->group('/{idOccasion}', function (Group $group) {
             $group->get('', ViewOccasionAction::class);
             $group->put('', EditOccasionAction::class);
+            $group->post('/participation', CreateParticipationOccasionAction::class);
         });
     });
     $app->group('/utilisateur', function (Group $group) {

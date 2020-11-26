@@ -9,6 +9,7 @@ use App\Application\Service\PasswordService;
 use App\Domain\Utilisateur\UtilisateurRepository;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Log\LoggerInterface;
+use Slim\Exception\HttpBadRequestException;
 
 class CreateUtilisateurAction extends UtilisateurAction
 {
@@ -28,6 +29,11 @@ class CreateUtilisateurAction extends UtilisateurAction
     parent::action();
     $this->assertUtilisateurAuthEstAdmin();
     $body = $this->getFormData();
+
+    if (!isset($body['identifiant'])) throw new HttpBadRequestException($this->request, "L'identifiant est obligatoire");
+    if (!isset($body['nom'])) throw new HttpBadRequestException($this->request, "Le nom est obligatoire");
+    if (!isset($body['genre'])) throw new HttpBadRequestException($this->request, "Le genre est obligatoire");
+    if (!isset($body['estAdmin'])) $body['estAdmin'] = false;
 
     $mdp = $this->passwordService->randomPassword();
     $utilisateur = $this->utilisateurRepository->create(

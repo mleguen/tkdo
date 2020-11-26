@@ -17,6 +17,7 @@
       - GET et POST /api/utilisateur
       - POST /api/utilisateur/:idUtilisateur/reinitmdp
       - POST et PUT /api/occasion
+      - POST /api/occasion/:idOccasion/participation
   - côté front : l'accès à une page d'administration
     détaillant l'utilisation de l'API en ligne de commande
 

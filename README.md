@@ -74,24 +74,9 @@ de changer le mot de passe du compte `admin` dès la fin de l'installation.
 
 La page d'administration de l'application permet ensuite :
 - de gérer les comptes utilisateurs (création, consultation, modification, réinitialisation du mot de passe)
-- de gérer les occasions (création, consultation, modification)
+- de gérer les occasions (création, consultation, modification, ajout de participants)
 
 Pour les autres tâches d'administration, voir ci-dessous.
-
-#### Ajout de participants à une occasion
-
-Un compte utilisateur doit avoir préalablement été créé pour chaque participant.
-Ces comptes utilisateurs doivent ensuite être déclarés comme participant à la dernière occasion créée,
-là encore pour l'instant directement en base de données, dans la table `tkdo_participation`.
-Par exemple :
-
-```sql
-INSERT INTO tkdo_participation (doctrineoccasion_id, doctrineutilisateur_id)
-SELECT o.lastid, u.id
-FROM (SELECT MAX(id) lastid FROM tkdo_occasion) o
-INNER JOIN tkdo_utilisateur u
-WHERE u.identifiant IN ('alice@tkdo.org', 'bob@tkdo.org')
-```
 
 #### Tirage au sort
 

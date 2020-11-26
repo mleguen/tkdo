@@ -273,5 +273,23 @@ curl -u {{token}}: \
 </samp></pre>
 
 <div class="alert alert-primary" role="alert">
-  Note : voir plus bas pour modifier les participants ou les résultats du tirage
+  Note : cette route ne permet pas de modifier les participants ou les résultats du tirage (voir plus bas).
 </div>
+
+<h3>Ajouter un participant à une occasion</h3>
+
+<pre><samp>
+curl -u {{token}}: \
+-d idParticipant={{idUtilisateur}} \
+-X POST {{urlApi}}/occasion/7/participation
+</samp></pre>
+
+<p>Renvoie :</p>
+
+<pre><samp>
+{{'{'}}
+  "genre": "F",
+  "id": 83,
+  "nom": "Alice"
+}
+</samp></pre>

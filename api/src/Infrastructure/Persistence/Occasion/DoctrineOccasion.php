@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Infrastructure\Persistence\Occasion;
 
 use App\Domain\Occasion\Occasion;
+use App\Domain\Utilisateur\Utilisateur;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
@@ -44,6 +45,15 @@ class DoctrineOccasion implements Occasion
     public function __construct(?int $id = NULL)
     {
         if (isset($id)) $this->id = $id;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function addParticipant(Utilisateur $participant): Occasion
+    {
+        $this->participants->add($participant);
+        return $this;
     }
 
     /**
