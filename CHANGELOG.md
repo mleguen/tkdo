@@ -2,8 +2,8 @@
 
 ## Prochaine version
 
-- accès à toutes les occasions auxquelles l'utilisateur participe
-  ou a participé (mais seulement celles-là)
+- accès à toutes les occasions auxquelles l'utilisateur participe ou a participé
+  (et seulement celles-là)
 - possibilité d'appeler l'API directement en ligne de commande avec curl
   (avec `-u $token:` pour fournir le token d'authentification
   et `-d cle=valeur` pour passer un à un les paramètres)
@@ -11,15 +11,18 @@
   - côté API :
     - un accès étendu à certaines routes standard :
       - GET /api/utilisateur/:idUtilisateur pour n'importe quel id utilisateur
-      - GET /api/occasion sans avoir à préciser d'idParticipant
+      - GET /api/occasion pour toutes les occasions,
+        ou les occasions de n'importe quel utilisateur
+      - GET /api/occasion/:idOccasion pour n'importe quelle occasion
     - un accès à de nouvelles routes réservées aux administrateurs
-      (et non accessibles par le front) :
+      (et accessibles uniquement en ligne de commande) :
       - GET et POST /api/utilisateur
       - POST /api/utilisateur/:idUtilisateur/reinitmdp
       - POST et PUT /api/occasion
-      - POST /api/occasion/:idOccasion/participation
+      - POST /api/occasion/:idOccasion/participant
+      - POST /api/occasion/:idOccasion/resultat
   - côté front : l'accès à une page d'administration
-    détaillant l'utilisation de l'API en ligne de commande
+    détaillant l'utilisation de ces routes en ligne de commande
 
 ## V1.0.0 (01/11/2020)
 

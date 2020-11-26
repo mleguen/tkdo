@@ -12,7 +12,7 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Log\LoggerInterface;
 use Slim\Exception\HttpBadRequestException;
 
-class CreateParticipationOccasionAction extends Action
+class CreateParticipantOccasionAction extends Action
 {
   protected $occasionRepository;
   protected $utilisateurRepository;

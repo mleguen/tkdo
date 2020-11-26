@@ -281,7 +281,7 @@ curl -u {{token}}: \
 <pre><samp>
 curl -u {{token}}: \
 -d idParticipant={{idUtilisateur}} \
--X POST {{urlApi}}/occasion/7/participation
+-X POST {{urlApi}}/occasion/7/participant
 </samp></pre>
 
 <p>Renvoie :</p>
@@ -289,7 +289,31 @@ curl -u {{token}}: \
 <pre><samp>
 {{'{'}}
   "genre": "F",
-  "id": 83,
+  "id": {{idUtilisateur}},
   "nom": "Alice"
 }
 </samp></pre>
+
+<h3>Ajouter un résultat à une occasion</h3>
+
+Cette route permet d'ajouter un à un les résultats d'un tirage au sort fait en dehors de l'application.
+
+<pre><samp>
+curl -u {{token}}: \
+-d idQuiOffre={{idUtilisateur}} \
+-d idQuiRecoit={{idUtilisateur+1}} \
+-X POST {{urlApi}}/occasion/7/resultat
+</samp></pre>
+
+<p>Renvoie :</p>
+
+<pre><samp>
+{{'{'}}
+  "idQuiOffre": {{idUtilisateur}},
+  "idQuiRecoit": {{idUtilisateur+1}}
+}
+</samp></pre>
+
+<div class="alert alert-primary" role="alert">
+  Note : chaque participant ne doit offrir et recevoir qu'une seule fois.
+</div>

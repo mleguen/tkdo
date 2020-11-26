@@ -74,26 +74,7 @@ de changer le mot de passe du compte `admin` dès la fin de l'installation.
 
 La page d'administration de l'application permet ensuite :
 - de gérer les comptes utilisateurs (création, consultation, modification, réinitialisation du mot de passe)
-- de gérer les occasions (création, consultation, modification, ajout de participants)
-
-Pour les autres tâches d'administration, voir ci-dessous.
-
-#### Tirage au sort
-
-Le tirage au sort pour la dernière occasion créée doit pour l'instant être fait en dehors de l'application,
-et injecté ensuite directement en base de données, dans la table `tkdo_resultat`,
-participant par participant.
-Par exemple :
-
-```sql
-INSERT INTO tkdo_resultat (occasion_id, quiOffre_id, quiRecoit_id)
-SELECT o.lastid, offre.id, recoit.id
-FROM (SELECT MAX(id) lastid FROM tkdo_occasion) o
-INNER JOIN tkdo_utilisateur offre ON offre.identifiant = 'alice@tkdo.org'
-INNER JOIN tkdo_utilisateur recoit ON recoit.identifiant = 'bob@tkdo.org'
-```
-
-Chaque participant à l'occasion doit offrir et recevoir une fois et une seule.
+- de gérer les occasions (création, consultation, modification, ajout de participants ou de résultats de tirage)
 
 ## Développement
 
