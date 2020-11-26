@@ -12,7 +12,11 @@ interface OccasionRepository
 
     /**
      * @return Occasion[]
-     * @throws OccasionNotFoundException
+     */
+    public function readAll(): array;
+    
+    /**
+     * @return Occasion[]
      */
     public function readByParticipant(int $idParticipant): array;
 }

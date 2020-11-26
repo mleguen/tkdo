@@ -33,6 +33,16 @@ class DoctrineOccasionRepository implements OccasionRepository
     /**
      * {@inheritdoc}
      */
+    public function readAll(): array
+    {
+        /** @var \Doctrine\ORM\EntityRepository */
+        $repository = $this->em->getRepository(DoctrineOccasion::class);
+        return $repository->findAll();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function readByParticipant(int $idParticipant): array
     {
         $occasions = $this->em->createQueryBuilder()

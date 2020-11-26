@@ -165,3 +165,28 @@ $ curl -u {{token}}: \
   le mot de passe est généré automatiquement et fourni dans la réponse,
   et ne sera plus fourni par la suite (même à un administrateur).
 </div>
+
+
+<h2>Occasions</h2>
+
+<h3>Lister les occasions</h3>
+
+<pre><samp>
+curl -u {{token}}: \
+{{urlApi}}/occasion
+</samp></pre>
+
+<p>Renvoie :</p>
+
+<pre><samp>
+[
+  {
+    "id": 5,
+    "titre": "No\u00ebl 2019"
+  },
+  {
+    "id": 6,
+    "titre": "No\u00ebl 2020"
+  }
+]
+</samp></pre>

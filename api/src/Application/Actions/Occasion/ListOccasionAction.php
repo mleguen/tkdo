@@ -25,11 +25,16 @@ class ListOccasionAction extends Action
         $this->assertAuth();
 
         $queryParams = $this->request->getQueryParams();
-        if (!isset($queryParams['idParticipant'])) throw new HttpBadRequestException($this->request, 'idParticipant manquant');
-        $idParticipant = (int) $queryParams['idParticipant'];
-        $this->assertUtilisateurAuthEst([$idParticipant]);
+        if (isset($queryParams['idParticipant'])) {
+            $idParticipant = (int) $queryParams['idParticipant'];
+            $this->assertUtilisateurAuthEst([$idParticipant]);
+            $occasions = $this->occasionRepository->readByParticipant($idParticipant);
+        }
+        else {
+            $this->assertUtilisateurAuthEstAdmin();
+            $occasions = $this->occasionRepository->readAll();
+        }
 
-        $occasions = $this->occasionRepository->readByParticipant($idParticipant);
         return $this->respondWithData(array_map(function ($occasion) {
             return new SerializableOccasion($occasion);
         }, $occasions));

@@ -78,6 +78,40 @@ EOT;
         $this->assertEquals($json, (string)$response->getBody());
     }
 
+    public function testActionSansIdParticipantAdmin()
+    {
+        $occasion1 = (new DoctrineOccasion(1))
+            ->setTitre('Noel 2020');
+        $occasion2 = (new DoctrineOccasion(2))
+            ->setTitre('Noel 2019');
+        $this->occasionRepositoryProphecy
+            ->readAll()
+            ->willReturn([$occasion1, $occasion2])
+            ->shouldBeCalledOnce();
+
+        $response = $this->handleAuthRequest(
+            $this->alice->getId(),
+            true,
+            'GET',
+            '/occasion'
+        );
+
+        $json = <<<EOT
+[
+    {
+        "id": {$occasion1->getId()},
+        "titre": "{$occasion1->getTitre()}"
+    },
+    {
+        "id": {$occasion2->getId()},
+        "titre": "{$occasion2->getTitre()}"
+    }
+]
+
+EOT;
+        $this->assertEquals($json, (string)$response->getBody());
+    }
+
     public function testActionMauvaisIdParticipant()
     {
         $this->expectException(HttpForbiddenException::class);
@@ -90,10 +124,9 @@ EOT;
         );
     }
 
-    public function testActionIdParticipantManquant()
+    public function testActionSansIdParticipantPasAdmin()
     {
-        $this->expectException(HttpBadRequestException::class);
-        $this->expectExceptionMessage('idParticipant manquant');
+        $this->expectException(HttpForbiddenException::class);
         $this->handleAuthRequest(
             $this->alice->getId(),
             false,

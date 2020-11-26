@@ -9,8 +9,9 @@
   et `-d cle=valeur` pour passer un à un les paramètres)
 - droits d'administration permettant :
   - côté API :
-    - un accès étendu à certaines routes standard
-      (GET /api/utilisateur/:idUtilisateur pour d'autres id que le sien, par exemple)
+    - un accès étendu à certaines routes standard :
+      - GET /api/utilisateur/:idUtilisateur pour n'importe quel id utilisateur
+      - GET /api/occasion sans avoir à préciser d'idParticipant
     - un accès à de nouvelles routes réservées aux administrateurs
       (et non accessibles par le front) :
       - GET et POST /api/utilisateur
