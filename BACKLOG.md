@@ -1,10 +1,5 @@
 # Travaux futurs
 
-- nettoyage de la page d'idées :
-  - renommer la page Idées en Vos idées si c'est pour l'utilisateur connecté
-  - rediriger vers cette page si aucune occasion
-  - ajouter un menu vos idées vers cette page
-  - Si pas utilisateur connecté, séparer : les idées proposées par l'utilisateur d'abord puis celles proposées par d'autres
 - notifications par mail :
   - ajouter l'e-mail dans le profil (modifiable mais requis, et au bon format, mais pas d'unicité imposée - 2 participants peuvent avoir le même mail)
   - ajouter l'envoi d'un mail avec les identifiants à la création d'un compte (mdp plus fourni à l'admin à la création)

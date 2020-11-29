@@ -7,15 +7,21 @@
 
   <div *ngIf="(utilisateurConnecte$ | async) as utilisateur" class="collapse navbar-collapse" id="navbarsExampleDefault">
     <ul class="navbar-nav mr-auto">
-      <li class="nav-item dropdown" *ngIf="occasions$|async as occasions">
-        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
-          aria-haspopup="true" aria-expanded="false" [ngClass]="{'active': menuActif === '/occasion'}">
-          Occasions
-        </a>
-        <div class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDropdown">
-          <a class="dropdown-item" [routerLink]="['/occasion', o.id]" *ngFor="let o of occasions"
-            [ngClass]="{'active': menuActif === '/occasion' && idOccasionActive === o.id}">{{o.titre}}</a>
-        </div>
+      <ng-container *ngIf="occasions$|async as occasions">
+        <li class="nav-item dropdown" *ngIf="occasions.length > 0">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
+            aria-haspopup="true" aria-expanded="false" [ngClass]="{'active': menuActif === '/occasion'}">
+            Mes occasions
+          </a>
+          <div class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDropdown">
+            <a class="dropdown-item" [routerLink]="['/occasion', o.id]" *ngFor="let o of occasions"
+              [ngClass]="{'active': menuActif === '/occasion' && idOccasionActive === o.id}">{{o.titre}}</a>
+          </div>
+        </li>
+      </ng-container>
+      <li class="nav-item" [ngClass]="{'active': menuActif === '/idee?idUtilisateur='+utilisateur.id}">
+        <a class="nav-link" [routerLink]="['/idee']" [queryParams]="{idUtilisateur: utilisateur.id}"
+        data-toggle="collapse" data-target=".navbar-collapse.show">Mes idées</a>
       </li>
       <li class="nav-item" [ngClass]="{'active': menuActif === '/profil'}">
         <a class="nav-link" [routerLink]="['/profil']"

@@ -132,11 +132,11 @@ export class BackendService {
     return this.http.get<Occasion[]>(`${URL_LISTE_OCCASIONS}?idParticipant=${this.idUtilisateur}`).pipe(
       tap(
         occasions => {
+          console.log(JSON.stringify(occasions));
           this.occasions$.next(occasions);
           localStorage.setItem(CLE_LISTE_OCCASIONS, JSON.stringify(occasions));
         }
-      ),
-      first()
+      )
     ).toPromise();
   }
 

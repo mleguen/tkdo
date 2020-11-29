@@ -15,7 +15,7 @@
             estMoi: p.estMoi,
             estQuiRecoitDeMoi: p.estQuiRecoitDeMoi
           }"
-          [routerLink]="['/liste-idees', p.id]">
+          [routerLink]="['/idee']" [queryParams]="{idUtilisateur: p.id}">
           <div class="card-body">
             <h3 class="card-title">{{p.nom}}</h3>
             <div class="card-text" *ngIf="p.estMoi">C'est vous !</div>

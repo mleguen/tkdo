@@ -2,8 +2,11 @@
 
 ## Prochaine version
 
-- accès à toutes les occasions auxquelles l'utilisateur participe ou a participé
-  (et seulement celles-là)
+- un menu "Mes occasions" permet d'accéder à toutes les occasions
+  auxquelles l'utilisateur participe ou a participé (et seulement celles-là).
+  La dernière occasion créée à laquelle il participe est la page par défaut quand il se connecte
+- un menu "Mes idées" permet d'accéder directement à la liste d'idées de l'utilisateur connecté.
+  C'est la page par défaut quand il se connecte s'il ne participe encore à aucune occasion
 - possibilité d'appeler l'API directement en ligne de commande avec curl
   (avec `-u $token:` pour fournir le token d'authentification
   et `-d cle=valeur` pour passer un à un les paramètres)

@@ -16,7 +16,7 @@ const routes: Routes = [
   { path: 'admin', component: AdminComponent, canActivate: [ConnexionGuard, AdminGuard], runGuardsAndResolvers: 'always' },
   { path: 'connexion', component: ConnexionComponent },
   { path: 'deconnexion', component: DeconnexionComponent },
-  { path: 'liste-idees/:idUtilisateur', component: ListeIdeesComponent, canActivate: [ConnexionGuard], runGuardsAndResolvers: 'always' },
+  { path: 'idee', component: ListeIdeesComponent, canActivate: [ConnexionGuard], runGuardsAndResolvers: 'always' },
   { path: 'occasion', component: ListeOccasionsComponent, canActivate: [ConnexionGuard], runGuardsAndResolvers: 'always' },
   { path: 'occasion/:idOccasion', component: OccasionComponent, canActivate: [ConnexionGuard], runGuardsAndResolvers: 'always' },
   { path: 'profil', component: ProfilComponent, canActivate: [ConnexionGuard], runGuardsAndResolvers: 'always' },

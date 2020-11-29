@@ -9,7 +9,7 @@ import { BackendService } from '../backend.service';
   styleUrls: ['./header.component.scss']
 })
 export class HeaderComponent {
-  occasions$ = this.backend.occasions$.pipe(map(occasions => occasions?.reverse()));
+  occasions$ = this.backend.occasions$.pipe(map(occasions => occasions?.slice(0).reverse()));
   utilisateurConnecte$ = this.backend.utilisateurConnecte$;
   menuActif: string;
   idOccasionActive: number;

@@ -64,7 +64,6 @@ const eve: UtilisateurAvecMdp = {
 
 const utilisateursAvecMdp = [alice, bob, charlie, david, eve];
 
-// En ordre décroissant volontairement, pour que find trouve l'occasion la plus récente en 1er
 const occasions: Occasion[] = [
   {
     id: 0,

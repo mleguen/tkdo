@@ -9,8 +9,6 @@ import { Router } from '@angular/router';
 })
 export class ListeOccasionsComponent implements OnInit {
 
-  public chargement = true;
-
   constructor(
     private readonly backend: BackendService,
     private readonly router: Router,
@@ -18,9 +16,12 @@ export class ListeOccasionsComponent implements OnInit {
 
   async ngOnInit(): Promise<void> {
     let occasions = await this.backend.getOccasions();
+    console.log(JSON.stringify(occasions));
+
     if (occasions.length > 0) {
       await this.router.navigate(['occasion', occasions[occasions.length-1].id]);
+    } else {
+      await this.router.navigate(['idee'], { queryParams: { idUtilisateur: this.backend.idUtilisateur } });
     }
-    this.chargement = false;
   }
 }

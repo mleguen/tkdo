@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Observable, combineLatest, BehaviorSubject, of } from 'rxjs';
-import { switchMap, catchError, map } from 'rxjs/operators';
+import { switchMap, catchError, map, filter } from 'rxjs/operators';
 import { BackendService, IdeesPour, Idee, Genre } from '../backend.service';
 import * as moment from 'moment';
 
@@ -32,19 +32,23 @@ export class ListeIdeesComponent implements OnInit {
 
   ngOnInit(): void {
     this.listeIdees$ = combineLatest([
-      this.route.paramMap,
+      this.route.queryParamMap,
       this.actualisation$      
     ]).pipe(
-      switchMap(([params]) => {
-        this.idUtilisateur = +params.get('idUtilisateur');
+      switchMap(([queryParams]) => {
+        this.idUtilisateur = +queryParams.get('idUtilisateur');
         return this.backend.getIdees(this.idUtilisateur).pipe(
-          map(li => Object.assign({}, li, {
-            estPourMoi: li.utilisateur.id === this.backend.idUtilisateur,
-            idees: li.idees.map(i => Object.assign({}, i, {
+          map(li => {
+            let idees = li.idees.map(i => Object.assign({}, i, {
               dateProposition: moment(i.dateProposition, 'YYYY-MM-DDTHH:mm:ssZ').locale('fr').format('L à LT'),
               estDeMoi: i.auteur.id === this.backend.idUtilisateur,
-            })),
-          })),
+            }));
+            return Object.assign({}, li, {
+              estPourMoi: li.utilisateur.id === this.backend.idUtilisateur,
+              idees: idees.filter(i => i.auteur.id === this.idUtilisateur),
+              autresIdees: idees.filter(i => i.auteur.id !== this.idUtilisateur),
+            });
+          }),
           // Les erreurs backend sont déjà affichées par AppComponent
           catchError(() => of(undefined))
         );
