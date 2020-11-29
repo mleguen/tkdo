@@ -2,9 +2,15 @@
 
 Tirage au sort de cadeaux, en famille ou entre amis.
 
-## Déploiement sur serveur Apache
+<table><tr>
+  <td width="20%"><img src="doc/connexion.png?raw=true" alt="Connexion"></td>
+  <td width="20%"><img src="doc/occasion.png?raw=true" alt="Occasion"></td>
+  <td width="20%"><img src="doc/idee-1.png?raw=true" alt="Liste d'idées"></td>
+  <td width="20%"><img src="doc/idee-2.png?raw=true" alt="Liste d'idées (suite)"></td>
+  <td width="20%"><img src="doc/menus.png?raw=true" alt="Menus"></td>
+</tr></table>
 
-### Installation
+## Installation sur serveur Apache
 
 Dans les explications ci-dessous, le *répertoire cible* désigne le répertoire du serveur Apache
 où sera installé tkdo.
@@ -24,7 +30,7 @@ Construction du package d'installation :
 ./apache-pack
 ```
 
-Décompresser ensuite dans le répertoire cible l'archive `tkdo.tar.gz` générée.
+Décompresser ensuite dans le répertoire cible l'archive `tkdo-v*.tar.gz` générée.
 
 > **Attention** : certains hébergeurs proposent des fonctions d'upload d'archives les décompressant automatiquement,
 > mais qui peuvent parfois tronquer les noms de fichiers si l'arborescence est trop profonde (`api/vendor` par exemple).
@@ -64,7 +70,7 @@ OK
 > L'utilisation de l'option `-n` peut aussi être nécessaire pour éviter l'utilisation du php.ini du serveur,
 > si ce dernier désactive par exemple l'affichage des exceptions.
 
-### Administration
+## Administration
 
 La base de données est initialisée avec un 1er compte utilisateur (identifiant `admin`, mot de passe `admin`),
 avec lequel vous pouvez vous connecter pour créer ensuite d'autres comptes.

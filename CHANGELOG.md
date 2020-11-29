@@ -1,6 +1,6 @@
 # Historique des changements
 
-## Prochaine version
+## V1.1.0 (29/11/2020)
 
 - un menu "Mes occasions" permet d'accéder à toutes les occasions
   auxquelles l'utilisateur participe ou a participé (et seulement celles-là).

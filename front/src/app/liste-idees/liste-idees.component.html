@@ -3,7 +3,7 @@
     <div class="row justify-content-around align-items-center">
       <h1 [ngSwitch]="li.estPourMoi" class="col-10">
         <ng-container *ngSwitchCase="true">Ma liste d'idées</ng-container>
-        <ng-container *ngSwitchDefault>Liste d'idées pour {{li.utilisateur.nom}}</ng-container>
+        <ng-container *ngSwitchDefault>Idées pour {{li.utilisateur.nom}}</ng-container>
       </h1>
       <div class="col-auto">
         <button (click)="actualise()" class="btn btn-secondary">Actualiser</button>
@@ -33,7 +33,7 @@
   
     <div class="row" *ngIf="(!li.estPourMoi) && (li.autresIdees.length > 0)">
       <div class="col-12">
-        <h2>Proposées par d'autres utilisateurs que {{li.utilisateur.nom}}</h2>
+        <h2>Proposées par d'autres que {{li.utilisateur.nom}}</h2>
         <div class="alert alert-warning col-12" role="alert">
           {{li.utilisateur.nom}} ne peut pas voir ces idées
         </div>
