@@ -8,20 +8,14 @@ use Firebase\JWT\JWT;
 
 class AuthService
 {
-  /**
-   * @var string
-   */
   private $defaultSettings;
 
-  public function __construct(array $defaultSettings = null)
+  public function __construct(array $defaultSettings = [])
   {
-    $this->defaultSettings = array_merge(
-      [
-        'algo' => 'RS256',
-        'validite' => 3600,
-      ],
-      $defaultSettings ?: []
-    );
+    $this->defaultSettings = array_merge([
+      'algo' => 'RS256',
+      'validite' => 3600,
+    ], $defaultSettings);
     
     if (!($this->defaultSettings['clePrivee'] = file_get_contents($this->defaultSettings['fichierClePrivee']))) {
       throw new \Exception("Impossible de lire la clé privée dans {$this->defaultSettings['fichierClePrivee']}");
@@ -55,9 +49,9 @@ class AuthService
    * Decode un bearer token et retourne l'id de l'utilisateur authentifié
    * et s'il est ou non admin
    */
-  public function decodeAuthToken(string $token, $settings = null): array
+  public function decodeAuthToken(string $token, $settings = []): array
   {
-    $settings = array_merge($this->defaultSettings, $settings ?: []);
+    $settings = array_merge($this->defaultSettings, $settings);
     $payload = JWT::decode($token, $settings['clePublique'], [$settings['algo']]);
     return [
       "idUtilisateurAuth" => $payload->sub,
@@ -69,9 +63,9 @@ class AuthService
    * Encode un bearer token contenant l'id de l'utilisateur authentifié
    * et s'il est ou non admin
    */
-  public function encodeAuthToken(int $idUtilisateurAuth, bool $estAdmin, $settings = null): string
+  public function encodeAuthToken(int $idUtilisateurAuth, bool $estAdmin, $settings = []): string
   {
-    $settings = array_merge($this->defaultSettings, $settings ?: []);
+    $settings = array_merge($this->defaultSettings, $settings);
     $payload = [
       "sub" => $idUtilisateurAuth,
       "exp" => \time() + $settings['validite'],

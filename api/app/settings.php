@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 
+use App\Application\Service\MailerService;
 use DI\ContainerBuilder;
 use Monolog\Logger;
 
@@ -13,6 +14,12 @@ return function (ContainerBuilder $containerBuilder) {
     // Global Settings Object
     $containerBuilder->addDefinitions([
         'settings' => [
+            'auth' => [
+                'algo' => 'RS256',
+                'fichierClePrivee' => APP_ROOT . '/var/auth/auth_rsa',
+                'fichierClePublique' => APP_ROOT . '/var/auth/auth_rsa.pub',
+                'validite' => 3600,
+            ],
             'doctrine' => [
                 // if true, metadata caching is forcefully disabled
                 'dev_mode' => $devMode,
@@ -44,11 +51,10 @@ return function (ContainerBuilder $containerBuilder) {
                 'path' => $docker ? 'php://stdout' : APP_ROOT . '/logs/api.log',
                 'level' => Logger::DEBUG,
             ],
-            'auth' => [
-                'algo' => 'RS256',
-                'fichierClePrivee' => APP_ROOT . '/var/auth/auth_rsa',
-                'fichierClePublique' => APP_ROOT . '/var/auth/auth_rsa.pub',
-                'validite' => 3600,
+            'mailer' => [
+                'mode' => $devMode ? MailerService::MODE_FILE : MailerService::MODE_MAIL,
+                'from' => $_ENV['MAILER_FROM'] ?? '',
+                'path' => APP_ROOT . '/var/mail',
             ],
         ],
     ]);

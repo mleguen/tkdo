@@ -15,13 +15,14 @@ export class ProfilComponent implements OnInit {
     {
       'identifiant': [''],
       'nom': ['', [Validators.minLength(3)]],
+      'email': ['', [Validators.email]],
       'genre': [''],
       'mdp': ['', [Validators.minLength(8)]],
       'confirmeMdp': [''],
     },
     {
       validators: [
-        requireOne(['nom', 'genre'], ['mdp']),
+        requireOne(['nom', 'email', 'genre'], ['mdp']),
         sameValueIfDefined('mdp', 'confirmeMdp'),
       ]
     },
@@ -41,6 +42,7 @@ export class ProfilComponent implements OnInit {
         this.utilisateur = utilisateur;
         this.identifiant.setValue(utilisateur.identifiant);
         this.nom.setValue(utilisateur.nom);
+        this.email.setValue(utilisateur.email);
         this.genre.setValue(utilisateur.genre);
       },
       // Les erreurs backend sont déjà affichées par AppComponent
@@ -56,6 +58,10 @@ export class ProfilComponent implements OnInit {
     return this.formProfil.get('nom');
   }
   
+  get email() {
+    return this.formProfil.get('email');
+  }
+
   get genre() {
     return this.formProfil.get('genre');
   }
@@ -65,9 +71,9 @@ export class ProfilComponent implements OnInit {
   }
 
   async modifie() {
-    const { nom, genre, mdp } = this.formProfil.value;
+    const { nom, email, genre, mdp } = this.formProfil.value;
     try {
-      Object.assign(this.utilisateur, { nom, genre });
+      Object.assign(this.utilisateur, { nom, email, genre });
       if (mdp) Object.assign(this.utilisateur, { mdp });
       await this.backend.modifieUtilisateur(this.utilisateur);
       for (let champ of ['mdp', 'confirmeMdp']) this.formProfil.get(champ).reset();

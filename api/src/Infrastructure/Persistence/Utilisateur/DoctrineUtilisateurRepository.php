@@ -26,6 +26,7 @@ class DoctrineUtilisateurRepository implements UtilisateurRepository
      */
     public function create(
         string $identifiant,
+        string $email,
         string $mdp,
         string $nom,
         string $genre,
@@ -34,6 +35,7 @@ class DoctrineUtilisateurRepository implements UtilisateurRepository
     {
         $utilisateur = (new DoctrineUtilisateur())
             ->setIdentifiant($identifiant)
+            ->setEmail($email)
             ->setMdp($mdp)
             ->setNom($nom)
             ->setGenre($genre)

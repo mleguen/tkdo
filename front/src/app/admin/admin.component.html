@@ -51,6 +51,7 @@ curl -u {{token}}: \
 <pre><samp>
 [
   {{'{'}}
+    "email": "admin@tkdo.org",
     "estAdmin": true,
     "genre": "M",
     "id": {{idUtilisateur}},
@@ -65,6 +66,7 @@ curl -u {{token}}: \
 <pre><samp>
 $ curl -u {{token}}: \
 -d identifiant='utilisatrice01' \
+-d email='utilisatrice01@tkdo.org' \
 -d nom='Utilisatrice 1' \
 -d genre=F \
 -d estAdmin=0 \
@@ -75,18 +77,17 @@ $ curl -u {{token}}: \
 
 <pre><samp>
 {{'{'}}
+  "email": "utilisatrice01@tkdo.org",
   "estAdmin": false,
   "genre": "F",
   "id": 71,
   "identifiant": "utilisatrice01",
-  "mdp": "G@x3Pjke",
   "nom": "Utilisatrice 1"
 }
 </samp></pre>
 
 <div class="alert alert-primary" role="alert">
-  Note : le mot de passe est généré automatiquement et fourni dans la réponse,
-  et ne sera plus fourni par la suite (même à un administrateur).
+  Note : le mot de passe est généré automatiquement et envoyé par email à l'utilisateur.
 </div>
 
 <h3>Afficher un utilisateur</h3>
@@ -100,6 +101,7 @@ curl -u {{token}}: \
 
 <pre><samp>
 {{'{'}}
+  "email": "admin@tkdo.org",
   "estAdmin": true,
   "genre": "M",
   "id": 70,
@@ -113,6 +115,7 @@ curl -u {{token}}: \
 <pre><samp>
 curl -u {{token}}: \
 -d identifiant='admin2' \
+-d email='admin2@tkdo.org' \
 -d mdp='Akjunz12' \
 -d nom='Administrateur 2' \
 -d genre=M \
@@ -124,6 +127,7 @@ curl -u {{token}}: \
 
 <pre><samp>
 {{'{'}}
+  "email": "admin2@tkdo.org",
   "estAdmin": true,
   "genre": "M",
   "id": {{idUtilisateur}},
@@ -140,6 +144,10 @@ curl -u {{token}}: \
   Note 2 : même un administrateur ne peut pas modifier le mot de passe d'un autre utilisateur.
 </div>
 
+<div class="alert alert-primary" role="alert">
+  Note 3 : les champs doivent être URL encodés (<code>+</code> doit être remplacé par <code>%2B</code>, etc).
+</div>
+
 <h3>Réinitialiser le mot de passe d'un utilisateur</h3>
 
 <pre><samp>
@@ -151,19 +159,18 @@ $ curl -u {{token}}: \
 
 <pre><samp>
 {{'{'}}
+  "email": "utilisatrice01@tkdo.org",
   "estAdmin": false,
   "genre": "F",
   "id": 71,
   "identifiant": "utilisatrice01",
-  "mdp": "G@x3Pjke",
   "nom": "Utilisatrice 1"
 }
 </samp></pre>
 
 <div class="alert alert-primary" role="alert">
   Note : comme lors de la création d'un nouvel utilisateur,
-  le mot de passe est généré automatiquement et fourni dans la réponse,
-  et ne sera plus fourni par la suite (même à un administrateur).
+  le mot de passe est généré automatiquement et envoyé par email à l'utilisateur.
 </div>
 
 

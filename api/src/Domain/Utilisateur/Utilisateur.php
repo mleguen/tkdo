@@ -10,6 +10,11 @@ interface Utilisateur
     /**
      * @throws ReferenceException
      */
+    public function getEmail(): string;
+
+    /**
+     * @throws ReferenceException
+     */
     public function getEstAdmin(): bool;
 
     /**
@@ -31,6 +36,11 @@ interface Utilisateur
      * @throws ReferenceException
      */
     public function getNom(): string;
+
+    /**
+     * @throws ReferenceException
+     */
+    public function setEmail(string $email): Utilisateur;
 
     /**
      * @throws ReferenceException

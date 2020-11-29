@@ -28,6 +28,7 @@ class ViewUtilisateurActionTest extends ActionTestCase
         $estAdmin = json_encode($this->alice->getEstAdmin());
         $json = <<<EOT
 {
+    "email": "{$this->alice->getEmail()}",
     "estAdmin": $estAdmin,
     "genre": "{$this->alice->getGenre()}",
     "id": {$this->alice->getId()},
@@ -56,6 +57,7 @@ EOT;
         $estAdmin = json_encode($this->alice->getEstAdmin());
         $json = <<<EOT
 {
+    "email": "{$this->alice->getEmail()}",
     "estAdmin": $estAdmin,
     "genre": "{$this->alice->getGenre()}",
     "id": {$this->alice->getId()},

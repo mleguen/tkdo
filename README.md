@@ -53,18 +53,29 @@ $ php bin/doctrine.php migrations:migrate
   ++ used xxxM memory
   ++ xxx migrations executed
   ++ xxx sql queries
+```
 
-$ php bin/doctrine.php fixtures:load --prod
+Initialiser ensuite la base de données avec un premier compte administrateur,
+en adaptant l'e-mail passé en paramètre à vos besoins :
+
+```bash
+$ php bin/doctrine.php fixtures:load --prod --admin-email vous@votrefai.fr
 Initialisation ou réinitialisation de la base de données (production)...
 xxx créés.
 [...]
 OK
 ```
 
-> **Note** : certains hébergeurs ne proposent pas d'accès ssh.
+Ce compte administrateur (identifiant `admin`, mot de passe `admin`)
+vous permettra de vous connecter à l'application pour créer ensuite d'autres comptes.
+
+Pour des raisons de sécurité, il est fortement recommandé
+de changer le mot de passe du compte `admin` dès la fin de l'installation.
+
+> **Note 1** : certains hébergeurs ne proposent pas d'accès ssh.
 > Utiliser dans ce cas des outils comme [Web Console](http://web-console.org/) pour accéder à la console.
 
-> **Note** : sur certains hébergements, le binaire php disponible dans le path est un binaire CGI et/ou en PHP 5.
+> **Note 2** : sur certains hébergements, le binaire php disponible dans le path est un binaire CGI et/ou en PHP 5.
 > Utiliser dans ce cas `phpinfo()` pour déterminer le chemin du binaire PHP 7 utilisé pour l'exécution des pages Web,
 > et exécuter `bin/doctrine.php` avec le binaire CLI correpondant (`/usr/local/php7.2/bin/php` par exemple).
 > L'utilisation de l'option `-n` peut aussi être nécessaire pour éviter l'utilisation du php.ini du serveur,
@@ -72,13 +83,8 @@ OK
 
 ## Administration
 
-La base de données est initialisée avec un 1er compte utilisateur (identifiant `admin`, mot de passe `admin`),
-avec lequel vous pouvez vous connecter pour créer ensuite d'autres comptes.
-
-Pour des raisons de sécurité, il est fortement recommandé
-de changer le mot de passe du compte `admin` dès la fin de l'installation.
-
-La page d'administration de l'application permet ensuite :
+Une fois connecté à l'application avec un compte administrateur,
+la page d'administration vous permet :
 - de gérer les comptes utilisateurs (création, consultation, modification, réinitialisation du mot de passe)
 - de gérer les occasions (création, consultation, modification, ajout de participants ou de résultats de tirage)
 

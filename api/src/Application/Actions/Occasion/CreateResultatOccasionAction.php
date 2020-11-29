@@ -6,6 +6,7 @@ namespace App\Application\Actions\Occasion;
 
 use App\Application\Actions\Action;
 use App\Application\Serializable\Resultat\SerializableResultat;
+use App\Application\Service\MailerService;
 use App\Domain\Occasion\OccasionRepository;
 use App\Domain\Resultat\ResultatRepository;
 use App\Domain\Utilisateur\UtilisateurRepository;
@@ -18,17 +19,20 @@ class CreateResultatOccasionAction extends Action
     protected $occasionRepository;
     protected $utilisateurRepository;
     protected $resultatRepository;
+    private $mailerService;
 
     public function __construct(
         LoggerInterface $logger,
         OccasionRepository $occasionRepository,
         UtilisateurRepository $utilisateurRepository,
-        ResultatRepository $resultatRepository
+        ResultatRepository $resultatRepository,
+        MailerService $mailerService
     ) {
         parent::__construct($logger);
         $this->occasionRepository = $occasionRepository;
         $this->utilisateurRepository = $utilisateurRepository;
         $this->resultatRepository = $resultatRepository;
+        $this->mailerService = $mailerService;
     }
 
     protected function action(): Response
@@ -45,6 +49,9 @@ class CreateResultatOccasionAction extends Action
         $quiRecoit = $this->utilisateurRepository->read((int) $body['idQuiRecoit']);
 
         $resultat = $this->resultatRepository->create($occasion, $quiOffre, $quiRecoit);
+
+        $this->mailerService->envoieMailTirageFait($this->request, $quiOffre, $occasion);
+
         return $this->respondWithData(new SerializableResultat($resultat));
     }
 }

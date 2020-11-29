@@ -1,15 +1,29 @@
 # Travaux futurs
 
 - notifications par mail :
-  - ajouter l'e-mail dans le profil (modifiable mais requis, et au bon format, mais pas d'unicité imposée - 2 participants peuvent avoir le même mail)
-  - ajouter l'envoi d'un mail avec les identifiants à la création d'un compte (mdp plus fourni à l'admin à la création)
-  - ajouter l'envoi d'un mail avec les nouveaux identifiants à la réinitialisation d'un mot de passe (mdp plus fourni à l'admin à la réinitialisation)
-  - ajouter l'envoi d'un mail à l'ajout d'un utilisateur à une occasion pour le prévenir
-  - ajouter une notification instantanée des idées créées ou supprimées (paramétrage oui/non dans le profil, non par défaut)
-  - ajouter une notification quotidienne des idées créées ou supprimées (paramétrages des notifications rien/instantanées/quotidiennes dans le profil, rien par défaut)
-- tirage au sort automatisé :
-  - ajouter une route admin de génération du tirage au sort dans l'application
-  - ajouter l'envoi d'un mail à la génération du tirage au sort pour prévenir les participants
+  - ajouter une notification instantanée des idées créées ou supprimées (pour les utilisateurs le souhaitant)
+    - ajouter des préférences de notification pour les créations/suppressions d'idées dans le profil
+    - ajouter une date aux occasions
+    - côté front : choisir par défaut la 1ère occasion non passée, plus la dernière
+    - ajouter une méthode aux repositories permettant de récupérer
+      tous les participants des occasions non passées auxquelles participe un utilisateur
+      qui ont demandé à être notifiés instantanément
+    - dans les routes de création/suppression des idées, envoyer une notification à ces utilisateurs
+  - ajouter une notification quotidienne des idées créées ou supprimées :
+    - ajouter un 3ème choix Q pour Quotidienne aux préférences de notification
+      - dans l'api
+      - dans le front
+    - remplacer la suppression d'une idée par l'ajout d'une date de suppression (PUT du coup au lieu de DELETE) :
+      - dans l'api
+      - dans le front
+    - filtrer les idées supprimées dans le GET (avec une querystring qui fait le filtre, obligatoire sauf pour les admins) :
+      - dans l'api
+      - dans le front
+      - dans la page admin (section Idées à ajouter)
+    - ajouter une commande doctrine d'envoi de la notification quotidienne (pour les utilisateurs le souhaitant)
+    - documenter l'installation d'un cron pour appeler cette commande
+- ajouter une route admin d'affichage des logs
+- ajouter une route admin de génération du tirage au sort dans l'application (tirage au sort automatisé)
 - ajouter sur la carte d'un participant le nombre d'idées qui ont été proposées pour lui (ne compter que les idées lisibles)
 - ajouter la possibilité de commenter une idée en cliquant sur sa carte (ne rendre lisible que ses propres commentaires pour ses idées)
 - afficher sur la carte d'une idée le nombre de commentaires qui on été faits (ne compter que les commentaires lisibles)

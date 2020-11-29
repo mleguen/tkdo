@@ -7,6 +7,7 @@ interface UtilisateurRepository
 {
     public function create(
         string $identifiant,
+        string $email,
         string $mdp,
         string $nom,
         string $genre,

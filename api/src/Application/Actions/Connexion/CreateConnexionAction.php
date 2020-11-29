@@ -6,6 +6,7 @@ namespace App\Application\Actions\Connexion;
 
 use App\Application\Actions\Action;
 use App\Application\Service\AuthService;
+use App\Application\Service\MailerService;
 use App\Domain\Utilisateur\UtilisateurNotFoundException;
 use App\Domain\Utilisateur\UtilisateurRepository;
 use Psr\Http\Message\ResponseInterface as Response;
@@ -14,21 +15,14 @@ use Slim\Exception\HttpBadRequestException;
 
 class CreateConnexionAction extends Action
 {
-  /**
-   * @var UtilisateurRepository
-   */
   protected $utilisateurRepository;
-
-  /**
-   * @var AuthService
-   */
   protected $authService;
 
-  /**
-   * @param LoggerInterface $logger
-   * @param UtilisateurRepository  $utilisateurRepository
-   */
-  public function __construct(LoggerInterface $logger, UtilisateurRepository $utilisateurRepository, AuthService $authService)
+  public function __construct(
+    LoggerInterface $logger,
+    UtilisateurRepository $utilisateurRepository,
+    AuthService $authService
+  )
   {
     parent::__construct($logger);
     $this->utilisateurRepository = $utilisateurRepository;

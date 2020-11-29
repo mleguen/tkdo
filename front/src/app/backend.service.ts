@@ -18,6 +18,7 @@ export interface Utilisateur {
 }
 
 export interface UtilisateurPrive extends Utilisateur {
+  email: string;
   estAdmin: boolean;
   identifiant: string;
 }

@@ -10,6 +10,14 @@
   </div>
 
   <div class="form-group">
+    <label for="email">Email :</label>
+    <input id="email" type="text" formControlName="email" class="form-control">
+    <div *ngIf="email.errors?.email" class="alert alert-danger">
+      E-mail invalide.
+    </div>
+  </div>
+
+  <div class="form-group">
     <label for="genre">Genre :</label>
     <select id="genre" formControlName="genre" class="form-control">
       <option value="{{Genre.Feminin}}">Féminin</option>

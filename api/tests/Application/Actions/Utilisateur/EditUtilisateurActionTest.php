@@ -7,6 +7,7 @@ namespace Tests\Application\Actions\Utilisateur;
 use App\Domain\Utilisateur\UtilisateurNotFoundException;
 use App\Infrastructure\Persistence\Utilisateur\DoctrineUtilisateur;
 use Prophecy\Argument;
+use Slim\Exception\HttpBadRequestException;
 use Slim\Exception\HttpForbiddenException;
 use Slim\Exception\HttpNotFoundException;
 use Slim\Exception\HttpUnauthorizedException;
@@ -24,7 +25,8 @@ class EditUtilisateurActionTest extends ActionTestCase
         $nouveauMdp = 'nouveaumdpalice';
         /** @var DoctrineUtilisateur */
         $aliceModifiee = (new DoctrineUtilisateur($this->alice->getId()))
-            ->setIdentifiant('alice2@tkdo.org')
+            ->setIdentifiant('alice2')
+            ->setEmail('alice2@tkdo.org')
             ->setNom('Alice2')
             ->setGenre('M')
             ->setMdp(password_hash($nouveauMdp, PASSWORD_DEFAULT))
@@ -55,6 +57,7 @@ class EditUtilisateurActionTest extends ActionTestCase
 {
     "genre": "{$aliceModifiee->getGenre()}",
     "identifiant": "{$aliceModifiee->getIdentifiant()}",
+    "email": "{$aliceModifiee->getEmail()}",
     "mdp": "{$nouveauMdp}",
     "nom": "{$aliceModifiee->getNom()}",
     "estAdmin": $estAdmin
@@ -66,6 +69,7 @@ EOT
         $estAdmin = json_encode($aliceModifiee->getEstAdmin());
         $json = <<<EOT
 {
+    "email": "{$aliceModifiee->getEmail()}",
     "estAdmin": $estAdmin,
     "genre": "{$aliceModifiee->getGenre()}",
     "id": {$aliceModifiee->getId()},
@@ -88,7 +92,8 @@ EOT;
         $mdp = $this->mdpalice;
         /** @var DoctrineUtilisateur */
         $aliceModifiee = (new DoctrineUtilisateur($this->alice->getId()))
-            ->setIdentifiant('alice2@tkdo.org')
+            ->setIdentifiant('alice2')
+            ->setEmail('alice2@tkdo.org')
             ->setNom('Alice2')
             ->setGenre('M')
             ->setMdp(password_hash($mdp, PASSWORD_DEFAULT))
@@ -119,6 +124,7 @@ EOT;
 {
     "genre": "{$aliceModifiee->getGenre()}",
     "identifiant": "{$aliceModifiee->getIdentifiant()}",
+    "email": "{$aliceModifiee->getEmail()}",
     "nom": "{$aliceModifiee->getNom()}",
     "estAdmin": $estAdmin
 }
@@ -129,6 +135,7 @@ EOT
         $estAdmin = json_encode($aliceModifiee->getEstAdmin());
         $json = <<<EOT
 {
+    "email": "{$aliceModifiee->getEmail()}",
     "estAdmin": $estAdmin,
     "genre": "{$aliceModifiee->getGenre()}",
     "id": {$aliceModifiee->getId()},
@@ -151,25 +158,17 @@ EOT;
          * @var DoctrineUtilisateur
          */
         $aliceModifiee = (new DoctrineUtilisateur($this->alice->getId()))
-            ->setIdentifiant('alice2@tkdo.org')
-            ->setNom('Alice2')
-            ->setGenre('M')
-            ->setMdp('nouveaumdpalice')
             ->setEstAdmin(!$this->alice->getEstAdmin());
 
         $this->expectException(HttpForbiddenException::class);
         $this->handleAuthRequest(
-            $this->bob->getId(),
-            true,
+            $this->alice->getId(),
+            false,
             'PUT',
             "/utilisateur/{$this->alice->getId()}",
             '',
             <<<EOT
 {
-    "genre": "{$aliceModifiee->getGenre()}",
-    "identifiant": "{$aliceModifiee->getIdentifiant()}",
-    "mdp": "{$aliceModifiee->getMdp()}",
-    "nom": "{$aliceModifiee->getNom()}",
     "estAdmin": "{$aliceModifiee->getEstAdmin()}"
 }
 
@@ -188,11 +187,7 @@ EOT
          * @var DoctrineUtilisateur
          */
         $aliceModifiee = (new DoctrineUtilisateur($this->alice->getId()))
-            ->setIdentifiant('alice2@tkdo.org')
-            ->setNom('Alice2')
-            ->setGenre('M')
-            ->setMdp('nouveaumdpalice')
-            ->setEstAdmin($this->alice->getEstAdmin());
+            ->setMdp('nouveaumdpalice');
 
         $this->expectException(HttpForbiddenException::class);
         $this->handleAuthRequest(
@@ -203,10 +198,7 @@ EOT
             '',
             <<<EOT
 {
-    "genre": "{$aliceModifiee->getGenre()}",
-    "identifiant": "{$aliceModifiee->getIdentifiant()}",
-    "mdp": "{$aliceModifiee->getMdp()}",
-    "nom": "{$aliceModifiee->getNom()}"
+    "mdp": "{$aliceModifiee->getMdp()}"
 }
 
 EOT
@@ -245,5 +237,33 @@ EOT
     {
         $this->expectException(HttpUnauthorizedException::class);
         $this->handleRequest('PUT', "/utilisateur/{$this->alice->getId()}");
+    }
+
+    public function testActionEmailInvalide()
+    {
+        $this->utilisateurRepositoryProphecy
+            ->read($this->alice->getId())
+            ->willReturn($this->alice)
+            ->shouldBeCalledOnce();
+
+        /** @var DoctrineUtilisateur */
+        $aliceModifiee = (new DoctrineUtilisateur($this->alice->getId()))
+            ->setEmail('alice.tkdo.org');
+
+        $this->expectException(HttpBadRequestException::class);
+        $this->expectExceptionMessage("{$aliceModifiee->getEmail()} n'est pas un email valide");
+        $this->handleAuthRequest(
+            $this->alice->getId(),
+            $this->alice->getEstAdmin(),
+            'PUT',
+            "/utilisateur/{$this->alice->getId()}",
+            '',
+            <<<EOT
+{
+    "email": "{$aliceModifiee->getEmail()}"
+}
+
+EOT
+        );
     }
 }

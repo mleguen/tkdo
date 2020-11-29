@@ -30,12 +30,19 @@ class FixturesLoadCommand extends DoctrineCommand {
         null,
         InputOption::VALUE_NONE,
         'Jeu de données de production'
+      )
+      ->addOption(
+        'admin-email',
+        null,
+        InputOption::VALUE_OPTIONAL,
+        'E-mail administrateur'
       );
   }
 
   protected function execute(InputInterface $input, OutputInterface $output): int
   {
     $prod = $input->getOption('prod');
+    $adminEmail = $input->hasOption('admin-email') ? $input->getOption('admin-email') : null;
     
     /**
      * @var EntityManager
@@ -43,14 +50,14 @@ class FixturesLoadCommand extends DoctrineCommand {
     $em = $this->getDependencyFactory()->getEntityManager();
 
     $loader = new Loader();
-    $loader->addFixture(new DoctrineUtilisateurFixture($output, $prod));
+    $loader->addFixture(new DoctrineUtilisateurFixture($output, $prod, $adminEmail));
     $loader->addFixture(new DoctrineOccasionFixture($output, $prod));
     $loader->addFixture(new DoctrineIdeeFixture($output, $prod));
     $loader->addFixture(new DoctrineResultatFixture($output, $prod));
 
     $purger = new ORMPurger();
     $executor = new ORMExecutor($em, $purger);
-    $output->writeln(['Initialisation ou réinitialisation de la base de données' . ($prod ? ' (production)' : '(tests)') . '...']);
+    $output->writeln(['Initialisation ou réinitialisation de la base de données (' . ($prod ? 'production' : 'tests') . ')...']);
     $executor->execute($loader->getFixtures());
     $output->writeln(['OK']);
 

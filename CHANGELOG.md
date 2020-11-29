@@ -1,5 +1,13 @@
 # Historique des changements
 
+## Prochaine version
+
+- ajout de l'email au profil utilisateur, pour le notifier :
+  - à la création de son compte
+  - à la réinitialisation de son mot de passe
+  - à sa participation à une nouvelle occasion
+  - à l'ajout d'un résultat de tirage le concernant
+
 ## V1.1.0 (29/11/2020)
 
 - un menu "Mes occasions" permet d'accéder à toutes les occasions

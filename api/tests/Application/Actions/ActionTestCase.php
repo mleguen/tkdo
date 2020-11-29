@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Tests\Application\Actions;
 
 use App\Application\Service\AuthService;
+use App\Application\Service\MailerService;
 use App\Domain\Idee\IdeeRepository;
 use App\Domain\Occasion\OccasionRepository;
 use App\Domain\Resultat\ResultatRepository;
@@ -60,26 +61,32 @@ abstract class ActionTestCase extends TestCase
 
         $this->utilisateurRepositoryProphecy = $this->prophesize(UtilisateurRepository::class);
         $this->container->set(UtilisateurRepository::class, $this->utilisateurRepositoryProphecy->reveal());
-        
+
+        $this->mailerServiceProphecy = $this->prophesize(MailerService::class);
+        $this->container->set(MailerService::class, $this->mailerServiceProphecy->reveal());
+
         $this->authService = $this->container->get(AuthService::class);
 
         $this->mdpalice = 'mdpalice';
         $this->alice = (new DoctrineUtilisateur(1))
-            ->setIdentifiant('alice@tkdo.org')
+            ->setIdentifiant('alice')
+            ->setEmail('alice@tkdo.org')
             ->setNom('Alice')
             ->setMdp(password_hash($this->mdpalice, PASSWORD_DEFAULT))
             ->setGenre(Genre::Feminin)
             ->setEstAdmin(true);
         $this->mdpbob = 'mdpbob';
         $this->bob = (new DoctrineUtilisateur(2))
-            ->setIdentifiant('bob@tkdo.org')
+            ->setIdentifiant('bob')
+            ->setEmail('bob@tkdo.org')
             ->setNom('Bob')
             ->setMdp(password_hash($this->mdpbob, PASSWORD_DEFAULT))
             ->setGenre(Genre::Masculin)
             ->setEstAdmin(false);
         $this->mdpcharlie = 'mdpcharlie';
         $this->charlie = (new DoctrineUtilisateur(3))
-            ->setIdentifiant('charlie@tkdo.org')
+            ->setIdentifiant('charlie')
+            ->setEmail('charlie@tkdo.org')
             ->setNom('Charlie')
             ->setMdp(password_hash($this->mdpcharlie, PASSWORD_DEFAULT))
             ->setGenre(Genre::Masculin)

@@ -30,6 +30,14 @@ class InMemoryUtilisateurReference implements Utilisateur
   /**
    * {@inheritdoc}
    */
+  public function getEmail(): string
+  {
+    throw new ReferenceException();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getEstAdmin(): bool
   {
     throw new ReferenceException();
@@ -63,6 +71,14 @@ class InMemoryUtilisateurReference implements Utilisateur
    * {@inheritdoc}
    */
   public function getNom(): string
+  {
+    throw new ReferenceException();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setEmail(string $email): Utilisateur
   {
     throw new ReferenceException();
   }

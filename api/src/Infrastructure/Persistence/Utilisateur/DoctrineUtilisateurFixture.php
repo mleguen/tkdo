@@ -5,48 +5,62 @@ namespace App\Infrastructure\Persistence\Utilisateur;
 use App\Domain\Utilisateur\Genre;
 use App\Infrastructure\Persistence\DoctrineAbstractFixture;
 use Doctrine\Persistence\ObjectManager;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class DoctrineUtilisateurFixture extends DoctrineAbstractFixture
 {
+    public function __construct(OutputInterface $output, bool $prod, string $adminEmail = null)
+    {
+        parent::__construct($output, $prod);
+        if ($prod && !isset($adminEmail)) throw new \Exception('email administrateur manquant');
+        $this->adminEmail = $adminEmail;
+    }
+
     public function load(ObjectManager $em)
     {
         if ($this->prod) {
             $utilisateurs = [
                 'admin' => (new DoctrineUtilisateur())
-                    ->setIdentifiant('admin')
-                    ->setNom('Administrateur')
-                    ->setMdp(password_hash('admin', PASSWORD_DEFAULT))
+                    ->setEmail($this->adminEmail)
+                    ->setEstAdmin(true)
                     ->setGenre(Genre::Masculin)
-                    ->setEstAdmin(true),
+                    ->setIdentifiant('admin')
+                    ->setMdp(password_hash('admin', PASSWORD_DEFAULT))
+                    ->setNom('Administrateur'),
             ];
         } else {
             $utilisateurs = [
                 'alice' => (new DoctrineUtilisateur())
-                    ->setIdentifiant('alice@tkdo.org')
-                    ->setNom('Alice')
-                    ->setMdp(password_hash('mdpalice', PASSWORD_DEFAULT))
+                    ->setEmail('alice@tkdo.org')
+                    ->setEstAdmin(true)
                     ->setGenre(Genre::Feminin)
-                    ->setEstAdmin(true),
+                    ->setIdentifiant('alice')
+                    ->setNom('Alice')
+                    ->setMdp(password_hash('mdpalice', PASSWORD_DEFAULT)),
                 'bob' => (new DoctrineUtilisateur())
-                    ->setIdentifiant('bob@tkdo.org')
+                    ->setEmail('bob@tkdo.org')
+                    ->setGenre(Genre::Masculin)
+                    ->setIdentifiant('bob')
                     ->setNom('Bob')
-                    ->setMdp(password_hash('mdpbob', PASSWORD_DEFAULT))
-                    ->setGenre(Genre::Masculin),
+                    ->setMdp(password_hash('mdpbob', PASSWORD_DEFAULT)),
                 'charlie' => (new DoctrineUtilisateur())
-                    ->setIdentifiant('charlie@tkdo.org')
-                    ->setNom('Charlie')
+                    ->setEmail('charlie@tkdo.org')
+                    ->setGenre(Genre::Masculin)
+                    ->setIdentifiant('charlie')
                     ->setMdp(password_hash('mdpcharlie', PASSWORD_DEFAULT))
-                    ->setGenre(Genre::Masculin),
+                    ->setNom('Charlie'),
                 'david' => (new DoctrineUtilisateur())
-                    ->setIdentifiant('david@tkdo.org')
-                    ->setNom('David')
+                    ->setEmail('david@tkdo.org')
+                    ->setGenre(Genre::Masculin)
+                    ->setIdentifiant('david')
                     ->setMdp(password_hash('mdpdavid', PASSWORD_DEFAULT))
-                    ->setGenre(Genre::Masculin),
+                    ->setNom('David'),
                 'eve' => (new DoctrineUtilisateur())
-                    ->setIdentifiant('eve@tkdo.org')
-                    ->setNom('Eve')
+                    ->setEmail('eve@tkdo.org')
+                    ->setGenre(Genre::Feminin)
+                    ->setIdentifiant('eve')
                     ->setMdp(password_hash('mdpeve', PASSWORD_DEFAULT))
-                    ->setGenre(Genre::Feminin),
+                    ->setNom('Eve'),
             ];
         }
         foreach($utilisateurs as $nom => $utilisateur) {

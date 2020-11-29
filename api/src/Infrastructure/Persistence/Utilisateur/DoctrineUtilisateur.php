@@ -19,6 +19,12 @@ class DoctrineUtilisateur implements Utilisateur
 {
 
   /**
+   * @var string
+   * @Column()
+   */
+  private $email;
+
+  /**
    * @var bool
    * @Column(type="boolean")
    */
@@ -40,7 +46,7 @@ class DoctrineUtilisateur implements Utilisateur
 
   /**
    * @var string
-   * @Column()
+   * @Column(unique=true)
    */
   private $identifiant;
 
@@ -59,6 +65,14 @@ class DoctrineUtilisateur implements Utilisateur
   public function __construct(?int $id = NULL)
   {
     if (isset($id)) $this->id = $id;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getEmail(): string
+  {
+    return $this->email;
   }
 
   /**
@@ -104,6 +118,15 @@ class DoctrineUtilisateur implements Utilisateur
   public function getNom(): string
   {
     return $this->nom;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setEmail(string $email): Utilisateur
+  {
+    $this->email = $email;
+    return $this;
   }
 
   /**

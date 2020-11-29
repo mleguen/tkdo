@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 use App\Application\Service\AuthService;
+use App\Application\Service\MailerService;
 use App\Application\Service\PasswordService;
 use DI\ContainerBuilder;
 use Monolog\Handler\StreamHandler;
@@ -28,6 +29,9 @@ return function (ContainerBuilder $containerBuilder) {
         },
         AuthService::class => function (ContainerInterface $c) {
             return new AuthService($c->get('settings')['auth']);
+        },
+        MailerService::class => function (ContainerInterface $c) {
+            return new MailerService($c->get('settings')['mailer']);
         },
         PasswordService::class => function () {
             return new PasswordService();

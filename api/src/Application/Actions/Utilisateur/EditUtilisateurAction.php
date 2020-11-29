@@ -16,6 +16,10 @@ class EditUtilisateurAction extends OneUtilisateurAction
     $body = $this->getFormData();
     $utilisateur = $this->utilisateurRepository->read($this->idUtilisateur);
     if (isset($body['identifiant'])) $utilisateur->setIdentifiant($body['identifiant']);
+    if (isset($body['email'])) {
+      $this->assertEstEmail($body['email']);
+      $utilisateur->setEmail($body['email']);
+    }
     if (isset($body['nom'])) $utilisateur->setNom($body['nom']);
     if (isset($body['genre'])) $utilisateur->setGenre($body['genre']);
 

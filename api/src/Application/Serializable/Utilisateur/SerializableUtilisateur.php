@@ -11,13 +11,11 @@ class SerializableUtilisateur implements JsonSerializable
 {
   private $utilisateur;
   private $complet;
-  private $mdp;
 
-  public function __construct(Utilisateur $utilisateur, bool $complet = false, string $mdp = null)
+  public function __construct(Utilisateur $utilisateur, bool $complet = false)
   {
     $this->utilisateur = $utilisateur;
     $this->complet = $complet;
-    $this->mdp = $mdp;
   }
 
   public function jsonSerialize(): array
@@ -29,10 +27,10 @@ class SerializableUtilisateur implements JsonSerializable
     ];
     if ($this->complet) {
       $data = array_merge($data, [
+        'email' => $this->utilisateur->getEmail(),
         'estAdmin' => $this->utilisateur->getEstAdmin(),
         'identifiant' => $this->utilisateur->getIdentifiant(),
       ]);
-      if (isset($this->mdp)) $data['mdp'] = $this->mdp;
       ksort($data);
     }
     return $data;

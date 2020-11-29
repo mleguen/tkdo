@@ -19,7 +19,8 @@ interface UtilisateurAvecMdp extends UtilisateurPrive {
 
 const alice: UtilisateurAvecMdp = {
   id: 0,
-  identifiant: 'alice@tkdo.org',
+  identifiant: 'alice',
+  email: 'alice@tkdo.org',
   nom: 'Alice',
   mdp: 'mdpalice',
   genre: Genre.Feminin,
@@ -28,7 +29,8 @@ const alice: UtilisateurAvecMdp = {
 
 const bob: UtilisateurAvecMdp = {
   id: 1,
-  identifiant: 'bob@tkdo.org',
+  identifiant: 'bob',
+  email: 'bob@tkdo.org',
   nom: 'Bob',
   mdp: 'mdpbob',
   genre: Genre.Masculin,
@@ -37,7 +39,8 @@ const bob: UtilisateurAvecMdp = {
 
 const charlie: UtilisateurAvecMdp = {
   id: 2,
-  identifiant: 'charlie@tkdo.org',
+  identifiant: 'charlie',
+  email: 'charlie@tkdo.org',
   nom: 'Charlie',
   mdp: 'mdpcharlie',
   genre: Genre.Masculin,
@@ -46,7 +49,8 @@ const charlie: UtilisateurAvecMdp = {
 
 const david: UtilisateurAvecMdp = {
   id: 3,
-  identifiant: 'david@tkdo.org',
+  identifiant: 'david',
+  email: 'david@tkdo.org',
   nom: 'David',
   mdp: 'mdpdavid',
   genre: Genre.Masculin,
@@ -55,7 +59,8 @@ const david: UtilisateurAvecMdp = {
 
 const eve: UtilisateurAvecMdp = {
   id: 4,
-  identifiant: 'eve@tkdo.org',
+  identifiant: 'eve',
+  email: 'eve@tkdo.org',
   nom: 'Eve',
   mdp: 'mdpeve',
   genre: Genre.Feminin,
@@ -195,18 +200,11 @@ export class DevBackendInterceptor implements HttpInterceptor {
       if (!authorizedUser()) return unauthorized();
 
       const utilisateur = utilisateursAvecMdp.find(u => u.id === idUtilisateur);
-      const { nom, mdp, genre } = body as any;
+      const { email, nom, mdp, genre } = body as any;
 
-      if (nom !== utilisateur.nom) {
-        if (utilisateursAvecMdp.filter(p => p.id !== idUtilisateur).map(p => p.nom).includes(nom)) {
-          return badRequest('Ce nom est déjà utilisé');
-        }
-
-        utilisateur.nom = nom;      
-      }
-
+      if (email) utilisateur.email = email;
+      if (nom) utilisateur.nom = nom;
       if (mdp) utilisateur.mdp = mdp;
-
       if (genre) utilisateur.genre = genre;
 
       return ok();
@@ -303,7 +301,7 @@ export const devBackendInterceptorProvider: Provider = {
 };
 
 function enleveDonneesPrivees(u: UtilisateurAvecMdp): Utilisateur {
-  let { estAdmin, identifiant, ...donneesPubliques } = enleveMdp(u);
+  let { email, estAdmin, identifiant, ...donneesPubliques } = enleveMdp(u);
   return donneesPubliques;
 }
 
