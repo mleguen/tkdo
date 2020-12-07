@@ -23,8 +23,8 @@ class CreateIdeeActionTest extends ActionTestCase
     {
         parent::setUp();
         $this->utilisateurRepositoryProphecy
-            ->read($this->alice->getId(), true)
-            ->willReturn(new InMemoryUtilisateurReference($this->alice->getId()));
+            ->read($this->alice->getId())
+            ->willReturn($this->alice);
         $this->utilisateurRepositoryProphecy
             ->read($this->bob->getId(), true)
             ->willReturn(new InMemoryUtilisateurReference($this->bob->getId()));
@@ -35,27 +35,38 @@ class CreateIdeeActionTest extends ActionTestCase
             ->setDescription('un gauffrier')
             ->setAuteur($this->bob)
             ->setDateProposition(new \DateTime);
+
+        $this->utilisateurRepositoryProphecy
+            ->readAllByNotifInstantaneePourIdees($this->idee->getUtilisateur()->getId(), Argument::cetera())
+            ->willReturn([]);
     }
 
-    public function testAction()
+    /**
+     * @dataProvider providerAction
+     */
+    public function testAction(bool $estAdmin)
     {
+        $testCase = $this;
         $callTime = new \DateTime();
+        /** @var \DateTime */
+        $dateProposition = null;
         $this->ideeRepositoryProphecy
-            ->create(
-                new InMemoryUtilisateurReference($this->idee->getUtilisateur()->getId()),
-                $this->idee->getDescription(),
-                new InMemoryUtilisateurReference($this->idee->getAuteur()->getId()),
-                Argument::that(function (\DateTime $dateProposition) use ($callTime) {
-                    $now = new \DateTime();
-                    return ($dateProposition >= $callTime) && ($dateProposition <= $now);
-                })
-            )
-            ->willReturn($this->idee)
+            ->create(Argument::cetera())
+            ->will(function ($args) use ($testCase, $callTime, &$dateProposition) {
+                $testCase->assertEquals($testCase->idee->getUtilisateur(), $args[0]);
+                $testCase->assertEquals($testCase->idee->getDescription(), $args[1]);
+                $testCase->assertEquals($testCase->idee->getAuteur()->getId(), $args[2]->getId());
+
+                $dateProposition = $args[3];
+                $testCase->assertGreaterThanOrEqual($callTime, $dateProposition);
+                $testCase->assertLessThanOrEqual(new \DateTime(), $dateProposition);
+                return $testCase->idee;
+            })
             ->shouldBeCalledOnce();
 
         $response = $this->handleAuthRequest(
-            $this->idee->getAuteur()->getId(),
-            false,
+            $estAdmin ? $this->charlie->getId() : $this->idee->getAuteur()->getId(),
+            $estAdmin,
             'POST',
             "/idee",
             '',
@@ -69,6 +80,7 @@ class CreateIdeeActionTest extends ActionTestCase
 EOT
         );
 
+        $this->assertNotNull($dateProposition);
         $json = <<<EOT
 {
     "id": {$this->idee->getId()},
@@ -78,11 +90,23 @@ EOT
         "id": {$this->idee->getAuteur()->getId()},
         "nom": "{$this->idee->getAuteur()->getNom()}"
     },
-    "dateProposition": "{$this->idee->getDateProposition()->format(\DateTimeInterface::ISO8601)}"
+    "dateProposition": "{$dateProposition->format(\DateTimeInterface::ISO8601)}"
 }
 
 EOT;
         $this->assertEquals($json, (string)$response->getBody());
+    }
+
+    public function providerAction()
+    {
+        return [
+            [ // L'auteur de l'idée
+                'estAdmin' => false,
+            ],
+            [ // Un administrateur
+                'estAdmin' => true,
+            ],
+        ];
     }
 
     public function testActionPasLAuteur()

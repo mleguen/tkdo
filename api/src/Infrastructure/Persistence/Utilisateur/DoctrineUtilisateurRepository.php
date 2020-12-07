@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Persistence\Utilisateur;
 
+use App\Domain\Utilisateur\PrefNotifIdees;
 use App\Domain\Utilisateur\Utilisateur;
 use App\Domain\Utilisateur\UtilisateurNotFoundException;
 use App\Domain\Utilisateur\UtilisateurRepository;
+use App\Infrastructure\Persistence\Occasion\DoctrineOccasion;
 use Doctrine\ORM\EntityManager;
 
 class DoctrineUtilisateurRepository implements UtilisateurRepository
@@ -30,7 +32,8 @@ class DoctrineUtilisateurRepository implements UtilisateurRepository
         string $mdp,
         string $nom,
         string $genre,
-        bool $estAdmin
+        bool $estAdmin,
+        string $prefNotifIdees
     ): Utilisateur
     {
         $utilisateur = (new DoctrineUtilisateur())
@@ -39,7 +42,8 @@ class DoctrineUtilisateurRepository implements UtilisateurRepository
             ->setMdp($mdp)
             ->setNom($nom)
             ->setGenre($genre)
-            ->setEstAdmin($estAdmin);
+            ->setEstAdmin($estAdmin)
+            ->setPrefNotifIdees($prefNotifIdees);
         $this->em->persist($utilisateur);
         $this->em->flush();
         return $utilisateur;
@@ -63,6 +67,28 @@ class DoctrineUtilisateurRepository implements UtilisateurRepository
     {
         $utilisateurs = $this->em->getRepository(DoctrineUtilisateur::class)->findAll();
         return $utilisateurs;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function readAllByNotifInstantaneePourIdees(int $idUtilisateur, int $idActeur): array
+    {
+        return $this->em->createQueryBuilder()
+            ->select('u')
+            ->distinct()
+            ->from(DoctrineUtilisateur::class, 'u')
+            ->innerJoin(DoctrineOccasion::class, 'o', 'u.id MEMBER OF o.participants')
+            ->where('u.prefNotifIdees = :prefNotifIdees')
+            ->andWhere('u.id <> :idUtilisateur')
+            ->andWhere('u.id <> :idActeur')
+            ->andWhere('o.date > CURRENT_TIMESTAMP()')
+            ->andWhere(':idUtilisateur MEMBER OF o.participants')
+            ->setParameter('prefNotifIdees', PrefNotifIdees::Instantanee)
+            ->setParameter('idUtilisateur', $idUtilisateur)
+            ->setParameter('idActeur', $idActeur)
+            ->getQuery()
+            ->getResult();
     }
 
     /**

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\Service;
 
+use App\Domain\Idee\Idee;
 use App\Domain\Occasion\Occasion;
 use App\Domain\Resultat\Resultat;
 use App\Domain\Utilisateur\Utilisateur;
@@ -15,12 +16,18 @@ class MailerService
   const MODE_FILE = 'file';
   const MODE_MAIL = 'mail';
 
+  const SIGNATURE = <<<EOS
+Cordialement,
+Votre administrateur Tkdo.
+EOS;
+
   private $settings;
 
   public function __construct(array $settings = [])
   {
     $this->settings = array_merge([
       'mode' => self::MODE_MAIL,
+      'signature' => self::SIGNATURE
     ], $settings);
 
     if ($this->settings['mode'] === self::MODE_FILE) {
@@ -38,13 +45,13 @@ class MailerService
 
   public function envoieMailCreationUtilisateur(
     ServerRequestInterface $request,
-    Utilisateur $utilisateur,
+    Utilisateur $destinataire,
     string $mdp
   ): bool
   {
     return $this->envoieMailMdp(
       $request,
-      $utilisateur,
+      $destinataire,
       $mdp,
       'Création de votre compte',
       "Votre compte Tkdo (tirages cadeaux) vient d'être créé"
@@ -53,13 +60,13 @@ class MailerService
 
   public function envoieMailReinitialisationMdp(
     ServerRequestInterface $request,
-    Utilisateur $utilisateur,
+    Utilisateur $destinataire,
     string $mdp
   ): bool
   {
     return $this->envoieMailMdp(
       $request,
-      $utilisateur,
+      $destinataire,
       $mdp,
       'Réinitialisation de votre mot de passe',
       'Le mot de passe de votre compte Tkdo (tirages cadeaux) a été réinitialisé'
@@ -68,7 +75,7 @@ class MailerService
 
   private function envoieMailMdp(
     ServerRequestInterface $request,
-    Utilisateur $utilisateur,
+    Utilisateur $destinataire,
     string $mdp,
     string $sujet,
     string $motif
@@ -76,36 +83,35 @@ class MailerService
   {
     return $this->mail(
       $request,
-      $utilisateur->getEmail(),
+      $destinataire->getEmail(),
       $sujet,
       <<<EOS
-Bonjour {$utilisateur->getNom()},
+Bonjour {$destinataire->getNom()},
 
 $motif.
 
 Pour accéder à l'application, connectez vous à {$this->getUri($request)}
 avec les identifiants suivants :
-- identifiant : {$utilisateur->getIdentifiant()}
+- identifiant : {$destinataire->getIdentifiant()}
 - mot de passe : $mdp
 
-Cordialement,
-Votre administrateur Tkdo.
+{$this->settings['signature']}
 EOS
     );
   }
 
   public function envoieMailAjoutParticipant(
     ServerRequestInterface $request,
-    Utilisateur $utilisateur,
+    Utilisateur $destinataire,
     Occasion $occasion
   ): bool
   {
     return $this->mail(
       $request,
-      $utilisateur->getEmail(),
+      $destinataire->getEmail(),
       "Participation au tirage cadeaux {$occasion->getTitre()}",
       <<<EOS
-Bonjour {$utilisateur->getNom()},
+Bonjour {$destinataire->getNom()},
 
 Vous participez désormais au tirage cadeaux {$occasion->getTitre()}.
 
@@ -113,32 +119,87 @@ Pour découvrir les noms des autres participants,
 et commencer à proposer des idées de cadeaux,
 rendez-vous sur {$this->getUri($request, "/occasion/{$occasion->getId()}")}
 
-Cordialement,
-Votre administrateur Tkdo.
+{$this->settings['signature']}
 EOS
     );
   }
 
   public function envoieMailTirageFait(
     ServerRequestInterface $request,
-    Utilisateur $utilisateur,
+    Utilisateur $destinataire,
     Occasion $occasion
   ): bool
   {
     return $this->mail(
       $request,
-      $utilisateur->getEmail(),
+      $destinataire->getEmail(),
       "Tirage au sort fait pour {$occasion->getTitre()}",
       <<<EOS
-Bonjour {$utilisateur->getNom()},
+Bonjour {$destinataire->getNom()},
 
 Le tirage au sort est fait pour '{$occasion->getTitre()}' !
 
 Pour découvrir à qui vous aurez le plaisir de faire un cadeau,
 rendez-vous sur {$this->getUri($request, "/occasion/{$occasion->getId()}")}
 
-Cordialement,
-Votre administrateur Tkdo.
+{$this->settings['signature']}
+EOS
+    );
+  }
+
+  public function envoieMailCreationIdee(
+    ServerRequestInterface $request,
+    Utilisateur $destinataire,
+    Utilisateur $utilisateur,
+    Idee $idee
+  ): bool
+  {
+    return $this->envoieMailIdee(
+      $request,
+      $destinataire,
+      $utilisateur,
+      "Nouvelle idée de cadeau pour {$utilisateur->getNom()}",
+      "Une nouvelle idée de cadeau a été proposée pour {$utilisateur->getNom()} :\n\n  > {$idee->getDescription()}"
+    );
+  }
+
+  public function envoieMailSuppressionIdee(
+    ServerRequestInterface $request,
+    Utilisateur $destinataire,
+    Utilisateur $utilisateur,
+    Idee $idee
+  ): bool
+  {
+    return $this->envoieMailIdee(
+      $request,
+      $destinataire,
+      $utilisateur,
+      "Idée de cadeau supprimée pour {$utilisateur->getNom()}",
+      "L'idée de cadeau pour {$utilisateur->getNom()} ci-dessous a été retirée de sa liste :\n\n  > {$idee->getDescription()}"
+    );
+  }
+
+  private function envoieMailIdee(
+    ServerRequestInterface $request,
+    Utilisateur $destinataire,
+    Utilisateur $utilisateur,
+    string $sujet,
+    string $motif
+  ): bool
+  {
+    return $this->mail(
+      $request,
+      $destinataire->getEmail(),
+      $sujet,
+      <<<EOS
+Bonjour {$destinataire->getNom()},
+
+$motif
+
+Pour consulter la liste d'idée de {$utilisateur->getNom()},
+rendez-vous sur {$this->getUri($request, '/idee', "idUtilisateur={$utilisateur->getId()}")}
+
+{$this->settings['signature']}
 EOS
     );
   }

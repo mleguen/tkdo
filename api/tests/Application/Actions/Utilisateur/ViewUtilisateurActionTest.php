@@ -33,7 +33,8 @@ class ViewUtilisateurActionTest extends ActionTestCase
     "genre": "{$this->alice->getGenre()}",
     "id": {$this->alice->getId()},
     "identifiant": "{$this->alice->getIdentifiant()}",
-    "nom": "{$this->alice->getNom()}"
+    "nom": "{$this->alice->getNom()}",
+    "prefNotifIdees": "{$this->alice->getPrefNotifIdees()}"
 }
 
 EOT;
@@ -62,7 +63,8 @@ EOT;
     "genre": "{$this->alice->getGenre()}",
     "id": {$this->alice->getId()},
     "identifiant": "{$this->alice->getIdentifiant()}",
-    "nom": "{$this->alice->getNom()}"
+    "nom": "{$this->alice->getNom()}",
+    "prefNotifIdees": "{$this->alice->getPrefNotifIdees()}"
 }
 
 EOT;

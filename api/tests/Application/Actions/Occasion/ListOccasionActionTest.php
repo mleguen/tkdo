@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Tests\Application\Actions\Occasion;
 
 use App\Infrastructure\Persistence\Occasion\DoctrineOccasion;
-use Slim\Exception\HttpBadRequestException;
+use DateTimeInterface;
 use Slim\Exception\HttpForbiddenException;
 use Slim\Exception\HttpUnauthorizedException;
 use Tests\Application\Actions\ActionTestCase;
@@ -17,9 +17,11 @@ class ListOccasionActionTest extends ActionTestCase
     public function testAction($estAdmin)
     {
         $occasion1 = (new DoctrineOccasion(1))
-            ->setTitre('Noel 2020');
+            ->setDate(new \DateTime('tomorrow'))
+            ->setTitre('Demain');
         $occasion2 = (new DoctrineOccasion(2))
-            ->setTitre('Noel 2019');
+            ->setDate(new \DateTime('yesterday'))
+            ->setTitre('Hier');
         $this->occasionRepositoryProphecy
             ->readByParticipant($this->bob->getId())
             ->willReturn([$occasion1, $occasion2])
@@ -37,10 +39,12 @@ class ListOccasionActionTest extends ActionTestCase
 [
     {
         "id": {$occasion1->getId()},
+        "date": "{$occasion1->getDate()->format(DateTimeInterface::W3C)}",
         "titre": "{$occasion1->getTitre()}"
     },
     {
         "id": {$occasion2->getId()},
+        "date": "{$occasion2->getDate()->format(DateTimeInterface::W3C)}",
         "titre": "{$occasion2->getTitre()}"
     }
 ]
@@ -81,9 +85,11 @@ EOT;
     public function testActionSansIdParticipantAdmin()
     {
         $occasion1 = (new DoctrineOccasion(1))
-            ->setTitre('Noel 2020');
+            ->setDate(new \DateTime('tomorrow'))
+            ->setTitre('Demain');
         $occasion2 = (new DoctrineOccasion(2))
-            ->setTitre('Noel 2019');
+            ->setDate(new \DateTime('yesterday'))
+            ->setTitre('Hier');
         $this->occasionRepositoryProphecy
             ->readAll()
             ->willReturn([$occasion1, $occasion2])
@@ -100,10 +106,12 @@ EOT;
 [
     {
         "id": {$occasion1->getId()},
+        "date": "{$occasion1->getDate()->format(DateTimeInterface::W3C)}",
         "titre": "{$occasion1->getTitre()}"
     },
     {
         "id": {$occasion2->getId()},
+        "date": "{$occasion2->getDate()->format(DateTimeInterface::W3C)}",
         "titre": "{$occasion2->getTitre()}"
     }
 ]

@@ -10,7 +10,7 @@ import {
 } from '@angular/common/http';
 import { Observable, of, throwError } from 'rxjs';
 import { mergeMap, materialize, dematerialize, delay } from 'rxjs/operators';
-import { Genre, Idee, Occasion, Utilisateur, UtilisateurPrive } from './backend.service';
+import { Genre, Idee, Occasion, PrefNotifIdees, Utilisateur, UtilisateurPrive } from './backend.service';
 import * as moment from 'moment';
 
 interface UtilisateurAvecMdp extends UtilisateurPrive {
@@ -25,6 +25,7 @@ const alice: UtilisateurAvecMdp = {
   mdp: 'mdpalice',
   genre: Genre.Feminin,
   estAdmin: true,
+  prefNotifIdees: PrefNotifIdees.Aucune,
 };
 
 const bob: UtilisateurAvecMdp = {
@@ -35,6 +36,7 @@ const bob: UtilisateurAvecMdp = {
   mdp: 'mdpbob',
   genre: Genre.Masculin,
   estAdmin: false,
+  prefNotifIdees: PrefNotifIdees.Instantanee,
 };
 
 const charlie: UtilisateurAvecMdp = {
@@ -45,6 +47,7 @@ const charlie: UtilisateurAvecMdp = {
   mdp: 'mdpcharlie',
   genre: Genre.Masculin,
   estAdmin: false,
+  prefNotifIdees: PrefNotifIdees.Instantanee,
 };
 
 const david: UtilisateurAvecMdp = {
@@ -55,6 +58,7 @@ const david: UtilisateurAvecMdp = {
   mdp: 'mdpdavid',
   genre: Genre.Masculin,
   estAdmin: false,
+  prefNotifIdees: PrefNotifIdees.Aucune,
 };
 
 const eve: UtilisateurAvecMdp = {
@@ -65,6 +69,7 @@ const eve: UtilisateurAvecMdp = {
   mdp: 'mdpeve',
   genre: Genre.Feminin,
   estAdmin: false,
+  prefNotifIdees: PrefNotifIdees.Aucune,
 };
 
 const utilisateursAvecMdp = [alice, bob, charlie, david, eve];
@@ -72,7 +77,8 @@ const utilisateursAvecMdp = [alice, bob, charlie, david, eve];
 const occasions: Occasion[] = [
   {
     id: 0,
-    titre: 'Noël 2019',
+    date: new Date(Date.now() - 24 * 3600 * 1000).toJSON(),
+    titre: 'Hier',
     participants: [alice, bob, charlie, david],
     resultats: [
       {
@@ -95,7 +101,8 @@ const occasions: Occasion[] = [
   },
   {
     id: 1,
-    titre: 'Noël 2020',
+    date: new Date(Date.now() + 24 * 3600 * 1000).toJSON(),
+    titre: 'Demain',
     participants: [alice, bob, charlie],
     resultats: [
       {
@@ -200,12 +207,13 @@ export class DevBackendInterceptor implements HttpInterceptor {
       if (!authorizedUser()) return unauthorized();
 
       const utilisateur = utilisateursAvecMdp.find(u => u.id === idUtilisateur);
-      const { email, nom, mdp, genre } = body as any;
+      const { email, nom, mdp, genre, prefNotifIdees } = body as any;
 
       if (email) utilisateur.email = email;
       if (nom) utilisateur.nom = nom;
       if (mdp) utilisateur.mdp = mdp;
       if (genre) utilisateur.genre = genre;
+      if (prefNotifIdees) utilisateur.prefNotifIdees = prefNotifIdees;
 
       return ok();
     }
@@ -301,7 +309,7 @@ export const devBackendInterceptorProvider: Provider = {
 };
 
 function enleveDonneesPrivees(u: UtilisateurAvecMdp): Utilisateur {
-  let { email, estAdmin, identifiant, ...donneesPubliques } = enleveMdp(u);
+  let { email, estAdmin, identifiant, prefNotifIdees, ...donneesPubliques } = enleveMdp(u);
   return donneesPubliques;
 }
 

@@ -26,6 +26,14 @@
   </div>
 
   <div class="form-group">
+    <label for="prefNotifIdees">Préférences de notification (création/suppression d'idées) :</label>
+    <select id="prefNotifIdees" formControlName="prefNotifIdees" class="form-control">
+      <option value="{{PrefNotifIdees.Aucune}}">Aucune</option>
+      <option value="{{PrefNotifIdees.Instantanee}}">Instantanée</option>
+    </select>
+  </div>
+
+  <div class="form-group">
     <label for="identifiant">Identifiant :</label>
     <input id="identifiant" type="text" readonly formControlName="identifiant" class="form-control">
   </div>

@@ -30,6 +30,7 @@ class SerializableUtilisateur implements JsonSerializable
         'email' => $this->utilisateur->getEmail(),
         'estAdmin' => $this->utilisateur->getEstAdmin(),
         'identifiant' => $this->utilisateur->getIdentifiant(),
+        'prefNotifIdees' => $this->utilisateur->getPrefNotifIdees(),
       ]);
       ksort($data);
     }

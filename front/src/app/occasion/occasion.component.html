@@ -1,6 +1,21 @@
 <ng-container *ngIf="occasion$|async as o">
   <h1>{{o.titre}}</h1>
   
+  <ng-container [ngSwitch]="o.estPassee">
+    <div *ngSwitchCase="true" class="alert alert-warning col-12" role="alert">
+      Cette occasion est passée.
+    </div>
+    <div *ngSwitchCase="false" class="alert alert-primary col-12" role="alert">
+      Date de remise des cadeaux : {{o.date}}
+    </div>
+  </ng-container>
+
+  <div *ngIf="!o.tirageFait" class="alert alert-warning col-12" role="alert">
+    Le tirage au sort n'a pas
+    <ng-container *ngIf="!o.estPassee">encore</ng-container>
+    eu lieu.
+  </div>
+  
   <!-- <h2>Participants</h2> -->
   <div class="container">
     <div class="row justify-content-center">
@@ -21,9 +36,16 @@
             <div class="card-text" *ngIf="p.estMoi">C'est vous !</div>
             <div class="card-text" *ngIf="p.estQuiRecoitDeMoi">
               C'est à
-              <ng-container *ngIf="p.genre === Genre.Feminin">elle</ng-container>
-              <ng-container *ngIf="p.genre === Genre.Masculin">lui</ng-container>
-              que vous faites un cadeau.
+              <ng-container [ngSwitch]="p.genre">
+                <ng-container *ngSwitchCase="Genre.Feminin">elle</ng-container>
+                <ng-container *ngSwitchCase="Genre.Masculin">lui</ng-container>
+              </ng-container>
+              que vous
+              <ng-container [ngSwitch]="o.estPassee">
+                <ng-container *ngSwitchCase="true">avez fait</ng-container>
+                <ng-container *ngSwitchCase="false">ferez</ng-container>
+              </ng-container>
+              un cadeau.
             </div>
           </div>
         </div>

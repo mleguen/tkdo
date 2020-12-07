@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Application\Actions\Occasion;
 
-use App\Application\Actions\Action;
 use App\Application\Serializable\Resultat\SerializableResultat;
+use App\Application\Service\DateService;
 use App\Application\Service\MailerService;
 use App\Domain\Occasion\OccasionRepository;
 use App\Domain\Resultat\ResultatRepository;
@@ -14,9 +14,8 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Log\LoggerInterface;
 use Slim\Exception\HttpBadRequestException;
 
-class CreateResultatOccasionAction extends Action
+class CreateResultatOccasionAction extends OccasionAction
 {
-    protected $occasionRepository;
     protected $utilisateurRepository;
     protected $resultatRepository;
     private $mailerService;
@@ -24,12 +23,12 @@ class CreateResultatOccasionAction extends Action
     public function __construct(
         LoggerInterface $logger,
         OccasionRepository $occasionRepository,
+        DateService $dateService,
         UtilisateurRepository $utilisateurRepository,
         ResultatRepository $resultatRepository,
         MailerService $mailerService
     ) {
-        parent::__construct($logger);
-        $this->occasionRepository = $occasionRepository;
+        parent::__construct($logger, $occasionRepository, $dateService);
         $this->utilisateurRepository = $utilisateurRepository;
         $this->resultatRepository = $resultatRepository;
         $this->mailerService = $mailerService;
@@ -50,7 +49,9 @@ class CreateResultatOccasionAction extends Action
 
         $resultat = $this->resultatRepository->create($occasion, $quiOffre, $quiRecoit);
 
-        $this->mailerService->envoieMailTirageFait($this->request, $quiOffre, $occasion);
+        if (!$this->dateService->estPassee($occasion->getDate())) {
+            $this->mailerService->envoieMailTirageFait($this->request, $quiOffre, $occasion);
+        }
 
         return $this->respondWithData(new SerializableResultat($resultat));
     }

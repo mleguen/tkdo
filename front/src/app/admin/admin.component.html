@@ -56,7 +56,8 @@ curl -u {{token}}: \
     "genre": "M",
     "id": {{idUtilisateur}},
     "identifiant": "admin",
-    "nom": "Administrateur"
+    "nom": "Administrateur",
+    "prefNotifIdees": "N"
   }
 ]
 </samp></pre>
@@ -70,6 +71,7 @@ $ curl -u {{token}}: \
 -d nom='Utilisatrice 1' \
 -d genre=F \
 -d estAdmin=0 \
+-d prefNotifIdees=N \
 -X POST {{urlApi}}/utilisateur
 </samp></pre>
 
@@ -82,7 +84,8 @@ $ curl -u {{token}}: \
   "genre": "F",
   "id": 71,
   "identifiant": "utilisatrice01",
-  "nom": "Utilisatrice 1"
+  "nom": "Utilisatrice 1",
+  "prefNotifIdees": "N"
 }
 </samp></pre>
 
@@ -106,7 +109,8 @@ curl -u {{token}}: \
   "genre": "M",
   "id": 70,
   "identifiant": "admin",
-  "nom": "Administrateur"
+  "nom": "Administrateur",
+  "prefNotifIdees": "N"
 }
 </samp></pre>
 
@@ -120,6 +124,7 @@ curl -u {{token}}: \
 -d nom='Administrateur 2' \
 -d genre=M \
 -d estAdmin=1 \
+-d prefNotifIdees=I \
 -X PUT {{urlApi}}/utilisateur/{{idUtilisateur}}
 </samp></pre>
 
@@ -132,7 +137,8 @@ curl -u {{token}}: \
   "genre": "M",
   "id": {{idUtilisateur}},
   "identifiant": "admin2",
-  "nom": "Administrateur 2"
+  "nom": "Administrateur 2",
+  "prefNotifIdees": "I"
 }
 </samp></pre>
 
@@ -164,7 +170,8 @@ $ curl -u {{token}}: \
   "genre": "F",
   "id": 71,
   "identifiant": "utilisatrice01",
-  "nom": "Utilisatrice 1"
+  "nom": "Utilisatrice 1",
+  "prefNotifIdees": "N"
 }
 </samp></pre>
 

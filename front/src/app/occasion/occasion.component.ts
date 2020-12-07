@@ -25,11 +25,15 @@ export class OccasionComponent implements OnInit {
       switchMap(async (params) => {
         let o = await this.backend.getOccasion(+params.get('idOccasion'));
         const idQuiRecoitDeMoi = o.resultats.find(rt => rt.idQuiOffre === this.backend.idUtilisateur)?.idQuiRecoit;
+        let d = new Date(o.date);
         return Object.assign({}, o, {
+          date: Intl.DateTimeFormat('fr-FR').format(d),
+          estPassee: d.getTime() < Date.now(),
           participants: o.participants.map(p => Object.assign({}, p, {
             estMoi: p.id === this.backend.idUtilisateur,
             estQuiRecoitDeMoi: p.id === idQuiRecoitDeMoi,
           })),
+          tirageFait: o.participants.some(p => p.id === idQuiRecoitDeMoi),
         });
       }),
       // Les erreurs backend sont déjà affichées par AppComponent

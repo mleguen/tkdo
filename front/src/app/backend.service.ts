@@ -2,10 +2,11 @@ import { DOCUMENT } from '@angular/common';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { first, map, tap } from 'rxjs/operators';
+import { first, map } from 'rxjs/operators';
 
 export interface Occasion {
   id: number;
+  date: string;
   titre: string;
   participants: Utilisateur[];
   resultats: Resultat[]
@@ -21,11 +22,17 @@ export interface UtilisateurPrive extends Utilisateur {
   email: string;
   estAdmin: boolean;
   identifiant: string;
+  prefNotifIdees: string;
 }
 
 export enum Genre {
   Feminin = 'F',
   Masculin = 'M',
+}
+
+export enum PrefNotifIdees {
+  Aucune = 'N',
+  Instantanee = 'I',
 }
 
 export interface Resultat {
@@ -131,11 +138,12 @@ export class BackendService {
 
   getOccasions() {
     return this.http.get<Occasion[]>(`${URL_LISTE_OCCASIONS}?idParticipant=${this.idUtilisateur}`).pipe(
-      tap(
+      map(
         occasions => {
-          console.log(JSON.stringify(occasions));
+          occasions = occasions.sort((a, b) => a.date.localeCompare(b.date));
           this.occasions$.next(occasions);
           localStorage.setItem(CLE_LISTE_OCCASIONS, JSON.stringify(occasions));
+          return occasions;
         }
       )
     ).toPromise();

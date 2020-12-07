@@ -3,22 +3,12 @@ declare(strict_types=1);
 
 namespace App\Application\Actions\Occasion;
 
-use App\Application\Actions\Action;
 use App\Application\Serializable\Occasion\SerializableOccasion;
-use App\Domain\Occasion\OccasionRepository;
 use Psr\Http\Message\ResponseInterface as Response;
-use Psr\Log\LoggerInterface;
+use Slim\Exception\HttpBadRequestException;
 
-class EditOccasionAction extends Action
+class EditOccasionAction extends OccasionAction
 {
-    protected $occasionRepository;
-
-    public function __construct(LoggerInterface $logger, OccasionRepository $occasionRepository)
-    {
-        parent::__construct($logger);
-        $this->occasionRepository = $occasionRepository;
-    }
-
     protected function action(): Response
     {
         $this->assertAuth();
@@ -26,9 +16,14 @@ class EditOccasionAction extends Action
         
         $occasion = $this->occasionRepository->read((int) $this->resolveArg('idOccasion'));
         $body = $this->getFormData();
+        if (isset($body['date'])) {
+            $date = $this->dateService->decodeDate($body['date']);
+            if (!$date) throw new HttpBadRequestException($this->request, "Format de date incorrect : {$body['date']}");
+            $occasion->setDate($date);
+        }
         if (isset($body['titre'])) $occasion->setTitre($body['titre']);
 
         $occasion = $this->occasionRepository->update($occasion);
-        return $this->respondWithData(new SerializableOccasion($occasion));
+        return $this->respondWithData(new SerializableOccasion($occasion, $this->dateService));
     }
 }

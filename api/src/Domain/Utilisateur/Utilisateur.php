@@ -40,6 +40,11 @@ interface Utilisateur
     /**
      * @throws ReferenceException
      */
+    public function getPrefNotifIdees(): string;
+
+    /**
+     * @throws ReferenceException
+     */
     public function setEmail(string $email): Utilisateur;
 
     /**
@@ -66,4 +71,9 @@ interface Utilisateur
      * @throws ReferenceException
      */
     public function setNom(string $nom): Utilisateur;
+
+    /**
+     * @throws ReferenceException
+     */
+    public function setPrefNotifIdees(string $prefNotifIdees): Utilisateur;
 }

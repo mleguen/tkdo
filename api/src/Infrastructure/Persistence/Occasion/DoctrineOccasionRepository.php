@@ -7,6 +7,7 @@ namespace App\Infrastructure\Persistence\Occasion;
 use App\Domain\Occasion\Occasion;
 use App\Domain\Occasion\OccasionNotFoundException;
 use App\Domain\Occasion\OccasionRepository;
+use DateTime;
 use Doctrine\ORM\EntityManager;
 
 class DoctrineOccasionRepository implements OccasionRepository
@@ -18,9 +19,13 @@ class DoctrineOccasionRepository implements OccasionRepository
         $this->em = $em;
     }
 
-    public function create(string $titre): Occasion
+    public function create(
+        DateTime $date,
+        string $titre
+    ): Occasion
     {
         $occasion = (new DoctrineOccasion())
+            ->setDate($date)
             ->setTitre($titre);
         $this->em->persist($occasion);
         $this->em->flush();

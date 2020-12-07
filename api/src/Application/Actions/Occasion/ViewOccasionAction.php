@@ -3,23 +3,26 @@ declare(strict_types=1);
 
 namespace App\Application\Actions\Occasion;
 
-use App\Application\Actions\Action;
 use App\Application\Serializable\Occasion\SerializableOccasionDetaillee;
+use App\Application\Service\DateService;
 use App\Domain\Occasion\OccasionRepository;
 use App\Domain\Resultat\ResultatRepository;
 use App\Domain\Utilisateur\Utilisateur;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Log\LoggerInterface;
 
-class ViewOccasionAction extends Action
+class ViewOccasionAction extends OccasionAction
 {
-    protected $occasionRepository;
     protected $resultatRepository;
 
-    public function __construct(LoggerInterface $logger, OccasionRepository $occasionRepository, ResultatRepository $resultatRepository)
+    public function __construct(
+        LoggerInterface $logger,
+        OccasionRepository $occasionRepository,
+        DateService $dateService,
+        ResultatRepository $resultatRepository
+    )
     {
-        parent::__construct($logger);
-        $this->occasionRepository = $occasionRepository;
+        parent::__construct($logger, $occasionRepository, $dateService);
         $this->resultatRepository = $resultatRepository;
     }
 
@@ -40,6 +43,7 @@ class ViewOccasionAction extends Action
 
         return $this->respondWithData(new SerializableOccasionDetaillee(
             $occasion,
+            $this->dateService,
             $this->resultatRepository->readByOccasion($occasion)
         ));
     }

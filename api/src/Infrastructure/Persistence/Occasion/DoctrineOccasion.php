@@ -6,6 +6,7 @@ namespace App\Infrastructure\Persistence\Occasion;
 
 use App\Domain\Occasion\Occasion;
 use App\Domain\Utilisateur\Utilisateur;
+use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
@@ -28,6 +29,12 @@ class DoctrineOccasion implements Occasion
      * @GeneratedValue
      */
     protected $id;
+
+    /**
+     * @var DateTime
+     * @Column(type="datetime")
+     */
+    private $date;
 
     /**
      * @var string
@@ -59,6 +66,14 @@ class DoctrineOccasion implements Occasion
     /**
      * {@inheritdoc}
      */
+    public function getDate(): DateTime
+    {
+        return $this->date;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getId(): int
     {
         return $this->id;
@@ -78,6 +93,15 @@ class DoctrineOccasion implements Occasion
     public function getParticipants(): array
     {
         return $this->participants->toArray();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setDate(DateTime $date): Occasion
+    {
+        $this->date = $date;
+        return $this;
     }
 
     /**

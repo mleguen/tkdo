@@ -1,14 +1,6 @@
 # Travaux futurs
 
 - notifications par mail :
-  - ajouter une notification instantanée des idées créées ou supprimées (pour les utilisateurs le souhaitant)
-    - ajouter des préférences de notification pour les créations/suppressions d'idées dans le profil
-    - ajouter une date aux occasions
-    - côté front : choisir par défaut la 1ère occasion non passée, plus la dernière
-    - ajouter une méthode aux repositories permettant de récupérer
-      tous les participants des occasions non passées auxquelles participe un utilisateur
-      qui ont demandé à être notifiés instantanément
-    - dans les routes de création/suppression des idées, envoyer une notification à ces utilisateurs
   - ajouter une notification quotidienne des idées créées ou supprimées :
     - ajouter un 3ème choix Q pour Quotidienne aux préférences de notification
       - dans l'api

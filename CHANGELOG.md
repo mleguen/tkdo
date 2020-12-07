@@ -7,6 +7,12 @@
   - à la réinitialisation de son mot de passe
   - à sa participation à une nouvelle occasion
   - à l'ajout d'un résultat de tirage le concernant
+- ajout d'une date aux occations.
+  L'occasion affichée par défaut à la connexion est maintenant la prochaine occasion à venir,
+  ou à défaut la dernière occasion passée
+- ajout de préférences de notification des créations/suppressions d'idées au profil utilisateur, pour le notifier :
+  - à chaque création/suppression d'idée pour un participant d'une occasion à venir
+  - ou pas du tout
 
 ## V1.1.0 (29/11/2020)
 

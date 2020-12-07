@@ -41,6 +41,7 @@ class CreateUtilisateurAction extends UtilisateurAction
     if (!isset($body['nom'])) throw new HttpBadRequestException($this->request, "Le nom est obligatoire");
     if (!isset($body['genre'])) throw new HttpBadRequestException($this->request, "Le genre est obligatoire");
     if (!isset($body['estAdmin'])) $body['estAdmin'] = false;
+    if (!isset($body['prefNotifIdees'])) $body['prefNotifIdees'] = PrefNotifIdees::Aucune;
 
     $mdp = $this->passwordService->randomPassword();
     $utilisateur = $this->utilisateurRepository->create(
@@ -49,7 +50,8 @@ class CreateUtilisateurAction extends UtilisateurAction
       password_hash($mdp, PASSWORD_DEFAULT),
       $body['nom'],
       $body['genre'],
-      boolval($body['estAdmin'])
+      boolval($body['estAdmin']),
+      $body['prefNotifIdees']
     );
   
     $this->mailerService->envoieMailCreationUtilisateur($this->request, $utilisateur, $mdp);

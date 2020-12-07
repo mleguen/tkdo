@@ -6,6 +6,7 @@ namespace Tests\Application\Actions\Occasion;
 use App\Domain\Occasion\OccasionNotFoundException;
 use App\Infrastructure\Persistence\Occasion\DoctrineOccasion;
 use App\Infrastructure\Persistence\Resultat\DoctrineResultat;
+use DateTimeInterface;
 use Slim\Exception\HttpForbiddenException;
 use Slim\Exception\HttpNotFoundException;
 use Slim\Exception\HttpUnauthorizedException;
@@ -16,7 +17,8 @@ class ViewOccasionActionTest extends ActionTestCase
     public function testAction()
     {
         $occasion = (new DoctrineOccasion(1))
-            ->setTitre('Noel 2020')
+            ->setDate(new \DateTime('tomorrow'))
+            ->setTitre('Demain')
             ->setParticipants([$this->alice, $this->bob]);
         $this->occasionRepositoryProphecy
             ->read($occasion->getId())
@@ -40,6 +42,7 @@ class ViewOccasionActionTest extends ActionTestCase
         $json = <<<EOT
 {
     "id": {$occasion->getId()},
+    "date": "{$occasion->getDate()->format(DateTimeInterface::W3C)}",
     "titre": "{$occasion->getTitre()}",
     "participants": [
         {
@@ -85,7 +88,8 @@ EOT;
     public function testActionPasParticipant()
     {
         $occasion = (new DoctrineOccasion(1))
-            ->setTitre('Noel 2020')
+            ->setDate(new \DateTime('tomorrow'))
+            ->setTitre('Demain')
             ->setParticipants([$this->bob]);
         $this->occasionRepositoryProphecy
             ->read($occasion->getId())

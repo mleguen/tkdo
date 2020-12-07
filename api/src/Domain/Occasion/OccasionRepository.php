@@ -3,9 +3,14 @@ declare(strict_types=1);
 
 namespace App\Domain\Occasion;
 
+use DateTime;
+
 interface OccasionRepository
 {
-    public function create(string $titre): Occasion;
+    public function create(
+        DateTime $date,
+        string $titre
+    ): Occasion;
 
     /**
      * @throws OccasionNotFoundException

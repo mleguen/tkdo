@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Validators, FormBuilder, ValidatorFn } from '@angular/forms';
-import { BackendService, Genre, Utilisateur } from '../backend.service';
+import { BackendService, Genre, PrefNotifIdees, Utilisateur } from '../backend.service';
 
 @Component({
   selector: 'app-profil',
@@ -10,6 +10,7 @@ import { BackendService, Genre, Utilisateur } from '../backend.service';
 export class ProfilComponent implements OnInit {
 
   Genre = Genre;
+  PrefNotifIdees = PrefNotifIdees;
 
   formProfil = this.fb.group(
     {
@@ -17,12 +18,13 @@ export class ProfilComponent implements OnInit {
       'nom': ['', [Validators.minLength(3)]],
       'email': ['', [Validators.email]],
       'genre': [''],
+      'prefNotifIdees': [''],
       'mdp': ['', [Validators.minLength(8)]],
       'confirmeMdp': [''],
     },
     {
       validators: [
-        requireOne(['nom', 'email', 'genre'], ['mdp']),
+        requireOne(['nom', 'email', 'genre', 'prefNotifIdees'], ['mdp']),
         sameValueIfDefined('mdp', 'confirmeMdp'),
       ]
     },
@@ -44,6 +46,7 @@ export class ProfilComponent implements OnInit {
         this.nom.setValue(utilisateur.nom);
         this.email.setValue(utilisateur.email);
         this.genre.setValue(utilisateur.genre);
+        this.prefNotifIdees.setValue(utilisateur.prefNotifIdees);
       },
       // Les erreurs backend sont déjà affichées par AppComponent
       () => {}
@@ -65,15 +68,19 @@ export class ProfilComponent implements OnInit {
   get genre() {
     return this.formProfil.get('genre');
   }
+
+  get prefNotifIdees() {
+    return this.formProfil.get('prefNotifIdees');
+  }
   
   get mdp() {
     return this.formProfil.get('mdp');
   }
 
   async modifie() {
-    const { nom, email, genre, mdp } = this.formProfil.value;
+    const { nom, email, genre, prefNotifIdees, mdp } = this.formProfil.value;
     try {
-      Object.assign(this.utilisateur, { nom, email, genre });
+      Object.assign(this.utilisateur, { nom, email, genre, prefNotifIdees });
       if (mdp) Object.assign(this.utilisateur, { mdp });
       await this.backend.modifieUtilisateur(this.utilisateur);
       for (let champ of ['mdp', 'confirmeMdp']) this.formProfil.get(champ).reset();

@@ -42,13 +42,15 @@ class DoctrineUtilisateurFixture extends DoctrineAbstractFixture
                     ->setGenre(Genre::Masculin)
                     ->setIdentifiant('bob')
                     ->setNom('Bob')
-                    ->setMdp(password_hash('mdpbob', PASSWORD_DEFAULT)),
+                    ->setMdp(password_hash('mdpbob', PASSWORD_DEFAULT))
+                    ->setPrefNotifIdees('I'),
                 'charlie' => (new DoctrineUtilisateur())
                     ->setEmail('charlie@tkdo.org')
                     ->setGenre(Genre::Masculin)
                     ->setIdentifiant('charlie')
                     ->setMdp(password_hash('mdpcharlie', PASSWORD_DEFAULT))
-                    ->setNom('Charlie'),
+                    ->setNom('Charlie')
+                    ->setPrefNotifIdees('I'),
                 'david' => (new DoctrineUtilisateur())
                     ->setEmail('david@tkdo.org')
                     ->setGenre(Genre::Masculin)

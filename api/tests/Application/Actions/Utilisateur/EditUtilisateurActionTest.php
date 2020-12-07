@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Application\Actions\Utilisateur;
 
+use App\Domain\Utilisateur\PrefNotifIdees;
 use App\Domain\Utilisateur\UtilisateurNotFoundException;
 use App\Infrastructure\Persistence\Utilisateur\DoctrineUtilisateur;
 use Prophecy\Argument;
@@ -30,7 +31,11 @@ class EditUtilisateurActionTest extends ActionTestCase
             ->setNom('Alice2')
             ->setGenre('M')
             ->setMdp(password_hash($nouveauMdp, PASSWORD_DEFAULT))
-            ->setEstAdmin($this->alice->getEstAdmin());
+            ->setEstAdmin($this->alice->getEstAdmin())
+            ->setPrefNotifIdees($this->alice->getPrefNotifIdees() === PrefNotifIdees::Aucune
+                ? PrefNotifIdees::Instantanee
+                : PrefNotifIdees::Aucune
+            );
         $testCase = $this;
         $this->utilisateurRepositoryProphecy
             ->update(Argument::cetera())
@@ -74,7 +79,8 @@ EOT
     "genre": "{$aliceModifiee->getGenre()}",
     "id": {$aliceModifiee->getId()},
     "identifiant": "{$aliceModifiee->getIdentifiant()}",
-    "nom": "{$aliceModifiee->getNom()}"
+    "nom": "{$aliceModifiee->getNom()}",
+    "prefNotifIdees": "{$aliceModifiee->getPrefNotifIdees()}"
 }
 
 EOT;
@@ -97,7 +103,11 @@ EOT;
             ->setNom('Alice2')
             ->setGenre('M')
             ->setMdp(password_hash($mdp, PASSWORD_DEFAULT))
-            ->setEstAdmin(!$this->alice->getEstAdmin());
+            ->setEstAdmin(!$this->alice->getEstAdmin())
+            ->setPrefNotifIdees($this->alice->getPrefNotifIdees() === PrefNotifIdees::Aucune
+                ? PrefNotifIdees::Instantanee
+                : PrefNotifIdees::Aucune
+            );
         $testCase = $this;
         $this->utilisateurRepositoryProphecy
             ->update(Argument::cetera())
@@ -140,7 +150,8 @@ EOT
     "genre": "{$aliceModifiee->getGenre()}",
     "id": {$aliceModifiee->getId()},
     "identifiant": "{$aliceModifiee->getIdentifiant()}",
-    "nom": "{$aliceModifiee->getNom()}"
+    "nom": "{$aliceModifiee->getNom()}",
+    "prefNotifIdees": "{$aliceModifiee->getPrefNotifIdees()}"
 }
 
 EOT;

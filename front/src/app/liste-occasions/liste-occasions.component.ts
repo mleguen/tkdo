@@ -16,10 +16,15 @@ export class ListeOccasionsComponent implements OnInit {
 
   async ngOnInit(): Promise<void> {
     let occasions = await this.backend.getOccasions();
-    console.log(JSON.stringify(occasions));
+    
+    let prochaineOccasion = occasions.find(o => {
+      let d = new Date(o.date);
+      return d.getTime() > Date.now();
+    });
 
-    if (occasions.length > 0) {
-      await this.router.navigate(['occasion', occasions[occasions.length-1].id]);
+    if (prochaineOccasion || (occasions.length > 0)) {
+      let occasion = prochaineOccasion || occasions[occasions.length - 1];
+      await this.router.navigate(['occasion', occasion.id]);
     } else {
       await this.router.navigate(['idee'], { queryParams: { idUtilisateur: this.backend.idUtilisateur } });
     }

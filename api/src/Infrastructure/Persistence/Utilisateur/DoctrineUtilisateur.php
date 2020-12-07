@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Persistence\Utilisateur;
 
+use App\Domain\Utilisateur\PrefNotifIdees;
 use App\Domain\Utilisateur\Utilisateur;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
@@ -61,6 +62,12 @@ class DoctrineUtilisateur implements Utilisateur
    * @Column()
    */
   private $nom;
+
+  /**
+   * @var string
+   * @Column()
+   */
+  private $prefNotifIdees = PrefNotifIdees::Aucune;
 
   public function __construct(?int $id = NULL)
   {
@@ -123,6 +130,14 @@ class DoctrineUtilisateur implements Utilisateur
   /**
    * {@inheritdoc}
    */
+  public function getPrefNotifIdees(): string
+  {
+    return $this->prefNotifIdees;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function setEmail(string $email): Utilisateur
   {
     $this->email = $email;
@@ -171,6 +186,15 @@ class DoctrineUtilisateur implements Utilisateur
   public function setNom(string $nom): Utilisateur
   {
     $this->nom = $nom;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setPrefNotifIdees(string $prefNotifIdees): Utilisateur
+  {
+    $this->prefNotifIdees = $prefNotifIdees;
     return $this;
   }
 }

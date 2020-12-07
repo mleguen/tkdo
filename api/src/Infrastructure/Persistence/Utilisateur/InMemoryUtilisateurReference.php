@@ -78,6 +78,14 @@ class InMemoryUtilisateurReference implements Utilisateur
   /**
    * {@inheritdoc}
    */
+  public function getPrefNotifIdees(): string
+  {
+    throw new ReferenceException();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function setEmail(string $email): Utilisateur
   {
     throw new ReferenceException();
@@ -119,6 +127,14 @@ class InMemoryUtilisateurReference implements Utilisateur
    * {@inheritdoc}
    */
   public function setNom(string $nom): Utilisateur
+  {
+    throw new ReferenceException();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setPrefNotifIdees(string $prefNotifIdees): Utilisateur
   {
     throw new ReferenceException();
   }

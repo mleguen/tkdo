@@ -6,6 +6,7 @@ namespace App\Application\Serializable\Occasion;
 
 use App\Application\Serializable\Resultat\SerializableResultat;
 use App\Application\Serializable\Utilisateur\SerializableUtilisateur;
+use App\Application\Service\DateService;
 use App\Domain\Occasion\Occasion;
 use App\Domain\Resultat\Resultat;
 use App\Domain\Utilisateur\Utilisateur;
@@ -17,9 +18,13 @@ class SerializableOccasionDetaillee extends SerializableOccasion
   /**
    * @param Resultat[] $resultats
    */
-  public function __construct(Occasion $occasion, array $resultats)
+  public function __construct(
+    Occasion $occasion,
+    DateService $dateService,
+    array $resultats
+  )
   {
-    parent::__construct($occasion);
+    parent::__construct($occasion, $dateService);
     $this->resultats = $resultats;
   }
 

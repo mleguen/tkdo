@@ -4,42 +4,33 @@ declare(strict_types=1);
 
 namespace App\Application\Actions\Idee;
 
-use App\Application\Actions\Idee\IdeeAction;
 use App\Application\Serializable\Idee\SerializableIdee;
-use App\Domain\Idee\IdeeRepository;
-use App\Domain\Utilisateur\UtilisateurRepository;
 use Psr\Http\Message\ResponseInterface as Response;
-use Psr\Log\LoggerInterface;
 
-class CreateIdeeAction extends IdeeAction
+class CreateIdeeAction extends IdeeActionANotifier
 {
-  /**
-   * @var UtilisateurRepository
-   */
-  private $utilisateurRepository;
-
-  public function __construct(
-    LoggerInterface $logger,
-    IdeeRepository $ideeRepository,
-    UtilisateurRepository $utilisateurRepository
-  )
-  {
-    parent::__construct($logger, $ideeRepository);
-    $this->utilisateurRepository = $utilisateurRepository;
-  }
-
   protected function action(): Response
   {
     $this->assertAuth();
     $body = $this->getFormData();
     $this->assertUtilisateurAuthEstAuteur($body['idAuteur']);
 
+    $utilisateur = $this->utilisateurRepository->read($body['idUtilisateur']);
+
     $idee = $this->ideeRepository->create(
-      $this->utilisateurRepository->read($body['idUtilisateur'], true),
+      $utilisateur,
       $body['description'],
       $this->utilisateurRepository->read($body['idAuteur'], true),
       new \DateTime()
     );
+
+    $utilisateursANotifier = $this->utilisateurRepository->readAllByNotifInstantaneePourIdees(
+      $body['idUtilisateur'],
+      $this->request->getAttribute('idUtilisateurAuth')
+    );
+    foreach ($utilisateursANotifier as $utilisateurANotifier) {
+      $this->mailerService->envoieMailCreationIdee($this->request, $utilisateurANotifier, $utilisateur, $idee);
+    }
 
     return $this->respondWithData(new SerializableIdee($idee));
   }

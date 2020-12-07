@@ -11,13 +11,13 @@ class DoctrineResultatFixture extends DoctrineAbstractFixture
     {
         if (!$this->prod) {
             foreach ([
-                'noel2019' => [
+                'noelPasse' => [
                     'alice'   => 'bob',
                     'bob'     => 'david',
                     'charlie' => 'alice',
                     'david'   => 'charlie',
                 ],
-                'noel2020' => [
+                'noelProchain' => [
                     'alice'   => 'charlie',
                     'bob'     => 'alice',
                     'charlie' => 'bob',

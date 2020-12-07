@@ -3,23 +3,11 @@ declare(strict_types=1);
 
 namespace App\Application\Actions\Occasion;
 
-use App\Application\Actions\Action;
 use App\Application\Serializable\Occasion\SerializableOccasion;
-use App\Domain\Occasion\OccasionRepository;
 use Psr\Http\Message\ResponseInterface as Response;
-use Psr\Log\LoggerInterface;
-use Slim\Exception\HttpBadRequestException;
 
-class ListOccasionAction extends Action
+class ListOccasionAction extends OccasionAction
 {
-    protected $occasionRepository;
-
-    public function __construct(LoggerInterface $logger, OccasionRepository $occasionRepository)
-    {
-        parent::__construct($logger);
-        $this->occasionRepository = $occasionRepository;
-    }
-
     protected function action(): Response
     {
         $this->assertAuth();
@@ -36,7 +24,7 @@ class ListOccasionAction extends Action
         }
 
         return $this->respondWithData(array_map(function ($occasion) {
-            return new SerializableOccasion($occasion);
+            return new SerializableOccasion($occasion, $this->dateService);
         }, $occasions));
     }
 }
