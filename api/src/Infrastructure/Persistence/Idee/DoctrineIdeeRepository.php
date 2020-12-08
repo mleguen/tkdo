@@ -8,6 +8,8 @@ use App\Domain\Idee\Idee;
 use App\Domain\Idee\IdeeNotFoundException;
 use App\Domain\Idee\IdeeRepository;
 use App\Domain\Utilisateur\Utilisateur;
+use App\Infrastructure\Persistence\Occasion\DoctrineOccasion;
+use DateTime;
 use Doctrine\ORM\EntityManager;
 
 class DoctrineIdeeRepository implements IdeeRepository
@@ -29,7 +31,7 @@ class DoctrineIdeeRepository implements IdeeRepository
         Utilisateur $utilisateur,
         string $description,
         Utilisateur $auteur,
-        \DateTime $dateProposition
+        DateTime $dateProposition
     ): Idee
     {
         $idee = (new DoctrineIdee())
@@ -56,19 +58,51 @@ class DoctrineIdeeRepository implements IdeeRepository
     /**
      * {@inheritdoc}
      */
-    public function readByUtilisateur(Utilisateur $utilisateur): array
+    public function readAllByNotifPeriodique(Utilisateur $utilisateur): array
     {
-        return $this->em->getRepository(DoctrineIdee::class)->findBy([
-            'utilisateur' => $utilisateur,
-        ]);
+        $classDoctrineIdee = DoctrineIdee::class;
+        $dql = <<<EOS
+            SELECT DISTINCT i FROM $classDoctrineIdee i
+            INNER JOIN i.utilisateur u
+            INNER JOIN u.occasions o WITH o.date > CURRENT_TIMESTAMP() AND :utilisateur MEMBER OF o.participants
+            WHERE i.utilisateur <> :utilisateur
+            AND i.auteur <> :utilisateur
+            AND (i.dateProposition >= :dateDerniereNotifPeriodique
+                OR (i.dateSuppression IS NOT NULL AND i.dateSuppression >= :dateDerniereNotifPeriodique))
+EOS;
+        return $this->em->createQuery($dql)
+            ->setParameter('utilisateur', $utilisateur)
+            ->setParameter('dateDerniereNotifPeriodique', $utilisateur->getDateDerniereNotifPeriodique())
+            ->getResult();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function delete(Idee $idee)
+    public function readAllByUtilisateur(Utilisateur $utilisateur, bool $supprimee = null): array
     {
-        $this->em->remove($idee);
+        $qb = $this->em->createQueryBuilder()
+            ->select('i')
+            ->from(DoctrineIdee::class, 'i')
+            ->where('i.utilisateur = :utilisateur');
+
+        if (!is_null($supprimee)) {
+            $qb = $qb->andWhere($supprimee ? $qb->expr()->isNotNull('i.dateSuppression') : $qb->expr()->isNull('i.dateSuppression'));
+        }
+
+        return $qb->setParameter('utilisateur', $utilisateur)
+            ->getQuery()
+            ->getResult();
+
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function update(Idee $idee): Idee
+    {
+        $this->em->persist($idee);
         $this->em->flush();
+        return $idee;
     }
 }

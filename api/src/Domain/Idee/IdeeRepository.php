@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Domain\Idee;
 
 use App\Domain\Utilisateur\Utilisateur;
+use DateTime;
 
 interface IdeeRepository
 {
@@ -11,7 +12,7 @@ interface IdeeRepository
         Utilisateur $utilisateur,
         string $description,
         Utilisateur $auteur,
-        \DateTime $dateProposition
+        DateTime $dateProposition
     ): Idee;
 
     /**
@@ -22,10 +23,12 @@ interface IdeeRepository
     /**
      * @return Idee[]
      */
-    public function readByUtilisateur(Utilisateur $utilisateur): array;
+    public function readAllByNotifPeriodique(Utilisateur $utilisateur): array;
 
     /**
-     * @throws IdeeNotFoundException
+     * @return Idee[]
      */
-    public function delete(Idee $idee);
+    public function readAllByUtilisateur(Utilisateur $utilisateur, bool $supprimee = null): array;
+    
+    public function update(Idee $idee): Idee;
 }

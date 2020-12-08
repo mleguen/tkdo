@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Tests\Application\Actions\Occasion;
 
 use App\Infrastructure\Persistence\Occasion\DoctrineOccasion;
+use DateTime;
 use DateTimeInterface;
 use Slim\Exception\HttpForbiddenException;
 use Slim\Exception\HttpUnauthorizedException;
@@ -17,10 +18,10 @@ class ListOccasionActionTest extends ActionTestCase
     public function testAction($estAdmin)
     {
         $occasion1 = (new DoctrineOccasion(1))
-            ->setDate(new \DateTime('tomorrow'))
+            ->setDate(new DateTime('tomorrow'))
             ->setTitre('Demain');
         $occasion2 = (new DoctrineOccasion(2))
-            ->setDate(new \DateTime('yesterday'))
+            ->setDate(new DateTime('yesterday'))
             ->setTitre('Hier');
         $this->occasionRepositoryProphecy
             ->readByParticipant($this->bob->getId())
@@ -85,10 +86,10 @@ EOT;
     public function testActionSansIdParticipantAdmin()
     {
         $occasion1 = (new DoctrineOccasion(1))
-            ->setDate(new \DateTime('tomorrow'))
+            ->setDate(new DateTime('tomorrow'))
             ->setTitre('Demain');
         $occasion2 = (new DoctrineOccasion(2))
-            ->setDate(new \DateTime('yesterday'))
+            ->setDate(new DateTime('yesterday'))
             ->setTitre('Hier');
         $this->occasionRepositoryProphecy
             ->readAll()

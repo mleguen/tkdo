@@ -3,9 +3,17 @@ declare(strict_types=1);
 
 namespace App\Domain\Utilisateur;
 
+use App\Domain\Occasion\Occasion;
+use DateTime;
+
 interface Utilisateur
 {
     public function getId(): int;
+
+    /**
+     * @throws ReferenceException
+     */
+    public function getDateDerniereNotifPeriodique(): DateTime;
 
     /**
      * @throws ReferenceException
@@ -38,9 +46,20 @@ interface Utilisateur
     public function getNom(): string;
 
     /**
+     * @return Occasion[]
+     * @throws ReferenceException
+     */
+    public function getOccasions(): array;
+
+    /**
      * @throws ReferenceException
      */
     public function getPrefNotifIdees(): string;
+
+    /**
+     * @throws ReferenceException
+     */
+    public function setDateDerniereNotifPeriodique(DateTime $dateDerniereNotifPeriodique): Utilisateur;
 
     /**
      * @throws ReferenceException

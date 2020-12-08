@@ -45,7 +45,7 @@ class CreateParticipantOccasionAction extends OccasionAction
     $occasion = $this->occasionRepository->update($occasion);
 
     if (!$this->dateService->estPassee($occasion->getDate())) {
-      $this->mailerService->envoieMailAjoutParticipant($this->request, $participant, $occasion);
+      $this->mailerService->envoieMailAjoutParticipant($participant, $occasion);
     }
 
     return $this->respondWithData(new SerializableUtilisateur($participant));

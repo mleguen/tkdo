@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tools\Console\Command;
+namespace App\Application\Command;
 
 use App\Infrastructure\Persistence\Idee\DoctrineIdeeFixture;
 use App\Infrastructure\Persistence\Occasion\DoctrineOccasionFixture;
@@ -9,15 +9,27 @@ use App\Infrastructure\Persistence\Utilisateur\DoctrineUtilisateurFixture;
 use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
 use Doctrine\Common\DataFixtures\Loader;
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;
-use Doctrine\Migrations\Tools\Console\Command\DoctrineCommand;
 use Doctrine\ORM\EntityManager;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class FixturesLoadCommand extends DoctrineCommand {
-  /** @var string */
-  protected static $defaultName = 'fixtures:load';
+class FixturesCommand extends Command
+{
+  private $em;
+  private $settings;
+
+  public function __construct(
+    EntityManager $em,
+    ContainerInterface $c
+  )
+  {
+    parent::__construct('fixtures');
+    $this->em = $em;
+    $this->settings = $c->get('settings')['fixtures'];
+  }
 
   protected function configure(): void
   {
@@ -44,19 +56,13 @@ class FixturesLoadCommand extends DoctrineCommand {
     $prod = $input->getOption('prod');
     $adminEmail = $input->hasOption('admin-email') ? $input->getOption('admin-email') : null;
     
-    /**
-     * @var EntityManager
-     */
-    $em = $this->getDependencyFactory()->getEntityManager();
-
     $loader = new Loader();
-    $loader->addFixture(new DoctrineUtilisateurFixture($output, $prod, $adminEmail));
+    $loader->addFixture(new DoctrineUtilisateurFixture($output, $prod, $this->settings['host'], $adminEmail));
     $loader->addFixture(new DoctrineOccasionFixture($output, $prod));
     $loader->addFixture(new DoctrineIdeeFixture($output, $prod));
     $loader->addFixture(new DoctrineResultatFixture($output, $prod));
 
-    $purger = new ORMPurger();
-    $executor = new ORMExecutor($em, $purger);
+    $executor = new ORMExecutor($this->em, new ORMPurger());
     $output->writeln(['Initialisation ou réinitialisation de la base de données (' . ($prod ? 'production' : 'tests') . ')...']);
     $executor->execute($loader->getFixtures());
     $output->writeln(['OK']);

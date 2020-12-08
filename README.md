@@ -12,31 +12,43 @@ Tirage au sort de cadeaux, en famille ou entre amis.
 
 ## Installation sur serveur Apache
 
-Dans les explications ci-dessous, le *répertoire cible* désigne le répertoire du serveur Apache
+Dans les explications ci-dessous, le *répertoire d'installation* désigne le répertoire du serveur Apache
 où sera installé tkdo.
 
-Pré-requis :
-- le module `mod_rewrite` est installé sur votre serveur Apache
-- l'utilisation de fichiers `.htaccess` dans le répertoire cible est autorisée 
+### Pré-requis
+
+- le module `mod_rewrite` est installé sur le serveur Apache
+- l'utilisation de fichiers `.htaccess` dans le répertoire d'installation est autorisée 
   (à défaut, copier le contenu de [.htaccess](./.htaccess) dans une directive `Directory` dans la configuration Apache)
-- le répertoire cible correspond à la racine de votre hôte Apache
+- le répertoire d'installation est le répertoire racine de l'hôte Apache
   (à défaut, ajouter `--base-href /prefixe/du/repertoire/cible` à la fin du script `build` dans [package.json](./package.json))
-- votre hôte Apache est accessible en HTTPS
+- l'hôte Apache est accessible en HTTPS
   (à défaut, commenter la règle de redirection vers HTTPS dans [.htaccess](./.htaccess))
 
-Construction du package d'installation :
+### Configuration
+
+Plusieurs variables d'environnement permettent de configurer Tkdo
+(voir [le fichier .env](./api/.env) pour la liste de ces variables).
+
+Tout ou partie de ces variables peuvent être redéfinies dans un fichier `api/.env.prod`,
+qui sera automatiquement intégré au package d'installation à l'étape suivante,
+et/ou directement dans les variables d'environnement du serveur Apache.
+
+### Construction du package d'installation
 
 ```bash
 ./apache-pack
 ```
 
-Décompresser ensuite dans le répertoire cible l'archive `tkdo-v*.tar.gz` générée.
+### Installation
+
+Décompresser dans le répertoire d'installation l'archive `tkdo-v*.tar.gz` obtenue.
 
 > **Attention** : certains hébergeurs proposent des fonctions d'upload d'archives les décompressant automatiquement,
 > mais qui peuvent parfois tronquer les noms de fichiers si l'arborescence est trop profonde (`api/vendor` par exemple).
 > Télécharger dans ce cas plutôt l'archive en tant que simple fichier, et la décompresser manuellement.
 
-Puis, sur le serveur, depuis le répertoire cible :
+Puis, depuis le répertoire d'installation :
 
 ```bash
 $ cd api
@@ -55,11 +67,24 @@ $ php bin/doctrine.php migrations:migrate
   ++ xxx sql queries
 ```
 
-Initialiser ensuite la base de données avec un premier compte administrateur,
-en adaptant l'e-mail passé en paramètre à vos besoins :
+### Scripts
+
+L'envoi des notifications périodiques par mail nécessite la configuration d'une tâche planifiée
+pour exécuter `api/bin/notif-quotidienne.php` une fois par jour, à l'heure de votre choix.
+Par exemple :
+
+```crontab
+0 6 * * * php /var/www/api/bin/notif-quotidienne.php
+```
+
+### Création d'un premier compte administrateur
+
+Créer le compte `admin` en spécifiant son e-mail
+(à défaut, si l'option `--admin-email` est omise,
+l'e-mail utilisé sera `admin@host` où `host` est le nom d'hôte de `TKDO_BASE_URI`) :
 
 ```bash
-$ php bin/doctrine.php fixtures:load --prod --admin-email vous@votrefai.fr
+$ php bin/console.php fixtures --prod --admin-email admin@host
 Initialisation ou réinitialisation de la base de données (production)...
 xxx créés.
 [...]
@@ -116,7 +141,7 @@ echo SLIM_GUID=$(id -g) >> ./api/.env
 ```bash
 ./docker-compose-api up -d
 ./composer-api doctrine orm:schema-tool:update
-./composer-api doctrine fixtures:load
+./composer-api console fixtures
 ./npm-front start --prod
 ```
 
@@ -147,7 +172,7 @@ ou pour la mettre à jour :
 Et pour la peupler de données de test :
 
 ```bash
-./composer-api doctrine fixtures:load
+./composer-api console fixtures
 ```
 
 ### Pré-requis au lancement des tests e2e front
@@ -182,5 +207,11 @@ Puis après vérification/finalisation de la migration, la tester :
 
 ```bash
 ./composer-api doctrine migrations:migrate
-./composer-api doctrine fixtures:load
+./composer-api console fixtures
+```
+
+Si nécessaire, retour arrière :
+
+```bash
+./composer-api doctrine migrations:migrate prev
 ```

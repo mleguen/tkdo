@@ -44,7 +44,7 @@ class DoctrineOccasion implements Occasion
 
     /**
      * @var ArrayCollection
-     * @ManyToMany(targetEntity="App\Infrastructure\Persistence\Utilisateur\DoctrineUtilisateur")
+     * @ManyToMany(targetEntity="App\Infrastructure\Persistence\Utilisateur\DoctrineUtilisateur", inversedBy="occasions")
      * @JoinTable(name="tkdo_participation")
      */
     private $participants;
@@ -120,16 +120,5 @@ class DoctrineOccasion implements Occasion
     {
         $this->participants = new ArrayCollection($participants);
         return $this;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function __clone()
-    {
-        if (isset($this->participants)) $this->participants = new ArrayCollection(array_map(
-            function ($o) { return clone $o; },
-            $this->participants->toArray()
-        ));
     }
 }

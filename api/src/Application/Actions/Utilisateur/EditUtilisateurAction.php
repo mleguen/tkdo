@@ -5,7 +5,10 @@ declare(strict_types=1);
 namespace App\Application\Actions\Utilisateur;
 
 use App\Application\Serializable\Utilisateur\SerializableUtilisateur;
+use App\Domain\Utilisateur\PrefNotifIdees;
+use DateTime;
 use Psr\Http\Message\ResponseInterface as Response;
+use Slim\Exception\HttpBadRequestException;
 use Slim\Exception\HttpForbiddenException;
 
 class EditUtilisateurAction extends OneUtilisateurAction
@@ -37,6 +40,20 @@ class EditUtilisateurAction extends OneUtilisateurAction
         throw new HttpForbiddenException($this->request);
       }
       $utilisateur->setEstAdmin(boolval($body['estAdmin']));
+    }
+
+    if (isset($body['prefNotifIdees'])) {
+      if (!in_array($body['prefNotifIdees'], PrefNotifIdees::Toutes)) {
+        throw new HttpBadRequestException($this->request, "Format de préférence de notification incorrect : {$body['prefNotifIdees']}");
+      }
+      // Si on passe à une notification périodique, on réinitialise la date de dernière notification
+      if (
+        !in_array($utilisateur->getPrefNotifIdees(), PrefNotifIdees::Periodiques) &&
+        in_array($body['prefNotifIdees'], PrefNotifIdees::Periodiques)
+      ) {
+        $utilisateur->setDateDerniereNotifPeriodique(new DateTime());
+      }
+      $utilisateur->setPrefNotifIdees($body['prefNotifIdees']);
     }
     
     $utilisateur = $this->utilisateurRepository->update($utilisateur);

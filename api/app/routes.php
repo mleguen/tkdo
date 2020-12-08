@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 use App\Application\Actions\Connexion\CreateConnexionAction;
 use App\Application\Actions\Idee\CreateIdeeAction;
-use App\Application\Actions\Idee\DeleteIdeeAction;
 use App\Application\Actions\Idee\ListIdeeAction;
+use App\Application\Actions\Idee\CreateIdeeSuppressionAction;
 use App\Application\Actions\Occasion\CreateOccasionAction;
 use App\Application\Actions\Occasion\CreateParticipantOccasionAction;
 use App\Application\Actions\Occasion\CreateResultatOccasionAction;
@@ -31,7 +31,7 @@ return function (App $app) {
     $app->group('/idee', function (Group $group) {
         $group->get('', ListIdeeAction::class);
         $group->post('', CreateIdeeAction::class);
-        $group->delete('/{idIdee}', DeleteIdeeAction::class);
+        $group->post('/{idIdee}/suppression', CreateIdeeSuppressionAction::class);
     });
     $app->group('/occasion', function (Group $group) {
         $group->get('', ListOccasionAction::class);

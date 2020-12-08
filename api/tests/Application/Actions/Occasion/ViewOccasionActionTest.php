@@ -6,6 +6,7 @@ namespace Tests\Application\Actions\Occasion;
 use App\Domain\Occasion\OccasionNotFoundException;
 use App\Infrastructure\Persistence\Occasion\DoctrineOccasion;
 use App\Infrastructure\Persistence\Resultat\DoctrineResultat;
+use DateTime;
 use DateTimeInterface;
 use Slim\Exception\HttpForbiddenException;
 use Slim\Exception\HttpNotFoundException;
@@ -17,7 +18,7 @@ class ViewOccasionActionTest extends ActionTestCase
     public function testAction()
     {
         $occasion = (new DoctrineOccasion(1))
-            ->setDate(new \DateTime('tomorrow'))
+            ->setDate(new DateTime('tomorrow'))
             ->setTitre('Demain')
             ->setParticipants([$this->alice, $this->bob]);
         $this->occasionRepositoryProphecy
@@ -88,7 +89,7 @@ EOT;
     public function testActionPasParticipant()
     {
         $occasion = (new DoctrineOccasion(1))
-            ->setDate(new \DateTime('tomorrow'))
+            ->setDate(new DateTime('tomorrow'))
             ->setTitre('Demain')
             ->setParticipants([$this->bob]);
         $this->occasionRepositoryProphecy

@@ -52,6 +52,7 @@
         }
     },
     "scripts": {
+        "console": "php bin/console.php",
         "doctrine": "php bin/doctrine.php",
         "start": "php -S localhost:8080 -t public",
         "test": "phpunit"

@@ -124,11 +124,47 @@ const occasions: Occasion[] = [
   return o;
 });
 
-let idees: { idee: Idee, utilisateur: Utilisateur }[] = [
-  { idee: { id: 0, description: 'un gauffrier', auteur: alice, dateProposition: '19/04/2020' }, utilisateur: alice },
-  { idee: { id: 1, description: 'une canne à pêche', auteur: alice, dateProposition: '19/04/2020' }, utilisateur: bob },
-  { idee: { id: 2, description: 'des gants de boxe', auteur: bob, dateProposition: '07/04/2020' }, utilisateur: bob },
+let idees: { idee: Idee & { dateSuppression?: string }, utilisateur: Utilisateur }[] = [
+  {
+    idee: {
+      id: 0,
+      description: 'un gauffrier',
+      auteur: alice,
+      dateProposition: '2020-04-19',
+    },
+    utilisateur: alice
+  },
+  {
+    idee: {
+      id: 1,
+      description: 'une cravate',
+      auteur: alice,
+      dateProposition: '2020-06-19',
+      dateSuppression: '2020-07-08',
+    },
+    utilisateur: alice
+  },
+  {
+    idee: {
+      id: 2,
+      description: 'une canne à pêche',
+      auteur: alice,
+      dateProposition: '2020-04-19',
+    },
+    utilisateur: bob
+  },
+  {
+    idee: {
+      id: 3,
+      description: 'des gants de boxe',
+      auteur: bob,
+      dateProposition: '2020-04-07',
+    },
+    utilisateur: bob
+  },
 ].map(i => {
+  i.idee.dateProposition = new Date(i.idee.dateProposition).toJSON();
+  if (i.idee.dateSuppression) i.idee.dateSuppression = new Date(i.idee.dateSuppression).toJSON();
   (i.idee as Idee).auteur = enleveDonneesPrivees(i.idee.auteur);
   (i.utilisateur as Utilisateur) = enleveDonneesPrivees(i.utilisateur);
   return i;
@@ -146,7 +182,7 @@ export class DevBackendInterceptor implements HttpInterceptor {
     return of(null)
       .pipe(mergeMap(handleRoute))
       .pipe(materialize()) // call materialize and dematerialize to ensure delay even if an error is thrown (https://github.com/Reactive-Extensions/RxJS/issues/648)
-      .pipe(delay(500))
+      .pipe(delay(100))
       .pipe(dematerialize());
 
     function handleRoute() {
@@ -164,11 +200,16 @@ export class DevBackendInterceptor implements HttpInterceptor {
           if (method === 'GET') return getUtilisateur(+idUtilisateur);
           if (method === 'PUT') return putUtilisateur(+idUtilisateur);
         }
-        else if (match = urlApi.match(/\/idee(?:(?:\/(\d+))|(?:\?idUtilisateur=(\d+)))?$/)) {
-          const [, idIdee, idUtilisateur] = match;
-          if ((method === 'GET') && (idIdee === undefined) && (idUtilisateur !== undefined)) return getIdees(+idUtilisateur);
-          if ((method === 'POST') && (idIdee === undefined) && (idUtilisateur === undefined)) return postIdee();
-          if ((method === 'DELETE') && (idIdee !== undefined) && (idUtilisateur === undefined)) return deleteIdee(+idIdee);
+        else if (urlApi === '/idee') {
+          if (method === 'POST') return postIdee();
+        }
+        else if (match = urlApi.match(/\/idee\?idUtilisateur=(\d+)&supprimee=0$/)) {
+          const [, idUtilisateur] = match;
+          if (method === 'GET') return getIdees(+idUtilisateur);
+        }
+        else if (match = urlApi.match(/\/idee\/(\d+)\/suppression/)) {
+          const [, idIdee] = match;
+          if (method === 'POST') return postSuppressionIdee(+idIdee);
         }
         else if (match = urlApi.match(/\/occasion\?idParticipant=(\d+)$/)) {
           const [, idParticipant] = match;
@@ -180,9 +221,9 @@ export class DevBackendInterceptor implements HttpInterceptor {
         }
 
         // all other api routes are unknown
-        return notFound();   
+        return notFound();
       }
-      
+
       // pass through any requests not handled above
       return next.handle(request);
     }
@@ -238,7 +279,7 @@ export class DevBackendInterceptor implements HttpInterceptor {
 
       return ok({
         utilisateur: enleveDonneesPrivees(utilisateursAvecMdp[idUtilisateur]),
-        idees: idees.filter(i => i.utilisateur.id === idUtilisateur).map(i => i.idee),
+        idees: idees.filter(i => (i.utilisateur.id === idUtilisateur) && !i.idee.dateSuppression).map(i => i.idee),
       });
     }
 
@@ -246,7 +287,7 @@ export class DevBackendInterceptor implements HttpInterceptor {
       const utilisateurConnecte = authorizedUser();
       if (!utilisateurConnecte) return unauthorized();
 
-      const {idUtilisateur, description} = body as any;
+      const { idUtilisateur, description } = body as any;
 
       idees.push({
         utilisateur: enleveDonneesPrivees(utilisateursAvecMdp[idUtilisateur]),
@@ -265,10 +306,11 @@ export class DevBackendInterceptor implements HttpInterceptor {
       return liste.length === 0 ? 0 : Math.max(...liste.map(i => i.id)) + 1;
     }
 
-    function deleteIdee(idIdee: number) {
+    function postSuppressionIdee(idIdee: number) {
       if (!authorizedUser()) return unauthorized();
 
-      idees = idees.filter(i => i.idee.id !== idIdee);
+      const idee = idees.find(i => i.idee.id === idIdee);
+      idee.idee.dateSuppression = new Date().toJSON();
 
       return ok();
     }

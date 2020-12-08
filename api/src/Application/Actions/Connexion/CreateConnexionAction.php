@@ -6,7 +6,6 @@ namespace App\Application\Actions\Connexion;
 
 use App\Application\Actions\Action;
 use App\Application\Service\AuthService;
-use App\Application\Service\MailerService;
 use App\Domain\Utilisateur\UtilisateurNotFoundException;
 use App\Domain\Utilisateur\UtilisateurRepository;
 use Psr\Http\Message\ResponseInterface as Response;

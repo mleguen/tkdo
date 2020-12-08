@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace App\Domain\Utilisateur;
 
+use DateTime;
+
 interface UtilisateurRepository
 {
     public function create(
@@ -12,7 +14,8 @@ interface UtilisateurRepository
         string $nom,
         string $genre,
         bool $estAdmin,
-        string $prefNotifIdees
+        string $prefNotifIdees,
+        DateTime $dateDerniereNotifPeriodique
     ): Utilisateur;
 
     /**
@@ -36,6 +39,14 @@ interface UtilisateurRepository
      * @return Utilisateur[]
      */
     public function readAllByNotifInstantaneePourIdees(int $idUtilisateur, int $idActeur): array;
+
+    /**
+     * Renvoie tous les utilisateurs souhaitant recevoir la notification périodique spécifiée
+     * ayant n'ayant pas été notifiés depuis la date spécifiée (ou jamais encore notifiés)
+     * 
+     * @return Utilisateur[]
+     */
+    public function readAllByNotifPeriodique(string $prefNotifIdees, DateTime $dateMaxDerniereNotifPeriodique): array;
 
     /**
      * @throws UtilisateurNotFoundException

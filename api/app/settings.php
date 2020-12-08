@@ -1,15 +1,20 @@
 <?php
 declare(strict_types=1);
 
+use App\Application\Command\FixturesCommand;
+use App\Application\Command\NotifCommand;
 use App\Application\Service\MailerService;
 use DI\ContainerBuilder;
 use Monolog\Logger;
+use Slim\Psr7\Factory\UriFactory;
 
 if (!defined('APP_ROOT')) define('APP_ROOT', __DIR__ . '/..');
 
 return function (ContainerBuilder $containerBuilder) {
-    $devMode = (php_sapi_name() == 'cli') || (php_sapi_name() == 'cli-server');
+
+    $devMode = boolval($_ENV['TKDO_DEV_MODE'] ?? '1');
     $docker = in_array('docker', array_keys($_ENV));
+    $baseUri = (new UriFactory())->createUri($_ENV['TKDO_BASE_URI'] ?? 'http://localhost:4200');
 
     // Global Settings Object
     $containerBuilder->addDefinitions([
@@ -19,6 +24,10 @@ return function (ContainerBuilder $containerBuilder) {
                 'fichierClePrivee' => APP_ROOT . '/var/auth/auth_rsa',
                 'fichierClePublique' => APP_ROOT . '/var/auth/auth_rsa.pub',
                 'validite' => 3600,
+            ],
+            'commands' => [
+                FixturesCommand::class,
+                NotifCommand::class,
             ],
             'doctrine' => [
                 // if true, metadata caching is forcefully disabled
@@ -53,9 +62,13 @@ return function (ContainerBuilder $containerBuilder) {
             ],
             'mailer' => [
                 'mode' => $devMode ? MailerService::MODE_FILE : MailerService::MODE_MAIL,
-                'from' => $_ENV['MAILER_FROM'] ?? '',
+                'from' => $_ENV['TKDO_MAILER_FROM'] ?? '',
                 'path' => APP_ROOT . '/var/mail',
+                'baseUri' => $baseUri,
             ],
+            'fixtures' => [
+                'host' => $baseUri->getHost()
+            ]
         ],
     ]);
 };

@@ -34,9 +34,15 @@ class ListIdeeAction extends IdeeAction
     {
         $this->assertAuth();
         $queryParams = $this->request->getQueryParams();
-        if (!isset($queryParams['idUtilisateur'])) throw new HttpBadRequestException($this->request, 'idUtilisateur manquant');
 
+        if (!isset($queryParams['idUtilisateur'])) throw new HttpBadRequestException($this->request, 'idUtilisateur manquant');
         $idUtilisateurAuth = $this->request->getAttribute('idUtilisateurAuth');
+
+        $supprimee = false;
+        if (!isset($queryParams['supprimee']) || boolval($queryParams['supprimee'])) {
+            $this->assertUtilisateurAuthEstAdmin();
+            $supprimee = isset($queryParams['supprimee']) ? true : null;
+        }
 
         $utilisateur = $this->utilisateurRepository->read((int) $queryParams['idUtilisateur']);
         return $this->respondWithData([
@@ -47,7 +53,7 @@ class ListIdeeAction extends IdeeAction
                 },
                 array_values( // Obligatoire pour être encodé comme un tableau en JSON
                     array_filter(
-                        $this->ideeRepository->readByUtilisateur($utilisateur),
+                        $this->ideeRepository->readAllByUtilisateur($utilisateur, $supprimee),
                         function (Idee $i) use ($idUtilisateurAuth) {
                             return (
                                 // L'utilisateur authentifié ne peut voir que les idées dont il est l'auteur

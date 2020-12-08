@@ -9,6 +9,7 @@ use App\Domain\Utilisateur\Utilisateur;
 use App\Domain\Utilisateur\UtilisateurNotFoundException;
 use App\Domain\Utilisateur\UtilisateurRepository;
 use App\Infrastructure\Persistence\Occasion\DoctrineOccasion;
+use DateTime;
 use Doctrine\ORM\EntityManager;
 
 class DoctrineUtilisateurRepository implements UtilisateurRepository
@@ -33,7 +34,8 @@ class DoctrineUtilisateurRepository implements UtilisateurRepository
         string $nom,
         string $genre,
         bool $estAdmin,
-        string $prefNotifIdees
+        string $prefNotifIdees,
+        DateTime $dateDerniereNotifPeriodique
     ): Utilisateur
     {
         $utilisateur = (new DoctrineUtilisateur())
@@ -43,7 +45,8 @@ class DoctrineUtilisateurRepository implements UtilisateurRepository
             ->setNom($nom)
             ->setGenre($genre)
             ->setEstAdmin($estAdmin)
-            ->setPrefNotifIdees($prefNotifIdees);
+            ->setPrefNotifIdees($prefNotifIdees)
+            ->setDateDerniereNotifPeriodique($dateDerniereNotifPeriodique);
         $this->em->persist($utilisateur);
         $this->em->flush();
         return $utilisateur;
@@ -88,6 +91,24 @@ class DoctrineUtilisateurRepository implements UtilisateurRepository
             ->setParameter('idUtilisateur', $idUtilisateur)
             ->setParameter('idActeur', $idActeur)
             ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function readAllByNotifPeriodique(string $prefNotifIdees, DateTime $dateMaxDerniereNotifPeriodique): array
+    {
+        $classDoctrineUtilisateur = DoctrineUtilisateur::class;
+        $dql = <<<EOS
+            SELECT u
+            FROM $classDoctrineUtilisateur u
+            WHERE u.prefNotifIdees = :prefNotifIdees
+            AND u.dateDerniereNotifPeriodique <= :dateMaxDerniereNotifPeriodique
+EOS;
+        return $this->em->createQuery($dql)
+            ->setParameter('prefNotifIdees', $prefNotifIdees)
+            ->setParameter('dateMaxDerniereNotifPeriodique', $dateMaxDerniereNotifPeriodique)
             ->getResult();
     }
 

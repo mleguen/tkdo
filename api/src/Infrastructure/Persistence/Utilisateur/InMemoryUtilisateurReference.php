@@ -6,6 +6,7 @@ namespace App\Infrastructure\Persistence\Utilisateur;
 
 use App\Domain\ReferenceException;
 use App\Domain\Utilisateur\Utilisateur;
+use DateTime;
 
 class InMemoryUtilisateurReference implements Utilisateur
 {
@@ -25,6 +26,14 @@ class InMemoryUtilisateurReference implements Utilisateur
   public function getId(): int
   {
     return $this->id;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getDateDerniereNotifPeriodique(): DateTime
+  {
+    throw new ReferenceException();
   }
 
   /**
@@ -78,7 +87,23 @@ class InMemoryUtilisateurReference implements Utilisateur
   /**
    * {@inheritdoc}
    */
+  public function getOccasions(): array
+  {
+    throw new ReferenceException();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getPrefNotifIdees(): string
+  {
+    throw new ReferenceException();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setDateDerniereNotifPeriodique(DateTime $dateDerniereNotifPeriodique): Utilisateur
   {
     throw new ReferenceException();
   }

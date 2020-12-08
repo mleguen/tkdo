@@ -5,17 +5,18 @@ declare(strict_types=1);
 namespace App\Application\Service;
 
 use Firebase\JWT\JWT;
+use Psr\Container\ContainerInterface;
 
 class AuthService
 {
   private $defaultSettings;
 
-  public function __construct(array $defaultSettings = [])
+  public function __construct(ContainerInterface $c)
   {
     $this->defaultSettings = array_merge([
       'algo' => 'RS256',
       'validite' => 3600,
-    ], $defaultSettings);
+    ], $c->get('settings')['auth']);
     
     if (!($this->defaultSettings['clePrivee'] = file_get_contents($this->defaultSettings['fichierClePrivee']))) {
       throw new \Exception("Impossible de lire la clé privée dans {$this->defaultSettings['fichierClePrivee']}");

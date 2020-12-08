@@ -33,6 +33,7 @@ export enum Genre {
 export enum PrefNotifIdees {
   Aucune = 'N',
   Instantanee = 'I',
+  Quotidienne = 'Q',
 }
 
 export interface Resultat {
@@ -59,6 +60,7 @@ const URL_OCCASION = (idOccasion: number) => `${URL_API}/occasion/${idOccasion}`
 const URL_UTILISATEUR = (idUtilisateur: number) => `${URL_API}/utilisateur/${idUtilisateur}`;
 const URL_IDEES = `${URL_API}/idee`;
 const URL_IDEE = (idIdee: number) => `${URL_IDEES}/${idIdee}`;
+const URL_SUPPRESSION_IDEE = (idIdee: number) => `${URL_IDEE(idIdee)}/suppression`;
 
 const CLE_LISTE_OCCASIONS = 'occasions';
 const CLE_TOKEN = 'backend-token';
@@ -129,7 +131,7 @@ export class BackendService {
   }
 
   getIdees(idUtilisateur: number) {
-    return this.http.get<IdeesPour>(`${URL_IDEES}?idUtilisateur=${idUtilisateur}`);
+    return this.http.get<IdeesPour>(`${URL_IDEES}?idUtilisateur=${idUtilisateur}&supprimee=0`);
   }
 
   getOccasion(idOccasion: number) {
@@ -173,6 +175,6 @@ export class BackendService {
   }
 
   supprimeIdee(idIdee: number) {
-    return this.http.delete(URL_IDEE(idIdee)).toPromise();
+    return this.http.post(URL_SUPPRESSION_IDEE(idIdee), undefined).toPromise();
   }
 }

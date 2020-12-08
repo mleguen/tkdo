@@ -10,6 +10,7 @@
 - ajout d'une date aux occations.
   L'occasion affichée par défaut à la connexion est maintenant la prochaine occasion à venir,
   ou à défaut la dernière occasion passée
+- les idées ne sont plus supprimées, mais marquées comme telles (et toujours présentes en base de données)
 - ajout de préférences de notification des créations/suppressions d'idées au profil utilisateur, pour le notifier :
   - à chaque création/suppression d'idée pour un participant d'une occasion à venir
   - ou pas du tout

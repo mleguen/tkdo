@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Application\Actions\Idee;
 
 use App\Application\Serializable\Idee\SerializableIdee;
+use DateTime;
 use Psr\Http\Message\ResponseInterface as Response;
 
 class CreateIdeeAction extends IdeeActionANotifier
@@ -21,7 +22,7 @@ class CreateIdeeAction extends IdeeActionANotifier
       $utilisateur,
       $body['description'],
       $this->utilisateurRepository->read($body['idAuteur'], true),
-      new \DateTime()
+      new DateTime()
     );
 
     $utilisateursANotifier = $this->utilisateurRepository->readAllByNotifInstantaneePourIdees(
@@ -29,7 +30,7 @@ class CreateIdeeAction extends IdeeActionANotifier
       $this->request->getAttribute('idUtilisateurAuth')
     );
     foreach ($utilisateursANotifier as $utilisateurANotifier) {
-      $this->mailerService->envoieMailCreationIdee($this->request, $utilisateurANotifier, $utilisateur, $idee);
+      $this->mailerService->envoieMailIdeeCreation($utilisateurANotifier, $utilisateur, $idee);
     }
 
     return $this->respondWithData(new SerializableIdee($idee));

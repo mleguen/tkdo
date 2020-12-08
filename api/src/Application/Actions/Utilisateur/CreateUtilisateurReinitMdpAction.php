@@ -37,7 +37,7 @@ class CreateUtilisateurReinitMdpAction extends OneUtilisateurAction
     $utilisateur->setMdp(password_hash($mdp, PASSWORD_DEFAULT));
     $this->utilisateurRepository->update($utilisateur);
 
-    $this->mailerService->envoieMailReinitialisationMdp($this->request, $utilisateur, $mdp);
+    $this->mailerService->envoieMailMdpReinitialisation($utilisateur, $mdp);
 
     return $this->respondWithData(new SerializableUtilisateur($utilisateur, true));
   }

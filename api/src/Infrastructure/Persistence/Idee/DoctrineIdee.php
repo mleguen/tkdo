@@ -6,6 +6,7 @@ namespace App\Infrastructure\Persistence\Idee;
 
 use App\Domain\Idee\Idee;
 use App\Domain\Utilisateur\Utilisateur;
+use DateTime;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\GeneratedValue;
@@ -49,10 +50,16 @@ class DoctrineIdee implements Idee
     private $auteur;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      * @Column(type="datetime")
      */
     private $dateProposition;
+
+    /**
+     * @var DateTime
+     * @Column(type="datetime", nullable=true)
+     */
+    private $dateSuppression;
 
     public function __construct(?int $id = NULL)
     {
@@ -94,9 +101,25 @@ class DoctrineIdee implements Idee
     /**
      * {@inheritdoc}
      */
-    public function getDateProposition(): \DateTime
+    public function getDateProposition(): DateTime
     {
         return $this->dateProposition;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDateSuppression(): DateTime
+    {
+        return $this->dateSuppression;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasDateSuppression(): bool
+    {
+        return isset($this->dateSuppression);
     }
 
     /**
@@ -129,18 +152,18 @@ class DoctrineIdee implements Idee
     /**
      * {@inheritdoc}
      */
-    public function setDateProposition(\DateTime $dateProposition): Idee
+    public function setDateProposition(DateTime $dateProposition): Idee
     {
         $this->dateProposition = $dateProposition;
         return $this;
     }
-
+    
     /**
      * {@inheritdoc}
      */
-    public function __clone() {
-        if (isset($this->utilisateur)) $this->utilisateur = clone $this->utilisateur;
-        if (isset($this->auteur)) $this->auteur = clone $this->auteur;
-        if (isset($this->dateProposition)) $this->dateProposition = clone $this->dateProposition;
+    public function setDateSuppression(DateTime $dateSuppression): Idee
+    {
+        $this->dateSuppression = $dateSuppression;
+        return $this;
     }
 }

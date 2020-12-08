@@ -3,16 +3,21 @@
 namespace App\Infrastructure\Persistence\Utilisateur;
 
 use App\Domain\Utilisateur\Genre;
+use App\Domain\Utilisateur\PrefNotifIdees;
 use App\Infrastructure\Persistence\DoctrineAbstractFixture;
+use DateTime;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class DoctrineUtilisateurFixture extends DoctrineAbstractFixture
 {
-    public function __construct(OutputInterface $output, bool $prod, string $adminEmail = null)
+    private $adminEmail;
+    private $host;
+
+    public function __construct(OutputInterface $output, bool $prod, string $host, string $adminEmail = null)
     {
         parent::__construct($output, $prod);
-        if ($prod && !isset($adminEmail)) throw new \Exception('email administrateur manquant');
+        $this->host = $host;
         $this->adminEmail = $adminEmail;
     }
 
@@ -21,48 +26,54 @@ class DoctrineUtilisateurFixture extends DoctrineAbstractFixture
         if ($this->prod) {
             $utilisateurs = [
                 'admin' => (new DoctrineUtilisateur())
-                    ->setEmail($this->adminEmail)
+                    ->setEmail($this->adminEmail ?? "admin@$this->host")
                     ->setEstAdmin(true)
                     ->setGenre(Genre::Masculin)
                     ->setIdentifiant('admin')
                     ->setMdp(password_hash('admin', PASSWORD_DEFAULT))
-                    ->setNom('Administrateur'),
+                    ->setNom('Administrateur')
+                    ->setDateDerniereNotifPeriodique(new DateTime()),
             ];
         } else {
             $utilisateurs = [
                 'alice' => (new DoctrineUtilisateur())
-                    ->setEmail('alice@tkdo.org')
+                    ->setEmail("alice@$this->host")
                     ->setEstAdmin(true)
                     ->setGenre(Genre::Feminin)
                     ->setIdentifiant('alice')
                     ->setNom('Alice')
-                    ->setMdp(password_hash('mdpalice', PASSWORD_DEFAULT)),
+                    ->setMdp(password_hash('mdpalice', PASSWORD_DEFAULT))
+                    ->setDateDerniereNotifPeriodique(new DateTime('2 days ago')),
                 'bob' => (new DoctrineUtilisateur())
-                    ->setEmail('bob@tkdo.org')
+                    ->setEmail("bob@$this->host")
                     ->setGenre(Genre::Masculin)
                     ->setIdentifiant('bob')
                     ->setNom('Bob')
                     ->setMdp(password_hash('mdpbob', PASSWORD_DEFAULT))
-                    ->setPrefNotifIdees('I'),
+                    ->setPrefNotifIdees(PrefNotifIdees::Instantanee)
+                    ->setDateDerniereNotifPeriodique(new DateTime('2 days ago')),
                 'charlie' => (new DoctrineUtilisateur())
-                    ->setEmail('charlie@tkdo.org')
+                    ->setEmail("charlie@$this->host")
                     ->setGenre(Genre::Masculin)
                     ->setIdentifiant('charlie')
                     ->setMdp(password_hash('mdpcharlie', PASSWORD_DEFAULT))
                     ->setNom('Charlie')
-                    ->setPrefNotifIdees('I'),
+                    ->setPrefNotifIdees(PrefNotifIdees::Quotidienne)
+                    ->setDateDerniereNotifPeriodique(new DateTime('2 days ago')),
                 'david' => (new DoctrineUtilisateur())
-                    ->setEmail('david@tkdo.org')
+                    ->setEmail("david@$this->host")
                     ->setGenre(Genre::Masculin)
                     ->setIdentifiant('david')
                     ->setMdp(password_hash('mdpdavid', PASSWORD_DEFAULT))
-                    ->setNom('David'),
+                    ->setNom('David')
+                    ->setDateDerniereNotifPeriodique(new DateTime('2 days ago')),
                 'eve' => (new DoctrineUtilisateur())
-                    ->setEmail('eve@tkdo.org')
+                    ->setEmail("eve@$this->host")
                     ->setGenre(Genre::Feminin)
                     ->setIdentifiant('eve')
                     ->setMdp(password_hash('mdpeve', PASSWORD_DEFAULT))
-                    ->setNom('Eve'),
+                    ->setNom('Eve')
+                    ->setDateDerniereNotifPeriodique(new DateTime('2 days ago')),
             ];
         }
         foreach($utilisateurs as $nom => $utilisateur) {

@@ -6,6 +6,7 @@ namespace App\Infrastructure\Persistence\Utilisateur;
 
 use App\Domain\Utilisateur\PrefNotifIdees;
 use App\Domain\Utilisateur\Utilisateur;
+use DateTime;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\GeneratedValue;
@@ -18,6 +19,11 @@ use Doctrine\ORM\Mapping\Table;
  */
 class DoctrineUtilisateur implements Utilisateur
 {
+  /**
+   * @var DateTime
+   * @Column(type="datetime")
+   */
+  private $dateDerniereNotifPeriodique;
 
   /**
    * @var string
@@ -64,6 +70,12 @@ class DoctrineUtilisateur implements Utilisateur
   private $nom;
 
   /**
+   * @var ArrayCollection
+   * @ManyToMany(targetEntity="App\Infrastructure\Persistence\Occasion\DoctrineOccasion", mappedBy="participants")
+   */
+  private $occasions;
+
+  /**
    * @var string
    * @Column()
    */
@@ -72,6 +84,14 @@ class DoctrineUtilisateur implements Utilisateur
   public function __construct(?int $id = NULL)
   {
     if (isset($id)) $this->id = $id;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getDateDerniereNotifPeriodique(): DateTime
+  {
+    return $this->dateDerniereNotifPeriodique;
   }
 
   /**
@@ -130,9 +150,26 @@ class DoctrineUtilisateur implements Utilisateur
   /**
    * {@inheritdoc}
    */
+  public function getOccasions(): array
+  {
+    return $this->occasions->toArray();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getPrefNotifIdees(): string
   {
     return $this->prefNotifIdees;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setDateDerniereNotifPeriodique(DateTime $dateDerniereNotifPeriodique): Utilisateur
+  {
+    $this->dateDerniereNotifPeriodique = $dateDerniereNotifPeriodique;
+    return $this;
   }
 
   /**

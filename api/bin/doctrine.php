@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 require 'vendor/autoload.php';
 
-use App\Tools\Console\Command\FixturesLoadCommand;
 use Doctrine\Migrations\DependencyFactory;
 use Doctrine\ORM\Tools\Console\ConsoleRunner;
 use Doctrine\Migrations\Tools\Console\ConsoleRunner as MigrationsConsoleRunner;
@@ -17,9 +16,8 @@ $helperSet->set(new QuestionHelper(), 'question');
 $cli = ConsoleRunner::createApplication($helperSet);
 
 MigrationsConsoleRunner::addCommands($cli, $dependencyFactory);
-$cli->addCommands([new FixturesLoadCommand($dependencyFactory)]);
 
 // Runs console application
-$cli->run();
+$status = $cli->run();
 
-
+exit($status);

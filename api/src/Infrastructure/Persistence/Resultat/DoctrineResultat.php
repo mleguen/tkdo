@@ -99,14 +99,4 @@ class DoctrineResultat implements Resultat
         $this->quiRecoit = $quiRecoit;
         return $this;
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function __clone()
-    {
-        $this->occasion = clone $this->occasion;
-        $this->quiOffre = clone $this->quiOffre;
-        $this->quiRecoit = clone $this->quiRecoit;
-    }
 }

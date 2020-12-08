@@ -1,19 +1,10 @@
 # Travaux futurs
 
-- notifications par mail :
-  - ajouter une notification quotidienne des idées créées ou supprimées :
-    - ajouter un 3ème choix Q pour Quotidienne aux préférences de notification
-      - dans l'api
-      - dans le front
-    - remplacer la suppression d'une idée par l'ajout d'une date de suppression (PUT du coup au lieu de DELETE) :
-      - dans l'api
-      - dans le front
-    - filtrer les idées supprimées dans le GET (avec une querystring qui fait le filtre, obligatoire sauf pour les admins) :
-      - dans l'api
-      - dans le front
-      - dans la page admin (section Idées à ajouter)
-    - ajouter une commande doctrine d'envoi de la notification quotidienne (pour les utilisateurs le souhaitant)
-    - documenter l'installation d'un cron pour appeler cette commande
+- utiliser $TKDO_DEV_MODE dans fixtures, plutôt que de passer --prod
+- notion d'environnement et séparation de .env en .env, .env.$TKDO_ENV et .env.local
+  (ATTENTION à docker qui ne supporte que .env)
+- valeurs par défaut des varibles d'environnement dans .env, plus dans le code
+  (avec contrôle qu'elles sont bien définies par php-dotenv)
 - ajouter une route admin d'affichage des logs
 - ajouter une route admin de génération du tirage au sort dans l'application (tirage au sort automatisé)
 - ajouter sur la carte d'un participant le nombre d'idées qui ont été proposées pour lui (ne compter que les idées lisibles)
@@ -28,3 +19,4 @@
 - ajouter une route admin de suppression d'occasion (si pas ou plus de tirage)
 - enlever "doctrine" des noms de colonne auto-générés en base de données
 - repartir d'un squelette slim de base pour enlever tout le superflu de l'api
+- revoir la ventilation appli / domaine / infra qui n'est pas respectée

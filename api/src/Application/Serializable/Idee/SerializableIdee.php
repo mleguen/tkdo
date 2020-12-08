@@ -6,6 +6,7 @@ namespace App\Application\Serializable\Idee;
 
 use App\Application\Serializable\Utilisateur\SerializableUtilisateur;
 use App\Domain\Idee\Idee;
+use DateTimeInterface;
 use JsonSerializable;
 
 class SerializableIdee implements JsonSerializable
@@ -21,11 +22,17 @@ class SerializableIdee implements JsonSerializable
 
   public function jsonSerialize(): array
   {
-    return [
+    $json = [
       'id' => $this->idee->getId(),
       'description' => $this->idee->getDescription(),
       'auteur' => new SerializableUtilisateur($this->idee->getAuteur()),
-      'dateProposition' => $this->idee->getDateProposition()->format(\DateTimeInterface::ISO8601),
+      'dateProposition' => $this->idee->getDateProposition()->format(DateTimeInterface::ISO8601),
     ];
+
+    if ($this->idee->hasDateSuppression()) {
+      $json['dateSuppression'] = $this->idee->getDateSuppression()->format(DateTimeInterface::ISO8601);
+    }
+
+    return $json;
   }
 }

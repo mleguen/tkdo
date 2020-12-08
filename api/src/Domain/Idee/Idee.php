@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Domain\Idee;
 
 use App\Domain\Utilisateur\Utilisateur;
+use DateTime;
 
 interface Idee
 {
@@ -27,7 +28,17 @@ interface Idee
     /**
      * @throws ReferenceException
      */
-    public function getDateProposition(): \DateTime;
+    public function getDateProposition(): DateTime;
+
+    /**
+     * @throws ReferenceException
+     */
+    public function getDateSuppression(): DateTime;
+
+    /**
+     * @throws ReferenceException
+     */
+    public function hasDateSuppression(): bool;
 
     /**
      * @throws ReferenceException
@@ -47,5 +58,10 @@ interface Idee
     /**
      * @throws ReferenceException
      */
-    public function setDateProposition(\DateTime $dateProposition): Idee;
+    public function setDateProposition(DateTime $dateProposition): Idee;
+
+    /**
+     * @throws ReferenceException
+     */
+    public function setDateSuppression(DateTime $dateSuppression): Idee;
 }

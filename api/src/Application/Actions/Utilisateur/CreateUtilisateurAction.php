@@ -9,6 +9,7 @@ use App\Application\Service\MailerService;
 use App\Application\Service\PasswordService;
 use App\Domain\Utilisateur\PrefNotifIdees;
 use App\Domain\Utilisateur\UtilisateurRepository;
+use DateTime;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Log\LoggerInterface;
 use Slim\Exception\HttpBadRequestException;
@@ -51,10 +52,12 @@ class CreateUtilisateurAction extends UtilisateurAction
       $body['nom'],
       $body['genre'],
       boolval($body['estAdmin']),
-      $body['prefNotifIdees']
+      $body['prefNotifIdees'],
+      // Empêche les notifications des événéments antérieurs à la création de l'utilisateur d'être envoyées
+      new DateTime()
     );
   
-    $this->mailerService->envoieMailCreationUtilisateur($this->request, $utilisateur, $mdp);
+    $this->mailerService->envoieMailMdpCreation($utilisateur, $mdp);
 
     return $this->respondWithData(new SerializableUtilisateur($utilisateur, true));
   }

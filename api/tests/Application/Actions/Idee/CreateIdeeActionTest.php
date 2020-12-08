@@ -6,6 +6,8 @@ namespace Tests\Application\Actions\Idee;
 
 use App\Infrastructure\Persistence\Idee\DoctrineIdee;
 use App\Infrastructure\Persistence\Utilisateur\InMemoryUtilisateurReference;
+use DateTime;
+use DateTimeInterface;
 use Exception;
 use Prophecy\Argument;
 use Slim\Exception\HttpForbiddenException;
@@ -34,7 +36,7 @@ class CreateIdeeActionTest extends ActionTestCase
             ->setUtilisateur($this->alice)
             ->setDescription('un gauffrier')
             ->setAuteur($this->bob)
-            ->setDateProposition(new \DateTime);
+            ->setDateProposition(new DateTime());
 
         $this->utilisateurRepositoryProphecy
             ->readAllByNotifInstantaneePourIdees($this->idee->getUtilisateur()->getId(), Argument::cetera())
@@ -47,8 +49,8 @@ class CreateIdeeActionTest extends ActionTestCase
     public function testAction(bool $estAdmin)
     {
         $testCase = $this;
-        $callTime = new \DateTime();
-        /** @var \DateTime */
+        $callTime = new DateTime();
+        /** @var DateTime */
         $dateProposition = null;
         $this->ideeRepositoryProphecy
             ->create(Argument::cetera())
@@ -59,7 +61,7 @@ class CreateIdeeActionTest extends ActionTestCase
 
                 $dateProposition = $args[3];
                 $testCase->assertGreaterThanOrEqual($callTime, $dateProposition);
-                $testCase->assertLessThanOrEqual(new \DateTime(), $dateProposition);
+                $testCase->assertLessThanOrEqual(new DateTime(), $dateProposition);
                 return $testCase->idee;
             })
             ->shouldBeCalledOnce();
@@ -90,7 +92,7 @@ EOT
         "id": {$this->idee->getAuteur()->getId()},
         "nom": "{$this->idee->getAuteur()->getNom()}"
     },
-    "dateProposition": "{$dateProposition->format(\DateTimeInterface::ISO8601)}"
+    "dateProposition": "{$dateProposition->format(DateTimeInterface::ISO8601)}"
 }
 
 EOT;

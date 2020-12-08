@@ -50,7 +50,7 @@ class CreateResultatOccasionAction extends OccasionAction
         $resultat = $this->resultatRepository->create($occasion, $quiOffre, $quiRecoit);
 
         if (!$this->dateService->estPassee($occasion->getDate())) {
-            $this->mailerService->envoieMailTirageFait($this->request, $quiOffre, $occasion);
+            $this->mailerService->envoieMailTirageFait($quiOffre, $occasion);
         }
 
         return $this->respondWithData(new SerializableResultat($resultat));
