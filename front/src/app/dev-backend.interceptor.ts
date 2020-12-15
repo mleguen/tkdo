@@ -24,7 +24,7 @@ const alice: UtilisateurAvecMdp = {
   nom: 'Alice',
   mdp: 'mdpalice',
   genre: Genre.Feminin,
-  estAdmin: true,
+  admin: true,
   prefNotifIdees: PrefNotifIdees.Aucune,
 };
 
@@ -35,7 +35,7 @@ const bob: UtilisateurAvecMdp = {
   nom: 'Bob',
   mdp: 'mdpbob',
   genre: Genre.Masculin,
-  estAdmin: false,
+  admin: false,
   prefNotifIdees: PrefNotifIdees.Instantanee,
 };
 
@@ -46,7 +46,7 @@ const charlie: UtilisateurAvecMdp = {
   nom: 'Charlie',
   mdp: 'mdpcharlie',
   genre: Genre.Masculin,
-  estAdmin: false,
+  admin: false,
   prefNotifIdees: PrefNotifIdees.Instantanee,
 };
 
@@ -57,7 +57,7 @@ const david: UtilisateurAvecMdp = {
   nom: 'David',
   mdp: 'mdpdavid',
   genre: Genre.Masculin,
-  estAdmin: false,
+  admin: false,
   prefNotifIdees: PrefNotifIdees.Aucune,
 };
 
@@ -68,7 +68,7 @@ const eve: UtilisateurAvecMdp = {
   nom: 'Eve',
   mdp: 'mdpeve',
   genre: Genre.Feminin,
-  estAdmin: false,
+  admin: false,
   prefNotifIdees: PrefNotifIdees.Aucune,
 };
 
@@ -203,7 +203,7 @@ export class DevBackendInterceptor implements HttpInterceptor {
         else if (urlApi === '/idee') {
           if (method === 'POST') return postIdee();
         }
-        else if (match = urlApi.match(/\/idee\?idUtilisateur=(\d+)&supprimee=0$/)) {
+        else if (match = urlApi.match(/\/idee\?idUtilisateur=(\d+)&supprimees=0$/)) {
           const [, idUtilisateur] = match;
           if (method === 'GET') return getIdees(+idUtilisateur);
         }
@@ -234,8 +234,8 @@ export class DevBackendInterceptor implements HttpInterceptor {
       const utilisateur = utilisateursAvecMdp.find(u => (u.identifiant === identifiant) && (u.mdp === mdp));
       if (!utilisateur) return badRequest('identifiants invalides');
 
-      const { id, nom, estAdmin } = utilisateur;
-      return ok({ token: identifiant, utilisateur: { id, nom, estAdmin } });
+      const { id, nom, admin } = utilisateur;
+      return ok({ token: identifiant, utilisateur: { id, nom, admin } });
     }
 
     function getUtilisateur(idUtilisateur: number) {
@@ -351,7 +351,7 @@ export const devBackendInterceptorProvider: Provider = {
 };
 
 function enleveDonneesPrivees(u: UtilisateurAvecMdp): Utilisateur {
-  let { email, estAdmin, identifiant, prefNotifIdees, ...donneesPubliques } = enleveMdp(u);
+  let { email, admin, identifiant, prefNotifIdees, ...donneesPubliques } = enleveMdp(u);
   return donneesPubliques;
 }
 

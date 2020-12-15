@@ -27,7 +27,7 @@
         <a class="nav-link" [routerLink]="['/profil']"
         data-toggle="collapse" data-target=".navbar-collapse.show">Mon profil</a>
       </li>
-      <li class="nav-item" *ngIf="utilisateur.estAdmin" [ngClass]="{'active': menuActif === '/admin'}">
+      <li class="nav-item" *ngIf="utilisateur.admin" [ngClass]="{'active': menuActif === '/admin'}">
         <a class="nav-link" [routerLink]="['/admin']"
         data-toggle="collapse" data-target=".navbar-collapse.show">Administration</a>
       </li>

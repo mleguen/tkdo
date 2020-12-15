@@ -1,19 +1,26 @@
 <?php
 
-use Psr\Container\ContainerInterface;
+declare(strict_types=1);
+
+use App\Appli\Command\FixturesCommand;
+use App\Appli\Command\NotifCommand;
+use App\Bootstrap;
 use Symfony\Component\Console\Application;
 
-require_once __DIR__ . '/../vendor/autoload.php';
+require __DIR__ . '/../vendor/autoload.php';
 
-/** @var ContainerInterface $container */
-$container = require __DIR__ . '/../bootstrap.php';
+$bootstrap = new Bootstrap();
+$bootstrap->initEnv();
+$container = $bootstrap->initContainer();
 
-$application = new Application();
+$symfonyConsoleApp = new Application();
 
-foreach ($container->get('settings')['commands'] as $class) {
-    $application->add($container->get($class));
+foreach ([
+    FixturesCommand::class,
+    NotifCommand::class,
+] as $class) {
+    $symfonyConsoleApp->add($container->get($class));
 }
 
-$status = $application->run();
-
+$status = $symfonyConsoleApp->run();
 exit($status);

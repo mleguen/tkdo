@@ -20,7 +20,7 @@ export interface Utilisateur {
 
 export interface UtilisateurPrive extends Utilisateur {
   email: string;
-  estAdmin: boolean;
+  admin: boolean;
   identifiant: string;
   prefNotifIdees: string;
 }
@@ -68,7 +68,7 @@ const CLE_UTILISATEUR = 'utilisateur';
 
 interface PostConnexionDTO {
   token: string;
-  utilisateur: Pick<UtilisateurPrive, 'id' | 'nom' | 'estAdmin'>;
+  utilisateur: Pick<UtilisateurPrive, 'id' | 'nom' | 'admin'>;
 }
 
 @Injectable({
@@ -115,10 +115,10 @@ export class BackendService {
     this.utilisateurConnecte$.next(null);
   }
   
-  estAdmin() {
+  admin() {
     return this.utilisateurConnecte$.pipe(
       first(),
-      map(u => u.estAdmin),
+      map(u => u.admin),
     ).toPromise();
   }
   
@@ -131,7 +131,7 @@ export class BackendService {
   }
 
   getIdees(idUtilisateur: number) {
-    return this.http.get<IdeesPour>(`${URL_IDEES}?idUtilisateur=${idUtilisateur}&supprimee=0`);
+    return this.http.get<IdeesPour>(`${URL_IDEES}?idUtilisateur=${idUtilisateur}&supprimees=0`);
   }
 
   getOccasion(idOccasion: number) {
@@ -167,7 +167,7 @@ export class BackendService {
     // Les erreurs applicatives sont sensées être prises en compte
     if (error.status === 400) return;
 
-    this.erreur$.next(`${error.status} ${error.statusText}`);
+    this.erreur$.next(error.error.message || (`${error.status} ${error.statusText}`));
   }
 
   notifieSuccesHTTP() {

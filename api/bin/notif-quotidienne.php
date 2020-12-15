@@ -1,22 +1,25 @@
 <?php
 
-use App\Application\Command\NotifCommand;
-use Psr\Container\ContainerInterface;
+declare(strict_types=1);
+
+use App\Appli\Command\NotifCommand;
+use App\Bootstrap;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\ConsoleOutput;
 
-require_once __DIR__ . '/../vendor/autoload.php';
+require __DIR__ . '/../vendor/autoload.php';
 
-/** @var ContainerInterface $container */
-$container = require __DIR__ . '/../bootstrap.php';
+$bootstrap = new Bootstrap();
+$bootstrap->initEnv();
+$container = $bootstrap->initContainer();
 
 /** @var NotifCommand */
 $command = $container->get(NotifCommand::class);
+
 $status = $command->run(
     new ArrayInput([
         '--periode' => 'Q',
     ]),
     new ConsoleOutput()
 );
-
 exit($status);

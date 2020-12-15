@@ -31,7 +31,7 @@ $ curl \
   "utilisateur": {{'{'}}
     "id": {{idUtilisateur}},
     "nom": "Alice",
-    "estAdmin": true
+    "admin": true
   }
 }
 </samp></pre>
@@ -52,7 +52,7 @@ curl -u {{token}}: \
 [
   {{'{'}}
     "email": "admin@tkdo.org",
-    "estAdmin": true,
+    "admin": true,
     "genre": "M",
     "id": {{idUtilisateur}},
     "identifiant": "admin",
@@ -70,7 +70,7 @@ $ curl -u {{token}}: \
 -d email='utilisatrice01@tkdo.org' \
 -d nom='Utilisatrice 1' \
 -d genre=F \
--d estAdmin=0 \
+-d admin=0 \
 -d prefNotifIdees=N \
 -X POST {{urlApi}}/utilisateur
 </samp></pre>
@@ -80,7 +80,7 @@ $ curl -u {{token}}: \
 <pre><samp>
 {{'{'}}
   "email": "utilisatrice01@tkdo.org",
-  "estAdmin": false,
+  "admin": false,
   "genre": "F",
   "id": 71,
   "identifiant": "utilisatrice01",
@@ -105,7 +105,7 @@ curl -u {{token}}: \
 <pre><samp>
 {{'{'}}
   "email": "admin@tkdo.org",
-  "estAdmin": true,
+  "admin": true,
   "genre": "M",
   "id": 70,
   "identifiant": "admin",
@@ -123,7 +123,7 @@ curl -u {{token}}: \
 -d mdp='Akjunz12' \
 -d nom='Administrateur 2' \
 -d genre=M \
--d estAdmin=1 \
+-d admin=1 \
 -d prefNotifIdees=I \
 -X PUT {{urlApi}}/utilisateur/{{idUtilisateur}}
 </samp></pre>
@@ -133,7 +133,7 @@ curl -u {{token}}: \
 <pre><samp>
 {{'{'}}
   "email": "admin2@tkdo.org",
-  "estAdmin": true,
+  "admin": true,
   "genre": "M",
   "id": {{idUtilisateur}},
   "identifiant": "admin2",
@@ -166,7 +166,7 @@ $ curl -u {{token}}: \
 <pre><samp>
 {{'{'}}
   "email": "utilisatrice01@tkdo.org",
-  "estAdmin": false,
+  "admin": false,
   "genre": "F",
   "id": 71,
   "identifiant": "utilisatrice01",

@@ -1,23 +1,35 @@
 <?php
+
 declare(strict_types=1);
 
-require 'vendor/autoload.php';
-
+use App\Appli\Settings\MigrationSettings;
+use App\Bootstrap;
+use Doctrine\ORM\EntityManager;
+use Doctrine\Migrations\Configuration\EntityManager\ExistingEntityManager;
 use Doctrine\Migrations\DependencyFactory;
 use Doctrine\ORM\Tools\Console\ConsoleRunner;
 use Doctrine\Migrations\Tools\Console\ConsoleRunner as MigrationsConsoleRunner;
 use Symfony\Component\Console\Helper\QuestionHelper;
 
-/** @var DependencyFactory */
-$dependencyFactory = require __DIR__ . '/../cli-config.php';
+require __DIR__ . '/../vendor/autoload.php';
+
+$bootstrap = new Bootstrap();
+$bootstrap->initEnv();
+$container = $bootstrap->initContainer();
+
+/** @var MigrationSettings */
+$settings = $container->get(MigrationSettings::class);
+$dependencyFactory = DependencyFactory::fromEntityManager(
+    $settings->configuration,
+    new ExistingEntityManager($container->get(EntityManager::class))
+);
 
 $helperSet = ConsoleRunner::createHelperSet($dependencyFactory->getEntityManager());
 $helperSet->set(new QuestionHelper(), 'question');
-$cli = ConsoleRunner::createApplication($helperSet);
+$symfonyConsoleApp = ConsoleRunner::createApplication($helperSet);
 
-MigrationsConsoleRunner::addCommands($cli, $dependencyFactory);
+MigrationsConsoleRunner::addCommands($symfonyConsoleApp, $dependencyFactory);
 
 // Runs console application
-$status = $cli->run();
-
+$status = $symfonyConsoleApp->run();
 exit($status);

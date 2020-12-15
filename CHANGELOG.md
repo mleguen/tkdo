@@ -1,5 +1,9 @@
 # Historique des changements
 
+## Prochaine version
+
+- refactorisation du code de l'API
+
 ## V1.2.0 (21/12/2020)
 
 - ajout de l'email au profil utilisateur, pour le notifier :

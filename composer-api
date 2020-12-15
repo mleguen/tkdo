@@ -1,2 +1,0 @@
-#!/usr/bin/env bash
-php composer.phar $1 -d api -- "${@:2}"

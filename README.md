@@ -17,7 +17,8 @@ où sera installé tkdo.
 
 ### Pré-requis
 
-- le module `mod_rewrite` est installé sur le serveur Apache
+- php 7.2 avec les extensions `dom` et `mbstring`
+- Apache avec le module `mod_rewrite`
 - l'utilisation de fichiers `.htaccess` dans le répertoire d'installation est autorisée 
   (à défaut, copier le contenu de [.htaccess](./.htaccess) dans une directive `Directory` dans la configuration Apache)
 - le répertoire d'installation est le répertoire racine de l'hôte Apache
@@ -52,13 +53,13 @@ Puis, depuis le répertoire d'installation :
 
 ```bash
 $ cd api
-$ php bin/doctrine.php orm:generate-proxies
+$ php composer.phar doctrine -- orm:generate-proxies
 
  Processing entity "xxx"
 [...]
 
  Proxy classes generated to "/home/lgnby/www/tkdo/api/var/doctrine/proxy"
-$ php bin/doctrine.php migrations:migrate
+$ php composer.phar doctrine -- migrations:migrate
 [...]
   ------------------------
   ++ finished in xxxms
@@ -118,6 +119,27 @@ la page d'administration vous permet :
 - [Historique des changements](./CHANGELOG.md).
 - [Travaux futurs](./BACKLOG.md).
 
+### Tests de l'API
+
+Lancer tous les tests avec Docker :
+
+```
+sudo docker-compose -f api/test/docker-compose.yml run --rm phpunit
+```
+
+Ou seulement les tests d'intégration :
+
+```
+sudo docker-compose -f api/test/docker-compose.yml run --rm phpunit --filter '/Test\\Int/'
+```
+
+Vous pouvez également lancer les test unitaires sans Docker (mais seulement les tests unitaires) :
+
+```
+cd api
+./composer.phar test -- --filter '/Test\\Unit/'
+```
+
 ### Utiliser le serveur de développement front seul
 
 ```bash
@@ -140,8 +162,10 @@ echo SLIM_GUID=$(id -g) >> ./api/.env
 
 ```bash
 ./docker-compose-api up -d
-./composer-api doctrine orm:schema-tool:update
-./composer-api console fixtures
+cd api
+./composer.phar doctrine -- orm:schema-tool:update
+./composer.phar console -- fixtures
+cd ..
 ./npm-front start --prod
 ```
 
@@ -160,19 +184,20 @@ Pour initialiser la base de données de l'API de développement docker
 (une fois qu'elle a fini de démarrer) :
 
 ```bash
-./composer-api doctrine orm:schema-tool:create
+cd api
+./composer.phar doctrine -- orm:schema-tool:create
 ```
 
 ou pour la mettre à jour :
 
 ```bash
-./composer-api doctrine orm:schema-tool:update
+./composer.phar doctrine -- orm:schema-tool:update
 ```
 
 Et pour la peupler de données de test :
 
 ```bash
-./composer-api console fixtures
+./composer.phar console -- fixtures
 ```
 
 ### Pré-requis au lancement des tests e2e front
@@ -189,29 +214,30 @@ au niveau de la dernière migration :
 
 ```bash
 ./docker-compose-api up -d
-./composer-api doctrine orm:schema-tool:drop --force
-./composer-api doctrine migrations:migrate
+cd api
+./composer.phar doctrine -- orm:schema-tool:drop --force
+./composer.phar doctrine -- migrations:migrate
 ```
 
 Puis :
 
 ```bash
-./composer-api doctrine orm:clear-cache:metadata
-./composer-api doctrine orm:clear-cache:query
-./composer-api doctrine orm:clear-cache:result
-for d in $(find api/var/doctrine/cache -mindepth 1 -type d); do rm -rf "$d"; done
-./composer-api doctrine migrations:diff
+./composer.phar doctrine -- orm:clear-cache:metadata
+./composer.phar doctrine -- orm:clear-cache:query
+./composer.phar doctrine -- orm:clear-cache:result
+for d in $(find var/doctrine/cache -mindepth 1 -type d); do rm -rf "$d"; done
+./composer.phar doctrine -- migrations:diff
 ```
 
 Puis après vérification/finalisation de la migration, la tester :
 
 ```bash
-./composer-api doctrine migrations:migrate
-./composer-api console fixtures
+./composer.phar doctrine -- migrations:migrate
+./composer.phar console -- fixtures
 ```
 
 Si nécessaire, retour arrière :
 
 ```bash
-./composer-api doctrine migrations:migrate prev
+./composer.phar doctrine -- migrations:migrate prev
 ```
