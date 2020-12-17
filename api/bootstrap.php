@@ -7,7 +7,21 @@ use Dotenv\Dotenv;
 require __DIR__ . '/vendor/autoload.php';
 
 // Load .env
-$dotenv = Dotenv::createImmutable(__DIR__);
+$dotenv = Dotenv::createImmutable(__DIR__, ['.env.local']);
+$dotenv->load();
+
+$env = $_ENV['TKDO_ENV'] ?? 'dev';
+
+$dotenv = Dotenv::createImmutable(__DIR__, [".env.{$_ENV['TKDO_ENV']}", '.env']);
+$dotenv->required([
+	'MYSQL_DATABASE',
+	'MYSQL_HOST',
+	'MYSQL_PASSWORD',
+	'MYSQL_PORT',
+	'MYSQL_USER',
+	'TKDO_DEV_MODE',
+	'TKDO_LOG_TO_STDOUT',
+]);
 $dotenv->load();
 
 // Instantiate PHP-DI ContainerBuilder

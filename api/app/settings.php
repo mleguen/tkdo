@@ -13,7 +13,6 @@ if (!defined('APP_ROOT')) define('APP_ROOT', __DIR__ . '/..');
 return function (ContainerBuilder $containerBuilder) {
 
     $devMode = boolval($_ENV['TKDO_DEV_MODE'] ?? '1');
-    $docker = in_array('docker', array_keys($_ENV));
     $baseUri = (new UriFactory())->createUri($_ENV['TKDO_BASE_URI'] ?? 'http://localhost:4200');
 
     // Global Settings Object
@@ -42,11 +41,11 @@ return function (ContainerBuilder $containerBuilder) {
 
                 'connection' => [
                     'driver' => 'pdo_mysql',
-                    'host' => $_ENV['MYSQL_HOST'] ?? ($docker ? 'mysql' : '127.0.0.1'),
-                    'port' => $_ENV['MYSQL_PORT'] ?? '3306',
-                    'dbname' => $_ENV['MYSQL_DATABASE'] ?? 'tkdo',
-                    'user' => $_ENV['MYSQL_USER'] ?? 'tkdo',
-                    'password' => $_ENV['MYSQL_PASSWORD'] ?? 'mdptkdo',
+                    'host' => $_ENV['MYSQL_HOST'],
+                    'port' => $_ENV['MYSQL_PORT'],
+                    'dbname' => $_ENV['MYSQL_DATABASE'],
+                    'user' => $_ENV['MYSQL_USER'],
+                    'password' => $_ENV['MYSQL_PASSWORD'],
                     'charset' => 'utf8'
                 ]
             ],
@@ -57,7 +56,7 @@ return function (ContainerBuilder $containerBuilder) {
             ],
             'logger' => [
                 'name' => 'api',
-                'path' => $docker ? 'php://stdout' : APP_ROOT . '/logs/api.log',
+                'path' => boolval($_ENV['TKDO_LOG_TO_STDOUT']) ? 'php://stdout' : APP_ROOT . '/logs/api.log',
                 'level' => Logger::DEBUG,
             ],
             'mailer' => [

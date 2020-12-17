@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
-TAR_FILE=tkdo-$(git describe --tags --dirty).tar
+TARGET_ENV=${1:-prod}
+
+TAR_FILE=tkdo-$(git describe --tags --dirty)-$TARGET_ENV.tar
 
 function echec {
   code=$1
