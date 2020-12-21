@@ -1,6 +1,6 @@
 # Historique des changements
 
-## Prochaine version
+## V1.2.0 (21/12/2020)
 
 - ajout de l'email au profil utilisateur, pour le notifier :
   - à la création de son compte
@@ -13,6 +13,7 @@
 - les idées ne sont plus supprimées, mais marquées comme telles (et toujours présentes en base de données)
 - ajout de préférences de notification des créations/suppressions d'idées au profil utilisateur, pour le notifier :
   - à chaque création/suppression d'idée pour un participant d'une occasion à venir
+  - une fois par jour (par un email récapitulatif)
   - ou pas du tout
 
 ## V1.1.0 (29/11/2020)

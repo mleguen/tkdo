@@ -1,5 +1,7 @@
 # Travaux futurs
 
+- repartir d'un squelette slim de base pour enlever tout le superflu de l'api
+- revoir la ventilation appli / domaine / infra qui n'est pas respectée
 - utiliser $TKDO_DEV_MODE dans fixtures, plutôt que de passer --prod
 - notion d'environnement et séparation de .env en .env, .env.$TKDO_ENV et .env.local
   (ATTENTION à docker qui ne supporte que .env)
@@ -18,5 +20,3 @@
 - ajouter une route admin de suppression d'un utilisateur d'une occasion
 - ajouter une route admin de suppression d'occasion (si pas ou plus de tirage)
 - enlever "doctrine" des noms de colonne auto-générés en base de données
-- repartir d'un squelette slim de base pour enlever tout le superflu de l'api
-- revoir la ventilation appli / domaine / infra qui n'est pas respectée
