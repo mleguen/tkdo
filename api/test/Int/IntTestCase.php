@@ -195,7 +195,7 @@ class IntTestCase extends TestCase
         $this->requestApi(
             $curl,
             'POST',
-            '/api/connexion',
+            '/connexion',
             $statusCode,
             $body,
             '',

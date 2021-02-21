@@ -18,7 +18,7 @@ class AuthIntTest extends IntTestCase
         $this->requestApi(
             $curl,
             'GET',
-            "/api/utilisateur/{$utilisateur->getId()}",
+            "/utilisateur/{$utilisateur->getId()}",
             $statusCode,
             $body
         );

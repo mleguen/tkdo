@@ -20,7 +20,7 @@ class ConnexionIntTest extends IntTestCase
         $this->requestApi(
             $curl,
             'POST',
-            '/api/connexion',
+            '/connexion',
             $statusCode,
             $body,
             '',
@@ -42,7 +42,7 @@ class ConnexionIntTest extends IntTestCase
         $this->requestApi(
             $curl,
             'POST',
-            '/api/connexion',
+            '/connexion',
             $statusCode,
             $body,
             '',

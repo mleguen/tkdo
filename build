@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+function echec {
+  code=$1
+  shift
+  message=$@
+  echo "ERREUR $code : $message" >&2
+  exit $code
+}
+
+# Génération des clés d'authentification (si pas déjà fait)
+AUTH_RSA=./api/var/auth/auth_rsa
+[ ! -f $AUTH_RSA.prod ] && openssl genrsa -out $AUTH_RSA.prod
+openssl pkey -in $AUTH_RSA.prod -pubout -out $AUTH_RSA.pub.prod
+
+# Front
+npm --prefix front -- install || echec 1 "Impossible d'installer les dépendances du front"
+npm --prefix front -- run build --prod || echec 2 "Impossible de construire le front"
+
+# API
+./api/composer.phar install -d api || echec 3 "Impossible d'installer les dependances de l'api"

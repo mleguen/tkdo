@@ -120,7 +120,7 @@ class Bootstrap
         // Instantiate the app
         AppFactory::setContainer($this->container);
         $this->slimApp = AppFactory::create();
-        $basePath = getenv('TKDO_API_BASE_PATH') ?: '/api';
+        $basePath = getenv('TKDO_API_BASE_PATH');
         if ($basePath) $this->slimApp->setBasePath($basePath);
 
         $this->slimApp->add(AuthMiddleware::class);

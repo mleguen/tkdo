@@ -1,0 +1,10 @@
+version: '3.8'
+
+services:
+    front:
+        build: ./test/build-front
+        depends_on:
+            - angular
+            - slim
+        ports:
+            - 8080:80

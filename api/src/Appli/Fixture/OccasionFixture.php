@@ -33,8 +33,6 @@ class OccasionFixture extends AppAbstractFixture
                 'noelProchain' => (new OccasionAdaptor())
                     ->setDate(new DateTime("$anneeProchaine-12-25"))
                     ->setTitre("Noël $anneeProchaine")
-                    ->setDate(new DateTime('2020-12-25'))
-                    ->setTitre('Noël 2020')
                     ->setParticipants([
                         $this->getReference('alice'),
                         $this->getReference('bob'),

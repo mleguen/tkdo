@@ -17,7 +17,7 @@ class UtilisateurIntTest extends IntTestCase
         $this->requestApi(
             $curl,
             'POST',
-            '/api/utilisateur',
+            '/utilisateur',
             $statusCode,
             $body,
             '',
@@ -36,7 +36,7 @@ class UtilisateurIntTest extends IntTestCase
         $this->requestApi(
             $curl,
             'GET',
-            '/api/utilisateur',
+            '/utilisateur',
             $statusCode,
             $body
         );
@@ -50,7 +50,7 @@ class UtilisateurIntTest extends IntTestCase
         $this->requestApi(
             $curl,
             'GET',
-            "/api/utilisateur/{$utilisateur->getId()}",
+            "/utilisateur/{$utilisateur->getId()}",
             $statusCode,
             $body
         );
@@ -80,7 +80,7 @@ class UtilisateurIntTest extends IntTestCase
         $this->requestApi(
             $curl,
             'POST',
-            "/api/utilisateur/{$utilisateur->getId()}/reinitmdp",
+            "/utilisateur/{$utilisateur->getId()}/reinitmdp",
             $statusCode,
             $body
         );
@@ -108,7 +108,7 @@ class UtilisateurIntTest extends IntTestCase
         $this->requestApi(
             $curl,
             'PUT',
-            "/api/utilisateur/{$utilisateur->getId()}",
+            "/utilisateur/{$utilisateur->getId()}",
             $statusCode,
             $body,
             '',
@@ -131,7 +131,7 @@ class UtilisateurIntTest extends IntTestCase
         $this->requestApi(
             $curl,
             'PUT',
-            "/api/utilisateur/{$utilisateur->getId()}",
+            "/utilisateur/{$utilisateur->getId()}",
             $statusCode,
             $body,
             '',
@@ -150,7 +150,7 @@ class UtilisateurIntTest extends IntTestCase
         $this->requestApi(
             $curl,
             'POST',
-            '/api/utilisateur',
+            '/utilisateur',
             $statusCode,
             $body,
             '',
@@ -173,7 +173,7 @@ class UtilisateurIntTest extends IntTestCase
         $this->requestApi(
             $curl,
             'POST',
-            '/api/utilisateur',
+            '/utilisateur',
             $statusCode,
             $body,
             '',
@@ -199,7 +199,7 @@ class UtilisateurIntTest extends IntTestCase
         $this->requestApi(
             $curl,
             'POST',
-            '/api/utilisateur',
+            '/utilisateur',
             $statusCode,
             $body,
             '',
@@ -227,7 +227,7 @@ class UtilisateurIntTest extends IntTestCase
         $this->requestApi(
             $curl,
             'POST',
-            '/api/utilisateur',
+            '/utilisateur',
             $statusCode,
             $body,
             '',
@@ -255,7 +255,7 @@ class UtilisateurIntTest extends IntTestCase
         $this->requestApi(
             $curl,
             'POST',
-            '/api/utilisateur',
+            '/utilisateur',
             $statusCode,
             $body,
             '',
@@ -283,7 +283,7 @@ class UtilisateurIntTest extends IntTestCase
         $this->requestApi(
             $curl,
             'POST',
-            '/api/utilisateur',
+            '/utilisateur',
             $statusCode,
             $body,
             '',
@@ -312,7 +312,7 @@ class UtilisateurIntTest extends IntTestCase
         $this->requestApi(
             $curl,
             'POST',
-            '/api/utilisateur',
+            '/utilisateur',
             $statusCode,
             $body,
             '',
@@ -338,7 +338,7 @@ class UtilisateurIntTest extends IntTestCase
         $this->requestApi(
             $curl,
             'POST',
-            "/api/utilisateur/{$utilisateur->getId()}/reinitmdp",
+            "/utilisateur/{$utilisateur->getId()}/reinitmdp",
             $statusCode,
             $body
         );
@@ -357,7 +357,7 @@ class UtilisateurIntTest extends IntTestCase
         $this->requestApi(
             $curl,
             'POST',
-            "/api/utilisateur/{$utilisateur->getId()}/reinitmdp",
+            "/utilisateur/{$utilisateur->getId()}/reinitmdp",
             $statusCode,
             $body
         );
@@ -377,7 +377,7 @@ class UtilisateurIntTest extends IntTestCase
         $this->requestApi(
             $curl,
             'POST',
-            "/api/utilisateur/$idUtilisateur/reinitmdp",
+            "/utilisateur/$idUtilisateur/reinitmdp",
             $statusCode,
             $body
         );
@@ -395,7 +395,7 @@ class UtilisateurIntTest extends IntTestCase
         $this->requestApi(
             $curl,
             'PUT',
-            "/api/utilisateur/{$utilisateur->getId()}",
+            "/utilisateur/{$utilisateur->getId()}",
             $statusCode,
             $body,
             '',
@@ -417,7 +417,7 @@ class UtilisateurIntTest extends IntTestCase
         $this->requestApi(
             $curl,
             'PUT',
-            "/api/utilisateur/$idUtilisateur",
+            "/utilisateur/$idUtilisateur",
             $statusCode,
             $body,
             '',
@@ -438,7 +438,7 @@ class UtilisateurIntTest extends IntTestCase
         $this->requestApi(
             $curl,
             'PUT',
-            "/api/utilisateur/{$utilisateur->getId()}",
+            "/utilisateur/{$utilisateur->getId()}",
             $statusCode,
             $body,
             '',
@@ -459,7 +459,7 @@ class UtilisateurIntTest extends IntTestCase
         $this->requestApi(
             $curl,
             'PUT',
-            "/api/utilisateur/{$utilisateur->getId()}",
+            "/utilisateur/{$utilisateur->getId()}",
             $statusCode,
             $body,
             '',
@@ -483,7 +483,7 @@ class UtilisateurIntTest extends IntTestCase
         $this->requestApi(
             $curl,
             'PUT',
-            "/api/utilisateur/{$utilisateur->getId()}",
+            "/utilisateur/{$utilisateur->getId()}",
             $statusCode,
             $body,
             '',
@@ -507,7 +507,7 @@ class UtilisateurIntTest extends IntTestCase
         $this->requestApi(
             $curl,
             'PUT',
-            "/api/utilisateur/{$utilisateur->getId()}",
+            "/utilisateur/{$utilisateur->getId()}",
             $statusCode,
             $body,
             '',
@@ -530,7 +530,7 @@ class UtilisateurIntTest extends IntTestCase
         $this->requestApi(
             $curl,
             'PUT',
-            "/api/utilisateur/{$utilisateur->getId()}",
+            "/utilisateur/{$utilisateur->getId()}",
             $statusCode,
             $body,
             '',
@@ -553,7 +553,7 @@ class UtilisateurIntTest extends IntTestCase
         $this->requestApi(
             $curl,
             'PUT',
-            "/api/utilisateur/{$utilisateur->getId()}",
+            "/utilisateur/{$utilisateur->getId()}",
             $statusCode,
             $body,
             '',
@@ -576,7 +576,7 @@ class UtilisateurIntTest extends IntTestCase
         $this->requestApi(
             $curl,
             'PUT',
-            "/api/utilisateur/{$utilisateur->getId()}",
+            "/utilisateur/{$utilisateur->getId()}",
             $statusCode,
             $body,
             '',
@@ -598,7 +598,7 @@ class UtilisateurIntTest extends IntTestCase
         $this->requestApi(
             $curl,
             'GET',
-            '/api/utilisateur',
+            '/utilisateur',
             $statusCode,
             $body
         );
@@ -616,7 +616,7 @@ class UtilisateurIntTest extends IntTestCase
         $this->requestApi(
             $curl,
             'GET',
-            "/api/utilisateur/{$utilisateur->getId()}",
+            "/utilisateur/{$utilisateur->getId()}",
             $statusCode,
             $body
         );
@@ -635,7 +635,7 @@ class UtilisateurIntTest extends IntTestCase
         $this->requestApi(
             $curl,
             'GET',
-            "/api/utilisateur/{$utilisateur->getId()}",
+            "/utilisateur/{$utilisateur->getId()}",
             $statusCode,
             $body
         );
@@ -655,7 +655,7 @@ class UtilisateurIntTest extends IntTestCase
         $this->requestApi(
             $curl,
             'GET',
-            "/api/utilisateur/$idUtilisateur",
+            "/utilisateur/$idUtilisateur",
             $statusCode,
             $body
         );

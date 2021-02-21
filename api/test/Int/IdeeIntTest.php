@@ -36,7 +36,7 @@ class IdeeIntTest extends IntTestCase
         $this->requestApi(
             $curl,
             'POST',
-            '/api/idee',
+            '/idee',
             $statusCode,
             $body,
             '',
@@ -54,7 +54,7 @@ class IdeeIntTest extends IntTestCase
         $this->requestApi(
             $curl,
             'GET',
-            '/api/idee',
+            '/idee',
             $statusCode,
             $body,
             "idUtilisateur={$utilisateur->getId()}&supprimees=0"
@@ -80,7 +80,7 @@ class IdeeIntTest extends IntTestCase
         $this->requestApi(
             $curl,
             'GET',
-            '/api/idee',
+            '/idee',
             $statusCode,
             $body,
             "idUtilisateur={$utilisateur->getId()}&supprimees=0"
@@ -105,7 +105,7 @@ class IdeeIntTest extends IntTestCase
         $this->requestApi(
             $curl,
             'POST',
-            "/api/idee/{$idee->getId()}/suppression",
+            "/idee/{$idee->getId()}/suppression",
             $statusCode,
             $body
         );
@@ -116,7 +116,7 @@ class IdeeIntTest extends IntTestCase
         $this->requestApi(
             $curl,
             'GET',
-            '/api/idee',
+            '/idee',
             $statusCode,
             $body,
             "idUtilisateur={$utilisateur->getId()}&supprimees=0"
@@ -172,7 +172,7 @@ class IdeeIntTest extends IntTestCase
         $this->requestApi(
             $curl,
             'POST',
-            '/api/idee',
+            '/idee',
             $statusCode,
             $body,
             '',
@@ -201,7 +201,7 @@ class IdeeIntTest extends IntTestCase
         $this->requestApi(
             $curl,
             'POST',
-            '/api/idee',
+            '/idee',
             $statusCode,
             $body,
             '',
@@ -228,7 +228,7 @@ class IdeeIntTest extends IntTestCase
         $this->requestApi(
             $curl,
             'POST',
-            '/api/idee',
+            '/idee',
             $statusCode,
             $body,
             '',
@@ -252,7 +252,7 @@ class IdeeIntTest extends IntTestCase
         $this->requestApi(
             $curl,
             'GET',
-            '/api/idee',
+            '/idee',
             $statusCode,
             $body,
             "idUtilisateur={$utilisateur->getId()}&supprimees=0"
@@ -272,7 +272,7 @@ class IdeeIntTest extends IntTestCase
         $this->requestApi(
             $curl,
             'GET',
-            '/api/idee',
+            '/idee',
             $statusCode,
             $body,
             "idUtilisateur={$utilisateur->getId()}" . (is_null($supprimees) ? '' : "&supprimees=$supprimees")
@@ -301,7 +301,7 @@ class IdeeIntTest extends IntTestCase
         $this->requestApi(
             $curl,
             'GET',
-            '/api/idee',
+            '/idee',
             $statusCode,
             $body,
             "idUtilisateur=$idUtilisateur&supprimees=0"
@@ -320,7 +320,7 @@ class IdeeIntTest extends IntTestCase
         $this->requestApi(
             $curl,
             'POST',
-            "/api/idee/{$idee->getId()}/suppression",
+            "/idee/{$idee->getId()}/suppression",
             $statusCode,
             $body
         );
@@ -338,7 +338,7 @@ class IdeeIntTest extends IntTestCase
         $this->requestApi(
             $curl,
             'POST',
-            "/api/idee/99/suppression",
+            "/idee/99/suppression",
             $statusCode,
             $body
         );
@@ -358,7 +358,7 @@ class IdeeIntTest extends IntTestCase
         $this->requestApi(
             $curl,
             'POST',
-            "/api/idee/{$idee->getId()}/suppression",
+            "/idee/{$idee->getId()}/suppression",
             $statusCode,
             $body
         );

@@ -3,34 +3,24 @@
 TAR_FILE=tkdo-$(git describe --tags --dirty).tar
 
 function echec {
-  code=$1
-  shift
-  message=$@
+  code=$?
   [ -f $TAR_FILE ] && rm -f $TAR_FILE
   [ -f $TAR_FILE.gz ] && rm -f $TAR_FILE.gz
-  echo "ERREUR $code : $message" >&2
   exit $code
 }
 
-# Génération des clés d'authentification (si pas déjà fait)
-AUTH_RSA=./api/var/auth/auth_rsa
-[ ! -f $AUTH_RSA.prod ] && openssl genrsa -out $AUTH_RSA.prod
-openssl pkey -in $AUTH_RSA.prod -pubout -out $AUTH_RSA.pub.prod
+# Construction
+./build || echec
 
 # Fichiers communs
 tar -cvf $TAR_FILE -C apache .
 
 # Fichiers front
-./npm-front install || echec 1 "Impossible d'installer les dépendances du front"
-./npm-front run build --prod || echec 2 "Impossible de construire le front"
 tar -rvf $TAR_FILE -C front/dist/tkdo-front .
 
 # Fichiers api
-./composer-api install || echec 3 "Impossible d'installer les dependances de l'api"
 tar -rvf $TAR_FILE --transform='s/\.prod$//' \
-  ./api/app \
   ./api/bin \
-  ./api/logs/README.md \
   ./api/public \
   ./api/src \
   ./api/var/auth/*.prod \
@@ -39,7 +29,7 @@ tar -rvf $TAR_FILE --transform='s/\.prod$//' \
   ./api/vendor \
   ./api/.env.prod \
   ./api/*.php \
-  ./api/composer.{json,lock}
+  ./api/composer.{json,lock,phar}
 
 # Finalisation
 gzip -f $TAR_FILE

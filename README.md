@@ -53,13 +53,13 @@ Puis, depuis le répertoire d'installation :
 
 ```bash
 $ cd api
-$ php composer.phar doctrine -- orm:generate-proxies
+$ ./composer.phar doctrine -- orm:generate-proxies
 
  Processing entity "xxx"
 [...]
 
  Proxy classes generated to "/home/lgnby/www/tkdo/api/var/doctrine/proxy"
-$ php composer.phar doctrine -- migrations:migrate
+$ ./composer.phar doctrine -- migrations:migrate
 [...]
   ------------------------
   ++ finished in xxxms
@@ -85,7 +85,7 @@ Créer le compte `admin` en spécifiant son e-mail
 l'e-mail utilisé sera `admin@host` où `host` est le nom d'hôte de `TKDO_BASE_URI`) :
 
 ```bash
-$ php bin/console.php fixtures --prod --admin-email admin@host
+$ ./composer.phar console -- fixtures --prod --admin-email admin@host
 Initialisation ou réinitialisation de la base de données (production)...
 xxx créés.
 [...]
@@ -119,85 +119,33 @@ la page d'administration vous permet :
 - [Historique des changements](./CHANGELOG.md).
 - [Travaux futurs](./BACKLOG.md).
 
+### Installation des dépendances et construction
+
+```bash
+./build
+```
+
 ### Tests de l'API
 
-Lancer tous les tests avec Docker :
+Lancer tous les tests sur l'environnement Docker :
 
-```
-sudo docker-compose -f api/test/docker-compose.yml run --rm phpunit
+```bash
+sudo docker-compose run --rm cli ./run-test.sh
 ```
 
 Ou seulement les tests d'intégration :
 
+```bash
+sudo docker-compose run --rm cli ./run-test.sh --filter '/Test\\Int/'
 ```
-sudo docker-compose -f api/test/docker-compose.yml run --rm phpunit --filter '/Test\\Int/'
-```
+
+> Attention : l'exécution des tests d'intégration
+> réinitialisera la base de données de l'environnement Docker
 
 Vous pouvez également lancer les test unitaires sans Docker (mais seulement les tests unitaires) :
 
-```
-cd api
-./composer.phar test -- --filter '/Test\\Unit/'
-```
-
-### Utiliser le serveur de développement front seul
-
 ```bash
-./npm-front start
-```
-
-Comme le serveur de développement front est lancé sans `--prod`,
-les requêtes destinées à l'API sont interceptées et bouchonnées
-(cf. [front/src/app/dev-backend.interceptor.ts](./front/src/app/dev-backend.interceptor.ts)).
-
-### Utiliser le serveur de développement front avec l'API de développement docker
-
-Paramétrer l'API de développement docker pour que Slim s'exécute avec l'utilisateur courant
-(permet d'éviter des conflits de droits sur les fichiers de cache créés par docker) :
-
-``` bash
-echo SLIM_UID=$(id -u) >> ./api/.env
-echo SLIM_GUID=$(id -g) >> ./api/.env
-```
-
-```bash
-./docker-compose-api up -d
-cd api
-./composer.phar doctrine -- orm:schema-tool:update
-./composer.phar console -- fixtures
-cd ..
-./npm-front start --prod
-```
-
-Le serveur de développement front redirige les requêtes destinées à l'API
-vers l'API de développement docker
-(cf. [front/src/proxy.conf.json](./front/src/proxy.conf.json)).
-
-Les logs sont affichés sur la sortie standard des conteneurs et collectés par docker-compose.
-Pour les consulter (par exemple ici pour les logs de l'API, au fil de l'eau) :
-
-```bash
-./docker-compose-api logs -f slim
-```
-
-Pour initialiser la base de données de l'API de développement docker
-(une fois qu'elle a fini de démarrer) :
-
-```bash
-cd api
-./composer.phar doctrine -- orm:schema-tool:create
-```
-
-ou pour la mettre à jour :
-
-```bash
-./composer.phar doctrine -- orm:schema-tool:update
-```
-
-Et pour la peupler de données de test :
-
-```bash
-./composer.phar console -- fixtures
+./api/composer.phar test -d api -- --filter '/Test\\Unit/'
 ```
 
 ### Pré-requis au lancement des tests e2e front
@@ -207,37 +155,88 @@ Et pour la peupler de données de test :
 - `npm run chrome-webdriver-update` lancé pour forcer la version de webdriver chrome de protractor
   à correspondre à celle du chrome/chromium installé
 
+### Utiliser le serveur de développement Angular seul
+
+```bash
+npm --prefix front -- start
+```
+
+Comme le serveur de développement Angular est lancé sans `--prod`,
+les requêtes destinées à l'API sont interceptées et bouchonnées
+(cf. [front/src/app/dev-backend.interceptor.ts](./front/src/app/dev-backend.interceptor.ts)).
+
+### Utiliser l'environnement Docker seul
+
+Démarrer et initialiser l'environnement docker :
+
+```bash
+sudo docker-compose up -d front
+sudo docker-compose run --rm cli -c '
+  ./composer.phar doctrine -- orm:generate-proxies &&
+  ./composer.phar doctrine -- orm:schema-tool:update --force &&
+  ./composer.phar console -- fixtures'
+```
+
+Il est alors accessible à l'URL : http://localhost:8080
+
+Les logs sont affichés sur la sortie standard des conteneurs et collectés par docker-compose.
+Pour les consulter (par exemple ici pour les logs de l'API, au fil de l'eau) :
+
+```bash
+sudo docker-compose logs -f slim
+```
+
+Et pour conserver le conteneur angular à jour des modifications
+sans avoir à l'arrêter/redémarrer :
+
+```bash
+npm --prefix front -- run build --prod --watch --delete-output-path false
+```
+
+### Utiliser le serveur de développement Angular avec l'environnement Docker
+
+Une fois l'environnement Docker opérationnel (voir ci-dessus),
+démarrer le serveur de développement Angular avec l'option `--prod`
+pour qu'il redirige les requêtes destinées à l'API vers l'environnement Docker
+(cf. [front/src/proxy.conf.json](./front/src/proxy.conf.json)).
+
+```bash
+npm --prefix front -- start --prod
+```
+
 ### Créer une nouvelle migration de base de données
 
-Si nécessaire, commencer par remettre la base de données de l'environnement de développement
-au niveau de la dernière migration :
+Commencer par réinitialiser l'environnement Docker
+et s'assurer que la base de données est au niveau de la dernière migration :
 
 ```bash
-./docker-compose-api up -d
-cd api
-./composer.phar doctrine -- orm:schema-tool:drop --force
-./composer.phar doctrine -- migrations:migrate
+sudo docker-compose run --rm cli -c '
+  ./composer.phar doctrine -- orm:generate-proxies &&
+  ./composer.phar doctrine -- orm:schema-tool:drop --force &&
+  ./composer.phar doctrine -- migrations:migrate'
 ```
 
-Puis :
+Puis générer automatiquement la nouvelle migration :
 
 ```bash
-./composer.phar doctrine -- orm:clear-cache:metadata
-./composer.phar doctrine -- orm:clear-cache:query
-./composer.phar doctrine -- orm:clear-cache:result
-for d in $(find var/doctrine/cache -mindepth 1 -type d); do rm -rf "$d"; done
-./composer.phar doctrine -- migrations:diff
+sudo docker-compose run --rm cli -c '
+  ./composer.phar doctrine -- orm:clear-cache:metadata &&
+  ./composer.phar doctrine -- orm:clear-cache:query &&
+  ./composer.phar doctrine -- orm:clear-cache:result &&
+  for d in $(find var/doctrine/cache -mindepth 1 -type d); do rm -rf "$d"; done &&
+  ./composer.phar doctrine -- migrations:diff'
 ```
 
-Puis après vérification/finalisation de la migration, la tester :
+Finalement, après vérification/finalisation de la migration, la tester :
 
 ```bash
-./composer.phar doctrine -- migrations:migrate
-./composer.phar console -- fixtures
+sudo docker-compose run --rm cli -c '
+  ./composer.phar doctrine -- migrations:migrate &&
+  ./composer.phar console -- fixtures'
 ```
 
-Si nécessaire, retour arrière :
+Si nécessaire, faire un retour arrière :
 
 ```bash
-./composer.phar doctrine -- migrations:migrate prev
+sudo docker-compose run --rm cli ./composer.phar doctrine -- migrations:migrate prev
 ```

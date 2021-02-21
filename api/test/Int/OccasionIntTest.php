@@ -23,7 +23,7 @@ class OccasionIntTest extends IntTestCase
         $this->requestApi(
             $curl,
             'POST',
-            '/api/occasion',
+            '/occasion',
             $statusCode,
             $body,
             '',
@@ -41,7 +41,7 @@ class OccasionIntTest extends IntTestCase
         $this->requestApi(
             $curl,
             'GET',
-            '/api/occasion',
+            '/occasion',
             $statusCode,
             $body
         );
@@ -54,7 +54,7 @@ class OccasionIntTest extends IntTestCase
         $this->requestApi(
             $curl,
             'PUT',
-            "/api/occasion/{$occasion->getId()}",
+            "/occasion/{$occasion->getId()}",
             $statusCode,
             $body,
             '',
@@ -77,7 +77,7 @@ class OccasionIntTest extends IntTestCase
                 $this->requestApi(
                     $curl,
                     'POST',
-                    "/api/occasion/{$occasion->getId()}/participant",
+                    "/occasion/{$occasion->getId()}/participant",
                     $statusCode,
                     $body,
                     '',
@@ -100,7 +100,7 @@ class OccasionIntTest extends IntTestCase
                 $this->requestApi(
                     $curl,
                     'GET',
-                    '/api/occasion',
+                    '/occasion',
                     $statusCode,
                     $body,
                     "idParticipant={$participant->getId()}"
@@ -112,7 +112,7 @@ class OccasionIntTest extends IntTestCase
                 $this->requestApi(
                     $curl,
                     'GET',
-                    "/api/occasion/{$occasion->getId()}",
+                    "/occasion/{$occasion->getId()}",
                     $statusCode,
                     $body
                 );
@@ -130,7 +130,7 @@ class OccasionIntTest extends IntTestCase
                 $this->requestApi(
                     $curl,
                     'POST',
-                    "/api/occasion/{$resultat->getOccasion()->getId()}/resultat",
+                    "/occasion/{$resultat->getOccasion()->getId()}/resultat",
                     $statusCode,
                     $body,
                     '',
@@ -153,7 +153,7 @@ class OccasionIntTest extends IntTestCase
                 $this->requestApi(
                     $curl,
                     'GET',
-                    "/api/occasion/{$occasion->getId()}",
+                    "/occasion/{$occasion->getId()}",
                     $statusCode,
                     $body
                 );
@@ -175,7 +175,7 @@ class OccasionIntTest extends IntTestCase
         $this->requestApi(
             $curl,
             'POST',
-            "/api/occasion/{$occasion->getId()}/participant",
+            "/occasion/{$occasion->getId()}/participant",
             $statusCode,
             $body,
             '',
@@ -200,7 +200,7 @@ class OccasionIntTest extends IntTestCase
         $this->requestApi(
             $curl,
             'POST',
-            "/api/occasion/{$occasion->getId()}/participant",
+            "/occasion/{$occasion->getId()}/participant",
             $statusCode,
             $body,
             '',
@@ -227,7 +227,7 @@ class OccasionIntTest extends IntTestCase
         $this->requestApi(
             $curl,
             'POST',
-            "/api/occasion/$idOccasionInconnue/participant",
+            "/occasion/$idOccasionInconnue/participant",
             $statusCode,
             $body,
             '',
@@ -253,7 +253,7 @@ class OccasionIntTest extends IntTestCase
         $this->requestApi(
             $curl,
             'POST',
-            "/api/occasion/{$occasion->getId()}/participant",
+            "/occasion/{$occasion->getId()}/participant",
             $statusCode,
             $body,
             '',
@@ -279,7 +279,7 @@ class OccasionIntTest extends IntTestCase
         $this->requestApi(
             $curl,
             'POST',
-            "/api/occasion/{$occasion->getId()}/participant",
+            "/occasion/{$occasion->getId()}/participant",
             $statusCode,
             $body,
             '',
@@ -303,7 +303,7 @@ class OccasionIntTest extends IntTestCase
         $this->requestApi(
             $curl,
             'POST',
-            "/api/occasion/{$occasion->getId()}/resultat",
+            "/occasion/{$occasion->getId()}/resultat",
             $statusCode,
             $body,
             '',
@@ -330,7 +330,7 @@ class OccasionIntTest extends IntTestCase
         $this->requestApi(
             $curl,
             'POST',
-            "/api/occasion/{$occasion->getId()}/resultat",
+            "/occasion/{$occasion->getId()}/resultat",
             $statusCode,
             $body,
             '',
@@ -359,7 +359,7 @@ class OccasionIntTest extends IntTestCase
         $this->requestApi(
             $curl,
             'POST',
-            "/api/occasion/$idOccasionInconnue/resultat",
+            "/occasion/$idOccasionInconnue/resultat",
             $statusCode,
             $body,
             '',
@@ -391,7 +391,7 @@ class OccasionIntTest extends IntTestCase
         $this->requestApi(
             $curl,
             'POST',
-            "/api/occasion/{$occasion->getId()}/resultat",
+            "/occasion/{$occasion->getId()}/resultat",
             $statusCode,
             $body,
             '',
@@ -436,7 +436,7 @@ class OccasionIntTest extends IntTestCase
         $this->requestApi(
             $curl,
             'POST',
-            "/api/occasion/{$occasion->getId()}/resultat",
+            "/occasion/{$occasion->getId()}/resultat",
             $statusCode,
             $body,
             '',
@@ -468,7 +468,7 @@ class OccasionIntTest extends IntTestCase
         $this->requestApi(
             $curl,
             'POST',
-            '/api/occasion',
+            '/occasion',
             $statusCode,
             $body,
             '',
@@ -492,7 +492,7 @@ class OccasionIntTest extends IntTestCase
         $this->requestApi(
             $curl,
             'POST',
-            '/api/occasion',
+            '/occasion',
             $statusCode,
             $body,
             '',
@@ -515,7 +515,7 @@ class OccasionIntTest extends IntTestCase
         $this->requestApi(
             $curl,
             'GET',
-            "/api/occasion/{$occasion->getId()}",
+            "/occasion/{$occasion->getId()}",
             $statusCode,
             $body
         );
@@ -534,7 +534,7 @@ class OccasionIntTest extends IntTestCase
         $this->requestApi(
             $curl,
             'GET',
-            "/api/occasion/{$occasion->getId()}",
+            "/occasion/{$occasion->getId()}",
             $statusCode,
             $body
         );
@@ -556,7 +556,7 @@ class OccasionIntTest extends IntTestCase
         $this->requestApi(
             $curl,
             'GET',
-            "/api/occasion/$idOccasionInconnue",
+            "/occasion/$idOccasionInconnue",
             $statusCode,
             $body
         );
@@ -572,7 +572,7 @@ class OccasionIntTest extends IntTestCase
         $this->requestApi(
             $curl,
             'GET',
-            '/api/occasion',
+            '/occasion',
             $statusCode,
             $body
         );
@@ -590,7 +590,7 @@ class OccasionIntTest extends IntTestCase
         $this->requestApi(
             $curl,
             'GET',
-            '/api/occasion',
+            '/occasion',
             $statusCode,
             $body
         );
@@ -608,7 +608,7 @@ class OccasionIntTest extends IntTestCase
         $this->requestApi(
             $curl,
             'GET',
-            '/api/occasion',
+            '/occasion',
             $statusCode,
             $body,
             "idParticipant={$participant->getId()}"
@@ -628,7 +628,7 @@ class OccasionIntTest extends IntTestCase
         $this->requestApi(
             $curl,
             'GET',
-            '/api/occasion',
+            '/occasion',
             $statusCode,
             $body,
             "idParticipant={$participant->getId()}"
@@ -650,7 +650,7 @@ class OccasionIntTest extends IntTestCase
         $this->requestApi(
             $curl,
             'GET',
-            '/api/occasion',
+            '/occasion',
             $statusCode,
             $body,
             "idParticipant=$idParticipant"
@@ -672,7 +672,7 @@ class OccasionIntTest extends IntTestCase
         $this->requestApi(
             $curl,
             'GET',
-            '/api/occasion',
+            '/occasion',
             $statusCode,
             $body,
             "idParticipant={$tiers->getId()}"
@@ -689,7 +689,7 @@ class OccasionIntTest extends IntTestCase
         $this->requestApi(
             $curl,
             'PUT',
-            "/api/occasion/{$occasion->getId()}",
+            "/occasion/{$occasion->getId()}",
             $statusCode,
             $body,
             '',
@@ -711,7 +711,7 @@ class OccasionIntTest extends IntTestCase
         $this->requestApi(
             $curl,
             'PUT',
-            "/api/occasion/{$occasion->getId()}",
+            "/occasion/{$occasion->getId()}",
             $statusCode,
             $body,
             '',
@@ -735,7 +735,7 @@ class OccasionIntTest extends IntTestCase
         $this->requestApi(
             $curl,
             'PUT',
-            "/api/occasion/$idOccasionInconnue",
+            "/occasion/$idOccasionInconnue",
             $statusCode,
             $body,
             '',

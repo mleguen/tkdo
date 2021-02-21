@@ -16,7 +16,7 @@ services:
             MYSQL_ROOT_PASSWORD: mdproot
         image: mysql:5.6
     slim:
-        build: ./build-slim
+        build: ./api/test/build-slim
         depends_on:
             - mailhog
             - mysql
@@ -33,15 +33,15 @@ services:
             TKDO_DEV_MODE: 0
             TKDO_MAILER_FROM: noreply@slim
         volumes:
-            - ../public:/var/www/html/api/public
-            - ../src:/var/www/html/api/src
-            - ../var/auth:/var/www/html/api/var/auth
-            - cache:/var/www/html/api/var/cache
-            - doctrine:/var/www/html/api/var/doctrine
-            - ../vendor:/var/www/html/api/vendor
-            - ../.env:/var/www/html/api/.env
-    phpunit:
-        build: ./build-phpunit
+            - ./api/public:/var/www/html/public
+            - ./api/src:/var/www/html/src
+            - ./api/var/auth:/var/www/html/var/auth
+            - cache:/var/www/html/var/cache
+            - doctrine:/var/www/html/var/doctrine
+            - ./api/vendor:/var/www/html/vendor
+            - ./api/.env:/var/www/html/.env
+    cli:
+        build: ./api/test/build-cli
         depends_on:
             - mysql
             - slim
@@ -60,16 +60,16 @@ services:
             TKDO_MAILER_FROM: noreply@slim
         restart: 'no'
         volumes:
-            - ../bin:/usr/src/tkdo/bin
-            - ../src:/usr/src/tkdo/src
-            - ../test:/usr/src/tkdo/test
-            - ../var/auth:/usr/src/tkdo/var/auth
+            - ./api/bin:/usr/src/tkdo/bin
+            - ./api/src:/usr/src/tkdo/src
+            - ./api/test:/usr/src/tkdo/test
+            - ./api/var/auth:/usr/src/tkdo/var/auth
             - cache:/usr/src/tkdo/var/cache
             - doctrine:/usr/src/tkdo/var/doctrine
-            - ../vendor:/usr/src/tkdo/vendor
-            - ../.env:/usr/src/tkdo/.env
-            - ../cli-config.php:/usr/src/tkdo/cli-config.php
-            - ../composer.json:/usr/src/tkdo/composer.json
-            - ../composer.phar:/usr/src/tkdo/composer.phar
-            - ../phpunit.xml:/usr/src/tkdo/phpunit.xml
-            - ./build-phpunit/startup.sh:/usr/src/tkdo/startup.sh
+            - ./api/vendor:/usr/src/tkdo/vendor
+            - ./api/.env:/usr/src/tkdo/.env
+            - ./api/cli-config.php:/usr/src/tkdo/cli-config.php
+            - ./api/composer.json:/usr/src/tkdo/composer.json
+            - ./api/composer.phar:/usr/src/tkdo/composer.phar
+            - ./api/phpunit.xml:/usr/src/tkdo/phpunit.xml
+            - ./api/test/build-cli/run-test.sh:/usr/src/tkdo/run-test.sh

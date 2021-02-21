@@ -1,0 +1,7 @@
+version: '3.8'
+
+services:
+    angular:
+        build: ./front/test/build-angular
+        volumes:
+            - ./front/dist/tkdo-front:/usr/local/apache2/htdocs

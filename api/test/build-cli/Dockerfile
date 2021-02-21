@@ -5,4 +5,4 @@ RUN curl -Lo /usr/local/bin/mhsendmail https://github.com/mailhog/mhsendmail/rel
   echo 'sendmail_path = /usr/local/bin/mhsendmail ${MHSENDMAIL_OPTIONS}' > $PHP_INI_DIR/conf.d/php-sendmail.ini
 COPY * /usr/src/tkdo/
 WORKDIR /usr/src/tkdo
-ENTRYPOINT [ "sh", "./startup.sh" ]
+ENTRYPOINT [ "/bin/sh" ]
