@@ -9,7 +9,7 @@ class ResultatFixture extends AppAbstractFixture
 {
     public function load(ObjectManager $em)
     {
-        if (!$this->prod) {
+        if ($this->devMode) {
             foreach ([
                 'noelPasse' => [
                     'alice'   => 'bob',

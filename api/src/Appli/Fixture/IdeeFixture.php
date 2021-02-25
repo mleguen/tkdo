@@ -10,7 +10,7 @@ class IdeeFixture extends AppAbstractFixture
 {
     public function load(ObjectManager $em)
     {
-        if (!$this->prod) {
+        if ($this->devMode) {
             $em->persist((new IdeeAdaptor())
                 ->setUtilisateur($this->getReference('alice'))
                 ->setDescription('un gauffrier')

@@ -3,38 +3,35 @@
 namespace App\Appli\Fixture;
 
 use App\Appli\ModelAdaptor\UtilisateurAdaptor;
+use App\Appli\Service\UriService;
+use App\Bootstrap;
 use App\Dom\Model\Genre;
 use App\Dom\Model\PrefNotifIdees;
 use DateTime;
 use Doctrine\Persistence\ObjectManager;
-use Symfony\Component\Console\Output\OutputInterface;
 
 class UtilisateurFixture extends AppAbstractFixture
 {
     private $adminEmail;
     private $host;
 
-    public function __construct(OutputInterface $output, bool $prod, string $host, string $adminEmail = null)
+    public function __construct(
+        Bootstrap $bootstrap,
+        UriService $uriService
+    ) {
+        parent::__construct($bootstrap);
+        $this->host = $uriService->getHost();
+    }
+
+    public function setAdminEmail(string $adminEmail = null): self
     {
-        parent::__construct($output, $prod);
-        $this->host = $host;
         $this->adminEmail = $adminEmail;
+        return $this;
     }
 
     public function load(ObjectManager $em)
     {
-        if ($this->prod) {
-            $utilisateurs = [
-                'admin' => (new UtilisateurAdaptor())
-                    ->setEmail($this->adminEmail ?? "admin@$this->host")
-                    ->setAdmin(true)
-                    ->setGenre(Genre::Masculin)
-                    ->setIdentifiant('admin')
-                    ->setMdpClair('admin')
-                    ->setNom('Administrateur')
-                    ->setDateDerniereNotifPeriodique(new DateTime()),
-            ];
-        } else {
+        if ($this->devMode) {
             $utilisateurs = [
                 'alice' => (new UtilisateurAdaptor())
                     ->setEmail("alice@$this->host")
@@ -74,6 +71,17 @@ class UtilisateurFixture extends AppAbstractFixture
                     ->setMdpClair('mdpeve')
                     ->setNom('Eve')
                     ->setDateDerniereNotifPeriodique(new DateTime('2 days ago')),
+            ];
+        } else {
+            $utilisateurs = [
+                'admin' => (new UtilisateurAdaptor())
+                    ->setEmail($this->adminEmail ?? "admin@$this->host")
+                    ->setAdmin(true)
+                    ->setGenre(Genre::Masculin)
+                    ->setIdentifiant('admin')
+                    ->setMdpClair('admin')
+                    ->setNom('Administrateur')
+                    ->setDateDerniereNotifPeriodique(new DateTime()),
             ];
         }
         foreach($utilisateurs as $nom => $utilisateur) {

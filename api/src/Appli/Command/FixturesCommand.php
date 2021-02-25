@@ -6,7 +6,7 @@ use App\Appli\Fixture\IdeeFixture;
 use App\Appli\Fixture\OccasionFixture;
 use App\Appli\Fixture\ResultatFixture;
 use App\Appli\Fixture\UtilisateurFixture;
-use App\Appli\Service\UriService;
+use App\Bootstrap;
 use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
 use Doctrine\Common\DataFixtures\Loader;
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;
@@ -18,55 +18,60 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class FixturesCommand extends Command
 {
-  private $em;
-  private $host;
+    private $devMode;
+    private $em;
+    private $ideeFixture;
+    private $occasionFixture;
+    private $resultatFixture;
+    private $utilisateurFixture;
 
-  public function __construct(
-    EntityManager $em,
-    UriService $uriService
-  )
-  {
-    parent::__construct('fixtures');
-    $this->em = $em;
-    $this->host = $uriService->getHost();
-  }
+    public function __construct(
+        Bootstrap $bootstrap,
+        EntityManager $em,
+        IdeeFixture $ideeFixture,
+        OccasionFixture $occasionFixture,
+        ResultatFixture $resultatFixture,
+        UtilisateurFixture $utilisateurFixture
+    )
+    {
+        parent::__construct('fixtures');
+        $this->devMode = $bootstrap->devMode;
+        $this->em = $em;
+        $this->ideeFixture = $ideeFixture;
+        $this->occasionFixture = $occasionFixture;
+        $this->resultatFixture = $resultatFixture;
+        $this->utilisateurFixture = $utilisateurFixture;
+    }
 
-  protected function configure(): void
-  {
-    parent::configure();
+    protected function configure(): void
+    {
+        parent::configure();
 
-    $this
-      ->setDescription('Initialise la base de données')
-      ->addOption(
-        'prod',
-        null,
-        InputOption::VALUE_NONE,
-        'Jeu de données de production'
-      )
-      ->addOption(
-        'admin-email',
-        null,
-        InputOption::VALUE_OPTIONAL,
-        'E-mail administrateur'
-      );
-  }
+        $this
+            ->setDescription('Initialise la base de données')
+            ->addOption(
+                'admin-email',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'E-mail administrateur'
+            );
+    }
 
-  protected function execute(InputInterface $input, OutputInterface $output): int
-  {
-    $prod = $input->getOption('prod');
-    $adminEmail = $input->hasOption('admin-email') ? $input->getOption('admin-email') : null;
-    
-    $loader = new Loader();
-    $loader->addFixture(new UtilisateurFixture($output, $prod, $this->host, $adminEmail));
-    $loader->addFixture(new OccasionFixture($output, $prod));
-    $loader->addFixture(new IdeeFixture($output, $prod));
-    $loader->addFixture(new ResultatFixture($output, $prod));
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
+        $adminEmail = $input->hasOption('admin-email') ? $input->getOption('admin-email') : null;
+        
+        $loader = new Loader();
+        $loader->addFixture($this->utilisateurFixture->setAdminEmail($adminEmail)->setOutput($output));
+        $loader->addFixture($this->occasionFixture->setOutput($output));
+        $loader->addFixture($this->ideeFixture->setOutput($output));
+        $loader->addFixture($this->resultatFixture->setOutput($output));
 
-    $executor = new ORMExecutor($this->em, new ORMPurger());
-    $output->writeln(['Initialisation ou réinitialisation de la base de données (' . ($prod ? 'production' : 'tests') . ')...']);
-    $executor->execute($loader->getFixtures());
-    $output->writeln(['OK']);
+        $executor = new ORMExecutor($this->em, new ORMPurger());
+        $output->writeln(['Initialisation ou réinitialisation de la base de données (' . ($this->devMode ? 'dev' : 'production') . ')...']);
+        $executor->execute($loader->getFixtures());
+        $output->writeln(['OK']);
 
-    return 0;
-  }
+        return 0;
+    }
 }

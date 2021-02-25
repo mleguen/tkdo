@@ -29,8 +29,6 @@ services:
             MYSQL_PORT: 3306
             MYSQL_USER: tkdo
             TKDO_BASE_URI: http://slim
-            TKDO_COMPILE_CONTAINER: 0
-            TKDO_DEV_MODE: 0
             TKDO_MAILER_FROM: noreply@slim
         volumes:
             - ./api/public:/var/www/html/public
@@ -55,8 +53,6 @@ services:
             MYSQL_PORT: 3306
             MYSQL_USER: tkdo
             TKDO_BASE_URI: http://slim
-            TKDO_COMPILE_CONTAINER: 0
-            TKDO_DEV_MODE: 0
             TKDO_MAILER_FROM: noreply@slim
         restart: 'no'
         volumes:

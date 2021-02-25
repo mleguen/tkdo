@@ -10,7 +10,7 @@ class OccasionFixture extends AppAbstractFixture
 {
     public function load(ObjectManager $em)
     {
-        if (!$this->prod) {
+        if ($this->devMode) {
             $annee = (new DateTime())->format('Y');
             if (new DateTime("$annee-12-25") > new DateTime('now')) {
                 $anneeProchaine = $annee;

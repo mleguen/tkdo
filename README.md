@@ -85,7 +85,7 @@ Créer le compte `admin` en spécifiant son e-mail
 l'e-mail utilisé sera `admin@host` où `host` est le nom d'hôte de `TKDO_BASE_URI`) :
 
 ```bash
-$ ./composer.phar console -- fixtures --prod --admin-email admin@host
+$ ./composer.phar console -- fixtures --admin-email admin@host
 Initialisation ou réinitialisation de la base de données (production)...
 xxx créés.
 [...]

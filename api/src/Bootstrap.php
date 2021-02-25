@@ -59,7 +59,6 @@ class Bootstrap
     private $slimApp;
 
     public $apiRoot = __DIR__ . '/..';
-    public $compileContainer = false;
     /** @var bool */
     public $devMode = true;
     public $docker = false;
@@ -70,8 +69,7 @@ class Bootstrap
         $dotenv = Dotenv::createImmutable($this->apiRoot);
         $dotenv->load();
 
-        $this->devMode = boolval(getenv('TKDO_DEV_MODE') ?? '1');
-        $this->compileContainer = getenv('TKDO_COMPILE_CONTAINER') ? boolval(getenv('TKDO_COMPILE_CONTAINER')) : !$this->devMode;
+        $this->devMode = boolval(getenv('TKDO_DEV_MODE') ?: '1');
         $this->docker = getenv('docker') !== false;
     }
 
@@ -79,7 +77,7 @@ class Bootstrap
     {
         // Instantiate PHP-DI ContainerBuilder
         $containerBuilder = new ContainerBuilder();
-        if ($this->compileContainer) $containerBuilder->enableCompilation($this->apiRoot . '/var/cache');
+        if (!$this->devMode) $containerBuilder->enableCompilation($this->apiRoot . '/var/cache');
 
         // Define all non implicit dependencies
         $containerBuilder->addDefinitions([
