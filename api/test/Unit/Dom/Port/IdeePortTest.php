@@ -17,9 +17,13 @@ use DateTime;
 use Exception;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
+use Prophecy\Prophecy\ObjectProphecy;
 
 class IdeePortTest extends TestCase
 {
+    use ProphecyTrait;
+
     /** @var ObjectProphecy */
     private $ideeRepositoryProphecy;
     /** @var ObjectProphecy */

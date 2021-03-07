@@ -21,9 +21,13 @@ use App\Dom\Repository\UtilisateurRepository;
 use Iterator;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
+use Prophecy\Prophecy\ObjectProphecy;
 
 class UtilisateurPortTest extends TestCase
 {
+    use ProphecyTrait;
+
     /** @var ObjectProphecy */
     private $mailPluginProphecy;
     /** @var ObjectProphecy */

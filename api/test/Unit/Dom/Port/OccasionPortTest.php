@@ -19,13 +19,16 @@ use App\Dom\Repository\ResultatRepository;
 use App\Dom\Repository\UtilisateurRepository;
 use DateTime;
 use Iterator;
-use Laminas\Code\Scanner\Util;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
+use Prophecy\Prophecy\ObjectProphecy;
 
 class OccasionPortTest extends TestCase
 {
-    /** @var ObjectProphecy */
+    use ProphecyTrait;
+
+   /** @var ObjectProphecy */
     private $mailPluginProphecy;
     /** @var ObjectProphecy */
     private $occasionRepositoryProphecy;

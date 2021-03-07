@@ -16,7 +16,7 @@ services:
             MYSQL_ROOT_PASSWORD: mdproot
         image: mysql:5.6
     slim:
-        build: ./api/test/build-slim
+        build: ./api/docker/slim
         depends_on:
             - mailhog
             - mysql
@@ -39,7 +39,7 @@ services:
             - ./api/vendor:/var/www/html/vendor
             - ./api/.env:/var/www/html/.env
     cli:
-        build: ./api/test/build-cli
+        build: ./api/docker/cli
         depends_on:
             - mysql
             - slim
@@ -66,6 +66,6 @@ services:
             - ./api/.env:/usr/src/tkdo/.env
             - ./api/cli-config.php:/usr/src/tkdo/cli-config.php
             - ./api/composer.json:/usr/src/tkdo/composer.json
+            - ./api/composer.lock:/usr/src/tkdo/composer.lock
             - ./api/composer.phar:/usr/src/tkdo/composer.phar
             - ./api/phpunit.xml:/usr/src/tkdo/phpunit.xml
-            - ./api/test/build-cli/run-test.sh:/usr/src/tkdo/run-test.sh

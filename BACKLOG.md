@@ -1,9 +1,11 @@
 # Travaux futurs
 
-- notion d'environnement et séparation de .env en .env, .env.$TKDO_ENV et .env.local
-  (ATTENTION à docker qui ne supporte que .env)
-- valeurs par défaut des varibles d'environnement dans .env, plus dans le code
-  (avec contrôle qu'elles sont bien définies par php-dotenv)
+- ajouter un conteneur angular-build qui :
+  - fasse un npm install au démarrage (comme cli fait le composer install)
+  - encapsule `npm --prefix front -- run build --prod --watch --delete-output-path false`
+  - soit une dépendance du conteneur angular
+- mettre en place des tests e2e (lancés depuis un conteneur browser avec un chrome headless)
+- monter les versions des dépendances front
 - ajouter une route admin d'affichage des logs
 - ajouter une route admin de génération du tirage au sort dans l'application (tirage au sort automatisé)
 - ajouter sur la carte d'un participant le nombre d'idées qui ont été proposées pour lui (ne compter que les idées lisibles)

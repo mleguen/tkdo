@@ -17,7 +17,7 @@ où sera installé tkdo.
 
 ### Pré-requis
 
-- php 7.2 avec les extensions `dom` et `mbstring`
+- php 7.3 avec les extensions `dom` et `mbstring`
 - Apache avec le module `mod_rewrite`
 - l'utilisation de fichiers `.htaccess` dans le répertoire d'installation est autorisée 
   (à défaut, copier le contenu de [.htaccess](./.htaccess) dans une directive `Directory` dans la configuration Apache)

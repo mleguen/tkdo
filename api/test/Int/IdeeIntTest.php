@@ -141,7 +141,7 @@ class IdeeIntTest extends IntTestCase
 
         // Lance les notifications quotidiennes
         exec("php bin/notif-quotidienne.php", $output, $return_var);
-        $this->assertRegexp("/NotifCommande: {$participantANotifierQ->getNom()} 2/", implode("\n", $output));
+        $this->assertMatchesRegularExpression("/NotifCommande: {$participantANotifierQ->getNom()} 2/", implode("\n", $output));
         $this->assertEquals(0, $return_var);
 
         // Vérifie que l'utilisateur à notifier quotidiennement
@@ -150,14 +150,14 @@ class IdeeIntTest extends IntTestCase
         $this->assertCount(1, $emailsRecus);
         $this->assertMessageRecipientsContains($participantANotifierQ->getEmail(), $emailsRecus[0]);
         $this->assertEquals('Actualités Tkdo', $emailsRecus[0]->subject);
-        $this->assertRegExp("/Une nouvelle idée de cadeau a été proposée pour {$utilisateur->getNom()}/", $emailsRecus[0]->body);
-        $this->assertRegExp("/L'idée de cadeau pour {$utilisateur->getNom()} ci-dessous a été retirée de sa liste/", $emailsRecus[0]->body);
+        $this->assertMatchesRegularExpression("/Une nouvelle idée de cadeau a été proposée pour {$utilisateur->getNom()}/", $emailsRecus[0]->body);
+        $this->assertMatchesRegularExpression("/L'idée de cadeau pour {$utilisateur->getNom()} ci-dessous a été retirée de sa liste/", $emailsRecus[0]->body);
 
         // Lance à nouveau les notifications quotidiennes et vérifie que cette fois aucun mail n'est parti
         $output = [];
         exec("php bin/notif-quotidienne.php", $output, $return_var);
         $this->assertEquals(0, $return_var);
-        $this->assertNotRegExp("/NotifCommande: {$participantANotifierQ->getNom()}/", implode("\n", $output));
+        $this->assertDoesNotMatchRegularExpression("/NotifCommande: {$participantANotifierQ->getNom()}/", implode("\n", $output));
         $emailsRecus = $this->depileDerniersEmailsRecus();
         $this->assertCount(0, $emailsRecus);
     }

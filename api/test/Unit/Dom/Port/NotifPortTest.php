@@ -17,9 +17,13 @@ use DateTime;
 use Iterator;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
+use Prophecy\Prophecy\ObjectProphecy;
 
 class NotifPortTest extends TestCase
 {
+    use ProphecyTrait;
+
     /** @var ObjectProphecy */
     private $ideeRepositoryProphecy;
     /** @var ObjectProphecy */
