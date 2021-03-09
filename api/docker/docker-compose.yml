@@ -3,6 +3,7 @@ version: '3.8'
 volumes:
     cache:
     doctrine:
+    vendor:
 services:
     mailhog:
         image: mailhog/mailhog
@@ -36,10 +37,11 @@ services:
             - ./api/var/auth:/var/www/html/var/auth
             - cache:/var/www/html/var/cache
             - doctrine:/var/www/html/var/doctrine
-            - ./api/vendor:/var/www/html/vendor
+            - vendor:/var/www/html/vendor
             - ./api/.env:/var/www/html/.env
     cli:
         build: ./api/docker/cli
+        command: ./install-with-fixtures.sh
         depends_on:
             - mysql
             - slim
@@ -62,7 +64,7 @@ services:
             - ./api/var/auth:/usr/src/tkdo/var/auth
             - cache:/usr/src/tkdo/var/cache
             - doctrine:/usr/src/tkdo/var/doctrine
-            - ./api/vendor:/usr/src/tkdo/vendor
+            - vendor:/usr/src/tkdo/vendor
             - ./api/.env:/usr/src/tkdo/.env
             - ./api/cli-config.php:/usr/src/tkdo/cli-config.php
             - ./api/composer.json:/usr/src/tkdo/composer.json

@@ -119,12 +119,6 @@ la page d'administration vous permet :
 - [Historique des changements](./CHANGELOG.md).
 - [Travaux futurs](./BACKLOG.md).
 
-### Installation des dépendances et construction
-
-```bash
-./build
-```
-
 ### Tests de l'API
 
 Lancer tous les tests sur l'environnement Docker :
@@ -141,12 +135,7 @@ sudo docker-compose run --rm cli ./run-test.sh --filter '/Test\\Int/'
 
 > Attention : l'exécution des tests d'intégration
 > réinitialisera la base de données de l'environnement Docker
-
-Vous pouvez également lancer les test unitaires sans Docker (mais seulement les tests unitaires) :
-
-```bash
-./api/composer.phar test -d api -- --filter '/Test\\Unit/'
-```
+> (`sudo docker-compose run --rm cli ./install.sh`)
 
 ### Pré-requis au lancement des tests e2e front
 
@@ -165,16 +154,12 @@ Comme le serveur de développement Angular est lancé sans `--prod`,
 les requêtes destinées à l'API sont interceptées et bouchonnées
 (cf. [front/src/app/dev-backend.interceptor.ts](./front/src/app/dev-backend.interceptor.ts)).
 
-### Utiliser l'environnement Docker seul
+### Utiliser l'environnement Docker
 
 Démarrer et initialiser l'environnement docker :
 
 ```bash
 sudo docker-compose up -d front
-sudo docker-compose run --rm cli -c '
-  ./composer.phar doctrine -- orm:generate-proxies &&
-  ./composer.phar doctrine -- orm:schema-tool:update --force &&
-  ./composer.phar console -- fixtures'
 ```
 
 Il est alors accessible à l'URL : http://localhost:8080
@@ -186,23 +171,9 @@ Pour les consulter (par exemple ici pour les logs de l'API, au fil de l'eau) :
 sudo docker-compose logs -f slim
 ```
 
-Et pour conserver le conteneur angular à jour des modifications
-sans avoir à l'arrêter/redémarrer :
-
-```bash
-npm --prefix front -- run build --prod --watch --delete-output-path false
-```
-
-### Utiliser le serveur de développement Angular avec l'environnement Docker
-
-Une fois l'environnement Docker opérationnel (voir ci-dessus),
-démarrer le serveur de développement Angular avec l'option `--prod`
-pour qu'il redirige les requêtes destinées à l'API vers l'environnement Docker
-(cf. [front/src/proxy.conf.json](./front/src/proxy.conf.json)).
-
-```bash
-npm --prefix front -- start --prod
-```
+> Attention : chaque démarrage de l'environnement Docker
+> réinitialisera la base de données et recréera les fixtures
+> (`sudo docker-compose run --rm cli ./install-with-fixtures.sh`)
 
 ### Créer une nouvelle migration de base de données
 
@@ -210,10 +181,7 @@ Commencer par réinitialiser l'environnement Docker
 et s'assurer que la base de données est au niveau de la dernière migration :
 
 ```bash
-sudo docker-compose run --rm cli -c '
-  ./composer.phar doctrine -- orm:generate-proxies &&
-  ./composer.phar doctrine -- orm:schema-tool:drop --force &&
-  ./composer.phar doctrine -- migrations:migrate'
+sudo docker-compose run --rm cli ./install.sh
 ```
 
 Puis générer automatiquement la nouvelle migration :
@@ -233,10 +201,4 @@ Finalement, après vérification/finalisation de la migration, la tester :
 sudo docker-compose run --rm cli -c '
   ./composer.phar doctrine -- migrations:migrate &&
   ./composer.phar console -- fixtures'
-```
-
-Si nécessaire, faire un retour arrière :
-
-```bash
-sudo docker-compose run --rm cli ./composer.phar doctrine -- migrations:migrate prev
 ```

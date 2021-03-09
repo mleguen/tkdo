@@ -2,9 +2,11 @@ version: '3.8'
 
 services:
     front:
-        build: ./test/build-front
+        build: ./docker/build-front
         depends_on:
             - angular
+            - angular-watch
+            - cli
             - slim
         ports:
             - 8080:80

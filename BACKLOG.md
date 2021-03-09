@@ -1,11 +1,7 @@
 # Travaux futurs
 
-- ajouter un conteneur angular-build qui :
-  - fasse un npm install au démarrage (comme cli fait le composer install)
-  - encapsule `npm --prefix front -- run build --prod --watch --delete-output-path false`
-  - soit une dépendance du conteneur angular
 - mettre en place des tests e2e (lancés depuis un conteneur browser avec un chrome headless)
-- monter les versions des dépendances front
+- monter la version de node et des dépendances front (en commençant par angular)
 - ajouter une route admin d'affichage des logs
 - ajouter une route admin de génération du tirage au sort dans l'application (tirage au sort automatisé)
 - ajouter sur la carte d'un participant le nombre d'idées qui ont été proposées pour lui (ne compter que les idées lisibles)

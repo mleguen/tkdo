@@ -5,6 +5,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
+    "install-build-watch": "npm install && npm run build -- --prod --watch --delete-output-path false",
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
