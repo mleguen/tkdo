@@ -17,14 +17,14 @@ où sera installé tkdo.
 
 ### Pré-requis
 
-- php 7.3 avec les extensions `dom` et `mbstring`
+- php 7.3 avec les extensions `dom`, `mbstring`, `pdo_mysql` et `zip`
 - Apache avec le module `mod_rewrite`
 - l'utilisation de fichiers `.htaccess` dans le répertoire d'installation est autorisée 
-  (à défaut, copier le contenu de [.htaccess](./.htaccess) dans une directive `Directory` dans la configuration Apache)
+  (à défaut, copier le contenu de [.htaccess](./apache/.htaccess) dans une directive `Directory` dans la configuration Apache)
 - le répertoire d'installation est le répertoire racine de l'hôte Apache
   (à défaut, ajouter `--base-href /prefixe/du/repertoire/cible` à la fin du script `build` dans [package.json](./package.json))
 - l'hôte Apache est accessible en HTTPS
-  (à défaut, commenter la règle de redirection vers HTTPS dans [.htaccess](./.htaccess))
+  (à défaut, commenter la règle de redirection vers HTTPS dans [.htaccess](./apache/.htaccess))
 
 ### Configuration
 
@@ -103,7 +103,7 @@ de changer le mot de passe du compte `admin` dès la fin de l'installation.
 
 > **Note 2** : sur certains hébergements, le binaire php disponible dans le path est un binaire CGI et/ou en PHP 5.
 > Utiliser dans ce cas `phpinfo()` pour déterminer le chemin du binaire PHP 7 utilisé pour l'exécution des pages Web,
-> et exécuter `bin/doctrine.php` avec le binaire CLI correpondant (`/usr/local/php7.2/bin/php` par exemple).
+> et exécuter `bin/doctrine.php` avec le binaire CLI correpondant (`/usr/local/php7.3/bin/php` par exemple).
 > L'utilisation de l'option `-n` peut aussi être nécessaire pour éviter l'utilisation du php.ini du serveur,
 > si ce dernier désactive par exemple l'affichage des exceptions.
 
@@ -119,75 +119,109 @@ la page d'administration vous permet :
 - [Historique des changements](./CHANGELOG.md).
 - [Travaux futurs](./BACKLOG.md).
 
-### Tests de l'API
+### Utiliser l'environnement de développement complet
 
-Lancer tous les tests sur l'environnement Docker :
-
-```bash
-sudo docker-compose run --rm cli ./run-test.sh
-```
-
-Ou seulement les tests d'intégration :
-
-```bash
-sudo docker-compose run --rm cli ./run-test.sh --filter '/Test\\Int/'
-```
-
-> Attention : l'exécution des tests d'intégration
-> réinitialisera la base de données de l'environnement Docker
-> (`sudo docker-compose run --rm cli ./install.sh`)
-
-### Pré-requis au lancement des tests e2e front
-
-- chrome/chromium installé
-- variable d'environnement CHROME_BIN pointant vers le binaire de chrome/chromium
-- `npm run chrome-webdriver-update` lancé pour forcer la version de webdriver chrome de protractor
-  à correspondre à celle du chrome/chromium installé
-
-### Utiliser le serveur de développement Angular seul
-
-```bash
-npm --prefix front -- start
-```
-
-Comme le serveur de développement Angular est lancé sans `--prod`,
-les requêtes destinées à l'API sont interceptées et bouchonnées
-(cf. [front/src/app/dev-backend.interceptor.ts](./front/src/app/dev-backend.interceptor.ts)).
-
-### Utiliser l'environnement Docker
-
-Démarrer et initialiser l'environnement docker :
+Démarrer et initialiser l'environnement :
 
 ```bash
 sudo docker-compose up -d front
 ```
 
-Il est alors accessible à l'URL : http://localhost:8080
+Puis ouvrez votre navigateur sur http://localhost:8080
 
 Les logs sont affichés sur la sortie standard des conteneurs et collectés par docker-compose.
-Pour les consulter (par exemple ici pour les logs de l'API, au fil de l'eau) :
+Pour les consulter ou fil de l'eau :
 
 ```bash
-sudo docker-compose logs -f slim
+sudo docker-compose logs -f
 ```
 
 > Attention : chaque démarrage de l'environnement Docker
 > réinitialisera la base de données et recréera les fixtures
-> (`sudo docker-compose run --rm cli ./install-with-fixtures.sh`)
+> (`sudo docker-compose run --rm slim-cli ./install-with-fixtures.sh`)
 
-### Créer une nouvelle migration de base de données
+### Tests de bout en bout
 
-Commencer par réinitialiser l'environnement Docker
+```bash
+sudo docker-compose up -d front
+sudo docker-compose run --rm npm run test-e2e
+```
+
+> Note : ces tests de bout en bout sont les tests d'intégration front,
+> mais exécutés sur l'environnement de développement complet,
+> avec du coup un jeu de test aligné sur les fixtures de l'API.
+
+### Front
+
+#### Installation des dépendances
+
+```sh
+sudo docker-compose run --rm npm install
+```
+
+#### Tests unitaires
+
+- tests unitaires :
+
+  ```bash
+  sudo docker-compose run --rm npm test
+  ```
+
+- tests d'intégration :
+
+  ```bash
+  sudo docker-compose run --rm npm run test-int
+  ```
+
+  > Note : ces tests d'intégration s'exécutent sur le serveur de développement Angular,
+  > avec interception des requêtes destinées à l'API (voir ci-dessous).
+
+#### Utiliser le serveur de développement Angular seul
+
+```bash
+sudo docker-compose run --rm -p 4200:4200 npm start
+```
+
+Puis ouvrez votre navigateur sur http://localhost:4200/
+quand l'invite vous le demande.
+
+Comme le serveur de développement Angular est lancé sans `--prod`,
+les requêtes destinées à l'API sont interceptées et bouchonnées
+(cf. [front/src/app/dev-backend.interceptor.ts](./front/src/app/dev-backend.interceptor.ts)).
+
+### API
+
+#### Tests
+
+- tous les tests (unitaires et intégration) :
+
+  ```bash
+  sudo docker-compose run --rm slim-cli ./run-test.sh
+  ```
+
+- ou seulement les tests d'intégration :
+
+  ```bash
+  sudo docker-compose run --rm slim-cli ./run-test.sh --filter '/Test\\Int/'
+  ```
+
+> Attention : l'exécution des tests d'intégration
+> réinitialise la base de données de l'environnement de développement
+> (`sudo docker-compose run --rm slim-cli ./install.sh`)
+
+#### Créer une nouvelle migration de base de données
+
+Commencer par réinitialiser l'environnement de développement
 et s'assurer que la base de données est au niveau de la dernière migration :
 
 ```bash
-sudo docker-compose run --rm cli ./install.sh
+sudo docker-compose run --rm slim-cli ./install.sh
 ```
 
 Puis générer automatiquement la nouvelle migration :
 
 ```bash
-sudo docker-compose run --rm cli -c '
+sudo docker-compose run --rm slim-cli -c '
   ./composer.phar doctrine -- orm:clear-cache:metadata &&
   ./composer.phar doctrine -- orm:clear-cache:query &&
   ./composer.phar doctrine -- orm:clear-cache:result &&
@@ -198,7 +232,7 @@ sudo docker-compose run --rm cli -c '
 Finalement, après vérification/finalisation de la migration, la tester :
 
 ```bash
-sudo docker-compose run --rm cli -c '
+sudo docker-compose run --rm slim-cli -c '
   ./composer.phar doctrine -- migrations:migrate &&
   ./composer.phar console -- fixtures'
 ```

@@ -9,7 +9,7 @@
     <label for="mdp">Mot de passe :</label>
     <input id="mdp" type="password" formControlName="mdp" class="form-control">
   </div>  
-  <button class="btn btn-primary" type="submit" [disabled]="!formConnexion.valid">Se connecter</button>
+  <button id="btnSeConnecter" class="btn btn-primary" type="submit" [disabled]="!formConnexion.valid">Se connecter</button>
 </form>
 
 <div *ngIf="erreurConnexion" class="alert alert-danger">{{erreurConnexion}}</div>

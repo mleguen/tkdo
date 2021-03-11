@@ -14,8 +14,8 @@ AUTH_RSA=./api/var/auth/auth_rsa
 openssl pkey -in $AUTH_RSA.prod -pubout -out $AUTH_RSA.pub.prod
 
 # Front
-npm --prefix front -- install || echec 1 "Impossible d'installer les dépendances du front"
-npm --prefix front -- run build --prod || echec 2 "Impossible de construire le front"
+sudo docker-compose run npm install || echec 1 "Impossible d'installer les dépendances du front"
+sudo docker-compose run npm run build --prod || echec 2 "Impossible de construire le front"
 
 # API
 ./api/composer.phar install -d api || echec 3 "Impossible d'installer les dependances de l'api"

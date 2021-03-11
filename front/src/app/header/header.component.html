@@ -9,12 +9,12 @@
     <ul class="navbar-nav mr-auto">
       <ng-container *ngIf="occasions$|async as occasions">
         <li class="nav-item dropdown" *ngIf="occasions.length > 0">
-          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
+          <a class="nav-link dropdown-toggle" href="#" id="menuMesOccasions" role="button" data-toggle="dropdown"
             aria-haspopup="true" aria-expanded="false" [ngClass]="{'active': menuActif === '/occasion'}">
             Mes occasions
           </a>
-          <div class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDropdown">
-            <a class="dropdown-item" [routerLink]="['/occasion', o.id]" *ngFor="let o of occasions"
+          <div class="dropdown-menu dropdown-menu-dark" aria-labelledby="menuMesOccasions">
+            <a class="dropdown-item menuMesOccasionsItem" [routerLink]="['/occasion', o.id]" *ngFor="let o of occasions"
               [ngClass]="{'active': menuActif === '/occasion' && idOccasionActive === o.id}">{{o.titre}}</a>
           </div>
         </li>
@@ -34,9 +34,9 @@
     </ul>
     
     <form class="form-inline">
-      <span class="form-text mr-2"
+      <span id="nomUtilisateur" class="form-text mr-2"
         data-toggle="collapse" data-target=".navbar-collapse.show">{{utilisateur.nom}}</span>
-      <button [routerLink]="['/deconnexion']" class="btn btn-secondary my-2 my-sm-0"
+      <button id="btnSeDeconnecter" [routerLink]="['/deconnexion']" class="btn btn-secondary my-2 my-sm-0"
         data-toggle="collapse" data-target=".navbar-collapse.show">Se déconnecter</button>
     </form>
   </div>

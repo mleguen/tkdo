@@ -3,6 +3,7 @@
 ## Prochaine version
 
 - refactorisation du code de l'API
+- ajout de tests de bout en bout
 
 ## V1.2.0 (21/12/2020)
 

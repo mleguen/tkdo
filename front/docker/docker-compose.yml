@@ -1,24 +1,19 @@
 version: '3.8'
 
-volumes:
-    dist-tkdo-front:
-    node_modules:
 services:
     angular:
-        build: ./front/docker/build-angular
+        build: ./front/docker/angular
         volumes:
-            - dist-tkdo-front:/usr/local/apache2/htdocs
-    angular-watch:
-        image: 'node:12'
-        command: npm run install-build-watch
+            - ./front/dist:/mnt/dist
+    npm:
+        build:
+            context: ./front/docker/npm
+            args:
+                DEV_GID: ${DEV_GID:-1000}
+                DEV_UID: ${DEV_UID:-1000}
+        cap_add:
+            # Mandatory to be able to run chrome without --no-sandbox option
+            - SYS_ADMIN
+        command: run install-build-watch
         volumes:
-            - dist-tkdo-front:/usr/local/tkdo-front/dist/tkdo-front
-            - node_modules:/usr/local/tkdo-front/node_modules
-            - ./front/src:/usr/local/tkdo-front/src
-            - ./front/angular.json:/usr/local/tkdo-front/angular.json
-            - ./front/package-lock.json:/usr/local/tkdo-front/package-lock.json
-            - ./front/package.json:/usr/local/tkdo-front/package.json
-            - ./front/tsconfig.app.json:/usr/local/tkdo-front/tsconfig.app.json
-            - ./front/tsconfig.json:/usr/local/tkdo-front/tsconfig.json
-            - ./front/version.js:/usr/local/tkdo-front/version.js
-        working_dir: /usr/local/tkdo-front
+            - ./:/mnt/tkdo

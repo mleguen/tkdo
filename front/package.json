@@ -5,12 +5,12 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "install-build-watch": "npm install && npm run build -- --prod --watch --delete-output-path false",
+    "install-build-watch": "npm install && npm run build -- --watch",
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
-    "e2e": "ng e2e --webdriver-update=false",
-    "update-chrome-driver": "cd node_modules/protractor && webdriver-manager clean && webdriver-manager update --versions.chrome $($CHROME_BIN --version|cut -d' ' -f2)",
+    "test-int": "ng e2e",
+    "test-e2e": "protractor /mnt/tkdo/e2e/protractor.conf.js",
     "postinstall": "node version.js"
   },
   "private": true,

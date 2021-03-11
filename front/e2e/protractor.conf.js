@@ -3,6 +3,7 @@
 // https://github.com/angular/protractor/blob/master/lib/config.ts
 
 const { SpecReporter, StacktraceOption } = require('jasmine-spec-reporter');
+const { join } = require('path');
 
 /**
  * @type { import("protractor").Config }
@@ -10,10 +11,13 @@ const { SpecReporter, StacktraceOption } = require('jasmine-spec-reporter');
 exports.config = {
   allScriptsTimeout: 11000,
   specs: [
-    './src/**/*.e2e-spec.ts'
+    join(__dirname, './src/**/*.e2e-spec.ts')
   ],
   capabilities: {
-    browserName: 'chrome'
+    browserName: 'chrome',
+    chromeOptions: {
+      args: ["--headless"]
+    },
   },
   directConnect: true,
   baseUrl: 'http://localhost:4200/',
@@ -25,12 +29,47 @@ exports.config = {
   },
   onPrepare() {
     require('ts-node').register({
-      project: require('path').join(__dirname, './tsconfig.json')
+      project: join(__dirname, './tsconfig.json')
     });
     jasmine.getEnv().addReporter(new SpecReporter({
       spec: {
         displayStacktrace: StacktraceOption.PRETTY
       }
     }));
-  }
+  },
+
+  // Jeu de données correspondant aux données du backend de dev
+  params: {
+    identifiants: {
+      moi: {
+        identifiant: 'alice',
+        mdp: 'mdpalice',
+      },
+      quiRecoitDeMoi: {
+        identifiant: 'charlie',
+        mdp: 'mdpcharlie',
+      },
+    },
+
+    noms: {
+      moi: 'Alice',
+      tiers: 'Bob',
+      quiRecoitDeMoi: 'Charlie',
+    },
+
+    ideesACreer: {
+      moi: "un pull",
+      quiRecoitDeMoi: "un jeu de société",
+      tiers: "un puzzle",
+    },
+
+    ideesASupprimer: {
+      moi: "un gauffrier",
+      tiers: "une canne à pêche",
+    },
+
+    ideesNonSupprimables: {
+      tiers: "des gants de boxe",
+    }
+  },
 };

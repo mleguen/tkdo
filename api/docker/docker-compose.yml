@@ -39,8 +39,8 @@ services:
             - doctrine:/var/www/html/var/doctrine
             - vendor:/var/www/html/vendor
             - ./api/.env:/var/www/html/.env
-    cli:
-        build: ./api/docker/cli
+    slim-cli:
+        build: ./api/docker/slim-cli
         command: ./install-with-fixtures.sh
         depends_on:
             - mysql

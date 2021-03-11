@@ -1,3 +1,6 @@
-node_modules
+/node_modules
+/init-ng.sh
+/package.json
+/package-lock.json
 /tkdo-*.tar
 /tkdo-*.tar.gz
