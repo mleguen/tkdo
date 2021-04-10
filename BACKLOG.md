@@ -1,6 +1,5 @@
 # Travaux futurs
 
-- réparer les tests unitaires front (2 KO)
 - monter la version de node et des dépendances front (en commençant par angular)
 - renommer le conteneur slim-cli en composer (sur le même principe que le conteneur npm)
 - remplacer apache-pack par un outil de build digne de ce nom
