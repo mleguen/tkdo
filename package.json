@@ -11,7 +11,8 @@
     "url": "https://github.com/mleguen/tkdo/issues"
   },
   "homepage": "https://github.com/mleguen/tkdo#readme",
-  "devDependencies": {
-    "@angular/cli": "^10.2.0"
+  "devDependencies": {},
+  "dependencies": {
+    "@angular/cli": "^11.2.8"
   }
 }

@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 rm -rf front
-npm install
+npm remove -S @angular/cli
+npm install -S @angular/cli
 ./node_modules/.bin/ng new --directory front --routing --skip-git --style scss tkdo-front
 cd front
 ./node_modules/.bin/ng generate component admin
