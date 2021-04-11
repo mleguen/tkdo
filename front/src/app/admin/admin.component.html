@@ -315,7 +315,7 @@ curl -u {{token}}: \
 <pre><samp>
 curl -u {{token}}: \
 -d idQuiOffre={{idUtilisateur}} \
--d idQuiRecoit={{idUtilisateur+1}} \
+-d idQuiRecoit={{idUtilisateur||0+1}} \
 -X POST {{urlApi}}/occasion/7/resultat
 </samp></pre>
 
@@ -324,7 +324,7 @@ curl -u {{token}}: \
 <pre><samp>
 {{'{'}}
   "idQuiOffre": {{idUtilisateur}},
-  "idQuiRecoit": {{idUtilisateur+1}}
+  "idQuiRecoit": {{idUtilisateur||0+1}}
 }
 </samp></pre>
 

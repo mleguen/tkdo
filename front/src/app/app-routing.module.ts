@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
+import { RouterModule, Routes } from '@angular/router';
 import { OccasionComponent } from './occasion/occasion.component';
 import { ListeIdeesComponent } from './liste-idees/liste-idees.component';
 import { ConnexionGuard } from './connexion.guard';

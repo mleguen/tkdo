@@ -1,9 +1,9 @@
 import { browser, logging } from 'protractor';
-import { AppPage } from './po/app.po';
-import { ConnexionPage } from './po/connexion.po';
-import { DeconnexionPage } from './po/deconnexion.po';
-import { ListeIdeesPage } from './po/liste-idees.po';
-import { OccasionPage } from './po/occasion.po';
+import { AppPage } from './app.po';
+import { ConnexionPage } from './connexion.po';
+import { DeconnexionPage } from './deconnexion.po';
+import { ListeIdeesPage } from './liste-idees.po';
+import { OccasionPage } from './occasion.po';
 
 describe('workspace-project App', () => {
 

@@ -10,13 +10,13 @@ import { BackendService } from '../backend.service';
 })
 export class ConnexionComponent implements OnInit {
 
-  erreurConnexion:string;
+  erreurConnexion?:string;
   formConnexion = this.fb.group({
     identifiant: ['', Validators.required],
     mdp: ['', Validators.required],
   });
   
-  private retour: string;
+  private retour?: string;
 
   constructor(
     private readonly fb: FormBuilder,
@@ -32,10 +32,11 @@ export class ConnexionComponent implements OnInit {
   }
 
   async connecte() {
+    if (!this.retour) throw new Error('Pas encore initialisé !');
     const { identifiant, mdp } = this.formConnexion.value;
     try {
       await this.backend.connecte(identifiant, mdp);
-      return this.router.navigateByUrl(this.retour);
+      await this.router.navigateByUrl(this.retour);
     }
     catch (err) {
       this.erreurConnexion = err.error?.description || 'connexion impossible';

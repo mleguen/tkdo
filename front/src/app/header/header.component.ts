@@ -11,8 +11,8 @@ import { BackendService } from '../backend.service';
 export class HeaderComponent {
   occasions$ = this.backend.occasions$.pipe(map(occasions => occasions?.slice(0).reverse()));
   utilisateurConnecte$ = this.backend.utilisateurConnecte$;
-  menuActif: string;
-  idOccasionActive: number;
+  menuActif?: string;
+  idOccasionActive?: number;
 
   constructor(
     private readonly backend: BackendService,

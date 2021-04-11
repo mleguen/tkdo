@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Validators, FormBuilder, ValidatorFn } from '@angular/forms';
+import { Validators, FormBuilder, ValidatorFn, AbstractControl } from '@angular/forms';
 import { BackendService, Genre, PrefNotifIdees, Utilisateur } from '../backend.service';
 
 @Component({
@@ -29,61 +29,62 @@ export class ProfilComponent implements OnInit {
       ]
     },
   );
-  erreurModification: string;
-  enregistre: boolean;
-  utilisateur: Utilisateur;
+  erreurModification?: string;
+  enregistre?: boolean;
+  utilisateur?: Utilisateur;
 
   constructor(
     private readonly fb: FormBuilder,
     private readonly backend: BackendService,
   ) { }
 
-  ngOnInit(): void {
-    this.backend.getUtilisateur$().subscribe(
-      utilisateur => {
-        this.utilisateur = utilisateur;
-        this.identifiant.setValue(utilisateur.identifiant);
-        this.nom.setValue(utilisateur.nom);
-        this.email.setValue(utilisateur.email);
-        this.genre.setValue(utilisateur.genre);
-        this.prefNotifIdees.setValue(utilisateur.prefNotifIdees);
-      },
+  async ngOnInit(): Promise<void> {
+    try {
+      const utilisateur = await this.backend.getUtilisateur();
+      this.utilisateur = utilisateur;
+      this.identifiant?.setValue(utilisateur.identifiant);
+      this.nom?.setValue(utilisateur.nom);
+      this.email?.setValue(utilisateur.email);
+      this.genre?.setValue(utilisateur.genre);
+      this.prefNotifIdees?.setValue(utilisateur.prefNotifIdees);
+    }
+    catch (err) {
       // Les erreurs backend sont déjà affichées par AppComponent
-      () => {}
-    );
+    }
   }
 
   get identifiant() {
-    return this.formProfil.get('identifiant');
+    return controlGet(this.formProfil, 'identifiant');
   }
 
   get nom() {
-    return this.formProfil.get('nom');
+    return controlGet(this.formProfil, 'nom');
   }
   
   get email() {
-    return this.formProfil.get('email');
+    return controlGet(this.formProfil, 'email');
   }
 
   get genre() {
-    return this.formProfil.get('genre');
+    return controlGet(this.formProfil, 'genre');
   }
 
   get prefNotifIdees() {
-    return this.formProfil.get('prefNotifIdees');
+    return controlGet(this.formProfil, 'prefNotifIdees');
   }
   
   get mdp() {
-    return this.formProfil.get('mdp');
+    return controlGet(this.formProfil, 'mdp');
   }
 
   async modifie() {
+    if (!this.utilisateur) throw new Error('Pas encore initialisé !');
     const { nom, email, genre, prefNotifIdees, mdp } = this.formProfil.value;
     try {
       Object.assign(this.utilisateur, { nom, email, genre, prefNotifIdees });
       if (mdp) Object.assign(this.utilisateur, { mdp });
       await this.backend.modifieUtilisateur(this.utilisateur);
-      for (let champ of ['mdp', 'confirmeMdp']) this.formProfil.get(champ).reset();
+      for (let champ of ['mdp', 'confirmeMdp']) controlGet(this.formProfil, (champ)).reset();
       this.erreurModification = undefined;
       this.enregistre = true;
     }
@@ -100,7 +101,7 @@ export class ProfilComponent implements OnInit {
 function requireOne (...lists: string[][]): ValidatorFn {
   return group => {
     return lists.some(names =>
-      names.every(name => Validators.required(group.get(name)) === null)
+      names.every(name => Validators.required(controlGet(group, name)) === null)
     )
       ? null
       : { requireOne: true };
@@ -112,7 +113,14 @@ function requireOne (...lists: string[][]): ValidatorFn {
  */
 function sameValueIfDefined (name1: string, name2: string): ValidatorFn {
   return group => {
-    if (Validators.required(group.get(name1)) !== null) return null;
-    return group.get(name1).value !== group.get(name2).value ? { sameValueIfDefined: [name1, name2] } : null;
+    if (Validators.required(controlGet(group, name1)) !== null) return null;
+    return controlGet(group, name1).value !== controlGet(group, name2).value ? { sameValueIfDefined: [name1, name2] } : null;
   }
+}
+
+
+function controlGet(group: AbstractControl, name: string): AbstractControl {
+  const control = group.get(name);
+  if (!control) throw new Error(`Contrôle '${name}' inconnu !`);
+  return control;
 }

@@ -248,6 +248,7 @@ export class DevBackendInterceptor implements HttpInterceptor {
       if (!authorizedUser()) return unauthorized();
 
       const utilisateur = utilisateursAvecMdp.find(u => u.id === idUtilisateur);
+      if (!utilisateur) throw new Error('Utilisateur inconnu');
       const { email, nom, mdp, genre, prefNotifIdees } = body as any;
 
       if (email) utilisateur.email = email;
@@ -310,6 +311,7 @@ export class DevBackendInterceptor implements HttpInterceptor {
       if (!authorizedUser()) return unauthorized();
 
       const idee = idees.find(i => i.idee.id === idIdee);
+      if (!idee) throw new Error('idee inconnue')
       idee.idee.dateSuppression = new Date().toJSON();
 
       return ok();
@@ -333,8 +335,8 @@ export class DevBackendInterceptor implements HttpInterceptor {
       return throwError(new HttpErrorResponse({ url, status: 404, statusText: 'Not found' }));
     }
 
-    function authorizedUser(): UtilisateurAvecMdp | null {
-      let match = headers.get('Authorization').match(/Bearer (.*)/);
+    function authorizedUser(): UtilisateurAvecMdp | undefined {
+      const match = headers.get('Authorization')?.match(/Bearer (.*)/) || null;
       if (!match) return undefined;
       return utilisateursAvecMdp.find(u => u.identifiant === match[1]);
     }

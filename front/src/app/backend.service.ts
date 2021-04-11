@@ -1,7 +1,7 @@
 import { DOCUMENT } from '@angular/common';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, of } from 'rxjs';
 import { first, map } from 'rxjs/operators';
 
 export interface Occasion {
@@ -76,18 +76,18 @@ interface PostConnexionDTO {
 })
 export class BackendService {
 
-  idUtilisateur: Utilisateur['id'];
-  utilisateurConnecte$: BehaviorSubject<PostConnexionDTO['utilisateur']>;
+  idUtilisateur?: Utilisateur['id'];
+  utilisateurConnecte$: BehaviorSubject<PostConnexionDTO['utilisateur']|null>;
 
-  erreur$ = new BehaviorSubject<string>(undefined);
-  occasions$ = new BehaviorSubject<Occasion[]>(JSON.parse(localStorage.getItem(CLE_LISTE_OCCASIONS)));
-  token = localStorage.getItem(CLE_TOKEN);
+  erreur$ = new BehaviorSubject<string|null>(null);
+  occasions$ = new BehaviorSubject<Occasion[]|null>(JSON.parse(localStorage.getItem(CLE_LISTE_OCCASIONS) || 'null'));
+  token? = localStorage.getItem(CLE_TOKEN);
 
   constructor(
     private readonly http: HttpClient,
     @Inject(DOCUMENT) private document: Document,
   ) {
-    let utilisateur = JSON.parse(localStorage.getItem(CLE_UTILISATEUR));
+    let utilisateur = JSON.parse(localStorage.getItem(CLE_UTILISATEUR) || 'null');
     this.idUtilisateur = utilisateur?.id;
     this.utilisateurConnecte$ = new BehaviorSubject(utilisateur);
   }
@@ -118,7 +118,7 @@ export class BackendService {
   admin() {
     return this.utilisateurConnecte$.pipe(
       first(),
-      map(u => u.admin),
+      map(u => !!(u?.admin)),
     ).toPromise();
   }
   
@@ -131,7 +131,7 @@ export class BackendService {
   }
 
   getIdees(idUtilisateur: number) {
-    return this.http.get<IdeesPour>(`${URL_IDEES}?idUtilisateur=${idUtilisateur}&supprimees=0`);
+    return this.http.get<IdeesPour>(`${URL_IDEES}?idUtilisateur=${idUtilisateur}&supprimees=0`).toPromise();
   }
 
   getOccasion(idOccasion: number) {
@@ -155,11 +155,13 @@ export class BackendService {
     return new URL(URL_API, this.document.baseURI).href;
   }
 
-  getUtilisateur$() {
-    return this.http.get<UtilisateurPrive>(URL_UTILISATEUR(this.idUtilisateur));
+  getUtilisateur() {
+    if (this.idUtilisateur === undefined) return Promise.reject();
+    return this.http.get<UtilisateurPrive>(URL_UTILISATEUR(this.idUtilisateur)).toPromise();
   }
 
   modifieUtilisateur(utilisateur: Partial<UtilisateurPrive>) {
+    if (this.idUtilisateur === undefined) return Promise.reject();
     return this.http.put(URL_UTILISATEUR(this.idUtilisateur), utilisateur).toPromise();
   }
 
@@ -171,7 +173,7 @@ export class BackendService {
   }
 
   notifieSuccesHTTP() {
-    this.erreur$.next(undefined);
+    this.erreur$.next(null);
   }
 
   supprimeIdee(idIdee: number) {
