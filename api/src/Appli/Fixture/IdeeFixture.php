@@ -10,46 +10,17 @@ class IdeeFixture extends AppAbstractFixture
 {
     public function load(ObjectManager $em)
     {
-        if ($this->devMode) {
-            $em->persist((new IdeeAdaptor())
-                ->setUtilisateur($this->getReference('alice'))
-                ->setDescription('un gauffrier')
-                ->setAuteur($this->getReference('alice'))
-                ->setDateProposition(new DateTime('8 hours ago'))
+        require __DIR__ . '/noel_ideecadeau.data.php';
+        foreach ($noel_ideecadeau as $row) {
+            $em->persist(
+                (new IdeeAdaptor())
+                    ->setAuteur($this->getReference("u{$row[1]}"))
+                    ->setUtilisateur($this->getReference("u{$row[2]}"))
+                    ->setDateProposition(new DateTime($row[3]))
+                    ->setDescription($row[4])
             );
-            $em->persist((new IdeeAdaptor())
-                ->setUtilisateur($this->getReference('alice'))
-                ->setDescription('une cravate')
-                ->setAuteur($this->getReference('alice'))
-                ->setDateProposition(new DateTime('4 days ago'))
-                ->setDateSuppression(new DateTime('10 hours ago'))
-            );
-            $em->persist((new IdeeAdaptor())
-                ->setUtilisateur($this->getReference('bob'))
-                ->setDescription('une canne à pêche')
-                ->setAuteur($this->getReference('alice'))
-                ->setDateProposition(new DateTime('3 days ago'))
-            );
-            $em->persist((new IdeeAdaptor())
-                ->setUtilisateur($this->getReference('bob'))
-                ->setDescription('des gants de boxe')
-                ->setAuteur($this->getReference('bob'))
-                ->setDateProposition(new DateTime('5 minutes ago'))
-            );
-            $em->persist((new IdeeAdaptor())
-                ->setUtilisateur($this->getReference('charlie'))
-                ->setDescription('un train électrique')
-                ->setAuteur($this->getReference('charlie'))
-                ->setDateProposition(new DateTime('1 hour ago'))
-            );
-            $em->persist((new IdeeAdaptor())
-                ->setUtilisateur($this->getReference('charlie'))
-                ->setDescription('une brouette')
-                ->setAuteur($this->getReference('bob'))
-                ->setDateProposition(new DateTime('1 day ago'))
-            );
-            $em->flush();
         }
+        $em->flush();
         $this->output->writeln(['Idées créées.']);
     }
 }

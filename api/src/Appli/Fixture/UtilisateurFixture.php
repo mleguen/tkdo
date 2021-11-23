@@ -3,92 +3,40 @@
 namespace App\Appli\Fixture;
 
 use App\Appli\ModelAdaptor\UtilisateurAdaptor;
-use App\Appli\Service\UriService;
-use App\Bootstrap;
-use App\Dom\Model\Genre;
-use App\Dom\Model\PrefNotifIdees;
 use DateTime;
 use Doctrine\Persistence\ObjectManager;
 
 class UtilisateurFixture extends AppAbstractFixture
 {
-    private $adminEmail;
-    private $host;
-
-    public function __construct(
-        Bootstrap $bootstrap,
-        UriService $uriService
-    ) {
-        parent::__construct($bootstrap);
-        $this->host = $uriService->getHost();
-    }
-
-    public function setAdminEmail(string $adminEmail = null): self
-    {
-        $this->adminEmail = $adminEmail;
-        return $this;
-    }
-
     public function load(ObjectManager $em)
     {
-        if ($this->devMode) {
-            $utilisateurs = [
-                'alice' => (new UtilisateurAdaptor())
-                    ->setEmail("alice@$this->host")
-                    ->setAdmin(true)
-                    ->setGenre(Genre::Feminin)
-                    ->setIdentifiant('alice')
-                    ->setNom('Alice')
-                    ->setMdpClair('mdpalice')
-                    ->setDateDerniereNotifPeriodique(new DateTime('2 days ago')),
-                'bob' => (new UtilisateurAdaptor())
-                    ->setEmail("bob@$this->host")
-                    ->setGenre(Genre::Masculin)
-                    ->setIdentifiant('bob')
-                    ->setNom('Bob')
-                    ->setMdpClair('mdpbob')
-                    ->setPrefNotifIdees(PrefNotifIdees::Instantanee)
-                    ->setDateDerniereNotifPeriodique(new DateTime('2 days ago')),
-                'charlie' => (new UtilisateurAdaptor())
-                    ->setEmail("charlie@$this->host")
-                    ->setGenre(Genre::Masculin)
-                    ->setIdentifiant('charlie')
-                    ->setMdpClair('mdpcharlie')
-                    ->setNom('Charlie')
-                    ->setPrefNotifIdees(PrefNotifIdees::Quotidienne)
-                    ->setDateDerniereNotifPeriodique(new DateTime('2 days ago')),
-                'david' => (new UtilisateurAdaptor())
-                    ->setEmail("david@$this->host")
-                    ->setGenre(Genre::Masculin)
-                    ->setIdentifiant('david')
-                    ->setMdpClair('mdpdavid')
-                    ->setNom('David')
-                    ->setDateDerniereNotifPeriodique(new DateTime('2 days ago')),
-                'eve' => (new UtilisateurAdaptor())
-                    ->setEmail("eve@$this->host")
-                    ->setGenre(Genre::Feminin)
-                    ->setIdentifiant('eve')
-                    ->setMdpClair('mdpeve')
-                    ->setNom('Eve')
-                    ->setDateDerniereNotifPeriodique(new DateTime('2 days ago')),
-            ];
-        } else {
-            $utilisateurs = [
-                'admin' => (new UtilisateurAdaptor())
-                    ->setEmail($this->adminEmail ?? "admin@$this->host")
-                    ->setAdmin(true)
-                    ->setGenre(Genre::Masculin)
-                    ->setIdentifiant('admin')
-                    ->setMdpClair('admin')
-                    ->setNom('Administrateur')
-                    ->setDateDerniereNotifPeriodique(new DateTime()),
-            ];
+        require __DIR__ . '/noel_user.data.php';
+        $utilisateurs = [];
+        foreach ($noel_user as $row) {
+            $complement = $noel_user_complement[$row[0]];
+            $utilisateurs["u{$row[0]}"] = (new UtilisateurAdaptor())
+                ->setEmail($row[3] ?: $complement['email'])
+                ->setMdpClair($row[4])
+                ->setIdentifiant($complement['identifiant'])
+                ->setNom($complement['nom'])
+                ->setGenre($complement['genre'])
+                ->setDateDerniereNotifPeriodique(new DateTime());
         }
-        foreach($utilisateurs as $nom => $utilisateur) {
+        foreach ($noel_user_complement_2 as $id => $complement) {
+            $utilisateurs["u{$id}"] = (new UtilisateurAdaptor())
+                ->setMdpClair($complement['mdpClair'])
+                ->setIdentifiant($complement['identifiant'])
+                ->setNom($complement['nom'])
+                ->setGenre($complement['genre'])
+                ->setEmail($complement['email'])
+                ->setDateDerniereNotifPeriodique(new DateTime());
+        }
+        $utilisateurs['u1']->setAdmin(true);
+        foreach ($utilisateurs as $nom => $utilisateur) {
             $em->persist($utilisateur);
             $this->addReference($nom, $utilisateur);
         }
         $em->flush();
         $this->output->writeln(['Utilisateurs créés.']);
-   }
+    }
 }

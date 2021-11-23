@@ -10,40 +10,37 @@ class OccasionFixture extends AppAbstractFixture
 {
     public function load(ObjectManager $em)
     {
-        if ($this->devMode) {
-            $annee = (new DateTime())->format('Y');
-            if (new DateTime("$annee-12-25") > new DateTime('now')) {
-                $anneeProchaine = $annee;
-                $anneePassee = $annee-1;
-            } else {
-                $anneeProchaine = $annee+1;
-                $anneePassee = $annee;
+        require __DIR__ . '/noel_repartition.data.php';
+        $annees = [];
+        foreach ($noel_repartition as $row) {
+            if (!array_key_exists($row[0], $annees)) {
+                $annees[$row[0]] = [];
             }
-
-            foreach([
-                'noelPasse' => (new OccasionAdaptor())
-                    ->setDate(new DateTime("$anneePassee-12-25"))
-                    ->setTitre("Noël $anneePassee")
-                    ->setParticipants([
-                        $this->getReference('alice'),
-                        $this->getReference('bob'),
-                        $this->getReference('charlie'),
-                        $this->getReference('david'),
-                    ]),
-                'noelProchain' => (new OccasionAdaptor())
-                    ->setDate(new DateTime("$anneeProchaine-12-25"))
-                    ->setTitre("Noël $anneeProchaine")
-                    ->setParticipants([
-                        $this->getReference('alice'),
-                        $this->getReference('bob'),
-                        $this->getReference('charlie'),
-                    ]),
-            ] as $nom => $occasion) {
-                $em->persist($occasion);
-                $this->addReference($nom, $occasion);
+            foreach ([$row[1], $row[2]] as $participant) {
+                $participant = $this->getReference("u$participant");
+                if (!in_array($participant, $annees[$row[0]])) {
+                    $annees[$row[0]][] = $participant;
+                }
             }
-            $em->flush();
         }
+        $that = $this;
+        foreach ($noel_repartition_complement as $annee => $participants) {
+            $annees[$annee] = array_map(
+                function ($participant) use ($that) {
+                    return $that->getReference("u$participant");
+                },
+                $participants
+            );
+        }
+        foreach ($annees as $annee => $participants) {
+            $occasion = (new OccasionAdaptor())
+                ->setDate(new DateTime("$annee-12-24"))
+                ->setTitre("Noël $annee")
+                ->setParticipants($participants);
+            $em->persist($occasion);
+            $this->addReference("o$annee", $occasion);
+        }
+        $em->flush();
         $this->output->writeln(['Occasions créées.']);
     }
 }

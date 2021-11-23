@@ -9,32 +9,14 @@ class ResultatFixture extends AppAbstractFixture
 {
     public function load(ObjectManager $em)
     {
-        if ($this->devMode) {
-            foreach ([
-                'noelPasse' => [
-                    'alice'   => 'bob',
-                    'bob'     => 'david',
-                    'charlie' => 'alice',
-                    'david'   => 'charlie',
-                ],
-                'noelProchain' => [
-                    'alice'   => 'charlie',
-                    'bob'     => 'alice',
-                    'charlie' => 'bob',
-                    // David ne participe pas à Noël 2020
-                ],
-                // Eve ne participe à aucune occasion
-            ] as $nomOccasion => $tirage) {
-                foreach ($tirage as $nomQuiDonne => $nomQuiRecoit) {
-                    $em->persist(
-                        (new ResultatAdaptor($this->getReference($nomOccasion), $this->getReference($nomQuiDonne)))
-                            ->setQuiRecoit($this->getReference($nomQuiRecoit))
-                    );
-                }
-            }
-            
-            $em->flush();
+        require __DIR__ . '/noel_repartition.data.php';
+        foreach ($noel_repartition as $row) {
+            $em->persist(
+                (new ResultatAdaptor($this->getReference("o{$row[0]}"), $this->getReference("u{$row[1]}")))
+                    ->setQuiRecoit($this->getReference("u{$row[2]}"))
+            );
         }
+        $em->flush();
         $this->output->writeln(['Résultats créés.']);
     }
 }
