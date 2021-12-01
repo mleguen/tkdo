@@ -308,7 +308,83 @@ curl -u {{token}}: \
 }
 </samp></pre>
 
-<h3>Ajouter un résultat à une occasion</h3>
+<h3>Lancer le tirage au sort pour une occasion</h3>
+
+<p>
+  Cette route permet de lancer le tirage au sort pour une occasion à venir,
+  de manière à ce qu'aucun participant ne doive offrir de cadeau :
+</p>
+<ul>
+  <li>ni à quelqu'un de paramétré dans ses exclusions (par exemple : conjoint, etc.)</li>
+  <li>ni à quelqu'un à qui il a déjà offert un cadeau lors d'une occasion passée</li>
+</ul>
+
+<pre><samp>
+curl -u {{token}}: \
+-d force=0 \
+-d nbMaxIter=10 \
+-X POST {{urlApi}}/occasion/6/tirage
+</samp></pre>
+
+<p>Renvoie :</p>
+
+<pre><samp>
+{{'{'}}
+  "id": 6,
+  "titre": "No\u00ebl 2020",
+  "participants": [
+    {{'{'}}
+      "genre": "F",
+      "id": 83,
+      "nom": "Alice"
+    },
+    {{'{'}}
+      "genre": "M",
+      "id": 84,
+      "nom": "Bob"
+    },
+    {{'{'}}
+      "genre": "M",
+      "id": 85,
+      "nom": "Charlie"
+    }
+  ],
+  "resultats": [
+    {{'{'}}
+      "idQuiOffre": 84,
+      "idQuiRecoit": 83
+    },
+    {{'{'}}
+      "idQuiOffre": 85,
+      "idQuiRecoit": 84
+    },
+    {{'{'}}
+      "idQuiOffre": 83,
+      "idQuiRecoit": 85
+    }
+  ]
+}
+</samp></pre>
+
+<div class="alert alert-primary" role="alert">
+  <p>Notes :</p>
+  <ul>
+    <li>l'occasion ne doit pas être passée</li>
+    <li>
+      un tirage ne doit pas déjà avoir été fait pour l'occasion, même partiellement
+      (résultats soumis manuellement, par exemple - voir plus bas),
+      sauf si le paramètre optionnel <pre>force</pre> vaut <pre>1</pre> ou <pre>true</pre>.
+      Dans ce cas, le tirage précédent est effacé, et un nouveau tirage est lancé&nbsp;;
+    </li>
+    <li>
+      le paramètre optionnel <pre>nbMaxIter</pre> permet de spécifier
+      le nombre d'itérations souhaitées pour l'algorithme de tirage au sort (10 par défaut),
+      dans le cas, par exemple, où une précédente tentative de tirage aurait échoué.
+    </li>
+  </ul>
+</div>
+
+<h3>Ajouter manuellement un résultat à une occasion</h3>
 
 <p>Cette route permet d'ajouter un à un les résultats d'un tirage au sort fait en dehors de l'application.</p>
 

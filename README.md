@@ -112,7 +112,7 @@ de changer le mot de passe du compte `admin` dès la fin de l'installation.
 Une fois connecté à l'application avec un compte administrateur,
 la page d'administration vous permet :
 - de gérer les comptes utilisateurs (création, consultation, modification, réinitialisation du mot de passe)
-- de gérer les occasions (création, consultation, modification, ajout de participants ou de résultats de tirage)
+- de gérer les occasions (création, consultation, modification, ajout de participants, tirages)
 
 ## Développement
 

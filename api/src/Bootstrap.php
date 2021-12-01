@@ -9,6 +9,7 @@ use App\Appli\Controller\CreateIdeeSuppressionController;
 use App\Appli\Controller\CreateOccasionController;
 use App\Appli\Controller\CreateParticipantOccasionController;
 use App\Appli\Controller\CreateResultatOccasionController;
+use App\Appli\Controller\CreateTirageOccasionController;
 use App\Appli\Controller\CreateUtilisateurController;
 use App\Appli\Controller\CreateUtilisateurReinitMdpController;
 use App\Appli\Controller\EditOccasionController;
@@ -24,6 +25,7 @@ use App\Appli\Handler\AppPlainTextErrorRenderer;
 use App\Appli\Middleware\AuthMiddleware;
 use App\Appli\PluginAdaptor\MailPluginAdaptor;
 use App\Appli\PluginAdaptor\PasswordPluginAdaptor;
+use App\Appli\RepositoryAdaptor\ExclusionRepositoryAdaptor;
 use App\Appli\RepositoryAdaptor\IdeeRepositoryAdaptor;
 use App\Appli\RepositoryAdaptor\OccasionRepositoryAdaptor;
 use App\Appli\RepositoryAdaptor\ResultatRepositoryAdaptor;
@@ -36,6 +38,7 @@ use App\Dom\Repository\OccasionRepository;
 use App\Dom\Repository\ResultatRepository;
 use App\Dom\Repository\UtilisateurRepository;
 use App\Appli\Settings\ErrorSettings;
+use App\Dom\Repository\ExclusionRepository;
 use DI\Container;
 use DI\ContainerBuilder;
 use Doctrine\Migrations\Configuration\EntityManager\ExistingEntityManager;
@@ -91,6 +94,7 @@ class Bootstrap
                 );
             },
 
+            ExclusionRepository::class => \DI\autowire(ExclusionRepositoryAdaptor::class),
             IdeeRepository::class => \DI\autowire(IdeeRepositoryAdaptor::class),
             LoggerInterface::class => \DI\autowire(AppLogger::class),
             MailPlugin::class => \DI\autowire(MailPluginAdaptor::class),
@@ -142,6 +146,7 @@ class Bootstrap
                 $group->put('', EditOccasionController::class);
                 $group->post('/participant', CreateParticipantOccasionController::class);
                 $group->post('/resultat', CreateResultatOccasionController::class);
+                $group->post('/tirage', CreateTirageOccasionController::class);
             });
         });
         $this->slimApp->group('/utilisateur', function (RouteCollectorProxyInterface $group) {

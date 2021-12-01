@@ -34,6 +34,30 @@ class ResultatRepositoryAdaptor implements ResultatRepository
         return $resultat;
     }
 
+    public function deleteByOccasion(Occasion $occasion)
+    {
+        $class = ResultatAdaptor::class;
+        $dql = <<<EOS
+            DELETE FROM $class r
+            WHERE r.occasion = :occasion
+EOS;
+        return $this->em->createQuery($dql)
+            ->setParameter('occasion', $occasion)
+            ->getResult();
+    }
+
+    public function hasForOccasion(Occasion $occasion): bool
+    {
+        $class = ResultatAdaptor::class;
+        $dql = <<<EOS
+            SELECT COUNT(r.quiOffre) FROM $class r
+            WHERE r.occasion = :occasion
+EOS;
+        return $this->em->createQuery($dql)
+            ->setParameter('occasion', $occasion)
+            ->getSingleScalarResult() > 0;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -42,5 +66,17 @@ class ResultatRepositoryAdaptor implements ResultatRepository
         return $this->em->getRepository(ResultatAdaptor::class)->findBy([
             'occasion' => $occasion,
         ]);
+    }
+
+    public function readByParticipantsOccasion(Occasion $occasion): array
+    {
+        $class = ResultatAdaptor::class;
+        $dql = <<<EOS
+            SELECT r FROM $class r
+            INNER JOIN r.quiOffre u WITH :occasion MEMBER OF u.occasions
+EOS;
+        return $this->em->createQuery($dql)
+            ->setParameter('occasion', $occasion)
+            ->getResult();
     }
 }

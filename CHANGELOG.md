@@ -4,6 +4,7 @@
 
 - refactorisation du code de l'API
 - ajout de tests de bout en bout
+- route admin de génération automatique du tirage au sort
 
 ## V1.2.0 (21/12/2020)
 

@@ -1,3 +1,4 @@
+/api/src/Appli/Fixture/*.data.php
 /node_modules
 /init-ng.sh
 /package.json

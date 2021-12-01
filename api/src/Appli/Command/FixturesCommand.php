@@ -2,6 +2,7 @@
 
 namespace App\Appli\Command;
 
+use App\Appli\Fixture\ExclusionFixture;
 use App\Appli\Fixture\IdeeFixture;
 use App\Appli\Fixture\OccasionFixture;
 use App\Appli\Fixture\ResultatFixture;
@@ -20,6 +21,7 @@ class FixturesCommand extends Command
 {
     private $devMode;
     private $em;
+    private $exclusionFixture;
     private $ideeFixture;
     private $occasionFixture;
     private $resultatFixture;
@@ -28,6 +30,7 @@ class FixturesCommand extends Command
     public function __construct(
         Bootstrap $bootstrap,
         EntityManager $em,
+        ExclusionFixture $exclusionFixture,
         IdeeFixture $ideeFixture,
         OccasionFixture $occasionFixture,
         ResultatFixture $resultatFixture,
@@ -37,6 +40,7 @@ class FixturesCommand extends Command
         parent::__construct('fixtures');
         $this->devMode = $bootstrap->devMode;
         $this->em = $em;
+        $this->exclusionFixture = $exclusionFixture;
         $this->ideeFixture = $ideeFixture;
         $this->occasionFixture = $occasionFixture;
         $this->resultatFixture = $resultatFixture;
@@ -63,6 +67,7 @@ class FixturesCommand extends Command
         
         $loader = new Loader();
         $loader->addFixture($this->utilisateurFixture->setAdminEmail($adminEmail)->setOutput($output));
+        $loader->addFixture($this->exclusionFixture->setOutput($output));
         $loader->addFixture($this->occasionFixture->setOutput($output));
         $loader->addFixture($this->ideeFixture->setOutput($output));
         $loader->addFixture($this->resultatFixture->setOutput($output));

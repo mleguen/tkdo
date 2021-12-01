@@ -14,9 +14,9 @@ use App\Dom\Model\Resultat;
 use App\Dom\Model\Utilisateur;
 use App\Dom\Plugin\MailPlugin;
 use App\Dom\Port\OccasionPort;
+use App\Dom\Repository\ExclusionRepository;
 use App\Dom\Repository\OccasionRepository;
 use App\Dom\Repository\ResultatRepository;
-use App\Dom\Repository\UtilisateurRepository;
 use DateTime;
 use Iterator;
 use PHPUnit\Framework\TestCase;
@@ -31,11 +31,11 @@ class OccasionPortTest extends TestCase
    /** @var ObjectProphecy */
     private $mailPluginProphecy;
     /** @var ObjectProphecy */
+    private $exclusionRepositoryProphecy;
+    /** @var ObjectProphecy */
     private $occasionRepositoryProphecy;
     /** @var ObjectProphecy */
     private $resultatRepositoryProphecy;
-    /** @var ObjectProphecy */
-    private $utilisateurRepositoryProphecy;
 
     /** @var ObjectProphecy */
     private $authProphecy;
@@ -55,15 +55,15 @@ class OccasionPortTest extends TestCase
     public function setUp(): void
     {
         $this->mailPluginProphecy = $this->prophesize(MailPlugin::class);
+        $this->exclusionRepositoryProphecy = $this->prophesize(ExclusionRepository::class);
         $this->occasionRepositoryProphecy = $this->prophesize(OccasionRepository::class);
         $this->resultatRepositoryProphecy = $this->prophesize(ResultatRepository::class);
-        $this->utilisateurRepositoryProphecy = $this->prophesize(UtilisateurRepository::class);
 
         $this->occasionPort = new OccasionPort(
             $this->mailPluginProphecy->reveal(),
+            $this->exclusionRepositoryProphecy->reveal(),
             $this->occasionRepositoryProphecy->reveal(),
-            $this->resultatRepositoryProphecy->reveal(),
-            $this->utilisateurRepositoryProphecy->reveal()
+            $this->resultatRepositoryProphecy->reveal()
         );
 
         $this->authProphecy = $this->prophesize(Auth::class);
