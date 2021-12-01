@@ -1,6 +1,6 @@
 # Historique des changements
 
-## Prochaine version
+## V1.3.0 (02/12/2021)
 
 - refactorisation du code de l'API
 - ajout de tests de bout en bout
