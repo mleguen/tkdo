@@ -1,6 +1,6 @@
 #!/bin/sh
 
-./composer.phar install
+./build.sh
 
 for vardir in cache doctrine/cache doctrine/proxy log; do
   [ -d ./var/$vardir ] || mkdir -p ./var/$vardir
