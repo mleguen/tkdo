@@ -69,7 +69,7 @@ class Bootstrap
     public function initEnv()
     {
         // Load .env
-        $dotenv = Dotenv::createImmutable($this->apiRoot);
+        $dotenv = Dotenv::createUnsafeImmutable($this->apiRoot);
         $dotenv->load();
 
         $this->devMode = boolval(getenv('TKDO_DEV_MODE') ?: '1');
