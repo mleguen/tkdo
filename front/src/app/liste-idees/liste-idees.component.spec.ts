@@ -22,7 +22,7 @@ describe('ListeIdeesComponent', () => {
       providers: [{
         provide: ActivatedRoute,
         useValue: {
-          paramMap: of({ get: () => '0' })
+          queryParamMap: of({ get: () => '0' })
         }
       }],
       declarations: [ ListeIdeesComponent ]
