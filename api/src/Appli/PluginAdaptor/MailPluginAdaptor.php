@@ -72,7 +72,7 @@ Bonjour {$destinataire->getNom()},
 
 $motif
 
-Pour consulter la liste d'idée de {$utilisateur->getNom()},
+Pour consulter la liste d'idées de {$utilisateur->getNom()},
 rendez-vous sur {$this->uriService->getUri('/idee', "idUtilisateur={$utilisateur->getId()}")}
 
 {$this->settings->signature}
@@ -209,7 +209,7 @@ EOS
             }
 
             if ((count($ideesUtilisateur->creations) > 0) || (count($ideesUtilisateur->suppressions) > 0)) {
-                $contenu .= "\nPour consulter la liste d'idée de $nomUtilisateur,\n";
+                $contenu .= "\nPour consulter la liste d'idées de $nomUtilisateur,\n";
                 $contenu .= "rendez-vous sur {$this->uriService->getUri('/idee', "idUtilisateur={$ideesUtilisateur->id}")}\n";
             }
         }
