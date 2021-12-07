@@ -1,5 +1,16 @@
 # Historique des changements
 
+## Prochaine version
+
+- correctifs :
+  - apache-pack :
+    - n'utlise plus la version locale de php pour installer les dépendances
+    - construit le front en mode prod
+  - api :
+    - chargement du fichier .env
+    - valeur par défaut pour TKDO_MAILER_FROM
+    - typo dans les mails de notifications (#12)
+
 ## V1.3.0 (02/12/2021)
 
 - refactorisation du code de l'API
