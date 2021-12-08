@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { Validators, FormBuilder, ValidatorFn } from '@angular/forms';
 import { BackendService, Genre, PrefNotifIdees, Utilisateur } from '../backend.service';
 
@@ -36,6 +36,7 @@ export class ProfilComponent implements OnInit {
   constructor(
     private readonly fb: FormBuilder,
     private readonly backend: BackendService,
+    private readonly changeDetector: ChangeDetectorRef,
   ) { }
 
   ngOnInit(): void {
@@ -49,7 +50,7 @@ export class ProfilComponent implements OnInit {
         this.prefNotifIdees.setValue(utilisateur.prefNotifIdees);
       },
       // Les erreurs backend sont déjà affichées par AppComponent
-      () => {}
+      () => { }
     );
   }
 
@@ -60,7 +61,7 @@ export class ProfilComponent implements OnInit {
   get nom() {
     return this.formProfil.get('nom');
   }
-  
+
   get email() {
     return this.formProfil.get('email');
   }
@@ -72,7 +73,7 @@ export class ProfilComponent implements OnInit {
   get prefNotifIdees() {
     return this.formProfil.get('prefNotifIdees');
   }
-  
+
   get mdp() {
     return this.formProfil.get('mdp');
   }
@@ -91,13 +92,17 @@ export class ProfilComponent implements OnInit {
       this.erreurModification = err.message;
       this.enregistre = false;
     }
+    finally {
+      this.changeDetector.detectChanges();
+      document.getElementsByClassName('feedback').item(0).scrollIntoView();
+    }
   }
 }
 
 /**
  * Validate that at least one list have all fields non-empty
  */
-function requireOne (...lists: string[][]): ValidatorFn {
+function requireOne(...lists: string[][]): ValidatorFn {
   return group => {
     return lists.some(names =>
       names.every(name => Validators.required(group.get(name)) === null)
@@ -110,7 +115,7 @@ function requireOne (...lists: string[][]): ValidatorFn {
 /**
  * Validate the fields have the same value if non-empty
  */
-function sameValueIfDefined (name1: string, name2: string): ValidatorFn {
+function sameValueIfDefined(name1: string, name2: string): ValidatorFn {
   return group => {
     if (Validators.required(group.get(name1)) !== null) return null;
     return group.get(name1).value !== group.get(name2).value ? { sameValueIfDefined: [name1, name2] } : null;

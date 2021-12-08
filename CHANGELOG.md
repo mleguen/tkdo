@@ -12,6 +12,7 @@
     - typo dans les mails de notifications (#12)
   - front :
     - redirection vers la page de connexion quand la session est expirée (#17)
+    - scroll pour afficher le message de succès ou d'erreur à l'enregistrement du profil (#14)
 
 ## V1.3.0 (02/12/2021)
 
