@@ -124,7 +124,7 @@ const occasions: Occasion[] = [
   return o;
 });
 
-let idees: { idee: Idee & { dateSuppression?: string }, utilisateur: Utilisateur }[] = [
+const idees: { idee: Idee & { dateSuppression?: string }, utilisateur: Utilisateur }[] = [
   {
     idee: {
       id: 0,
@@ -239,67 +239,58 @@ export class DevBackendInterceptor implements HttpInterceptor {
     }
 
     function getUtilisateur(idUtilisateur: number) {
-      if (!authorizedUser()) return unauthorized();
-
-      return ok(enleveMdp(utilisateursAvecMdp[idUtilisateur]));
+      return authGuard(() => ok(enleveMdp(utilisateursAvecMdp[idUtilisateur])));
     }
 
     function putUtilisateur(idUtilisateur: number) {
-      if (!authorizedUser()) return unauthorized();
-
-      const utilisateur = utilisateursAvecMdp.find(u => u.id === idUtilisateur);
-      const { email, nom, mdp, genre, prefNotifIdees } = body as any;
-
-      if (email) utilisateur.email = email;
-      if (nom) utilisateur.nom = nom;
-      if (mdp) utilisateur.mdp = mdp;
-      if (genre) utilisateur.genre = genre;
-      if (prefNotifIdees) utilisateur.prefNotifIdees = prefNotifIdees;
-
-      return ok();
+      return authGuard(() => {
+        const utilisateur = utilisateursAvecMdp.find(u => u.id === idUtilisateur);
+        const { email, nom, mdp, genre, prefNotifIdees } = body as any;
+  
+        if (email) utilisateur.email = email;
+        if (nom) utilisateur.nom = nom;
+        if (mdp) utilisateur.mdp = mdp;
+        if (genre) utilisateur.genre = genre;
+        if (prefNotifIdees) utilisateur.prefNotifIdees = prefNotifIdees;
+  
+        return ok();
+      })
     }
 
     function getListeOccasions(idParticipant: number) {
-      const utilisateur = authorizedUser();
-      if (!utilisateur) return unauthorized();
-
-      return ok(occasions.filter(o => o.participants.some(u => u.id === idParticipant)));
+      return authGuard(() => ok(occasions.filter(o => o.participants.some(u => u.id === idParticipant))));
     }
 
     function getOccasion(idOccasion: number) {
-      const utilisateur = authorizedUser();
-      if (!utilisateur) return unauthorized();
-
-      const occasion = occasions.find(o => o.id === idOccasion);
-      return occasion ? ok(occasion) : notFound();
+      return authGuard(() => {
+        const occasion = occasions.find(o => o.id === idOccasion);
+        return occasion ? ok(occasion) : notFound();
+      });
     }
 
     function getIdees(idUtilisateur: number) {
-      if (!authorizedUser()) return unauthorized();
-
-      return ok({
+      return authGuard(() => ok({
         utilisateur: enleveDonneesPrivees(utilisateursAvecMdp[idUtilisateur]),
         idees: idees.filter(i => (i.utilisateur.id === idUtilisateur) && !i.idee.dateSuppression).map(i => i.idee),
-      });
+      }));
     }
 
     function postIdee() {
-      const utilisateurConnecte = authorizedUser();
-      if (!utilisateurConnecte) return unauthorized();
+      return authGuard((utilisateurConnecte) => {
+        const { idUtilisateur, description } = body as any;
 
-      const { idUtilisateur, description } = body as any;
+        idees.push({
+          utilisateur: enleveDonneesPrivees(utilisateursAvecMdp[idUtilisateur]),
+          idee: {
+            id: nextId(idees.map(i => i.idee)),
+            description,
+            auteur: enleveDonneesPrivees(utilisateurConnecte),
+            dateProposition: moment().locale('fr').format('YYYY-MM-DDTHH:mm:ssZ'),
+          }
+        });
 
-      idees.push({
-        utilisateur: enleveDonneesPrivees(utilisateursAvecMdp[idUtilisateur]),
-        idee: {
-          id: nextId(idees.map(i => i.idee)),
-          description,
-          auteur: enleveDonneesPrivees(utilisateurConnecte),
-          dateProposition: moment().locale('fr').format('YYYY-MM-DDTHH:mm:ssZ'),
-        }
+        return ok();
       });
-
-      return ok();
     }
 
     function nextId(liste: { id: number }[]): number {
@@ -307,36 +298,47 @@ export class DevBackendInterceptor implements HttpInterceptor {
     }
 
     function postSuppressionIdee(idIdee: number) {
-      if (!authorizedUser()) return unauthorized();
+      return authGuard(() => {
+        const idee = idees.find(i => i.idee.id === idIdee);
+        idee.idee.dateSuppression = new Date().toJSON();
 
-      const idee = idees.find(i => i.idee.id === idIdee);
-      idee.idee.dateSuppression = new Date().toJSON();
-
-      return ok();
+        return ok();
+      });
     }
 
     // helper functions
 
+    function authGuard(next: (utilisateur: UtilisateurAvecMdp) => Observable<HttpEvent<unknown>>) {
+      let match = headers.get('Authorization').match(/Bearer (.*)/);
+      if (!match) return forbidden();
+      if (match[1] === 'invalid') return unauthorized();
+      return next(utilisateursAvecMdp.find(u => u.identifiant === match[1]));
+    }
+
     function ok(body?: any) {
+      console.log(`DevBackendInterceptor: ${method} ${url} 200 OK`);
       return of(new HttpResponse({ url, status: 200, body }));
     }
 
-    function badRequest(message: string) {
-      return throwError(new HttpErrorResponse({ url, status: 400, statusText: 'Bad request', error: { message } }));
+    function ko(status: number, statusText: string, error?: any) {
+      console.log(`DevBackendInterceptor: ${method} ${url} ${status} ${statusText}`);
+      return throwError(new HttpErrorResponse({ url, status, statusText, error}));
     }
 
+    function badRequest(message: string) {
+      return ko(400, 'Bad request', { message });
+    }
+    
     function unauthorized() {
-      return throwError(new HttpErrorResponse({ url, status: 401, statusText: 'Unauthorized' }));
+      return ko(401, 'Unauthorized');
+    }
+
+    function forbidden() {
+      return ko(403, 'Forbidden');
     }
 
     function notFound() {
-      return throwError(new HttpErrorResponse({ url, status: 404, statusText: 'Not found' }));
-    }
-
-    function authorizedUser(): UtilisateurAvecMdp | null {
-      let match = headers.get('Authorization').match(/Bearer (.*)/);
-      if (!match) return undefined;
-      return utilisateursAvecMdp.find(u => u.identifiant === match[1]);
+      return ko(404, 'Not found');
     }
   }
 }

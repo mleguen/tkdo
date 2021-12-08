@@ -10,6 +10,8 @@
     - chargement du fichier .env
     - valeur par défaut pour TKDO_MAILER_FROM
     - typo dans les mails de notifications (#12)
+  - front :
+    - redirection vers la page de connexion quand la session est expirée (#17)
 
 ## V1.3.0 (02/12/2021)
 

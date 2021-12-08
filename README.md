@@ -150,6 +150,11 @@ sudo docker-compose run --rm npm run test-e2e
 > Note : ces tests de bout en bout sont les tests d'intégration front,
 > mais exécutés sur l'environnement de développement complet,
 > avec du coup un jeu de test aligné sur les fixtures de l'API.
+> Ce jeu de test doit être raffraichi entre 2 exécutions des tests :
+> 
+> ```bash
+> sudo docker-compose up -d slim-cli
+> ```
 
 ### Front
 
@@ -173,8 +178,15 @@ sudo docker-compose run --rm npm install
   sudo docker-compose run --rm npm run test-int
   ```
 
-  > Note : ces tests d'intégration s'exécutent sur le serveur de développement Angular,
-  > avec interception des requêtes destinées à l'API (voir ci-dessous).
+  > Notes :
+  > - ces tests d'intégration s'exécutent sur le serveur de développement Angular,
+  >   avec interception des requêtes destinées à l'API (voir ci-dessous)
+  > - si les tests d'intégration échouent sur une erreur _"This version of ChromeDriver only supports Chrome version XX"_,
+  >   forcer la reconstruction du conteneur npm pour qu'il récupère une version de Chrome plus récente :
+  >   
+  >     ```bash
+  >     sudo docker-compose build --no-cache npm
+  >     ```
 
 #### Utiliser le serveur de développement Angular seul
 

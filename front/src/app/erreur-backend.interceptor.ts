@@ -7,6 +7,7 @@ import {
   HTTP_INTERCEPTORS,
   HttpErrorResponse
 } from '@angular/common/http';
+import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { BackendService } from './backend.service';
@@ -16,6 +17,7 @@ export class ErreurBackendInterceptor implements HttpInterceptor {
 
   constructor(
     private readonly backend: BackendService,
+    private readonly router: Router
   ) {}
 
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
@@ -26,11 +28,16 @@ export class ErreurBackendInterceptor implements HttpInterceptor {
       tap(
         // Réinitialise le message d'erreur backend en cas de succès
         () => this.backend.notifieSuccesHTTP(),
-        // Trace en cas d'erreur
-        // et construit le message d'erreur backend si l'erreur est non applicative
         (error: HttpErrorResponse) => {
-          if (isDevMode()) console.error({ method, url, error });
-          this.backend.notifieErreurHTTP(error);
+          // Redirige vers la page de connexion en cas de problème d'authentification
+          if (error.status === 401) {
+            const state = this.router.routerState.snapshot;
+            return this.router.navigate(['connexion'], { queryParams: { retour: state.url } });
+          }
+          // Et construit le message d'erreur backend dans les autres cas d'erreur
+          else {
+            this.backend.notifieErreurHTTP(error);
+          }
         }
       )
     );
