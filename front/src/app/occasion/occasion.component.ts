@@ -32,7 +32,19 @@ export class OccasionComponent implements OnInit {
           participants: o.participants.map(p => Object.assign({}, p, {
             estMoi: p.id === this.backend.idUtilisateur,
             estQuiRecoitDeMoi: p.id === idQuiRecoitDeMoi,
-          })),
+          })).sort((a, b) => {
+            if (a.estQuiRecoitDeMoi) {
+              return -1;
+            } else if (b.estQuiRecoitDeMoi) {
+              return 1;
+            } else if (a.estMoi) {
+              return -1;
+            } else if (b.estMoi) {
+              return 1;
+            } else {
+              return a.nom.localeCompare(b.nom);
+            }
+          }),
           tirageFait: o.participants.some(p => p.id === idQuiRecoitDeMoi),
         });
       }),

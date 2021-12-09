@@ -2,6 +2,10 @@
 
 ## Prochaine version
 
+- tri des participants à une occasion, de manière à avoir :
+  - la personne à qui offrir en premier (si le tirage a été fait)
+  - la personne connectée ensuite
+  - et enfin les autres participants, par ordre alphabétique
 - correctifs :
   - apache-pack :
     - n'utlise plus la version locale de php pour installer les dépendances
