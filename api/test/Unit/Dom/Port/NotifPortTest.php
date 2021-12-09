@@ -66,7 +66,7 @@ class NotifPortTest extends TestCase
             ->willReturn([$utilisateurANotifier]);
 
         $idee = $this->ideeProphecy->reveal();
-        $this->ideeRepositoryProphecy->readAllByNotifPeriodique($utilisateurANotifier)->willReturn([$idee]);
+        $this->ideeRepositoryProphecy->readAllByNotifPeriodique($utilisateurANotifier, Argument::type(DateTime::class))->willReturn([$idee]);
 
         $this->mailPluginProphecy->envoieMailNotifPeriodique($utilisateurANotifier, [$idee])
             ->willReturn($mailEnvoye)

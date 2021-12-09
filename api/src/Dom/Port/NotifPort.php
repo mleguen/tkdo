@@ -23,26 +23,39 @@ class NotifPort
         IdeeRepository $ideeRepository,
         MailPlugin $mailPlugin,
         UtilisateurRepository $utilisateurRepository
-    )
-    {
+    ) {
         $this->ideeRepository = $ideeRepository;
         $this->mailPlugin = $mailPlugin;
         $this->utilisateurRepository = $utilisateurRepository;
     }
 
+    private function _getDebutPeriode(
+        DateTime $dateNotif,
+        string $periode
+    ) {
+        $debutPeriode = clone $dateNotif;
+        switch ($periode) {
+            case PrefNotifIdees::Quotidienne:
+                $debutPeriode->setTime(0, 0, 0);
+                break;
+
+            default:
+                throw new PrefNotifIdeesPasPeriodiqueException();
+        }
+        return $debutPeriode;
+    }
+
     public function envoieNotifsInstantaneesCreation(
         Auth $auth,
         Idee $idee
-    ): void
-    {
+    ): void {
         $this->envoieNotifsInstantanees($auth, $idee, [$this->mailPlugin, 'envoieMailIdeeCreation']);
     }
 
     public function envoieNotifsInstantaneesSuppression(
         Auth $auth,
         Idee $idee
-    ): void
-    {
+    ): void {
         $this->envoieNotifsInstantanees($auth, $idee, [$this->mailPlugin, 'envoieMailIdeeSuppression']);
     }
 
@@ -50,8 +63,7 @@ class NotifPort
         Auth $auth,
         Idee $idee,
         callable $envoieMailIdee
-    ): void
-    {
+    ): void {
         $utilisateursANotifier = $this->utilisateurRepository->readAllByNotifInstantaneePourIdees($idee->getUtilisateur());
         foreach ($utilisateursANotifier as $utilisateurANotifier) {
             if (!$auth->estUtilisateur($utilisateurANotifier)) {
@@ -63,22 +75,12 @@ class NotifPort
     public function envoieNotifsPeriodiques(
         string $periode,
         callable $avantEnvoiMail = null
-    ): void
-    {
-        $dateMaxDerniereNotifPeriodique = new DateTime();
-
-        switch ($periode) {
-            case PrefNotifIdees::Quotidienne:
-                $dateMaxDerniereNotifPeriodique->sub(date_interval_create_from_date_string('1 day'));
-                break;
-
-            default:
-                throw new PrefNotifIdeesPasPeriodiqueException();
-        }
-
-        $utilisateursANotifier = $this->utilisateurRepository->readAllByNotifPeriodique($periode, $dateMaxDerniereNotifPeriodique);
+    ): void {
+        $dateNotif = new DateTime();
+        $dateDebutPeriode = $this->_getDebutPeriode($dateNotif, $periode);
+        $utilisateursANotifier = $this->utilisateurRepository->readAllByNotifPeriodique($periode, $dateDebutPeriode);
         foreach ($utilisateursANotifier as $utilisateurANotifier) {
-            $idees = $this->ideeRepository->readAllByNotifPeriodique($utilisateurANotifier);
+            $idees = $this->ideeRepository->readAllByNotifPeriodique($utilisateurANotifier, $dateNotif);
 
             if ($avantEnvoiMail) call_user_func($avantEnvoiMail, $utilisateurANotifier, $idees);
 
@@ -86,7 +88,7 @@ class NotifPort
                 $utilisateurANotifier,
                 $idees
             )) {
-                $utilisateurANotifier->setDateDerniereNotifPeriodique(new DateTime());
+                $utilisateurANotifier->setDateDerniereNotifPeriodique($dateNotif);
                 $this->utilisateurRepository->update($utilisateurANotifier);
             };
         }

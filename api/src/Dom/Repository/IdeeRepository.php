@@ -25,7 +25,7 @@ interface IdeeRepository
     /**
      * @return Idee[]
      */
-    public function readAllByNotifPeriodique(Utilisateur $utilisateur): array;
+    public function readAllByNotifPeriodique(Utilisateur $utilisateur, DateTime $dateNotif): array;
 
     /**
      * @return Idee[]

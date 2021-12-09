@@ -14,6 +14,7 @@
     - chargement du fichier .env
     - valeur par défaut pour TKDO_MAILER_FROM
     - typo dans les mails de notifications (#12)
+    - envoi des notifs quotidiennes tous les jours, pas 1 jour sur 2 (#18)
   - front :
     - redirection vers la page de connexion quand la session est expirée (#17)
     - scroll pour afficher le message de succès ou d'erreur à l'enregistrement du profil (#14)

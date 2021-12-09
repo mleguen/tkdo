@@ -48,11 +48,11 @@ interface UtilisateurRepository
 
     /**
      * Renvoie tous les utilisateurs souhaitant recevoir la notification périodique spécifiée
-     * ayant n'ayant pas été notifiés depuis la date spécifiée (ou jamais encore notifiés)
+     * et n'ayant pas encore été notifiés depuis le début de la période donnée (ou jamais encore notifiés)
      * 
      * @return Utilisateur[]
      */
-    public function readAllByNotifPeriodique(string $prefNotifIdees, DateTime $dateMaxDerniereNotifPeriodique): array;
+    public function readAllByNotifPeriodique(string $prefNotifIdees, DateTime $dateDebutPeriode): array;
 
     /**
      * @throws UtilisateurInconnuException

@@ -58,7 +58,7 @@ class IdeeRepositoryAdaptor implements IdeeRepository
     /**
      * {@inheritdoc}
      */
-    public function readAllByNotifPeriodique(Utilisateur $utilisateur): array
+    public function readAllByNotifPeriodique(Utilisateur $utilisateur, DateTime $dateNotif): array
     {
         $classDoctrineIdee = IdeeAdaptor::class;
         $dql = <<<EOS
@@ -67,12 +67,13 @@ class IdeeRepositoryAdaptor implements IdeeRepository
             INNER JOIN u.occasions o WITH o.date > CURRENT_TIMESTAMP() AND :utilisateur MEMBER OF o.participants
             WHERE i.utilisateur <> :utilisateur
             AND i.auteur <> :utilisateur
-            AND (i.dateProposition >= :dateDerniereNotifPeriodique
-                OR (i.dateSuppression IS NOT NULL AND i.dateSuppression >= :dateDerniereNotifPeriodique))
+            AND ((i.dateProposition > :dateDerniereNotifPeriodique AND i.dateProposition <= :dateNotif)
+                OR (i.dateSuppression IS NOT NULL AND i.dateSuppression > :dateDerniereNotifPeriodique AND i.dateSuppression <= :dateNotif))
 EOS;
         return $this->em->createQuery($dql)
             ->setParameter('utilisateur', $utilisateur)
             ->setParameter('dateDerniereNotifPeriodique', $utilisateur->getDateDerniereNotifPeriodique())
+            ->setParameter('dateNotif', $dateNotif)
             ->getResult();
     }
 

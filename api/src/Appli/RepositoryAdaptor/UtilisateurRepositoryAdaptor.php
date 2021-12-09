@@ -102,18 +102,18 @@ class UtilisateurRepositoryAdaptor implements UtilisateurRepository
     /**
      * {@inheritdoc}
      */
-    public function readAllByNotifPeriodique(string $prefNotifIdees, DateTime $dateMaxDerniereNotifPeriodique): array
+    public function readAllByNotifPeriodique(string $prefNotifIdees, DateTime $dateDebutPeriode): array
     {
         $classDoctrineUtilisateur = UtilisateurAdaptor::class;
         $dql = <<<EOS
             SELECT u
             FROM $classDoctrineUtilisateur u
             WHERE u.prefNotifIdees = :prefNotifIdees
-            AND u.dateDerniereNotifPeriodique <= :dateMaxDerniereNotifPeriodique
+            AND u.dateDerniereNotifPeriodique < :dateDebutPeriode
 EOS;
         return $this->em->createQuery($dql)
             ->setParameter('prefNotifIdees', $prefNotifIdees)
-            ->setParameter('dateMaxDerniereNotifPeriodique', $dateMaxDerniereNotifPeriodique)
+            ->setParameter('dateDebutPeriode', $dateDebutPeriode)
             ->getResult();
     }
 
