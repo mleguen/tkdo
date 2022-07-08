@@ -28,7 +28,7 @@
     "bootstrap": "^4.5.3",
     "git-describe": "^4.0.4",
     "jquery": "^3.5.1",
-    "moment": "^2.29.1",
+    "moment": "^2.29.4",
     "popper.js": "^1.16.1",
     "rxjs": "~6.6.0",
     "tslib": "^2.0.0",
