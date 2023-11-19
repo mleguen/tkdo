@@ -1,10 +1,17 @@
 # Travaux futurs
 
+- ajouter une route admin d'ajout d'exclusion
+- rendre personnalisable la signature des emails, pour faire un peu moins "machine"
+- passer à `docker compose` et standardiser son utilisation (un unique `docker-compose.yml`)
+- enlever l'utilisation de `sudo` pour les appels à Docker dans la doc
+- remplacer `protractor` par `cypress` pour les tests e2e, en ne dépendant plus de quoi que ce soit d'autre que docker sur le host
+- monter la version de node et des dépendances front (en commençant par angular)
+- monter également les dépendances API
 - trier les participants par ordre alphabétique
 - couper proprement les noms de participants trop longs
-- monter la version de node et des dépendances front (en commençant par angular)
+- support de AWS en serverless avec ansible, et 2 stacks dev/prod
 - renommer le conteneur slim-cli en composer (sur le même principe que le conteneur npm)
-- remplacer apache-pack par un outil de build digne de ce nom
+- remplacer apache-pack par un outil de build digne de ce nom ou le supprimer complètement
 - renommer fixtures en install, et renseigner un email admin par défaut
   (l'admin pourra ensuite le modifier par lui-même)
 - ajouter sur la carte d'un participant le nombre d'idées qui ont été proposées pour lui (ne compter que les idées lisibles)
@@ -16,5 +23,6 @@
   (toujours présent en base pour l'historique, mais plus utilisable)
 - ajouter une route admin d'annulation du tirage
 - ajouter une route admin de suppression d'un utilisateur d'une occasion
+- ajouter une route admin de suppression d'exclusion
 - ajouter une route admin de suppression d'occasion (si pas ou plus de tirage)
 - enlever "doctrine" des noms de colonne auto-générés en base de données
