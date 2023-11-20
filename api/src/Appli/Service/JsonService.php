@@ -6,6 +6,7 @@ namespace App\Appli\Service;
 
 use App\Appli\ModelAdaptor\AuthAdaptor;
 use App\Appli\Service\AuthService;
+use App\Dom\Model\Exclusion;
 use App\Dom\Model\Idee;
 use App\Dom\Model\Occasion;
 use App\Dom\Model\Resultat;
@@ -43,6 +44,13 @@ class JsonService
     {
         return [
             "message" => $e->getMessage(),
+        ];
+    }
+
+    public function getPayloadExclusion(Exclusion $exclusion): array
+    {
+        return [
+            "quiNeDoitPasRecevoir" => $this->getPayloadUtilisateur($exclusion->getQuiNeDoitPasRecevoir())
         ];
     }
 
@@ -153,6 +161,11 @@ class JsonService
         return $this->encode($this->getPayloadException($e));
     }
 
+    public function encodeExclusion(Exclusion $exclusion): string
+    {
+        return $this->encode($this->getPayloadExclusion($exclusion));
+    }
+
     public function encodeIdee(Idee $idee): string
     {
         return $this->encode($this->getPayloadIdee($idee));
@@ -161,6 +174,14 @@ class JsonService
     public function encodeListeIdees(Utilisateur $utilisateur, array $idees): string
     {
         return $this->encode($this->getPayloadListeIdees($utilisateur, $idees));
+    }
+
+    /**
+     * @param Exclusion[] $exclusions
+     */
+    public function encodeListeExclusions(array $exclusions): string
+    {
+        return $this->encode(array_map([$this, 'getPayloadExclusion'], $exclusions));
     }
 
     /**

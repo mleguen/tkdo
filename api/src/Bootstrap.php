@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App;
 
 use App\Appli\Controller\CreateConnexionController;
+use App\Appli\Controller\CreateExclusionUtilisateurController;
 use App\Appli\Controller\CreateIdeeController;
 use App\Appli\Controller\CreateIdeeSuppressionController;
 use App\Appli\Controller\CreateOccasionController;
@@ -14,6 +15,7 @@ use App\Appli\Controller\CreateUtilisateurController;
 use App\Appli\Controller\CreateUtilisateurReinitMdpController;
 use App\Appli\Controller\EditOccasionController;
 use App\Appli\Controller\EditUtilisateurController;
+use App\Appli\Controller\ListExclusionUtilisateurController;
 use App\Appli\Controller\ListIdeeController;
 use App\Appli\Controller\ListOccasionController;
 use App\Appli\Controller\ListUtilisateurController;
@@ -156,6 +158,10 @@ class Bootstrap
                 $group->get('', ViewUtilisateurController::class);
                 $group->put('', EditUtilisateurController::class);
                 $group->post('/reinitmdp', CreateUtilisateurReinitMdpController::class);
+                $group->group('/exclusion', function (RouteCollectorProxyInterface $group) {
+                    $group->get('', ListExclusionUtilisateurController::class);
+                    $group->post('', CreateExclusionUtilisateurController::class);
+                });
             });
         });
 

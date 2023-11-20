@@ -180,6 +180,49 @@ $ curl -u {{token}}: \
   le mot de passe est généré automatiquement et envoyé par email à l'utilisateur.
 </div>
 
+<h3>Lister les exclusions d'un utilisateur</h3>
+
+<p>Les exclusions permettent de définir à qui un utilisateur ne doit pas offrir de cadeaux (conjoint, etc.)</p>
+
+<pre><samp>
+curl -u {{token}}: \
+{{urlApi}}/utilisateur/{{idUtilisateur}}/exclusion
+</samp></pre>
+
+<p>Renvoie :</p>
+
+<pre><samp>
+[
+  {{'{'}}
+    "quiNeDoitPasRecevoir": {{'{'}}
+      "genre": "F",
+      "id": 71,
+      "nom": "Utilisatrice 1"
+    }
+  }
+]
+</samp></pre>
+
+<h3>Ajouter une nouvelle exclusion pour un utilisateur</h3>
+
+<pre><samp>
+curl -u {{token}}: \
+-d idQuiNeDoitPasRecevoir=71 \
+-X POST {{urlApi}}/utilisateur/{{idUtilisateur}}/exclusion
+</samp></pre>
+
+<p>Renvoie :</p>
+
+<pre><samp>
+{{'{'}}
+  "quiNeDoitPasRecevoir": {{'{'}}
+    "genre": "F",
+    "id": 71,
+    "nom": "Utilisatrice 1"
+  }
+}
+</samp></pre>
+
 
 <h2>Occasions</h2>
 

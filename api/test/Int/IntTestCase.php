@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Test\Int;
 
+use App\Appli\ModelAdaptor\ExclusionAdaptor;
 use App\Appli\ModelAdaptor\IdeeAdaptor;
 use App\Appli\ModelAdaptor\OccasionAdaptor;
 use App\Appli\ModelAdaptor\ResultatAdaptor;
@@ -65,6 +66,7 @@ class IntTestCase extends TestCase
             IdeeAdaptor::class,
             ResultatAdaptor::class,
             OccasionAdaptor::class,
+            ExclusionAdaptor::class,
             UtilisateurAdaptor::class,
         ] as $class) {
             foreach (self::$em->getRepository($class)->findAll() as $entite) {
