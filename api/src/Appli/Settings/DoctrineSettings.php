@@ -10,7 +10,7 @@ use Doctrine\ORM\Tools\Setup;
 
 class DoctrineSettings
 {
-    public $configuration;
+    public $config;
     public $connection;
 
     public function __construct(

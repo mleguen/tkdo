@@ -57,7 +57,6 @@ class IntTestCase extends TestCase
         $this->client = new GuzzleClient();
         $this->mhclient = new MailhogClient(new GuzzleAdapter($this->client), new GuzzleMessageFactory(), getenv('MAILHOG_BASE_URI'));
         $this->mhclient->purgeMessages();
-        $this->mdps = [];
     }
 
     public function tearDown(): void

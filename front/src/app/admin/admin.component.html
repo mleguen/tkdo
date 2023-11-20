@@ -17,7 +17,7 @@ en vous authentifiant avec le token d'authentification ci-dessous (valable uniqu
 <p>Vous pouvez également créer un nouveau token :</p>
 
 <pre><samp>
-$ curl \
+curl \
 -d identifiant='utilisatrice01' \
 -d mdp='********' \
 -X POST {{urlApi}}/connexion
@@ -65,7 +65,7 @@ curl -u {{token}}: \
 <h3>Créer un nouvel utilisateur</h3>
 
 <pre><samp>
-$ curl -u {{token}}: \
+curl -u {{token}}: \
 -d identifiant='utilisatrice01' \
 -d email='utilisatrice01@tkdo.org' \
 -d nom='Utilisatrice 1' \
@@ -157,7 +157,7 @@ curl -u {{token}}: \
 <h3>Réinitialiser le mot de passe d'un utilisateur</h3>
 
 <pre><samp>
-$ curl -u {{token}}: \
+curl -u {{token}}: \
 -X POST {{urlApi}}/utilisateur/{{idUtilisateur}}/reinitmdp
 </samp></pre>
 
@@ -251,7 +251,7 @@ curl -u {{token}}: \
 <h3>Créer une nouvelle occasion</h3>
 
 <pre><samp>
-$ curl -u {{token}}: \
+curl -u {{token}}: \
 -d titre='Nouvelle occasion' \
 -X POST {{urlApi}}/occasion
 </samp></pre>
