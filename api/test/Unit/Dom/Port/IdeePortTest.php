@@ -15,12 +15,11 @@ use App\Dom\Model\Utilisateur;
 use App\Dom\Port\NotifPort;
 use DateTime;
 use Exception;
-use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 
-class IdeePortTest extends TestCase
+class IdeePortTest extends UnitTestCase
 {
     use ProphecyTrait;
 
@@ -61,7 +60,7 @@ class IdeePortTest extends TestCase
         $this->ideeProphecy = $this->prophesize(Idee::class);
     }
 
-    /** @dataProvider provideDataCreeIdee */
+    /** @dataProvider provideDataTestAdmin */
     public function testCreeIdee(bool $getAdmin)
     {
         $auteur = $this->auteurProphecy->reveal();
@@ -108,18 +107,6 @@ class IdeePortTest extends TestCase
         $this->assertEquals($ideeAttendue, $idee);
     }
 
-    public function provideDataCreeIdee()
-    {       
-        return [
-            [ // L'auteur de l'idée
-                'getAdmin' => false,
-            ],
-            [ // Un administrateur
-                'getAdmin' => true,
-            ],
-        ];
-    }
-
     public function testCreeIdeePasLAuteur()
     {
         $auteur = $this->auteurProphecy->reveal();
@@ -158,7 +145,7 @@ class IdeePortTest extends TestCase
     }
 
     /**
-     * @dataProvider provideDataMarqueIdeeCommeSupprimee
+     * @dataProvider provideDataTestAdmin
      */
     public function testMarqueIdeeCommeSupprimee(bool $getAdmin)
     {
@@ -199,18 +186,6 @@ class IdeePortTest extends TestCase
         );
 
         $this->assertEquals($ideeAttendue, $idee);
-    }
-
-    public function provideDataMarqueIdeeCommeSupprimee()
-    {       
-        return [
-            [ // L'auteur de l'idée
-                'getAdmin' => false,
-            ],
-            [ // Un administrateur
-                'getAdmin' => true,
-            ],
-        ];
     }
 
     public function testMarqueIdeeCommeSupprimeePasLAuteur()

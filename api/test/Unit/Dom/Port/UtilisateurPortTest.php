@@ -18,13 +18,11 @@ use App\Dom\Plugin\MailPlugin;
 use App\Dom\Plugin\PasswordPlugin;
 use App\Dom\Port\UtilisateurPort;
 use App\Dom\Repository\UtilisateurRepository;
-use Iterator;
-use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 
-class UtilisateurPortTest extends TestCase
+class UtilisateurPortTest extends UnitTestCase
 {
     use ProphecyTrait;
 
@@ -61,7 +59,7 @@ class UtilisateurPortTest extends TestCase
         $this->utilisateurProphecy = $this->prophesize(Utilisateur::class);
     }
 
-    /** @dataProvider provideDataTestCreeUtilisateur */
+    /** @dataProvider provideDataTestAdmin */
     public function testCreeUtilisateur(bool $admin)
     {
         $utilisateurAttendu = $this->utilisateurProphecy->reveal();
@@ -114,14 +112,6 @@ class UtilisateurPortTest extends TestCase
         );
 
         $this->assertEquals($utilisateurAttendu, $utilisateur);
-    }
-
-    public function provideDataTestCreeUtilisateur(): array
-    {
-        return [
-            ['admin' => false],
-            ['admin' => true],
-        ];
     }
 
     public function testCreeUtilisateurPasAdmin()
@@ -243,7 +233,7 @@ class UtilisateurPortTest extends TestCase
         );
     }
 
-    /** @dataProvider provideDataTestModifieUtilisateur */
+    /** @dataProvider provideDataTestAdmin */
     public function testModifieUtilisateur(bool $admin)
     {
         $utilisateurAttendu = $this->utilisateurProphecy->reveal();
@@ -298,13 +288,6 @@ class UtilisateurPortTest extends TestCase
         );
 
         $this->assertEquals($utilisateurAttendu, $utilisateur);
-    }
-
-    public function provideDataTestModifieUtilisateur(): Iterator
-    {
-        foreach([false, true] as $admin) {
-            yield [$admin];
-        }
     }
 
     public function testModifieUtilisateurPasUtilisateur()
@@ -441,7 +424,7 @@ class UtilisateurPortTest extends TestCase
         );
     }
 
-    /** @dataProvider provideDataTestGetUtilisateur */
+    /** @dataProvider provideDataTestAdmin */
     public function testGetUtilisateur(bool $admin)
     {
         $utilisateurAttendu = $this->utilisateurProphecy->reveal();
@@ -455,13 +438,6 @@ class UtilisateurPortTest extends TestCase
         );
 
         $this->assertEquals($utilisateurAttendu, $utilisateur);
-    }
-
-    public function provideDataTestGetUtilisateur(): Iterator
-    {
-        foreach ([false, true] as $admin) {
-            yield [$admin];
-        }
     }
 
     public function testGetUtilisateurPasUtilisateur()

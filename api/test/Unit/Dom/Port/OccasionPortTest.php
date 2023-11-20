@@ -19,12 +19,11 @@ use App\Dom\Repository\OccasionRepository;
 use App\Dom\Repository\ResultatRepository;
 use DateTime;
 use Iterator;
-use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 
-class OccasionPortTest extends TestCase
+class OccasionPortTest extends UnitTestCase
 {
     use ProphecyTrait;
 
@@ -344,7 +343,7 @@ class OccasionPortTest extends TestCase
     }
 
     /**
-     * @dataProvider provideDataListeOccasionsParticipant
+     * @dataProvider provideDataTestAdmin
      */
     public function testListeOccasionsParticipant(bool $admin)
     {
@@ -365,13 +364,6 @@ class OccasionPortTest extends TestCase
         );
 
         $this->assertEquals($occasionsAttendues, $occasions);
-    }
-
-    public function provideDataListeOccasionsParticipant(): Iterator
-    {
-        foreach ([false, true] as $admin) {
-            yield [$admin];
-        }
     }
 
     public function testListeOccasionsParticipantPasUtilisateur()
