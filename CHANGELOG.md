@@ -1,11 +1,12 @@
 # Historique des changements
 
-## Prochaine version
+## V1.4.0 (25/11/2023)
 
 - tri des participants à une occasion, de manière à avoir :
   - la personne à qui offrir en premier (si le tirage a été fait)
   - la personne connectée ensuite
   - et enfin les autres participants, par ordre alphabétique
+- route admin de création et d'affichage des exclusions
 - correctifs :
   - apache-pack :
     - n'utlise plus la version locale de php pour installer les dépendances
