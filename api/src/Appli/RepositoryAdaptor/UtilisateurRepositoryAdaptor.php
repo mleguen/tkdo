@@ -84,18 +84,18 @@ class UtilisateurRepositoryAdaptor implements UtilisateurRepository
      */
     public function readAllByNotifInstantaneePourIdees(Utilisateur $utilisateur): array
     {
-        return $this->em->createQueryBuilder()
-            ->select('u')
-            ->distinct()
-            ->from(UtilisateurAdaptor::class, 'u')
-            ->innerJoin(OccasionAdaptor::class, 'o', 'u.id MEMBER OF o.participants')
-            ->where('u.prefNotifIdees = :prefNotifIdees')
-            ->andWhere('u.id <> :idUtilisateur')
-            ->andWhere('o.date > CURRENT_TIMESTAMP()')
-            ->andWhere(':idUtilisateur MEMBER OF o.participants')
+        $classDoctrineUtilisateur = UtilisateurAdaptor::class;
+        $dql = <<<EOS
+            SELECT DISTINCT u FROM $classDoctrineUtilisateur u
+            INNER JOIN u.occasions o WITH u MEMBER OF o.participants
+            WHERE u <> :utilisateur
+            AND u.prefNotifIdees = :prefNotifIdees
+            AND o.date > CURRENT_TIMESTAMP()
+            AND :utilisateur MEMBER OF o.participants
+EOS;
+        return $this->em->createQuery($dql)
+            ->setParameter('utilisateur', $utilisateur)
             ->setParameter('prefNotifIdees', PrefNotifIdees::Instantanee)
-            ->setParameter('idUtilisateur', $utilisateur->getId())
-            ->getQuery()
             ->getResult();
     }
 

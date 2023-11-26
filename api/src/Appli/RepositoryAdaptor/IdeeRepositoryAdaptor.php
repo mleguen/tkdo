@@ -64,11 +64,13 @@ class IdeeRepositoryAdaptor implements IdeeRepository
         $dql = <<<EOS
             SELECT DISTINCT i FROM $classDoctrineIdee i
             INNER JOIN i.utilisateur u
-            INNER JOIN u.occasions o WITH o.date > CURRENT_TIMESTAMP() AND :utilisateur MEMBER OF o.participants
-            WHERE i.utilisateur <> :utilisateur
-            AND i.auteur <> :utilisateur
+            INNER JOIN u.occasions o
+            WHERE i.auteur <> :utilisateur
             AND ((i.dateProposition > :dateDerniereNotifPeriodique AND i.dateProposition <= :dateNotif)
                 OR (i.dateSuppression IS NOT NULL AND i.dateSuppression > :dateDerniereNotifPeriodique AND i.dateSuppression <= :dateNotif))
+            AND u <> :utilisateur
+            AND o.date > CURRENT_TIMESTAMP()
+            AND :utilisateur MEMBER OF o.participants
 EOS;
         return $this->em->createQuery($dql)
             ->setParameter('utilisateur', $utilisateur)

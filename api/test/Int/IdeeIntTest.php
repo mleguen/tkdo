@@ -17,6 +17,7 @@ class IdeeIntTest extends IntTestCase
         $auteur = $idee->getAuteur();
         $utilisateur = $idee->getUtilisateur();
 
+        // Occasion à laquelle participe l'utilisateur
         $participantANotifierI = $this->creeUtilisateurEnBase('participantANotifierI', [
             'prefNotifIdees' => PrefNotifIdees::Instantanee
         ]);
@@ -29,6 +30,20 @@ class IdeeIntTest extends IntTestCase
             $participantANotifierI,
             $participantANotifierQ,
         ]]);
+
+        // Occasion à laquelle ne participe pas l'utilisateur
+        $this->creeOccasionEnBase([
+            'titre' => 'Autre occasion',
+            'participants' => [
+                $this->creeUtilisateurEnBase('participantPasANotifierI', [
+                    'prefNotifIdees' => PrefNotifIdees::Instantanee
+                ]),
+                $this->creeUtilisateurEnBase('participantPasANotifierQ', [
+                    'prefNotifIdees' => PrefNotifIdees::Quotidienne,
+                    'dateDerniereNotifPeriodique' => new DateTime('yesterday')
+                ]),
+            ]
+        ]);
 
         $this->postConnexion($curl, $auteur);
 
@@ -93,7 +108,7 @@ class IdeeIntTest extends IntTestCase
         ], $body);
         $this->postConnexion($curl, $auteur);
 
-        // Vérifie que l'utilisateur à notifier instantanément a bien été notifié de la création
+        // Vérifie que seul l'utilisateur à notifier instantanément a bien été notifié de la création
         $emailsRecus = $this->depileDerniersEmailsRecus();
         $this->assertCount(1, $emailsRecus);
         $this->assertMessageRecipientsContains($participantANotifierI->getEmail(), $emailsRecus[0]);
@@ -128,7 +143,7 @@ class IdeeIntTest extends IntTestCase
             'idees' => [],
         ], $body);
 
-        // Vérifie que l'utilisateur à notifier instantanément a bien été notifié de la suppression
+        // Vérifie que seul l'utilisateur à notifier instantanément a bien été notifié de la suppression
         $emailsRecus = $this->depileDerniersEmailsRecus();
         $this->assertCount(1, $emailsRecus);
         $this->assertMessageRecipientsContains($participantANotifierI->getEmail(), $emailsRecus[0]);
@@ -144,7 +159,7 @@ class IdeeIntTest extends IntTestCase
         $this->assertMatchesRegularExpression("/NotifCommande: {$participantANotifierQ->getNom()} 2/", implode("\n", $output));
         $this->assertEquals(0, $return_var);
 
-        // Vérifie que l'utilisateur à notifier quotidiennement
+        // Vérifie que seul l'utilisateur à notifier quotidiennement
         // a bien été notifié de la la suppression de la 1ère idée, et de la création de la 2ème
         $emailsRecus = $this->depileDerniersEmailsRecus();
         $this->assertCount(1, $emailsRecus);

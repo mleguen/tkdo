@@ -1,5 +1,11 @@
 # Historique des changements
 
+## Prochaine release
+
+- correctifs :
+  - api :
+    - n'envoie les notifs instantanées qu'aux personnes concernées
+
 ## V1.4.0 (25/11/2023)
 
 - tri des participants à une occasion, de manière à avoir :
