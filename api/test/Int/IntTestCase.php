@@ -229,8 +229,7 @@ class IntTestCase extends TestCase
         int &$statusCode = null,
         array &$body = null,
         $query = '',
-        array $data = null,
-        $showOutput = false
+        array $data = null
     ): void {
         if ($curl) {
             $uParam = $this->token ? "-u {$this->token}:" : '';
@@ -255,7 +254,6 @@ class IntTestCase extends TestCase
                     return true;
                 }
             });
-            if ($showOutput) var_dump($output);
             $jsonBody = implode("\n", $output);
         }
         else {
