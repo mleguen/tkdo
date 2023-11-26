@@ -1,7 +1,6 @@
 # Travaux futurs
 
 - monter la version de node et des dépendances front (en commençant par angular)
-- monter également les dépendances API
 - rendre personnalisable la signature des emails, pour faire un peu moins "machine"
 - passer à `docker compose` et standardiser son utilisation (un unique `docker-compose.yml`)
 - enlever l'utilisation de `sudo` pour les appels à Docker dans la doc

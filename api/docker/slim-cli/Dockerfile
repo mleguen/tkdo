@@ -1,6 +1,7 @@
 FROM php:7.3-cli
 RUN apt-get update && apt-get install -y \
   libzip-dev \
+  sudo \
   zip \
   && docker-php-ext-install \
   pdo_mysql \

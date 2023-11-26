@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Appli\Settings;
 
 use App\Bootstrap;
-use Doctrine\Common\Cache\PhpFileCache;
-use Doctrine\ORM\Tools\Setup;
+use Doctrine\ORM\ORMSetup;
+use Symfony\Component\Cache\Adapter\PhpFilesAdapter;
 
 class DoctrineSettings
 {
@@ -17,12 +17,12 @@ class DoctrineSettings
         Bootstrap $bootstrap
     )
     {
-        $this->config = Setup::createAnnotationMetadataConfiguration(
+        $this->config = ORMSetup::createAnnotationMetadataConfiguration(
             ["$bootstrap->apiRoot/src/Appli/ModelAdaptor"],
             $bootstrap->devMode,
-            // make sure the next 2 paths exists and are writable
+            // make sure the next 2 paths exist and are writable
             "$bootstrap->apiRoot/var/doctrine/proxy",
-            new PhpFileCache("$bootstrap->apiRoot/var/doctrine/cache")
+            new PhpFilesAdapter('', 0, "$bootstrap->apiRoot/var/doctrine/cache")
         );
 
         $this->connection = [

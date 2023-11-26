@@ -9,6 +9,7 @@ use App\Appli\ModelAdaptor\AuthAdaptor;
 use App\Appli\Settings\AuthSettings;
 use Exception;
 use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 
 class AuthService
 {
@@ -36,7 +37,8 @@ class AuthService
     public function decode(string $token): AuthAdaptor
     {
         try {
-            $payload = JWT::decode($token, $this->clePublique, [$this->settings->algo]);
+            $key = new Key($this->clePublique, $this->settings->algo);
+            $payload = JWT::decode($token, $key);
             return new AuthAdaptor(
                 intval($payload->sub),
                 isset($payload->adm) && $payload->adm
