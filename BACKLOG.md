@@ -3,7 +3,6 @@
 - monter la version de node et des dépendances front (en commençant par angular)
 - rendre personnalisable la signature des emails, pour faire un peu moins "machine"
 - passer à `docker compose` et standardiser son utilisation (un unique `docker-compose.yml`)
-- enlever l'utilisation de `sudo` pour les appels à Docker dans la doc
 - remplacer `protractor` par `cypress` pour les tests e2e, en ne dépendant plus de quoi que ce soit d'autre que docker sur le host
 - trier les participants par ordre alphabétique
 - couper proprement les noms de participants trop longs
