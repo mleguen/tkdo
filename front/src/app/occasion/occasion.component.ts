@@ -1,15 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-occasion',
+  standalone: true,
+  imports: [],
   templateUrl: './occasion.component.html',
-  styleUrls: ['./occasion.component.scss']
+  styleUrl: './occasion.component.scss'
 })
-export class OccasionComponent implements OnInit {
-
-  constructor() { }
-
-  ngOnInit(): void {
-  }
+export class OccasionComponent {
 
 }

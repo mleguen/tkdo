@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+COMPOSE_FILE=docker-compose.yml:front/docker/docker-compose.yml docker-compose run --rm --entrypoint="node_modules/.bin/ng" npm "$@"
