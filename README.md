@@ -121,5 +121,5 @@ la page d'administration vous permet :
 ## Développement
 
 - [Historique des changements](./CHANGELOG.md)
-- [Travaux futurs](./BACKLOG.md)
 - [Guide du développeur](./CONTRIBUTING.md)
+- [Travaux futurs](./BACKLOG.md)

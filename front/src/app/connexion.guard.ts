@@ -1,21 +1,20 @@
-import { Injectable } from '@angular/core';
-import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, UrlTree, Router } from '@angular/router';
+import { Injectable, inject } from '@angular/core';
+import { CanActivateFn, RouterStateSnapshot, UrlTree, Router } from '@angular/router';
+
 import { BackendService } from './backend.service';
 
-@Injectable({
-  providedIn: 'root'
-})
-export class ConnexionGuard implements CanActivate {
+@Injectable()
+export class ConnexionGuard {
 
   constructor(
     private readonly backend: BackendService,
     private readonly router: Router,
-  ) {}
+  ) { }
 
-  async canActivate(
-    route: ActivatedRouteSnapshot,
-    state: RouterStateSnapshot): Promise<boolean | UrlTree> {
-    if (!await this.backend.estConnecte()) return this.router.createUrlTree(['connexion'], { queryParams: { retour: state.url }});
+  async canActivate(state: RouterStateSnapshot): Promise<boolean | UrlTree> {
+    if (!await this.backend.estConnecte()) return this.router.createUrlTree(['connexion'], { queryParams: { retour: state.url } });
     return true;
   }
 }
+
+export const connexionGuard: CanActivateFn = (route, state) => inject(ConnexionGuard).canActivate(state);

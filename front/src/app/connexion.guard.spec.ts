@@ -1,23 +1,24 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
+import { CanActivateFn } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 
-import { ConnexionGuard } from './connexion.guard';
+import { connexionGuard } from './connexion.guard';
 
-describe('ConnexionGuard', () => {
-  let guard: ConnexionGuard;
+describe('connexionGuard', () => {
+  const executeGuard: CanActivateFn = (...guardParameters) =>
+    TestBed.runInInjectionContext(() => connexionGuard(...guardParameters));
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
         RouterTestingModule,
         HttpClientTestingModule,
-      ],
+      ]
     });
-    guard = TestBed.inject(ConnexionGuard);
   });
 
   it('should be created', () => {
-    expect(guard).toBeTruthy();
+    expect(executeGuard).toBeTruthy();
   });
 });

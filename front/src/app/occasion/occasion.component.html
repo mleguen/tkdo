@@ -1,6 +1,6 @@
-<ng-container *ngIf="occasion$|async as o">
-  <h1>{{o.titre}}</h1>
-  
+<ng-container *ngIf="occasion$|async as o; else veuillezPatienter">
+  <h1 id="occasion">{{o.titre}}</h1>
+
   <ng-container [ngSwitch]="o.estPassee">
     <div *ngSwitchCase="true" class="alert alert-warning col-12" role="alert">
       Cette occasion est passée.
@@ -15,25 +15,22 @@
     <ng-container *ngIf="!o.estPassee">encore</ng-container>
     eu lieu.
   </div>
-  
+
   <!-- <h2>Participants</h2> -->
   <div>
     Cliquer sur le nom d'un des participants pour accéder à sa liste d'idées.
   </div>
   <div class="container">
     <div class="row justify-content-center">
-      <div *ngFor="let p of o.participants"
-        class="col-sm-6 col-md-4 col-lg-3 col-xl-2">
-        <div class="card"
-          [ngClass]="{
+      <div *ngFor="let p of o.participants" class="col-sm-6 col-md-4 col-lg-3 col-xl-2">
+        <div class="card" [ngClass]="{
             'bg-primary': p.estQuiRecoitDeMoi,
             'bg-muted': p.estMoi,
             'bg-secondary': !p.estMoi && !p.estQuiRecoitDeMoi,
             'text-white': !p.estMoi,
             estMoi: p.estMoi,
             estQuiRecoitDeMoi: p.estQuiRecoitDeMoi
-          }"
-          [routerLink]="['/idee']" [queryParams]="{idUtilisateur: p.id}">
+          }" [routerLink]="['/idee']" [queryParams]="{idUtilisateur: p.id}">
           <div class="card-body">
             <h3 class="card-title">{{p.nom}}</h3>
             <div class="card-text" *ngIf="p.estMoi">C'est vous !</div>
@@ -56,3 +53,7 @@
     </div>
   </div>
 </ng-container>
+
+<ng-template #veuillezPatienter>
+  <h1 id="occasion">Veuillez patienter...</h1>
+</ng-template>

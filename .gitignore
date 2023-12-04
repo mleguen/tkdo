@@ -1,5 +1,7 @@
+/.cache
 /api/src/Appli/Fixture/*.data.php
-/node_modules
+node_modules
+/front/cypress/screenshots
 /init-ng.sh
 /package.json
 /package-lock.json

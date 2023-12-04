@@ -1,13 +1,22 @@
+import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { BackendService } from './backend.service';
-import { Router, NavigationStart } from '@angular/router';
+import { NavigationStart, Router, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs/operators';
+
 import { environment } from '../environments/environment';
+import { HeaderComponent } from './header/header.component';
+import { BackendService } from './backend.service';
 
 @Component({
   selector: 'app-root',
+  standalone: true,
+  imports: [
+    RouterOutlet,
+    CommonModule,
+    HeaderComponent,
+  ],
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+  styleUrl: './app.component.scss'
 })
 export class AppComponent implements OnInit {
 

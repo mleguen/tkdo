@@ -1,0 +1,14 @@
+{
+  "soi": {
+    "aCreer": "un pull",
+    "aSupprimer": "un gauffrier"
+  },
+  "quiRecoitDeSoi": {
+    "aCreer": "un jeu de société"
+  },
+  "tiers": {
+    "aCreer": "un puzzle",
+    "aSupprimer": "une canne à pêche",
+    "nonSupprimable": "des gants de boxe"
+  }
+}

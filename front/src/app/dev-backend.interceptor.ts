@@ -1,17 +1,17 @@
-import { Injectable, isDevMode, Provider } from '@angular/core';
 import {
   HttpRequest,
   HttpHandler,
   HttpEvent,
   HttpInterceptor,
-  HTTP_INTERCEPTORS,
   HttpResponse,
   HttpErrorResponse
 } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import moment from 'moment';
 import { Observable, of, throwError } from 'rxjs';
 import { mergeMap, materialize, dematerialize, delay } from 'rxjs/operators';
+
 import { Genre, Idee, Occasion, PrefNotifIdees, Utilisateur, UtilisateurPrive } from './backend.service';
-import * as moment from 'moment';
 
 interface UtilisateurAvecMdp extends UtilisateurPrive {
   mdp: string;
@@ -246,13 +246,13 @@ export class DevBackendInterceptor implements HttpInterceptor {
       return authGuard(() => {
         const utilisateur = utilisateursAvecMdp.find(u => u.id === idUtilisateur);
         const { email, nom, mdp, genre, prefNotifIdees } = body as any;
-  
-        if (email) utilisateur.email = email;
-        if (nom) utilisateur.nom = nom;
-        if (mdp) utilisateur.mdp = mdp;
-        if (genre) utilisateur.genre = genre;
-        if (prefNotifIdees) utilisateur.prefNotifIdees = prefNotifIdees;
-  
+
+        if (email) utilisateur!.email = email;
+        if (nom) utilisateur!.nom = nom;
+        if (mdp) utilisateur!.mdp = mdp;
+        if (genre) utilisateur!.genre = genre;
+        if (prefNotifIdees) utilisateur!.prefNotifIdees = prefNotifIdees;
+
         return ok();
       })
     }
@@ -300,7 +300,7 @@ export class DevBackendInterceptor implements HttpInterceptor {
     function postSuppressionIdee(idIdee: number) {
       return authGuard(() => {
         const idee = idees.find(i => i.idee.id === idIdee);
-        idee.idee.dateSuppression = new Date().toJSON();
+        idee!.idee.dateSuppression = new Date().toJSON();
 
         return ok();
       });
@@ -309,10 +309,14 @@ export class DevBackendInterceptor implements HttpInterceptor {
     // helper functions
 
     function authGuard(next: (utilisateur: UtilisateurAvecMdp) => Observable<HttpEvent<unknown>>) {
-      let match = headers.get('Authorization').match(/Bearer (.*)/);
+      const authorizationHeader = headers.get('Authorization');
+      if (!authorizationHeader) return forbidden();
+      const match = authorizationHeader.match(/Bearer (.*)/);
       if (!match) return forbidden();
       if (match[1] === 'invalid') return unauthorized();
-      return next(utilisateursAvecMdp.find(u => u.identifiant === match[1]));
+      const u = utilisateursAvecMdp.find(u => u.identifiant === match![1])
+      if (!u) return unauthorized();
+      return next(u);
     }
 
     function ok(body?: any) {
@@ -322,13 +326,13 @@ export class DevBackendInterceptor implements HttpInterceptor {
 
     function ko(status: number, statusText: string, error?: any) {
       console.log(`DevBackendInterceptor: ${method} ${url} ${status} ${statusText}`);
-      return throwError(new HttpErrorResponse({ url, status, statusText, error}));
+      return throwError(new HttpErrorResponse({ url, status, statusText, error }));
     }
 
     function badRequest(message: string) {
       return ko(400, 'Bad request', { message });
     }
-    
+
     function unauthorized() {
       return ko(401, 'Unauthorized');
     }
@@ -342,15 +346,6 @@ export class DevBackendInterceptor implements HttpInterceptor {
     }
   }
 }
-
-const noopInterceptor: HttpInterceptor = { intercept: (request: HttpRequest<unknown>, next: HttpHandler) => next.handle(request) };
-
-export const devBackendInterceptorProvider: Provider = {
-  // use fake backend in place of Http service for backend-less development
-  provide: HTTP_INTERCEPTORS,
-  useFactory: () => isDevMode() ? new DevBackendInterceptor() : noopInterceptor,
-  multi: true
-};
 
 function enleveDonneesPrivees(u: UtilisateurAvecMdp): Utilisateur {
   let { email, admin, identifiant, prefNotifIdees, ...donneesPubliques } = enleveMdp(u);

@@ -6,7 +6,7 @@ describe('DevBackendInterceptor', () => {
   beforeEach(() => TestBed.configureTestingModule({
     providers: [
       DevBackendInterceptor
-      ]
+    ]
   }));
 
   it('should be created', () => {

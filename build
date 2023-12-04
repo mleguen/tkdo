@@ -15,7 +15,7 @@ openssl pkey -in $AUTH_RSA.prod -pubout -out $AUTH_RSA.pub.prod
 
 # Front
 docker-compose run npm install || echec 1 "Impossible d'installer les dépendances du front"
-docker-compose run npm run build -- --prod || echec 2 "Impossible de construire le front"
+docker-compose run npm run build -- --configuration production || echec 2 "Impossible de construire le front"
 
 # API
 docker-compose run --rm slim-cli ./build.sh || echec 3 "Impossible d'installer les dependances de l'api"

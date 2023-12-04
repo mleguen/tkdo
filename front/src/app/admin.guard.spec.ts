@@ -1,10 +1,12 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
+import { CanActivateFn } from '@angular/router';
 
-import { AdminGuard } from './admin.guard';
+import { adminGuard } from './admin.guard';
 
-describe('AdminGuard', () => {
-  let guard: AdminGuard;
+describe('adminGuard', () => {
+  const executeGuard: CanActivateFn = (...guardParameters) =>
+    TestBed.runInInjectionContext(() => adminGuard(...guardParameters));
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -12,10 +14,9 @@ describe('AdminGuard', () => {
         HttpClientTestingModule,
       ],
     });
-    guard = TestBed.inject(AdminGuard);
   });
 
   it('should be created', () => {
-    expect(guard).toBeTruthy();
+    expect(executeGuard).toBeTruthy();
   });
 });

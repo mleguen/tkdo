@@ -1,36 +1,48 @@
-import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Component } from '@angular/core';
+import { ActivatedRoute, RouterModule } from '@angular/router';
 import { Observable, of } from 'rxjs';
+import { catchError, combineLatestWith, switchMap } from 'rxjs/operators';
+
 import { BackendService, Genre, Occasion, Utilisateur } from '../backend.service';
-import { catchError, switchMap } from 'rxjs/operators';
-import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-occasion',
+  standalone: true,
+  imports: [
+    CommonModule,
+    RouterModule,
+  ],
   templateUrl: './occasion.component.html',
-  styleUrls: ['./occasion.component.scss']
+  styleUrl: './occasion.component.scss'
 })
-export class OccasionComponent implements OnInit {
+export class OccasionComponent {
 
   Genre = Genre;
 
-  occasion$: Observable<OccasionAffichee>;
+  occasion$: Observable<OccasionAffichee | null>;
 
   constructor(
     private readonly backend: BackendService,
     private readonly route: ActivatedRoute,
-  ) { }
-
-  ngOnInit(): void {
+  ) {
+    // subscribe/unsubscribe automatiques par le template html
     this.occasion$ = this.route.paramMap.pipe(
-      switchMap(async (params) => {
-        let o = await this.backend.getOccasion(+params.get('idOccasion'));
-        const idQuiRecoitDeMoi = o.resultats.find(rt => rt.idQuiOffre === this.backend.idUtilisateur)?.idQuiRecoit;
+      combineLatestWith(this.backend.utilisateurConnecte$),
+      switchMap(async ([params, utilisateurConnecte]) => {
+        if (utilisateurConnecte === null) return null;
+
+        const idOccasion = params.get('idOccasion') || '0';
+        const o = await this.backend.getOccasion(+idOccasion);
+        if (!o) throw new Error(`l'ID d'occasion '${idOccasion}' n'existe pas`);
+
+        const idQuiRecoitDeMoi = o.resultats.find(rt => rt.idQuiOffre === utilisateurConnecte.id)?.idQuiRecoit;
         let d = new Date(o.date);
         return Object.assign({}, o, {
           date: Intl.DateTimeFormat('fr-FR').format(d),
           estPassee: d.getTime() < Date.now(),
           participants: o.participants.map(p => Object.assign({}, p, {
-            estMoi: p.id === this.backend.idUtilisateur,
+            estMoi: p.id === utilisateurConnecte.id,
             estQuiRecoitDeMoi: p.id === idQuiRecoitDeMoi,
           })).sort((a, b) => {
             if (a.estQuiRecoitDeMoi) {
@@ -49,13 +61,15 @@ export class OccasionComponent implements OnInit {
         });
       }),
       // Les erreurs backend sont déjà affichées par AppComponent
-      catchError(() => of(undefined)),
+      catchError(() => of(null)),
     );
   }
 }
 
 interface OccasionAffichee extends Occasion {
+  estPassee: boolean;
   participants: UtilisateurAffiche[];
+  tirageFait: boolean;
 }
 
 interface UtilisateurAffiche extends Utilisateur {

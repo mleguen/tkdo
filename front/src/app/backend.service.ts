@@ -1,8 +1,8 @@
 import { DOCUMENT } from '@angular/common';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
-import { first, map } from 'rxjs/operators';
+import { BehaviorSubject, Observable, firstValueFrom, of } from 'rxjs';
+import { first, map, shareReplay, switchMap } from 'rxjs/operators';
 
 export interface Occasion {
   id: number;
@@ -62,9 +62,9 @@ const URL_IDEES = `${URL_API}/idee`;
 const URL_IDEE = (idIdee: number) => `${URL_IDEES}/${idIdee}`;
 const URL_SUPPRESSION_IDEE = (idIdee: number) => `${URL_IDEE(idIdee)}/suppression`;
 
+const CLE_ID_UTILISATEUR = 'id_utilisateur';
 const CLE_LISTE_OCCASIONS = 'occasions';
 const CLE_TOKEN = 'backend-token';
-const CLE_UTILISATEUR = 'utilisateur';
 
 interface PostConnexionDTO {
   token: string;
@@ -76,56 +76,63 @@ interface PostConnexionDTO {
 })
 export class BackendService {
 
-  idUtilisateur: Utilisateur['id'];
-  utilisateurConnecte$: BehaviorSubject<PostConnexionDTO['utilisateur']>;
-
-  erreur$ = new BehaviorSubject<string>(undefined);
-  occasions$ = new BehaviorSubject<Occasion[]>(JSON.parse(localStorage.getItem(CLE_LISTE_OCCASIONS)));
+  erreur$ = new BehaviorSubject<string | undefined>(undefined);
+  occasions$: Observable<Occasion[] | null>;
   token = localStorage.getItem(CLE_TOKEN);
+  utilisateurConnecte$: Observable<UtilisateurPrive | null>;
+
+  protected idUtilisateurConnecte$: BehaviorSubject<number | null>;
 
   constructor(
     private readonly http: HttpClient,
     @Inject(DOCUMENT) private document: Document,
   ) {
-    let utilisateur = JSON.parse(localStorage.getItem(CLE_UTILISATEUR));
-    this.idUtilisateur = utilisateur?.id;
-    this.utilisateurConnecte$ = new BehaviorSubject(utilisateur);
+    this.idUtilisateurConnecte$ = new BehaviorSubject(JSON.parse(localStorage.getItem(CLE_ID_UTILISATEUR) || 'null'));
+    this.utilisateurConnecte$ = this.idUtilisateurConnecte$.pipe(
+      switchMap(idUtilisateur => idUtilisateur === null ? of(null) : this.http.get<UtilisateurPrive>(URL_UTILISATEUR(idUtilisateur))),
+      shareReplay(1)
+    );
+    this.occasions$ = this.idUtilisateurConnecte$.pipe(
+      switchMap(idUtilisateur => idUtilisateur === null ? of(null) : this.http.get<Occasion[]>(`${URL_LISTE_OCCASIONS}?idParticipant=${idUtilisateur}`)),
+      shareReplay(1)
+    );
   }
 
-  ajouteIdee(idUtilisateur: number, description: string) {
-    return this.http.post(URL_IDEES, { idUtilisateur, idAuteur: this.idUtilisateur, description }).toPromise();
+  async ajouteIdee(idUtilisateur: number, description: string) {
+    return firstValueFrom(this.http.post(URL_IDEES, { idUtilisateur, idAuteur: await this.getIdUtilisateurConnecte(), description }));
   }
 
   async connecte(identifiant: string, mdp: string) {
-    const { token, utilisateur } = await this.http.post<PostConnexionDTO>(URL_CONNEXION, { identifiant, mdp }).toPromise();
-    this.idUtilisateur = utilisateur.id;
-    this.token = token;
+    const { token, utilisateur } = await firstValueFrom(this.http.post<PostConnexionDTO>(URL_CONNEXION, { identifiant, mdp }));
+    localStorage.setItem(CLE_ID_UTILISATEUR, JSON.stringify(utilisateur.id));
     localStorage.setItem(CLE_TOKEN, token);
-    localStorage.setItem(CLE_UTILISATEUR, JSON.stringify(utilisateur));
-    this.utilisateurConnecte$.next(utilisateur);
+    // this.token doit être set avant de publier l'utilisateur sur l'observable
+    // (ce qui peut déclencher des appels réseaux nécessitant le token)
+    this.token = token;
+    this.idUtilisateurConnecte$.next(utilisateur.id);
   }
 
   async deconnecte() {
-    delete this.token;
-    delete this.idUtilisateur;
+    this.token = null;
+    localStorage.removeItem(CLE_ID_UTILISATEUR);
     localStorage.removeItem(CLE_LISTE_OCCASIONS);
     localStorage.removeItem(CLE_TOKEN);
-    localStorage.removeItem(CLE_UTILISATEUR);
-    this.occasions$.next(null);
-    this.utilisateurConnecte$.next(null);
+    this.idUtilisateurConnecte$.next(null);
   }
-  
+
   admin() {
-    return this.utilisateurConnecte$.pipe(
-      first(),
-      map(u => u.admin),
-    ).toPromise();
+    return firstValueFrom(
+      this.utilisateurConnecte$.pipe(
+        first(),
+        map(u => !!u?.admin),
+      )
+    );
   }
-  
-  estConnecte() {
-    return this.utilisateurConnecte$.pipe(first()).toPromise();
+
+  async estConnecte() {
+    return await firstValueFrom(this.idUtilisateurConnecte$) !== null;
   }
-  
+
   estUrlBackend(url: string): boolean {
     return !!url.match(new RegExp(`^${URL_API}`));
   }
@@ -134,40 +141,35 @@ export class BackendService {
     return this.http.get<IdeesPour>(`${URL_IDEES}?idUtilisateur=${idUtilisateur}&supprimees=0`);
   }
 
-  getOccasion(idOccasion: number) {
-    return this.http.get<Occasion>(URL_OCCASION(idOccasion)).pipe(first()).toPromise();
+  async getIdUtilisateurConnecte() {
+    const idUtilisateurConnecte = await firstValueFrom(this.idUtilisateurConnecte$);
+    if (idUtilisateurConnecte == null) throw Error("Aucun utilisateur connecté");
+    return idUtilisateurConnecte;
   }
 
-  getOccasions() {
-    return this.http.get<Occasion[]>(`${URL_LISTE_OCCASIONS}?idParticipant=${this.idUtilisateur}`).pipe(
-      map(
-        occasions => {
-          occasions = occasions.sort((a, b) => a.date.localeCompare(b.date));
-          this.occasions$.next(occasions);
-          localStorage.setItem(CLE_LISTE_OCCASIONS, JSON.stringify(occasions));
-          return occasions;
-        }
-      )
-    ).toPromise();
+  getOccasion(idOccasion: number) {
+    return this.http.get<Occasion>(URL_OCCASION(idOccasion)).pipe(first()).toPromise();
   }
 
   getAbsUrlApi() {
     return new URL(URL_API, this.document.baseURI).href;
   }
 
-  getUtilisateur$() {
-    return this.http.get<UtilisateurPrive>(URL_UTILISATEUR(this.idUtilisateur));
+  async getUtilisateurConnecte() {
+    const utilisateurConnecte = await firstValueFrom(this.utilisateurConnecte$);
+    if (utilisateurConnecte == null) throw Error("Aucun utilisateur connecté");
+    return utilisateurConnecte;
   }
 
-  modifieUtilisateur(utilisateur: Partial<UtilisateurPrive>) {
-    return this.http.put(URL_UTILISATEUR(this.idUtilisateur), utilisateur).toPromise();
+  async modifieUtilisateur(utilisateur: Partial<UtilisateurPrive>) {
+    return firstValueFrom(this.http.put(URL_UTILISATEUR(await this.getIdUtilisateurConnecte()), utilisateur));
   }
 
   notifieErreurHTTP(error: HttpErrorResponse) {
-    // Les erreurs applicatives sont sensées être prises en compte
+    // Les erreurs applicatives sont censées être prises en compte
     if (error.status === 400) return;
 
-    this.erreur$.next(error.error.message || (`${error.status} ${error.statusText}`));
+    this.erreur$.next(error.message || (`${error.status} ${error.statusText}`));
   }
 
   notifieSuccesHTTP() {
@@ -175,6 +177,6 @@ export class BackendService {
   }
 
   supprimeIdee(idIdee: number) {
-    return this.http.post(URL_SUPPRESSION_IDEE(idIdee), undefined).toPromise();
+    return firstValueFrom(this.http.post(URL_SUPPRESSION_IDEE(idIdee), undefined));
   }
 }

@@ -1,4 +1,4 @@
-<ng-container *ngIf="listeIdees$|async as li">
+<ng-container *ngIf="listeIdees$|async as li; else veuillezPatienter">
   <div class="container">
     <div class="row justify-content-around align-items-center">
       <h1 [ngSwitch]="li.estPourMoi" class="col-10">
@@ -30,7 +30,7 @@
         </div>
       </div>
     </div>
-  
+
     <div class="row" *ngIf="(!li.estPourMoi) && (li.autresIdees.length > 0)">
       <div class="col-12">
         <h2>Proposées par d'autres que {{li.utilisateur.nom}}</h2>
@@ -39,7 +39,8 @@
         </div>
         <div class="card-columns">
           <div *ngFor="let i of li.autresIdees" class="card">
-            <div class="card-header"><span class="auteur">{{i.estDeMoi ? 'Vous' : i.auteur.nom}}</span> le {{i.dateProposition}}</div>
+            <div class="card-header"><span class="auteur">{{i.estDeMoi ? 'Vous' : i.auteur.nom}}</span> le
+              {{i.dateProposition}}</div>
             <div class="card-body">
               <h3 class="card-title">{{i.description}}</h3>
               <button *ngIf="i.estDeMoi" (click)="supprime(i.id)" class="btn btn-danger btnSupprimer">Supprimer</button>
@@ -48,7 +49,7 @@
         </div>
       </div>
     </div>
-  
+
     <div class="row">
       <div class="col-12">
         <form [formGroup]="formAjout" (ngSubmit)="ajoute()">
@@ -62,5 +63,9 @@
     </div>
   </div>
 </ng-container>
+
+<ng-template #veuillezPatienter>
+  <h1>Veuillez patienter...</h1>
+</ng-template>
 
 <div *ngIf="erreurAjoutSuppression" class="alert alert-danger">{{erreurAjoutSuppression}}</div>

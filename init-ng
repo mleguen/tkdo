@@ -1,0 +1,88 @@
+#!/usr/bin/env bash
+
+# Clean up the front folder while keeping the docker-compose stuff
+[ -d front/docker ] && mv front/docker front-docker
+[ -f front/docker-compose.yml ] && mv front/docker-compose.yml front-docker-compose.yml
+rm -rf front && mkdir front
+[ -d front-docker ] && mv front-docker front/docker
+[ -f front-docker-compose.yml ] && mv front-docker-compose.yml front/docker-compose.yml
+
+# npm & ng setup
+docker-compose build npm
+./npm install @angular/cli
+
+# ng fails when package.json already exists
+rm front/package*.json
+
+./ng new tkdo-front --defaults --directory=. --routing --skip-git --style=scss
+./ng add @ng-bootstrap/ng-bootstrap --defaults --skip-confirmation
+./ng add @angular-eslint/schematics --defaults --skip-confirmation
+./ng add @cypress/schematic --defaults --skip-confirmation
+
+# Use local-cypress to ensure Cypress types are defined but not global,
+# to prevent them from breaking Jasmine unit tests
+# (see https://github.com/cypress-io/cypress/issues/7552#issuecomment-1842066053)
+./npm install --save-dev local-cypress
+
+ANGULAR_JSON=$(cat front/angular.json)
+PACKAGE_JSON=$(cat front/package.json)
+TSCONFIG_JSON=$(sed -e '/^\w*\/\*.*/d' front/tsconfig.json)
+CYPRESS_TSCONFIG_JSON=$(cat front/cypress/tsconfig.json)
+
+# A bug in @cypress/schematic:component prevents ng generate components from generating scss
+COMPONENT_SCHEMATICS_TO_DUPLICATE=$(jq <<<$ANGULAR_JSON '.projects."tkdo-front".schematics."@schematics/angular:component"')
+ANGULAR_JSON=$(jq <<<$ANGULAR_JSON '.projects."tkdo-front".schematics."@cypress/schematic:component" = '"$COMPONENT_SCHEMATICS_TO_DUPLICATE")
+
+# Force Karma unit tests to run with chrome headless, and without watch (as watch does not work inside docker)
+ANGULAR_JSON=$(jq <<<$ANGULAR_JSON '.projects."tkdo-front".architect.test.options.browsers = "ChromeHeadless"')
+ANGULAR_JSON=$(jq <<<$ANGULAR_JSON '.projects."tkdo-front".architect.test.options.watch = false')
+
+# Fix a bug in default e2e test not looking for the right punctuation
+sed -e 's/app is running!/app is running./' -i front/cypress/e2e/spec.cy.ts
+
+# Force Cypress component & e2e tests to run without watch (as watch does not work inside docker)
+ANGULAR_JSON=$(jq <<<$ANGULAR_JSON '.projects."tkdo-front".architect.ct.options.watch = false')
+ANGULAR_JSON=$(jq <<<$ANGULAR_JSON '.projects."tkdo-front".architect.e2e.options.watch = false')
+
+# Cypress still complains when baseUrl is not set
+TSCONFIG_JSON=$(jq <<<$TSCONFIG_JSON '.compilerOptions.baseUrl = "./"')
+
+# Do not globally load Cypress types in e2e tests (cf. comment about installing local-cypress above)
+CYPRESS_TSCONFIG_JSON=$(jq <<<$CYPRESS_TSCONFIG_JSON 'del(.compilerOptions.types[]|select(. == "cypress"))')
+
+# Add npm run ct
+PACKAGE_JSON=$(jq <<<$PACKAGE_JSON '.scripts.ct = "ng run tkdo-front:ct"')
+
+cat <<<$ANGULAR_JSON > front/angular.json
+cat <<<$PACKAGE_JSON > front/package.json
+cat <<<$TSCONFIG_JSON > front/tsconfig.json
+cat <<<$CYPRESS_TSCONFIG_JSON > front/cypress/tsconfig.json
+
+# Ensure e2e tests use local Cypress types (cf. comment about installing local-cypress above)
+sed -E '1i import { cy, describe, it } from '\''local-cypress'\'\\n -i front/cypress/e2e/spec.cy.ts
+# Ensure cy.mount is built into local Cypress types for component tests (cf. comment about installing local-cypress above)
+sed -e '/import .* from '\''cypress\/angular'\''/a import { Cypress } from '\''local-cypress'\' -i front/cypress/support/component.ts
+
+./ng generate environments
+
+for c in admin connexion deconnexion header liste-idees liste-occasions occasion profil; do
+    # Another bug in @cypress/schematic:component prevents the base Angular component from working without --standalone
+    # (it doesn't know the app is standalone and therefore looks for a module ng new no longer creates - apps are now standalone by default)
+    ./ng generate component $c --standalone
+    # Ensure component tests use local Cypress types (cf. comment about installing local-cypress above)
+    sed -E '1i import { cy, describe, it } from '\''local-cypress'\'\\n -i front/src/app/$c/$c.component.cy.ts
+done
+
+for i in erreur-backend auth-backend dev-backend; do
+    ./ng generate interceptor $i --no-functional
+done
+
+./ng generate service backend
+
+for g in admin connexion; do
+    ./ng generate guard $g --implements=CanActivate
+done
+
+./npm test
+./npm run ct
+./npm run e2e

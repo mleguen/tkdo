@@ -1,19 +1,18 @@
-import { Injectable } from '@angular/core';
-import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, UrlTree, Router } from '@angular/router';
-import { Observable } from 'rxjs';
+import { Injectable, inject } from '@angular/core';
+import { CanActivateFn } from '@angular/router';
+
 import { BackendService } from './backend.service';
 
-@Injectable({
-  providedIn: 'root'
-})
-export class AdminGuard implements CanActivate {
+@Injectable()
+export class AdminGuard {
   constructor(
     private readonly backend: BackendService,
   ) { }
 
-  canActivate(
-    route: ActivatedRouteSnapshot,
-    state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
-    return this.backend.admin();
-  } 
+  async canActivate() {
+    const admin = await this.backend.admin();
+    return !!admin;
+  }
 }
+
+export const adminGuard: CanActivateFn = () => inject(AdminGuard).canActivate();

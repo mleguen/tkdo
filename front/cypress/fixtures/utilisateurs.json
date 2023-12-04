@@ -1,0 +1,17 @@
+{
+  "soi": {
+    "identifiant": "alice",
+    "mdp": "mdpalice",
+    "nom": "Alice"
+  },
+  "quiRecoitDeSoi": {
+    "identifiant": "charlie",
+    "mdp": "mdpcharlie",
+    "nom": "Charlie"
+  },
+  "tiers": {
+    "identifiant": "bob",
+    "mdp": "mdpbob",
+    "nom": "Bob"
+  }
+}

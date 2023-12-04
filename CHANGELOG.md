@@ -6,6 +6,7 @@
   - api : n'envoie les notifs instantanées qu'aux personnes concernées
 - tâches techniques :
   - api : montée de version des dépendances
+  - front : montée de version des dépendances
 
 ## V1.4.0 (25/11/2023)
 

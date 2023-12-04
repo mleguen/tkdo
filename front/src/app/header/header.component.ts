@@ -1,18 +1,27 @@
+import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { Router, Event, NavigationEnd } from '@angular/router';
+import { Router, Event, NavigationEnd, RouterModule } from '@angular/router';
+import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { filter, map } from 'rxjs/operators';
+
 import { BackendService } from '../backend.service';
 
 @Component({
   selector: 'app-header',
+  standalone: true,
+  imports: [
+    CommonModule,
+    RouterModule,
+    NgbDropdownModule
+  ],
   templateUrl: './header.component.html',
-  styleUrls: ['./header.component.scss']
+  styleUrl: './header.component.scss'
 })
 export class HeaderComponent {
   occasions$ = this.backend.occasions$.pipe(map(occasions => occasions?.slice(0).reverse()));
   utilisateurConnecte$ = this.backend.utilisateurConnecte$;
-  menuActif: string;
-  idOccasionActive: number;
+  menuActif = '';
+  idOccasionActive = 0;
 
   constructor(
     private readonly backend: BackendService,

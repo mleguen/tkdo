@@ -1,10 +1,16 @@
 import { Component, OnInit } from '@angular/core';
+import { RouterModule } from '@angular/router';
+
 import { BackendService } from '../backend.service';
 
 @Component({
   selector: 'app-deconnexion',
+  standalone: true,
+  imports: [
+    RouterModule,
+  ],
   templateUrl: './deconnexion.component.html',
-  styleUrls: ['./deconnexion.component.scss']
+  styleUrl: './deconnexion.component.scss'
 })
 export class DeconnexionComponent implements OnInit {
 

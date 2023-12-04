@@ -25,7 +25,7 @@ docker-compose logs -f
 
 ```bash
 docker-compose up -d front
-docker-compose run --rm npm run test-e2e
+./npm run e2e
 ```
 
 > Note : ces tests de bout en bout sont les tests d'intégration front,
@@ -37,42 +37,72 @@ docker-compose run --rm npm run test-e2e
 > docker-compose up -d slim-cli
 > ```
 
+## Prérequis globaux
+
+- docker et docker-compose installés
+- utilisateur membre du groupe `docker` (pour exécuter docker et docker-compose sans `sudo`)
+- id d'utilisateur (`id -u`) et de groupe (`id -g`) défini dans le `.env` à la racine du projet, si différents de 1000
+  (pour s'assurer que les différents conteneurs s'exécutent en tant que l'utilisateur pour avoir les mêmes droits)
+
 ## Front
+
+### Outils
+
+Les différents outils front (cypress, npm, ng) s'exécutent dans le conteneur docker `npm`, de manière à ne pas nécessiter l'installation de dépendances sur le poste du développeur, et maîtriser les versions utilisées.
+
+Des scripts sont disponibles à la racine du projet pour simplifier leur appel via docker : `./cypress`, `./ng`, `./npm`.
+Ces scripts s'exécutent directement dans le contexte du répertoire `front`.
 
 ### Installation des dépendances
 
-```sh
-docker-compose run --rm npm install
+```bash
+./npm install
 ```
 
-### Tests unitaires
+### Tests
 
 - tests unitaires :
 
   ```bash
-  docker-compose run --rm npm test
+  ./npm test
   ```
+
+  > *A faire* : les tests unitaires sont minimalistes (instanciation des singleton).
+  > Une partie des tests faits en e2e devrait être repassée en tests unitaires
+
+- tests de composants :
+
+  ```bash
+  ./npm run ct
+  ```
+
+  > *A faire* : les tests de composants sont minimalistes (montage des composants).
+  > Une partie des tests faits en e2e devrait être repassée en tests de composants
 
 - tests d'intégration :
 
   ```bash
-  docker-compose run --rm npm run test-int
+  ./npm run e2e
   ```
+
+  ou pour n'exécuter que certains fichiers de tests :
+
+  ```bash
+  ./npm run e2e --- -spec '**/liste-idees.cy.ts'
+  ```
+
+  (pour n'exécuter qu'une partie des tests au sein d'un fichier,
+  remplacer `it(...)` par `it.only()` dans le fichier pour n'exécuter que certains tests,
+  ou `it.skip()` pour au contraire passer certains tests)
 
   > Notes :
   > - ces tests d'intégration s'exécutent sur le serveur de développement Angular,
   >   avec interception des requêtes destinées à l'API (voir ci-dessous)
-  > - si les tests d'intégration échouent sur une erreur _"This version of ChromeDriver only supports Chrome version XX"_,
-  >   forcer la reconstruction du conteneur npm pour qu'il récupère une version de Chrome plus récente :
-  >   
-  >     ```bash
-  >     docker-compose build --no-cache npm
-  >     ```
 
 ### Utiliser le serveur de développement Angular seul
 
 ```bash
-docker-compose run --rm -p 4200:4200 npm start
+./npm start
 ```
 
 Puis ouvrez votre navigateur sur http://localhost:4200/
@@ -81,6 +111,21 @@ quand l'invite vous le demande.
 Comme le serveur de développement Angular est lancé sans `--prod`,
 les requêtes destinées à l'API sont interceptées et bouchonnées
 (cf. [front/src/app/dev-backend.interceptor.ts](./front/src/app/dev-backend.interceptor.ts)).
+
+### Montées de version de node, angular et des autres dépendances
+
+Procédure à suivre pour que le projet continue d'utiliser angular de la manière la plus standard possible de version en version :
+
+- passer sur la branche `ngskel`
+- monter la version de l'image `node` sur laquelle est basée le conteneur `npm` à la dernière version stable
+- reconstruire le conteneur `npm`
+- lancer `./init-ng`, en l'adaptant si nécessaire aux nouveautés de node et d'angular
+- commit & push sur `ngskel`
+- cherry-pick `ngskel` dans `master` et :
+  - supprimer le répertoire `node_modules` et le `package.lock`
+  - repartir du `package.json` de la branche `ngskel`
+  - réinstaller les autres dépendances avec `./npm install` (pour qu'elles soient dans la dernière version disponible avec cette version de node)
+  - résoudre les conflits pour adapter le code du front aux nouveautés de node, d'angular et des autres dépendances
 
 ## API
 

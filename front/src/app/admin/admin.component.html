@@ -1,452 +1,462 @@
-<h1>Administration</h1>
+<ng-container *ngIf="utilisateurConnecte$|async as utilisateurConnecte; else veuillezPatienter">
+  <h1>Administration</h1>
 
+  <h2>Connexion à l'API en ligne de commande</h2>
 
-<h2>Connexion à l'API en ligne de commande</h2>
+  <h3>En utilisant le token courant</h3>
 
-<h3>En utilisant le token courant</h3>
+  <p>L'API est accessible en ligne de commande, avec la commande <a href="https://curl.se/docs/manpage.html">curl</a>,
+    en vous authentifiant avec le token d'authentification ci-dessous (valable uniquement pour votre session en cours) :
+  </p>
 
-<p>L'API est accessible en ligne de commande, avec la commande <a href="https://curl.se/docs/manpage.html">curl</a>,
-en vous authentifiant avec le token d'authentification ci-dessous (valable uniquement pour votre session en cours) :</p>
+  <pre>
+  {{token}}
+  </pre>
 
-<pre>
-{{token}}
-</pre>
+  <h3>En créant un nouveau token</h3>
 
-<h3>En créant un nouveau token</h3>
+  <p>Vous pouvez également créer un nouveau token :</p>
 
-<p>Vous pouvez également créer un nouveau token :</p>
+  <pre><samp>
+  curl \
+  -d identifiant='utilisatrice01' \
+  -d mdp='********' \
+  -X POST {{urlApi}}/connexion
+  </samp></pre>
 
-<pre><samp>
-curl \
--d identifiant='utilisatrice01' \
--d mdp='********' \
--X POST {{urlApi}}/connexion
-</samp></pre>
+  <p>Renvoie :</p>
 
-<p>Renvoie :</p>
-
-<pre><samp>
-{{'{'}}
-  "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOjczLCJleHAiOjE2MDYwODM0MjIsImFkbSI6dHJ1ZX0.UTliyT--bAJfOxMTL2i1w_ufhRwhVW8ExjW3Z2XMiDHuT5d16lx7fhFapvUBy8sIEUoN9Y7iIWCUoZXm7hJUNjlikq5u6jBQjnqUvophLwmP1cJAk6Mqwtnzncc2yuGjDNeB0_7VrcoyyZxUiPxtuE_Kr6bABQ7AoUyMJDxufxA",
-  "utilisateur": {{'{'}}
-    "id": {{idUtilisateur}},
-    "nom": "Alice",
-    "admin": true
-  }
-}
-</samp></pre>
-
-
-<h2>Utilisateurs</h2>
-
-<h3>Lister les utilisateurs</h3>
-
-<pre><samp>
-curl -u {{token}}: \
-{{urlApi}}/utilisateur
-</samp></pre>
-
-<p>Renvoie :</p>
-
-<pre><samp>
-[
+  <pre><samp>
   {{'{'}}
-    "email": "admin@tkdo.org",
+    "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOjczLCJleHAiOjE2MDYwODM0MjIsImFkbSI6dHJ1ZX0.UTliyT--bAJfOxMTL2i1w_ufhRwhVW8ExjW3Z2XMiDHuT5d16lx7fhFapvUBy8sIEUoN9Y7iIWCUoZXm7hJUNjlikq5u6jBQjnqUvophLwmP1cJAk6Mqwtnzncc2yuGjDNeB0_7VrcoyyZxUiPxtuE_Kr6bABQ7AoUyMJDxufxA",
+    "utilisateur": {{'{'}}
+      "id": {{utilisateurConnecte.id}},
+      "nom": "Alice",
+      "admin": true
+    {{'}'}}
+  {{'}'}}
+  </samp></pre>
+
+
+  <h2>Utilisateurs</h2>
+
+  <h3>Lister les utilisateurs</h3>
+
+  <pre><samp>
+  curl -u {{token}}: \
+  {{urlApi}}/utilisateur
+  </samp></pre>
+
+  <p>Renvoie :</p>
+
+  <pre><samp>
+  [
+    {{'{'}}
+      "email": "admin{{'@'}}tkdo.org",
+      "admin": true,
+      "genre": "M",
+      "id": {{utilisateurConnecte.id}},
+      "identifiant": "admin",
+      "nom": "Administrateur",
+      "prefNotifIdees": "N"
+    {{'}'}}
+  ]
+  </samp></pre>
+
+  <h3>Créer un nouvel utilisateur</h3>
+
+  <pre><samp>
+  curl -u {{token}}: \
+  -d identifiant='utilisatrice01' \
+  -d email='utilisatrice01{{'@'}}tkdo.org' \
+  -d nom='Utilisatrice 1' \
+  -d genre=F \
+  -d admin=0 \
+  -d prefNotifIdees=N \
+  -X POST {{urlApi}}/utilisateur
+  </samp></pre>
+
+  <p>Renvoie :</p>
+
+  <pre><samp>
+  {{'{'}}
+    "email": "utilisatrice01{{'@'}}tkdo.org",
+    "admin": false,
+    "genre": "F",
+    "id": 71,
+    "identifiant": "utilisatrice01",
+    "nom": "Utilisatrice 1",
+    "prefNotifIdees": "N"
+  {{'}'}}
+  </samp></pre>
+
+  <div class="alert alert-primary" role="alert">
+    Note : le mot de passe est généré automatiquement et envoyé par email à l'utilisateur.
+  </div>
+
+  <h3>Afficher un utilisateur</h3>
+
+  <pre><samp>
+  curl -u {{token}}: \
+  {{urlApi}}/utilisateur/{{utilisateurConnecte.id}}
+  </samp></pre>
+
+  <p>Renvoie :</p>
+
+  <pre><samp>
+  {{'{'}}
+    "email": "admin{{'@'}}tkdo.org",
     "admin": true,
     "genre": "M",
-    "id": {{idUtilisateur}},
+    "id": 70,
     "identifiant": "admin",
     "nom": "Administrateur",
     "prefNotifIdees": "N"
-  }
-]
-</samp></pre>
+  {{'}'}}
+  </samp></pre>
 
-<h3>Créer un nouvel utilisateur</h3>
+  <h3>Modifier un utilisateur</h3>
 
-<pre><samp>
-curl -u {{token}}: \
--d identifiant='utilisatrice01' \
--d email='utilisatrice01@tkdo.org' \
--d nom='Utilisatrice 1' \
--d genre=F \
--d admin=0 \
--d prefNotifIdees=N \
--X POST {{urlApi}}/utilisateur
-</samp></pre>
+  <pre><samp>
+  curl -u {{token}}: \
+  -d identifiant='admin2' \
+  -d email='admin2{{'@'}}tkdo.org' \
+  -d mdp='Akjunz12' \
+  -d nom='Administrateur 2' \
+  -d genre=M \
+  -d admin=1 \
+  -d prefNotifIdees=I \
+  -X PUT {{urlApi}}/utilisateur/{{utilisateurConnecte.id}}
+  </samp></pre>
 
-<p>Renvoie :</p>
+  <p>Renvoie :</p>
 
-<pre><samp>
-{{'{'}}
-  "email": "utilisatrice01@tkdo.org",
-  "admin": false,
-  "genre": "F",
-  "id": 71,
-  "identifiant": "utilisatrice01",
-  "nom": "Utilisatrice 1",
-  "prefNotifIdees": "N"
-}
-</samp></pre>
+  <pre><samp>
+  {{'{'}}
+    "email": "admin2{{'@'}}tkdo.org",
+    "admin": true,
+    "genre": "M",
+    "id": {{utilisateurConnecte.id}},
+    "identifiant": "admin2",
+    "nom": "Administrateur 2",
+    "prefNotifIdees": "I"
+  {{'}'}}
+  </samp></pre>
 
-<div class="alert alert-primary" role="alert">
-  Note : le mot de passe est généré automatiquement et envoyé par email à l'utilisateur.
-</div>
+  <div class="alert alert-primary" role="alert">
+    Note 1 : tous les champs en entrée sont facultatifs.
+  </div>
 
-<h3>Afficher un utilisateur</h3>
+  <div class="alert alert-primary" role="alert">
+    Note 2 : même un administrateur ne peut pas modifier le mot de passe d'un autre utilisateur.
+  </div>
 
-<pre><samp>
-curl -u {{token}}: \
-{{urlApi}}/utilisateur/{{idUtilisateur}}
-</samp></pre>
+  <div class="alert alert-primary" role="alert">
+    Note 3 : les champs doivent être URL encodés (<code>+</code> doit être remplacé par <code>%2B</code>, etc).
+  </div>
 
-<p>Renvoie :</p>
+  <h3>Réinitialiser le mot de passe d'un utilisateur</h3>
 
-<pre><samp>
-{{'{'}}
-  "email": "admin@tkdo.org",
-  "admin": true,
-  "genre": "M",
-  "id": 70,
-  "identifiant": "admin",
-  "nom": "Administrateur",
-  "prefNotifIdees": "N"
-}
-</samp></pre>
+  <pre><samp>
+  curl -u {{token}}: \
+  -X POST {{urlApi}}/utilisateur/{{utilisateurConnecte.id}}/reinitmdp
+  </samp></pre>
 
-<h3>Modifier un utilisateur</h3>
+  <p>Renvoie :</p>
 
-<pre><samp>
-curl -u {{token}}: \
--d identifiant='admin2' \
--d email='admin2@tkdo.org' \
--d mdp='Akjunz12' \
--d nom='Administrateur 2' \
--d genre=M \
--d admin=1 \
--d prefNotifIdees=I \
--X PUT {{urlApi}}/utilisateur/{{idUtilisateur}}
-</samp></pre>
+  <pre><samp>
+  {{'{'}}
+    "email": "utilisatrice01{{'@'}}tkdo.org",
+    "admin": false,
+    "genre": "F",
+    "id": 71,
+    "identifiant": "utilisatrice01",
+    "nom": "Utilisatrice 1",
+    "prefNotifIdees": "N"
+  {{'}'}}
+  </samp></pre>
 
-<p>Renvoie :</p>
+  <div class="alert alert-primary" role="alert">
+    Note : comme lors de la création d'un nouvel utilisateur,
+    le mot de passe est généré automatiquement et envoyé par email à l'utilisateur.
+  </div>
 
-<pre><samp>
-{{'{'}}
-  "email": "admin2@tkdo.org",
-  "admin": true,
-  "genre": "M",
-  "id": {{idUtilisateur}},
-  "identifiant": "admin2",
-  "nom": "Administrateur 2",
-  "prefNotifIdees": "I"
-}
-</samp></pre>
+  <h3>Lister les exclusions d'un utilisateur</h3>
 
-<div class="alert alert-primary" role="alert">
-  Note 1 : tous les champs en entrée sont facultatifs.
-</div>
+  <p>Les exclusions permettent de définir à qui un utilisateur ne doit pas offrir de cadeaux (conjoint, etc.)</p>
 
-<div class="alert alert-primary" role="alert">
-  Note 2 : même un administrateur ne peut pas modifier le mot de passe d'un autre utilisateur.
-</div>
+  <pre><samp>
+  curl -u {{token}}: \
+  {{urlApi}}/utilisateur/{{utilisateurConnecte.id}}/exclusion
+  </samp></pre>
 
-<div class="alert alert-primary" role="alert">
-  Note 3 : les champs doivent être URL encodés (<code>+</code> doit être remplacé par <code>%2B</code>, etc).
-</div>
+  <p>Renvoie :</p>
 
-<h3>Réinitialiser le mot de passe d'un utilisateur</h3>
+  <pre><samp>
+  [
+    {{'{'}}
+      "quiNeDoitPasRecevoir": {{'{'}}
+        "genre": "F",
+        "id": 71,
+        "nom": "Utilisatrice 1"
+      {{'}'}}
+    {{'}'}}
+  ]
+  </samp></pre>
 
-<pre><samp>
-curl -u {{token}}: \
--X POST {{urlApi}}/utilisateur/{{idUtilisateur}}/reinitmdp
-</samp></pre>
+  <h3>Ajouter une nouvelle exclusion pour un utilisateur</h3>
 
-<p>Renvoie :</p>
+  <pre><samp>
+  curl -u {{token}}: \
+  -d idQuiNeDoitPasRecevoir=71 \
+  -X POST {{urlApi}}/utilisateur/{{utilisateurConnecte.id}}/exclusion
+  </samp></pre>
 
-<pre><samp>
-{{'{'}}
-  "email": "utilisatrice01@tkdo.org",
-  "admin": false,
-  "genre": "F",
-  "id": 71,
-  "identifiant": "utilisatrice01",
-  "nom": "Utilisatrice 1",
-  "prefNotifIdees": "N"
-}
-</samp></pre>
+  <p>Renvoie :</p>
 
-<div class="alert alert-primary" role="alert">
-  Note : comme lors de la création d'un nouvel utilisateur,
-  le mot de passe est généré automatiquement et envoyé par email à l'utilisateur.
-</div>
-
-<h3>Lister les exclusions d'un utilisateur</h3>
-
-<p>Les exclusions permettent de définir à qui un utilisateur ne doit pas offrir de cadeaux (conjoint, etc.)</p>
-
-<pre><samp>
-curl -u {{token}}: \
-{{urlApi}}/utilisateur/{{idUtilisateur}}/exclusion
-</samp></pre>
-
-<p>Renvoie :</p>
-
-<pre><samp>
-[
+  <pre><samp>
   {{'{'}}
     "quiNeDoitPasRecevoir": {{'{'}}
       "genre": "F",
       "id": 71,
       "nom": "Utilisatrice 1"
-    }
-  }
-]
-</samp></pre>
-
-<h3>Ajouter une nouvelle exclusion pour un utilisateur</h3>
-
-<pre><samp>
-curl -u {{token}}: \
--d idQuiNeDoitPasRecevoir=71 \
--X POST {{urlApi}}/utilisateur/{{idUtilisateur}}/exclusion
-</samp></pre>
-
-<p>Renvoie :</p>
-
-<pre><samp>
-{{'{'}}
-  "quiNeDoitPasRecevoir": {{'{'}}
-    "genre": "F",
-    "id": 71,
-    "nom": "Utilisatrice 1"
-  }
-}
-</samp></pre>
+    {{'}'}}
+  {{'}'}}
+  </samp></pre>
 
 
-<h2>Occasions</h2>
+  <h2>Occasions</h2>
 
-<h3>Lister les occasions</h3>
+  <h3>Lister les occasions</h3>
 
-<pre><samp>
-curl -u {{token}}: \
-{{urlApi}}/occasion
-</samp></pre>
+  <pre><samp>
+  curl -u {{token}}: \
+  {{urlApi}}/occasion
+  </samp></pre>
 
-<p>Renvoie :</p>
+  <p>Renvoie :</p>
 
-<pre><samp>
-[
+  <pre><samp>
+  [
+    {{'{'}}
+      "id": 5,
+      "titre": "No\u00ebl 2019"
+    {{'}'}},
+    {{'{'}}
+      "id": 6,
+      "titre": "No\u00ebl 2020"
+    {{'}'}}
+  ]
+  </samp></pre>
+
+  <h3>Créer une nouvelle occasion</h3>
+
+  <pre><samp>
+  curl -u {{token}}: \
+  -d titre='Nouvelle occasion' \
+  -X POST {{urlApi}}/occasion
+  </samp></pre>
+
+  <p>Renvoie :</p>
+
+  <pre><samp>
   {{'{'}}
-    "id": 5,
-    "titre": "No\u00ebl 2019"
-  },
+    "id": 7,
+    "titre": "Nouvelle occasion"
+  {{'}'}}
+  </samp></pre>
+
+  <h3>Afficher une occasion</h3>
+
+  <pre><samp>
+  curl -u {{token}}: \
+  {{urlApi}}/occasion/6
+  </samp></pre>
+
+  <p>Renvoie :</p>
+
+  <pre><samp>
   {{'{'}}
     "id": 6,
-    "titre": "No\u00ebl 2020"
-  }
-]
-</samp></pre>
+    "titre": "No\u00ebl 2020",
+    "participants": [
+      {{'{'}}
+        "genre": "F",
+        "id": 83,
+        "nom": "Alice"
+      {{'}'}},
+      {{'{'}}
+        "genre": "M",
+        "id": 84,
+        "nom": "Bob"
+      {{'}'}},
+      {{'{'}}
+        "genre": "M",
+        "id": 85,
+        "nom": "Charlie"
+      {{'}'}}
+    ],
+    "resultats": [
+      {{'{'}}
+        "idQuiOffre": 84,
+        "idQuiRecoit": 83
+      {{'}'}},
+      {{'{'}}
+        "idQuiOffre": 85,
+        "idQuiRecoit": 84
+      {{'}'}},
+      {{'{'}}
+        "idQuiOffre": 83,
+        "idQuiRecoit": 85
+      {{'}'}}
+    ]
+  {{'}'}}
+  </samp></pre>
 
-<h3>Créer une nouvelle occasion</h3>
+  <h3>Modifier une occasion</h3>
 
-<pre><samp>
-curl -u {{token}}: \
--d titre='Nouvelle occasion' \
--X POST {{urlApi}}/occasion
-</samp></pre>
+  <pre><samp>
+  curl -u {{token}}: \
+  -d titre='Titre modifié' \
+  -X PUT {{urlApi}}/occasion/7
+  </samp></pre>
 
-<p>Renvoie :</p>
+  <p>Renvoie :</p>
 
-<pre><samp>
-{{'{'}}
-  "id": 7,
-  "titre": "Nouvelle occasion"
-}
-</samp></pre>
+  <pre><samp>
+  {{'{'}}
+    "id": 7,
+    "titre": "Titre modifi\u00e9"
+  {{'}'}}
+  </samp></pre>
 
-<h3>Afficher une occasion</h3>
+  <div class="alert alert-primary" role="alert">
+    Note : cette route ne permet pas de modifier les participants ou les résultats du tirage (voir plus bas).
+  </div>
 
-<pre><samp>
-curl -u {{token}}: \
-{{urlApi}}/occasion/6
-</samp></pre>
+  <h3>Ajouter un participant à une occasion</h3>
 
-<p>Renvoie :</p>
+  <pre><samp>
+  curl -u {{token}}: \
+  -d idParticipant={{utilisateurConnecte.id}} \
+  -X POST {{urlApi}}/occasion/7/participant
+  </samp></pre>
 
-<pre><samp>
-{{'{'}}
-  "id": 6,
-  "titre": "No\u00ebl 2020",
-  "participants": [
-    {{'{'}}
-      "genre": "F",
-      "id": 83,
-      "nom": "Alice"
-    },
-    {{'{'}}
-      "genre": "M",
-      "id": 84,
-      "nom": "Bob"
-    },
-    {{'{'}}
-      "genre": "M",
-      "id": 85,
-      "nom": "Charlie"
-    }
-  ],
-  "resultats": [
-    {{'{'}}
-      "idQuiOffre": 84,
-      "idQuiRecoit": 83
-    },
-    {{'{'}}
-      "idQuiOffre": 85,
-      "idQuiRecoit": 84
-    },
-    {{'{'}}
-      "idQuiOffre": 83,
-      "idQuiRecoit": 85
-    }
-  ]
-}
-</samp></pre>
+  <p>Renvoie :</p>
 
-<h3>Modifier une occasion</h3>
+  <pre><samp>
+  {{'{'}}
+    "genre": "F",
+    "id": {{utilisateurConnecte.id}},
+    "nom": "Alice"
+  {{'}'}}
+  </samp></pre>
 
-<pre><samp>
-curl -u {{token}}: \
--d titre='Titre modifié' \
--X PUT {{urlApi}}/occasion/7
-</samp></pre>
+  <h3>Lancer le tirage au sort pour une occasion</h3>
 
-<p>Renvoie :</p>
-
-<pre><samp>
-{{'{'}}
-  "id": 7,
-  "titre": "Titre modifi\u00e9"
-}
-</samp></pre>
-
-<div class="alert alert-primary" role="alert">
-  Note : cette route ne permet pas de modifier les participants ou les résultats du tirage (voir plus bas).
-</div>
-
-<h3>Ajouter un participant à une occasion</h3>
-
-<pre><samp>
-curl -u {{token}}: \
--d idParticipant={{idUtilisateur}} \
--X POST {{urlApi}}/occasion/7/participant
-</samp></pre>
-
-<p>Renvoie :</p>
-
-<pre><samp>
-{{'{'}}
-  "genre": "F",
-  "id": {{idUtilisateur}},
-  "nom": "Alice"
-}
-</samp></pre>
-
-<h3>Lancer le tirage au sort pour une occasion</h3>
-
-<p>
-  Cette route permet de lancer le tirage au sort pour une occasion à venir,
-  de manière à ce qu'aucun participant ne doive offrir de cadeau :
-</p>
-<ul>
-  <li>ni à quelqu'un de paramétré dans ses exclusions (par exemple : conjoint, etc.)</li>
-  <li>ni à quelqu'un à qui il a déjà offert un cadeau lors d'une occasion passée</li>
-</ul>
-
-<pre><samp>
-curl -u {{token}}: \
--d force=0 \
--d nbMaxIter=10 \
--X POST {{urlApi}}/occasion/6/tirage
-</samp></pre>
-
-<p>Renvoie :</p>
-
-<pre><samp>
-{{'{'}}
-  "id": 6,
-  "titre": "No\u00ebl 2020",
-  "participants": [
-    {{'{'}}
-      "genre": "F",
-      "id": 83,
-      "nom": "Alice"
-    },
-    {{'{'}}
-      "genre": "M",
-      "id": 84,
-      "nom": "Bob"
-    },
-    {{'{'}}
-      "genre": "M",
-      "id": 85,
-      "nom": "Charlie"
-    }
-  ],
-  "resultats": [
-    {{'{'}}
-      "idQuiOffre": 84,
-      "idQuiRecoit": 83
-    },
-    {{'{'}}
-      "idQuiOffre": 85,
-      "idQuiRecoit": 84
-    },
-    {{'{'}}
-      "idQuiOffre": 83,
-      "idQuiRecoit": 85
-    }
-  ]
-}
-</samp></pre>
-
-<div class="alert alert-primary" role="alert">
-  <p>Notes :</p>
+  <p>
+    Cette route permet de lancer le tirage au sort pour une occasion à venir,
+    de manière à ce qu'aucun participant ne doive offrir de cadeau :
+  </p>
   <ul>
-    <li>l'occasion ne doit pas être passée</li>
-    <li>
-      un tirage ne doit pas déjà avoir été fait pour l'occasion, même partiellement
-      (résultats soumis manuellement, par exemple - voir plus bas),
-      sauf si le paramètre optionnel <pre>force</pre> vaut <pre>1</pre> ou <pre>true</pre>.
-      Dans ce cas, le tirage précédent est effacé, et un nouveau tirage est lancé&nbsp;;
-    </li>
-    <li>
-      le paramètre optionnel <pre>nbMaxIter</pre> permet de spécifier
-      le nombre d'itérations souhaitées pour l'algorithme de tirage au sort (10 par défaut),
-      dans le cas, par exemple, où une précédente tentative de tirage aurait échoué.
-    </li>
+    <li>ni à quelqu'un de paramétré dans ses exclusions (par exemple : conjoint, etc.)</li>
+    <li>ni à quelqu'un à qui il a déjà offert un cadeau lors d'une occasion passée</li>
   </ul>
-</div>
 
-<h3>Ajouter manuellement un résultat à une occasion</h3>
+  <pre><samp>
+  curl -u {{token}}: \
+  -d force=0 \
+  -d nbMaxIter=10 \
+  -X POST {{urlApi}}/occasion/6/tirage
+  </samp></pre>
 
-<p>Cette route permet d'ajouter un à un les résultats d'un tirage au sort fait en dehors de l'application.</p>
+  <p>Renvoie :</p>
 
-<pre><samp>
-curl -u {{token}}: \
--d idQuiOffre={{idUtilisateur}} \
--d idQuiRecoit={{idUtilisateur+1}} \
--X POST {{urlApi}}/occasion/7/resultat
-</samp></pre>
+  <pre><samp>
+  {{'{'}}
+    "id": 6,
+    "titre": "No\u00ebl 2020",
+    "participants": [
+      {{'{'}}
+        "genre": "F",
+        "id": 83,
+        "nom": "Alice"
+      {{'}'}},
+      {{'{'}}
+        "genre": "M",
+        "id": 84,
+        "nom": "Bob"
+      {{'}'}},
+      {{'{'}}
+        "genre": "M",
+        "id": 85,
+        "nom": "Charlie"
+      {{'}'}}
+    ],
+    "resultats": [
+      {{'{'}}
+        "idQuiOffre": 84,
+        "idQuiRecoit": 83
+      {{'}'}},
+      {{'{'}}
+        "idQuiOffre": 85,
+        "idQuiRecoit": 84
+      {{'}'}},
+      {{'{'}}
+        "idQuiOffre": 83,
+        "idQuiRecoit": 85
+      {{'}'}}
+    ]
+  {{'}'}}
+  </samp></pre>
 
-<p>Renvoie :</p>
+  <div class="alert alert-primary" role="alert">
+    <p>Notes :</p>
+    <ul>
+      <li>l'occasion ne doit pas être passée</li>
+      <li>
+        un tirage ne doit pas déjà avoir été fait pour l'occasion, même partiellement
+        (résultats soumis manuellement, par exemple - voir plus bas),
+        sauf si le paramètre optionnel
+        <pre>force</pre> vaut
+        <pre>1</pre> ou
+        <pre>true</pre>.
+        Dans ce cas, le tirage précédent est effacé, et un nouveau tirage est lancé&nbsp;;
+      </li>
+      <li>
+        le paramètre optionnel
+        <pre>nbMaxIter</pre> permet de spécifier
+        le nombre d'itérations souhaitées pour l'algorithme de tirage au sort (10 par défaut),
+        dans le cas, par exemple, où une précédente tentative de tirage aurait échoué.
+      </li>
+    </ul>
+  </div>
 
-<pre><samp>
-{{'{'}}
-  "idQuiOffre": {{idUtilisateur}},
-  "idQuiRecoit": {{idUtilisateur+1}}
-}
-</samp></pre>
+  <h3>Ajouter manuellement un résultat à une occasion</h3>
 
-<div class="alert alert-primary" role="alert">
-  Note : chaque participant ne doit offrir et recevoir qu'une seule fois.
-</div>
+  <p>Cette route permet d'ajouter un à un les résultats d'un tirage au sort fait en dehors de l'application.</p>
+
+  <pre><samp>
+  curl -u {{token}}: \
+  -d idQuiOffre={{utilisateurConnecte.id}} \
+  -d idQuiRecoit={{utilisateurConnecte.id+1}} \
+  -X POST {{urlApi}}/occasion/7/resultat
+  </samp></pre>
+
+  <p>Renvoie :</p>
+
+  <pre><samp>
+  {{'{'}}
+    "idQuiOffre": {{utilisateurConnecte.id}},
+    "idQuiRecoit": {{utilisateurConnecte.id+1}}
+  {{'}'}}
+  </samp></pre>
+
+  <div class="alert alert-primary" role="alert">
+    Note : chaque participant ne doit offrir et recevoir qu'une seule fois.
+  </div>
+</ng-container>
+
+<ng-template #veuillezPatienter>
+  <h1>Veuillez patienter...</h1>
+</ng-template>

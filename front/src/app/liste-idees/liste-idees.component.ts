@@ -1,76 +1,82 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, Validators } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { Component } from '@angular/core';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { Observable, combineLatest, BehaviorSubject, of } from 'rxjs';
-import { switchMap, catchError, map, filter } from 'rxjs/operators';
+import moment from 'moment';
+import { BehaviorSubject, Observable, of } from 'rxjs';
+import { switchMap, catchError, map, combineLatestWith } from 'rxjs/operators';
+
 import { BackendService, IdeesPour, Idee, Genre } from '../backend.service';
-import * as moment from 'moment';
 
 @Component({
   selector: 'app-liste-idees',
+  standalone: true,
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+  ],
   templateUrl: './liste-idees.component.html',
-  styleUrls: ['./liste-idees.component.scss']
+  styleUrl: './liste-idees.component.scss'
 })
-export class ListeIdeesComponent implements OnInit {
+export class ListeIdeesComponent {
 
   Genre = Genre;
-  
+
   formAjout = this.fb.group({
     description: ['', Validators.required],
   });
-  erreurAjoutSuppression: string;
-  listeIdees$: Observable<IdeesAfficheesPour>;
+  erreurAjoutSuppression?: string;
+  listeIdees$: Observable<IdeesAfficheesPour | null>;
 
-  private idUtilisateur: number;
-  private actualisation$ = new BehaviorSubject(true);
+  protected idUtilisateur?: number;
+  protected actualise$ = new BehaviorSubject(true);
 
   constructor(
     private readonly fb: FormBuilder,
     private readonly backend: BackendService,
     private readonly route: ActivatedRoute,
-  ) { }
-
-  ngOnInit(): void {
-    this.listeIdees$ = combineLatest([
-      this.route.queryParamMap,
-      this.actualisation$      
-    ]).pipe(
-      switchMap(([queryParams]) => {
-        this.idUtilisateur = +queryParams.get('idUtilisateur');
+  ) {
+    // subscribe/unsubscribe automatiques par le template html
+    this.listeIdees$ = this.route.queryParamMap.pipe(
+      combineLatestWith(this.backend.utilisateurConnecte$, this.actualise$),
+      switchMap(([queryParams, utilisateurConnecte]) => {
+        if (!queryParams.has('idUtilisateur') || utilisateurConnecte === null) return of(null);
+        this.idUtilisateur = +(queryParams.get('idUtilisateur')!);
         return this.backend.getIdees(this.idUtilisateur).pipe(
           map(li => {
             let idees = li.idees.map(i => Object.assign({}, i, {
               dateProposition: moment(i.dateProposition, 'YYYY-MM-DDTHH:mm:ssZ').locale('fr').format('L à LT'),
-              estDeMoi: i.auteur.id === this.backend.idUtilisateur,
+              estDeMoi: i.auteur.id === utilisateurConnecte.id,
             }));
             return Object.assign({}, li, {
-              estPourMoi: li.utilisateur.id === this.backend.idUtilisateur,
+              estPourMoi: li.utilisateur.id === utilisateurConnecte.id,
               idees: idees.filter(i => i.auteur.id === this.idUtilisateur),
               autresIdees: idees.filter(i => i.auteur.id !== this.idUtilisateur),
             });
           }),
           // Les erreurs backend sont déjà affichées par AppComponent
-          catchError(() => of(undefined))
+          catchError(() => of(null))
         );
       })
     );
-    this.actualise();
   }
 
   actualise() {
-    this.actualisation$.next(true);
+    this.actualise$.next(true);
   }
 
   async ajoute() {
+    if (this.idUtilisateur === undefined) throw new Error("pas encore initialisé");
+
     const { description } = this.formAjout.value;
     try {
-      await this.backend.ajouteIdee(this.idUtilisateur, description);
+      await this.backend.ajouteIdee(this.idUtilisateur, description || '');
       this.erreurAjoutSuppression = undefined;
       this.formAjout.reset();
       this.actualise();
     }
     catch (err) {
-      this.erreurAjoutSuppression = err.message || 'ajout impossible';
+      this.erreurAjoutSuppression = (err instanceof Error ? err.message : undefined) || 'ajout impossible';
     }
   }
 
@@ -81,12 +87,13 @@ export class ListeIdeesComponent implements OnInit {
       this.actualise();
     }
     catch (err) {
-      this.erreurAjoutSuppression = err.message || 'ajout impossible';
+      this.erreurAjoutSuppression = (err instanceof Error ? err.message : undefined) || 'suppression impossible';
     }
   }
 }
 
 interface IdeesAfficheesPour extends IdeesPour {
+  autresIdees: IdeeAffichee[];
   estPourMoi: boolean;
   idees: IdeeAffichee[];
 }
