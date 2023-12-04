@@ -1,16 +1,17 @@
 import { TestBed } from '@angular/core/testing';
+import { HttpInterceptorFn } from '@angular/common/http';
 
-import { ErreurBackendInterceptor } from './erreur-backend.interceptor';
+import { erreurBackendInterceptor } from './erreur-backend.interceptor';
 
-describe('ErreurBackendInterceptor', () => {
-  beforeEach(() => TestBed.configureTestingModule({
-    providers: [
-      ErreurBackendInterceptor
-      ]
-  }));
+describe('erreurBackendInterceptor', () => {
+  const interceptor: HttpInterceptorFn = (req, next) => 
+    TestBed.runInInjectionContext(() => erreurBackendInterceptor(req, next));
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({});
+  });
 
   it('should be created', () => {
-    const interceptor: ErreurBackendInterceptor = TestBed.inject(ErreurBackendInterceptor);
     expect(interceptor).toBeTruthy();
   });
 });

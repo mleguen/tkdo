@@ -1,15 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-deconnexion',
+  standalone: true,
+  imports: [],
   templateUrl: './deconnexion.component.html',
-  styleUrls: ['./deconnexion.component.scss']
+  styleUrl: './deconnexion.component.scss'
 })
-export class DeconnexionComponent implements OnInit {
-
-  constructor() { }
-
-  ngOnInit(): void {
-  }
+export class DeconnexionComponent {
 
 }

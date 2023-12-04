@@ -1,0 +1,69 @@
+#!/usr/bin/env bash
+
+# Clean up the front folder while keeping the docker-compose stuff
+[ -d front/docker ] && mv front/docker front-docker
+[ -f front/docker-compose.yml ] && mv front/docker-compose.yml front-docker-compose.yml
+rm -rf front && mkdir front
+[ -d front-docker ] && mv front-docker front/docker
+[ -f front-docker-compose.yml ] && mv front-docker-compose.yml front/docker-compose.yml
+
+# npm & ng setup
+docker-compose build npm
+./npm install @angular/cli
+
+# ng fails when package.json already exists
+rm front/package*.json
+
+./ng new tkdo-front --defaults --directory=. --routing --skip-git --style=scss
+./ng add @angular-eslint/schematics --defaults --skip-confirmation
+./ng add @cypress/schematic --defaults --skip-confirmation
+
+ANGULAR_JSON=$(cat front/angular.json)
+PACKAGE_JSON=$(cat front/package.json)
+TSCONFIG_JSON=$(sed -e '/^\w*\/\*.*/d' front/tsconfig.json)
+
+# A bug in @cypress/schematic:component prevents ng generate components from generating scss
+COMPONENT_SCHEMATICS_TO_DUPLICATE=$(jq <<<$ANGULAR_JSON '.projects."tkdo-front".schematics."@schematics/angular:component"')
+ANGULAR_JSON=$(jq <<<$ANGULAR_JSON '.projects."tkdo-front".schematics."@cypress/schematic:component" = '"$COMPONENT_SCHEMATICS_TO_DUPLICATE")
+
+# Force Karma unit tests to run with chrome headless, and without watch (as watch does not work inside docker)
+ANGULAR_JSON=$(jq <<<$ANGULAR_JSON '.projects."tkdo-front".architect.test.options.browsers = "ChromeHeadless"')
+ANGULAR_JSON=$(jq <<<$ANGULAR_JSON '.projects."tkdo-front".architect.test.options.watch = false')
+
+# Fix a bug in default e2e test not looking for the right punctuation
+sed -e 's/app is running!/app is running./' -i front/cypress/e2e/spec.cy.ts
+
+# Force Cypress component & e2e tests to run without watch (as watch does not work inside docker)
+ANGULAR_JSON=$(jq <<<$ANGULAR_JSON '.projects."tkdo-front".architect.ct.options.watch = false')
+ANGULAR_JSON=$(jq <<<$ANGULAR_JSON '.projects."tkdo-front".architect.e2e.options.watch = false')
+
+# Cypress still complains when baseUrl is not set
+TSCONFIG_JSON=$(jq <<<$TSCONFIG_JSON '.compilerOptions.baseUrl = "./"')
+
+# Add npm run ct
+PACKAGE_JSON=$(jq <<<$PACKAGE_JSON '.scripts.ct = "ng run tkdo-front:ct"')
+
+cat <<<$ANGULAR_JSON > front/angular.json
+cat <<<$PACKAGE_JSON > front/package.json
+cat <<<$TSCONFIG_JSON > front/tsconfig.json
+
+# Another bug in @cypress/schematic:component prevents the base Angular component from working without --standalone
+# (it doesn't know the app is standalone and therefore looks for a module ng new no longer creates - apps are now standalone by default)
+./ng generate component admin --standalone
+./ng generate component connexion --standalone
+./ng generate component deconnexion --standalone
+./ng generate component header --standalone
+./ng generate component liste-idees --standalone
+./ng generate component liste-occasions --standalone
+./ng generate component occasion --standalone
+./ng generate component profil --standalone
+./ng generate interceptor erreur-backend
+./ng generate interceptor auth-backend
+./ng generate interceptor dev-backend
+./ng generate service backend
+./ng generate guard admin --implements=CanActivate
+./ng generate guard connexion --implements=CanActivate
+
+./npm test
+./npm run ct
+./npm run e2e

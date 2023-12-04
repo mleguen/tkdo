@@ -1,3 +1,5 @@
+/.cache
+/front/cypress/screenshots
 node_modules
 /tkdo-*.tar
 /tkdo-*.tar.gz

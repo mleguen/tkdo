@@ -1,0 +1,6 @@
+version: '3.8'
+
+# Ce docker-compose.yml vide est à appeler en 1er
+# pour forcer ./ à correspondre au répertoire racine du projet
+# dans les différents docker-compose.yml des sous-répertoires
+# (cf .env pour la liste des docker-compose.yml utilisés)
