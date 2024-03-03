@@ -189,13 +189,13 @@ export class DevBackendInterceptor implements HttpInterceptor {
       let match: string[] | null;
 
       // API
-      if (match = url.match(/^\/api(\/.+)?$/)) {
+      if ((match = url.match(/^\/api(\/.+)?$/))) {
         const [, urlApi] = match;
 
         if (urlApi === '/connexion') {
           if (method === 'POST') return postConnexion();
         }
-        else if (match = urlApi.match(/\/utilisateur\/(\d+)$/)) {
+        else if ((match = urlApi.match(/\/utilisateur\/(\d+)$/))) {
           const [, idUtilisateur] = match;
           if (method === 'GET') return getUtilisateur(+idUtilisateur);
           if (method === 'PUT') return putUtilisateur(+idUtilisateur);
@@ -203,19 +203,19 @@ export class DevBackendInterceptor implements HttpInterceptor {
         else if (urlApi === '/idee') {
           if (method === 'POST') return postIdee();
         }
-        else if (match = urlApi.match(/\/idee\?idUtilisateur=(\d+)&supprimees=0$/)) {
+        else if ((match = urlApi.match(/\/idee\?idUtilisateur=(\d+)&supprimees=0$/))) {
           const [, idUtilisateur] = match;
           if (method === 'GET') return getIdees(+idUtilisateur);
         }
-        else if (match = urlApi.match(/\/idee\/(\d+)\/suppression/)) {
+        else if ((match = urlApi.match(/\/idee\/(\d+)\/suppression/))) {
           const [, idIdee] = match;
           if (method === 'POST') return postSuppressionIdee(+idIdee);
         }
-        else if (match = urlApi.match(/\/occasion\?idParticipant=(\d+)$/)) {
+        else if ((match = urlApi.match(/\/occasion\?idParticipant=(\d+)$/))) {
           const [, idParticipant] = match;
           if (method === 'GET') return getListeOccasions(+idParticipant);
         }
-        else if (match = urlApi.match(/\/occasion\/(\d+)$/)) {
+        else if ((match = urlApi.match(/\/occasion\/(\d+)$/))) {
           const [, idOccasion] = match;
           if (method === 'GET') return getOccasion(+idOccasion);
         }
@@ -229,7 +229,7 @@ export class DevBackendInterceptor implements HttpInterceptor {
     }
 
     function postConnexion() {
-      const { identifiant, mdp } = body as any;
+      const { identifiant, mdp } = body as { identifiant: string, mdp: string };
 
       const utilisateur = utilisateursAvecMdp.find(u => (u.identifiant === identifiant) && (u.mdp === mdp));
       if (!utilisateur) return badRequest('identifiants invalides');
@@ -245,7 +245,7 @@ export class DevBackendInterceptor implements HttpInterceptor {
     function putUtilisateur(idUtilisateur: number) {
       return authGuard(() => {
         const utilisateur = utilisateursAvecMdp.find(u => u.id === idUtilisateur);
-        const { email, nom, mdp, genre, prefNotifIdees } = body as any;
+        const { email, nom, mdp, genre, prefNotifIdees } = body as { email: string, nom: string, mdp: string, genre: Genre, prefNotifIdees: string };
 
         if (email) utilisateur!.email = email;
         if (nom) utilisateur!.nom = nom;
@@ -277,7 +277,7 @@ export class DevBackendInterceptor implements HttpInterceptor {
 
     function postIdee() {
       return authGuard((utilisateurConnecte) => {
-        const { idUtilisateur, description } = body as any;
+        const { idUtilisateur, description } = body as { idUtilisateur: number, description: string };
 
         idees.push({
           utilisateur: enleveDonneesPrivees(utilisateursAvecMdp[idUtilisateur]),
@@ -319,14 +319,14 @@ export class DevBackendInterceptor implements HttpInterceptor {
       return next(u);
     }
 
-    function ok(body?: any) {
+    function ok(body?: object) {
       console.log(`DevBackendInterceptor: ${method} ${url} 200 OK`);
       return of(new HttpResponse({ url, status: 200, body }));
     }
 
-    function ko(status: number, statusText: string, error?: any) {
+    function ko(status: number, statusText: string, error?: object) {
       console.log(`DevBackendInterceptor: ${method} ${url} ${status} ${statusText}`);
-      return throwError(new HttpErrorResponse({ url, status, statusText, error }));
+      return throwError(() => new HttpErrorResponse({ url, status, statusText, error }));
     }
 
     function badRequest(message: string) {
@@ -348,11 +348,13 @@ export class DevBackendInterceptor implements HttpInterceptor {
 }
 
 function enleveDonneesPrivees(u: UtilisateurAvecMdp): Utilisateur {
-  let { email, admin, identifiant, prefNotifIdees, ...donneesPubliques } = enleveMdp(u);
+  /* eslint-disable-next-line no-unused-vars */
+  const { email, admin, identifiant, prefNotifIdees, ...donneesPubliques } = enleveMdp(u);
   return donneesPubliques;
 }
 
 function enleveMdp(u: UtilisateurAvecMdp): UtilisateurPrive {
-  let { mdp, ...donneesPrivees } = u;
+  /* eslint-disable-next-line no-unused-vars */
+  const { mdp, ...donneesPrivees } = u;
   return donneesPrivees;
 }

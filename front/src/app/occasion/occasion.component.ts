@@ -37,7 +37,7 @@ export class OccasionComponent {
         if (!o) throw new Error(`l'ID d'occasion '${idOccasion}' n'existe pas`);
 
         const idQuiRecoitDeMoi = o.resultats.find(rt => rt.idQuiOffre === utilisateurConnecte.id)?.idQuiRecoit;
-        let d = new Date(o.date);
+        const d = new Date(o.date);
         return Object.assign({}, o, {
           date: Intl.DateTimeFormat('fr-FR').format(d),
           estPassee: d.getTime() < Date.now(),

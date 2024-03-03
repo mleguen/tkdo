@@ -145,7 +145,7 @@ describe("liste d'idées", () => {
   afterEach(async () => {
     cy.get('@log')
       .invoke('getCalls')
-      .each((call: sinon.SinonSpyCall<any[], any>) => {
+      .each((call: sinon.SinonSpyCall<string[], void>) => {
         // inspect each console.log argument
         call.args.forEach((arg) => {
           expect(arg).to.not.contain('error')

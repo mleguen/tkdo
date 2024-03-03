@@ -94,7 +94,7 @@ export class ProfilComponent implements OnInit {
       Object.assign(this.utilisateur, { nom, email, genre, prefNotifIdees });
       if (mdp) Object.assign(this.utilisateur, { mdp });
       await this.backend.modifieUtilisateur(this.utilisateur);
-      for (let champ of ['mdp', 'confirmeMdp']) getChildControl(this.formProfil, champ).reset();
+      for (const champ of ['mdp', 'confirmeMdp']) getChildControl(this.formProfil, champ).reset();
       this.erreurModification = undefined;
       this.enregistre = true;
     }
@@ -109,7 +109,7 @@ export class ProfilComponent implements OnInit {
   }
 }
 
-function getChildControl(group: AbstractControl<any, any>, path: string) {
+function getChildControl(group: AbstractControl, path: string) {
   const child = group.get(path);
   if (!child) throw new Error(`le contrôle '${path}' n'existe pas dans le groupe`);
   return child;

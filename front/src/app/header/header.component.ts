@@ -31,7 +31,7 @@ export class HeaderComponent {
       filter((e: Event): e is NavigationEnd => e instanceof NavigationEnd)
     ).subscribe(e => {
       let match: string[] | null;
-      if (match = e.urlAfterRedirects.match(/(\/occasion)\/([0-9]+)$/)) {
+      if ((match = e.urlAfterRedirects.match(/(\/occasion)\/([0-9]+)$/))) {
         const [, menuActif, idOccasionActive] = match;
         this.menuActif = menuActif;
         this.idOccasionActive = +idOccasionActive;

@@ -44,7 +44,7 @@ export class ListeIdeesComponent {
         this.idUtilisateur = +(queryParams.get('idUtilisateur')!);
         return this.backend.getIdees(this.idUtilisateur).pipe(
           map(li => {
-            let idees = li.idees.map(i => Object.assign({}, i, {
+            const idees = li.idees.map(i => Object.assign({}, i, {
               dateProposition: moment(i.dateProposition, 'YYYY-MM-DDTHH:mm:ssZ').locale('fr').format('L à LT'),
               estDeMoi: i.auteur.id === utilisateurConnecte.id,
             }));

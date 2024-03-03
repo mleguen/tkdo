@@ -21,8 +21,7 @@ export class ErreurBackendInterceptor implements HttpInterceptor {
   ) { }
 
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
-    const { method, url } = request;
-    if (!this.backend.estUrlBackend(url)) return next.handle(request);
+    if (!this.backend.estUrlBackend(request.url)) return next.handle(request);
 
     return next.handle(request).pipe(
       tap({

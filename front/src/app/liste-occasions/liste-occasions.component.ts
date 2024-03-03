@@ -23,7 +23,7 @@ export class ListeOccasionsComponent implements OnInit, OnDestroy {
       tap(async (occasions) => {
         if (occasions !== null) {
           let occasion = occasions.find(o => {
-            let d = new Date(o.date);
+            const d = new Date(o.date);
             return d.getTime() > Date.now();
           });
 

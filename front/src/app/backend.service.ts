@@ -148,7 +148,7 @@ export class BackendService {
   }
 
   getOccasion(idOccasion: number) {
-    return this.http.get<Occasion>(URL_OCCASION(idOccasion)).pipe(first()).toPromise();
+    return firstValueFrom(this.http.get<Occasion>(URL_OCCASION(idOccasion)));
   }
 
   getAbsUrlApi() {
