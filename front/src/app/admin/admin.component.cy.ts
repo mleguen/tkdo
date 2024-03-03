@@ -1,9 +1,9 @@
-import { cy, describe, it } from 'local-cypress'
+import { cy, describe, it } from 'local-cypress';
 
-import { AdminComponent } from './admin.component'
+import { AdminComponent } from './admin.component';
 
 describe('AdminComponent', () => {
   it('should mount', () => {
-    cy.mount(AdminComponent)
-  })
-})
+    cy.mount(AdminComponent);
+  });
+});

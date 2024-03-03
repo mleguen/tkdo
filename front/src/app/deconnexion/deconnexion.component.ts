@@ -5,8 +5,6 @@ import { Component } from '@angular/core';
   standalone: true,
   imports: [],
   templateUrl: './deconnexion.component.html',
-  styleUrl: './deconnexion.component.scss'
+  styleUrl: './deconnexion.component.scss',
 })
-export class DeconnexionComponent {
-
-}
+export class DeconnexionComponent {}

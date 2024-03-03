@@ -14,13 +14,13 @@
 // ***********************************************************
 
 // Import commands.js using ES2015 syntax:
-import './commands'
+import './commands';
 
 // Alternatively you can use CommonJS syntax:
 // require('./commands')
 
-import { mount } from 'cypress/angular'
-import { Cypress } from 'local-cypress'
+import { mount } from 'cypress/angular';
+import { Cypress } from 'local-cypress';
 
 // Augment the Cypress namespace to include type definitions for
 // your custom command.
@@ -30,12 +30,12 @@ declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace -- A réactiver après implémentation
   namespace Cypress {
     interface Chainable {
-      mount: typeof mount
+      mount: typeof mount;
     }
   }
 }
 
-Cypress.Commands.add('mount', mount)
+Cypress.Commands.add('mount', mount);
 
 // Example use:
 // cy.mount(MyComponent)

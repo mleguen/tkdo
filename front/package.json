@@ -6,7 +6,7 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng lint && ng test",
+    "test": "npx prettier . --write && ng lint && ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
     "cypress:open": "cypress open",
@@ -54,6 +54,7 @@
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
     "local-cypress": "^1.2.6",
+    "prettier": "^3.2.5",
     "typescript": "~5.3.2"
   }
 }

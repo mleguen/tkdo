@@ -27,6 +27,9 @@ rm front/package*.json
 # Have eslint prevent deprecated code
 ./npm install --save-dev eslint-plugin-deprecation
 
+# Use prettier as code formatter
+./npm install --save-dev prettier
+
 ESLINTRC_JSON=$(cat front/.eslintrc.json)
 ANGULAR_JSON=$(cat front/angular.json)
 PACKAGE_JSON=$(cat front/package.json)
@@ -60,13 +63,18 @@ PACKAGE_JSON=$(jq <<<$PACKAGE_JSON '.scripts.ct = "ng run tkdo-front:ct"')
 # Setup eslint-plugin-deprecation
 ESLINTRC_JSON=$(jq <<<$ESLINTRC_JSON '.overrides[0].extends += ["plugin:deprecation/recommended"]')
 ESLINTRC_JSON=$(jq <<<$ESLINTRC_JSON '.overrides[0].parserOptions.project = "./tsconfig.json"')
-PACKAGE_JSON=$(jq <<<$PACKAGE_JSON '.scripts.test |= "ng lint && " + .')
+PACKAGE_JSON=$(jq <<<$PACKAGE_JSON '.scripts.test |= "npx prettier . --write && ng lint && " + .')
 
 cat <<<$ESLINTRC_JSON > front/.eslintrc.json
 cat <<<$ANGULAR_JSON > front/angular.json
 cat <<<$PACKAGE_JSON > front/package.json
 cat <<<$TSCONFIG_JSON > front/tsconfig.json
 cat <<<$CYPRESS_TSCONFIG_JSON > front/cypress/tsconfig.json
+
+# Setup prettier
+cat > front/.prettierrc <<EOF
+{}
+EOF
 
 # Ensure e2e tests use local Cypress types (cf. comment about installing local-cypress above)
 sed -E '1i import { cy, describe, it } from '\''local-cypress'\'\\n -i front/cypress/e2e/spec.cy.ts

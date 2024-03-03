@@ -1,9 +1,9 @@
-import { cy, describe, it } from 'local-cypress'
+import { cy, describe, it } from 'local-cypress';
 
-import { ConnexionComponent } from './connexion.component'
+import { ConnexionComponent } from './connexion.component';
 
 describe('ConnexionComponent', () => {
   it('should mount', () => {
-    cy.mount(ConnexionComponent)
-  })
-})
+    cy.mount(ConnexionComponent);
+  });
+});
