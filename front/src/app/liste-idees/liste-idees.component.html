@@ -1,19 +1,23 @@
-<ng-container *ngIf="listeIdees$|async as li; else veuillezPatienter">
+<ng-container *ngIf="listeIdees$ | async as li; else veuillezPatienter">
   <div class="container">
     <div class="row justify-content-around align-items-center">
       <h1 [ngSwitch]="li.estPourMoi" class="col-10">
         <ng-container *ngSwitchCase="true">Ma liste d'idées</ng-container>
-        <ng-container *ngSwitchDefault>Idées pour {{li.utilisateur.nom}}</ng-container>
+        <ng-container *ngSwitchDefault
+          >Idées pour {{ li.utilisateur.nom }}</ng-container
+        >
       </h1>
       <div class="col-auto">
-        <button (click)="actualise()" class="btn btn-secondary">Actualiser</button>
+        <button (click)="actualise()" class="btn btn-secondary">
+          Actualiser
+        </button>
       </div>
     </div>
 
     <div class="row" *ngIf="li.idees.length > 0">
       <div class="col-12">
         <h2 *ngIf="!li.estPourMoi">
-          Proposées par {{li.utilisateur.nom}}
+          Proposées par {{ li.utilisateur.nom }}
           <ng-container [ngSwitch]="li.utilisateur.genre">
             <ng-container *ngSwitchCase="Genre.Feminin">elle-même</ng-container>
             <ng-container *ngSwitchCase="Genre.Masculin">lui-même</ng-container>
@@ -21,29 +25,45 @@
         </h2>
         <div class="card-columns">
           <div *ngFor="let i of li.idees" class="card">
-            <div class="card-header">Le {{i.dateProposition}}</div>
+            <div class="card-header">Le {{ i.dateProposition }}</div>
             <div class="card-body">
-              <h3 class="card-title">{{i.description}}</h3>
-              <button *ngIf="i.estDeMoi" (click)="supprime(i.id)" class="btn btn-danger btnSupprimer">Supprimer</button>
+              <h3 class="card-title">{{ i.description }}</h3>
+              <button
+                *ngIf="i.estDeMoi"
+                (click)="supprime(i.id)"
+                class="btn btn-danger btnSupprimer"
+              >
+                Supprimer
+              </button>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="row" *ngIf="(!li.estPourMoi) && (li.autresIdees.length > 0)">
+    <div class="row" *ngIf="!li.estPourMoi && li.autresIdees.length > 0">
       <div class="col-12">
-        <h2>Proposées par d'autres que {{li.utilisateur.nom}}</h2>
+        <h2>Proposées par d'autres que {{ li.utilisateur.nom }}</h2>
         <div class="alert alert-warning col-12" role="alert">
-          {{li.utilisateur.nom}} ne peut pas voir ces idées
+          {{ li.utilisateur.nom }} ne peut pas voir ces idées
         </div>
         <div class="card-columns">
           <div *ngFor="let i of li.autresIdees" class="card">
-            <div class="card-header"><span class="auteur">{{i.estDeMoi ? 'Vous' : i.auteur.nom}}</span> le
-              {{i.dateProposition}}</div>
+            <div class="card-header">
+              <span class="auteur">{{
+                i.estDeMoi ? "Vous" : i.auteur.nom
+              }}</span>
+              le {{ i.dateProposition }}
+            </div>
             <div class="card-body">
-              <h3 class="card-title">{{i.description}}</h3>
-              <button *ngIf="i.estDeMoi" (click)="supprime(i.id)" class="btn btn-danger btnSupprimer">Supprimer</button>
+              <h3 class="card-title">{{ i.description }}</h3>
+              <button
+                *ngIf="i.estDeMoi"
+                (click)="supprime(i.id)"
+                class="btn btn-danger btnSupprimer"
+              >
+                Supprimer
+              </button>
             </div>
           </div>
         </div>
@@ -55,9 +75,21 @@
         <form [formGroup]="formAjout" (ngSubmit)="ajoute()">
           <div class="form-group">
             <label for="description">Nouvelle idée :</label>
-            <input id="description" type="text" formControlName="description" class="form-control">
+            <input
+              id="description"
+              type="text"
+              formControlName="description"
+              class="form-control"
+            />
           </div>
-          <button id="btnAjouter" type="submit" class="btn btn-primary" [disabled]="!formAjout.valid">Ajouter</button>
+          <button
+            id="btnAjouter"
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="!formAjout.valid"
+          >
+            Ajouter
+          </button>
         </form>
       </div>
     </div>
@@ -68,4 +100,6 @@
   <h1>Veuillez patienter...</h1>
 </ng-template>
 
-<div *ngIf="erreurAjoutSuppression" class="alert alert-danger">{{erreurAjoutSuppression}}</div>
+<div *ngIf="erreurAjoutSuppression" class="alert alert-danger">
+  {{ erreurAjoutSuppression }}
+</div>

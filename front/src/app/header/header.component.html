@@ -1,45 +1,108 @@
 <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
   <a class="navbar-brand" href="#">Tirage cadeaux</a>
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault"
-    aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+  <button
+    class="navbar-toggler"
+    type="button"
+    data-toggle="collapse"
+    data-target="#navbarsExampleDefault"
+    aria-controls="navbarsExampleDefault"
+    aria-expanded="false"
+    aria-label="Toggle navigation"
+  >
     <span class="navbar-toggler-icon"></span>
   </button>
 
-  <div *ngIf="(utilisateurConnecte$ | async) as utilisateur" class="collapse navbar-collapse"
-    id="navbarsExampleDefault">
+  <div
+    *ngIf="utilisateurConnecte$ | async as utilisateur"
+    class="collapse navbar-collapse"
+    id="navbarsExampleDefault"
+  >
     <ul class="navbar-nav mr-auto">
-      <ng-container *ngIf="occasions$|async as occasions">
+      <ng-container *ngIf="occasions$ | async as occasions">
         <li ngbDropdown class="nav-item dropdown" *ngIf="occasions.length > 0">
-          <button class="nav-link" id="menuMesOccasions" [ngClass]="{'active': menuActif === '/occasion'}"
-            ngbDropdownToggle>
+          <button
+            class="nav-link"
+            id="menuMesOccasions"
+            [ngClass]="{ active: menuActif === '/occasion' }"
+            ngbDropdownToggle
+          >
             Mes occasions
           </button>
-          <div ngbDropdownMenu class="dropdown-menu-dark" aria-labelledby="menuMesOccasions">
-            <a ngbDropdownItem class="menuMesOccasionsItem" [routerLink]="['/occasion', o.id]"
+          <div
+            ngbDropdownMenu
+            class="dropdown-menu-dark"
+            aria-labelledby="menuMesOccasions"
+          >
+            <a
+              ngbDropdownItem
+              class="menuMesOccasionsItem"
+              [routerLink]="['/occasion', o.id]"
               *ngFor="let o of occasions"
-              [ngClass]="{'active': menuActif === '/occasion' && idOccasionActive === o.id}">{{o.titre}}</a>
+              [ngClass]="{
+                active: menuActif === '/occasion' && idOccasionActive === o.id
+              }"
+              >{{ o.titre }}</a
+            >
           </div>
         </li>
       </ng-container>
-      <li class="nav-item" [ngClass]="{'active': menuActif === '/idee?idUtilisateur='+utilisateur.id}">
-        <a class="nav-link" [routerLink]="['/idee']" [queryParams]="{idUtilisateur: utilisateur.id}"
-          data-toggle="collapse" data-target=".navbar-collapse.show">Mes idées</a>
+      <li
+        class="nav-item"
+        [ngClass]="{
+          active: menuActif === '/idee?idUtilisateur=' + utilisateur.id
+        }"
+      >
+        <a
+          class="nav-link"
+          [routerLink]="['/idee']"
+          [queryParams]="{ idUtilisateur: utilisateur.id }"
+          data-toggle="collapse"
+          data-target=".navbar-collapse.show"
+          >Mes idées</a
+        >
       </li>
-      <li class="nav-item" [ngClass]="{'active': menuActif === '/profil'}">
-        <a class="nav-link" [routerLink]="['/profil']" id="menuMonProfil" data-toggle="collapse"
-          data-target=".navbar-collapse.show">Mon profil</a>
+      <li class="nav-item" [ngClass]="{ active: menuActif === '/profil' }">
+        <a
+          class="nav-link"
+          [routerLink]="['/profil']"
+          id="menuMonProfil"
+          data-toggle="collapse"
+          data-target=".navbar-collapse.show"
+          >Mon profil</a
+        >
       </li>
-      <li class="nav-item" *ngIf="utilisateur.admin" [ngClass]="{'active': menuActif === '/admin'}">
-        <a class="nav-link" [routerLink]="['/admin']" data-toggle="collapse"
-          data-target=".navbar-collapse.show">Administration</a>
+      <li
+        class="nav-item"
+        *ngIf="utilisateur.admin"
+        [ngClass]="{ active: menuActif === '/admin' }"
+      >
+        <a
+          class="nav-link"
+          [routerLink]="['/admin']"
+          data-toggle="collapse"
+          data-target=".navbar-collapse.show"
+          >Administration</a
+        >
       </li>
     </ul>
 
     <form class="form-inline">
-      <span id="nomUtilisateur" class="form-text mr-2" data-toggle="collapse"
-        data-target=".navbar-collapse.show">{{utilisateur.nom}}</span>
-      <button id="btnSeDeconnecter" [routerLink]="['/deconnexion']" class="btn btn-secondary my-2 my-sm-0"
-        data-toggle="collapse" data-target=".navbar-collapse.show">Se déconnecter</button>
+      <span
+        id="nomUtilisateur"
+        class="form-text mr-2"
+        data-toggle="collapse"
+        data-target=".navbar-collapse.show"
+        >{{ utilisateur.nom }}</span
+      >
+      <button
+        id="btnSeDeconnecter"
+        [routerLink]="['/deconnexion']"
+        class="btn btn-secondary my-2 my-sm-0"
+        data-toggle="collapse"
+        data-target=".navbar-collapse.show"
+      >
+        Se déconnecter
+      </button>
     </form>
   </div>
 </nav>

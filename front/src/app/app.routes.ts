@@ -12,11 +12,36 @@ import { ConnexionGuard } from './connexion.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/occasion', pathMatch: 'full' },
-  { path: 'admin', component: AdminComponent, canActivate: [ConnexionGuard, adminGuard], runGuardsAndResolvers: 'always' },
+  {
+    path: 'admin',
+    component: AdminComponent,
+    canActivate: [ConnexionGuard, adminGuard],
+    runGuardsAndResolvers: 'always',
+  },
   { path: 'connexion', component: ConnexionComponent },
   { path: 'deconnexion', component: DeconnexionComponent },
-  { path: 'idee', component: ListeIdeesComponent, canActivate: [ConnexionGuard], runGuardsAndResolvers: 'always' },
-  { path: 'occasion', component: ListeOccasionsComponent, canActivate: [ConnexionGuard], runGuardsAndResolvers: 'always' },
-  { path: 'occasion/:idOccasion', component: OccasionComponent, canActivate: [ConnexionGuard], runGuardsAndResolvers: 'always' },
-  { path: 'profil', component: ProfilComponent, canActivate: [ConnexionGuard], runGuardsAndResolvers: 'always' },
+  {
+    path: 'idee',
+    component: ListeIdeesComponent,
+    canActivate: [ConnexionGuard],
+    runGuardsAndResolvers: 'always',
+  },
+  {
+    path: 'occasion',
+    component: ListeOccasionsComponent,
+    canActivate: [ConnexionGuard],
+    runGuardsAndResolvers: 'always',
+  },
+  {
+    path: 'occasion/:idOccasion',
+    component: OccasionComponent,
+    canActivate: [ConnexionGuard],
+    runGuardsAndResolvers: 'always',
+  },
+  {
+    path: 'profil',
+    component: ProfilComponent,
+    canActivate: [ConnexionGuard],
+    runGuardsAndResolvers: 'always',
+  },
 ];

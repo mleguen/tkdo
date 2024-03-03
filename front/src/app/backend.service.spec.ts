@@ -8,10 +8,7 @@ describe('BackendService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [
-        RouterTestingModule,
-        HttpClientTestingModule,
-      ]
+      imports: [RouterTestingModule, HttpClientTestingModule],
     });
     service = TestBed.inject(BackendService);
   });

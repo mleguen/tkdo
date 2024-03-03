@@ -6,17 +6,12 @@ import { BackendService } from '../backend.service';
 @Component({
   selector: 'app-deconnexion',
   standalone: true,
-  imports: [
-    RouterModule,
-  ],
+  imports: [RouterModule],
   templateUrl: './deconnexion.component.html',
-  styleUrl: './deconnexion.component.scss'
+  styleUrl: './deconnexion.component.scss',
 })
 export class DeconnexionComponent implements OnInit {
-
-  constructor(
-    private readonly backend: BackendService,
-  ) { }
+  constructor(private readonly backend: BackendService) {}
 
   async ngOnInit() {
     await this.backend.deconnecte();

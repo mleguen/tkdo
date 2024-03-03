@@ -5,9 +5,7 @@ import { BackendService } from './backend.service';
 
 @Injectable()
 export class AdminGuard {
-  constructor(
-    private readonly backend: BackendService,
-  ) { }
+  constructor(private readonly backend: BackendService) {}
 
   async canActivate() {
     const admin = await this.backend.admin();

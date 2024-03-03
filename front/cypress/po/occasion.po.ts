@@ -1,9 +1,8 @@
-import { cy } from 'local-cypress'
+import { cy } from 'local-cypress';
 
 import { AppPage } from './app.po';
 
 export class OccasionPage extends AppPage {
-
   maCarte() {
     return cy.get('.estMoi h3');
   }

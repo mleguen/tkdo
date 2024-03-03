@@ -9,7 +9,7 @@ export interface Occasion {
   date: string;
   titre: string;
   participants: Utilisateur[];
-  resultats: Resultat[]
+  resultats: Resultat[];
 }
 
 export interface Utilisateur {
@@ -56,11 +56,14 @@ export interface Idee {
 const URL_API = '/api';
 const URL_CONNEXION = `${URL_API}/connexion`;
 const URL_LISTE_OCCASIONS = `${URL_API}/occasion`;
-const URL_OCCASION = (idOccasion: number) => `${URL_API}/occasion/${idOccasion}`;
-const URL_UTILISATEUR = (idUtilisateur: number) => `${URL_API}/utilisateur/${idUtilisateur}`;
+const URL_OCCASION = (idOccasion: number) =>
+  `${URL_API}/occasion/${idOccasion}`;
+const URL_UTILISATEUR = (idUtilisateur: number) =>
+  `${URL_API}/utilisateur/${idUtilisateur}`;
 const URL_IDEES = `${URL_API}/idee`;
 const URL_IDEE = (idIdee: number) => `${URL_IDEES}/${idIdee}`;
-const URL_SUPPRESSION_IDEE = (idIdee: number) => `${URL_IDEE(idIdee)}/suppression`;
+const URL_SUPPRESSION_IDEE = (idIdee: number) =>
+  `${URL_IDEE(idIdee)}/suppression`;
 
 const CLE_ID_UTILISATEUR = 'id_utilisateur';
 const CLE_LISTE_OCCASIONS = 'occasions';
@@ -72,10 +75,9 @@ interface PostConnexionDTO {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class BackendService {
-
   erreur$ = new BehaviorSubject<string | undefined>(undefined);
   occasions$: Observable<Occasion[] | null>;
   token = localStorage.getItem(CLE_TOKEN);
@@ -87,23 +89,43 @@ export class BackendService {
     private readonly http: HttpClient,
     @Inject(DOCUMENT) private document: Document,
   ) {
-    this.idUtilisateurConnecte$ = new BehaviorSubject(JSON.parse(localStorage.getItem(CLE_ID_UTILISATEUR) || 'null'));
+    this.idUtilisateurConnecte$ = new BehaviorSubject(
+      JSON.parse(localStorage.getItem(CLE_ID_UTILISATEUR) || 'null'),
+    );
     this.utilisateurConnecte$ = this.idUtilisateurConnecte$.pipe(
-      switchMap(idUtilisateur => idUtilisateur === null ? of(null) : this.http.get<UtilisateurPrive>(URL_UTILISATEUR(idUtilisateur))),
-      shareReplay(1)
+      switchMap((idUtilisateur) =>
+        idUtilisateur === null
+          ? of(null)
+          : this.http.get<UtilisateurPrive>(URL_UTILISATEUR(idUtilisateur)),
+      ),
+      shareReplay(1),
     );
     this.occasions$ = this.idUtilisateurConnecte$.pipe(
-      switchMap(idUtilisateur => idUtilisateur === null ? of(null) : this.http.get<Occasion[]>(`${URL_LISTE_OCCASIONS}?idParticipant=${idUtilisateur}`)),
-      shareReplay(1)
+      switchMap((idUtilisateur) =>
+        idUtilisateur === null
+          ? of(null)
+          : this.http.get<Occasion[]>(
+              `${URL_LISTE_OCCASIONS}?idParticipant=${idUtilisateur}`,
+            ),
+      ),
+      shareReplay(1),
     );
   }
 
   async ajouteIdee(idUtilisateur: number, description: string) {
-    return firstValueFrom(this.http.post(URL_IDEES, { idUtilisateur, idAuteur: await this.getIdUtilisateurConnecte(), description }));
+    return firstValueFrom(
+      this.http.post(URL_IDEES, {
+        idUtilisateur,
+        idAuteur: await this.getIdUtilisateurConnecte(),
+        description,
+      }),
+    );
   }
 
   async connecte(identifiant: string, mdp: string) {
-    const { token, utilisateur } = await firstValueFrom(this.http.post<PostConnexionDTO>(URL_CONNEXION, { identifiant, mdp }));
+    const { token, utilisateur } = await firstValueFrom(
+      this.http.post<PostConnexionDTO>(URL_CONNEXION, { identifiant, mdp }),
+    );
     localStorage.setItem(CLE_ID_UTILISATEUR, JSON.stringify(utilisateur.id));
     localStorage.setItem(CLE_TOKEN, token);
     // this.token doit être set avant de publier l'utilisateur sur l'observable
@@ -124,13 +146,13 @@ export class BackendService {
     return firstValueFrom(
       this.utilisateurConnecte$.pipe(
         first(),
-        map(u => !!u?.admin),
-      )
+        map((u) => !!u?.admin),
+      ),
     );
   }
 
   async estConnecte() {
-    return await firstValueFrom(this.idUtilisateurConnecte$) !== null;
+    return (await firstValueFrom(this.idUtilisateurConnecte$)) !== null;
   }
 
   estUrlBackend(url: string): boolean {
@@ -138,12 +160,17 @@ export class BackendService {
   }
 
   getIdees(idUtilisateur: number) {
-    return this.http.get<IdeesPour>(`${URL_IDEES}?idUtilisateur=${idUtilisateur}&supprimees=0`);
+    return this.http.get<IdeesPour>(
+      `${URL_IDEES}?idUtilisateur=${idUtilisateur}&supprimees=0`,
+    );
   }
 
   async getIdUtilisateurConnecte() {
-    const idUtilisateurConnecte = await firstValueFrom(this.idUtilisateurConnecte$);
-    if (idUtilisateurConnecte == null) throw Error("Aucun utilisateur connecté");
+    const idUtilisateurConnecte = await firstValueFrom(
+      this.idUtilisateurConnecte$,
+    );
+    if (idUtilisateurConnecte == null)
+      throw Error('Aucun utilisateur connecté');
     return idUtilisateurConnecte;
   }
 
@@ -157,19 +184,24 @@ export class BackendService {
 
   async getUtilisateurConnecte() {
     const utilisateurConnecte = await firstValueFrom(this.utilisateurConnecte$);
-    if (utilisateurConnecte == null) throw Error("Aucun utilisateur connecté");
+    if (utilisateurConnecte == null) throw Error('Aucun utilisateur connecté');
     return utilisateurConnecte;
   }
 
   async modifieUtilisateur(utilisateur: Partial<UtilisateurPrive>) {
-    return firstValueFrom(this.http.put(URL_UTILISATEUR(await this.getIdUtilisateurConnecte()), utilisateur));
+    return firstValueFrom(
+      this.http.put(
+        URL_UTILISATEUR(await this.getIdUtilisateurConnecte()),
+        utilisateur,
+      ),
+    );
   }
 
   notifieErreurHTTP(error: HttpErrorResponse) {
     // Les erreurs applicatives sont censées être prises en compte
     if (error.status === 400) return;
 
-    this.erreur$.next(error.message || (`${error.status} ${error.statusText}`));
+    this.erreur$.next(error.message || `${error.status} ${error.statusText}`);
   }
 
   notifieSuccesHTTP() {
@@ -177,6 +209,8 @@ export class BackendService {
   }
 
   supprimeIdee(idIdee: number) {
-    return firstValueFrom(this.http.post(URL_SUPPRESSION_IDEE(idIdee), undefined));
+    return firstValueFrom(
+      this.http.post(URL_SUPPRESSION_IDEE(idIdee), undefined),
+    );
   }
 }

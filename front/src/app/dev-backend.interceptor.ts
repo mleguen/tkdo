@@ -4,14 +4,21 @@ import {
   HttpEvent,
   HttpInterceptor,
   HttpResponse,
-  HttpErrorResponse
+  HttpErrorResponse,
 } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import moment from 'moment';
 import { Observable, of, throwError } from 'rxjs';
 import { mergeMap, materialize, dematerialize, delay } from 'rxjs/operators';
 
-import { Genre, Idee, Occasion, PrefNotifIdees, Utilisateur, UtilisateurPrive } from './backend.service';
+import {
+  Genre,
+  Idee,
+  Occasion,
+  PrefNotifIdees,
+  Utilisateur,
+  UtilisateurPrive,
+} from './backend.service';
 
 interface UtilisateurAvecMdp extends UtilisateurPrive {
   mdp: string;
@@ -119,12 +126,15 @@ const occasions: Occasion[] = [
       },
     ],
   },
-].map(o => {
+].map((o) => {
   (o as Occasion).participants = o.participants.map(enleveDonneesPrivees);
   return o;
 });
 
-const idees: { idee: Idee & { dateSuppression?: string }, utilisateur: Utilisateur }[] = [
+const idees: {
+  idee: Idee & { dateSuppression?: string };
+  utilisateur: Utilisateur;
+}[] = [
   {
     idee: {
       id: 0,
@@ -132,7 +142,7 @@ const idees: { idee: Idee & { dateSuppression?: string }, utilisateur: Utilisate
       auteur: alice,
       dateProposition: '2020-04-19',
     },
-    utilisateur: alice
+    utilisateur: alice,
   },
   {
     idee: {
@@ -142,7 +152,7 @@ const idees: { idee: Idee & { dateSuppression?: string }, utilisateur: Utilisate
       dateProposition: '2020-06-19',
       dateSuppression: '2020-07-08',
     },
-    utilisateur: alice
+    utilisateur: alice,
   },
   {
     idee: {
@@ -151,7 +161,7 @@ const idees: { idee: Idee & { dateSuppression?: string }, utilisateur: Utilisate
       auteur: alice,
       dateProposition: '2020-04-19',
     },
-    utilisateur: bob
+    utilisateur: bob,
   },
   {
     idee: {
@@ -160,11 +170,12 @@ const idees: { idee: Idee & { dateSuppression?: string }, utilisateur: Utilisate
       auteur: bob,
       dateProposition: '2020-04-07',
     },
-    utilisateur: bob
+    utilisateur: bob,
   },
-].map(i => {
+].map((i) => {
   i.idee.dateProposition = new Date(i.idee.dateProposition).toJSON();
-  if (i.idee.dateSuppression) i.idee.dateSuppression = new Date(i.idee.dateSuppression).toJSON();
+  if (i.idee.dateSuppression)
+    i.idee.dateSuppression = new Date(i.idee.dateSuppression).toJSON();
   (i.idee as Idee).auteur = enleveDonneesPrivees(i.idee.auteur);
   (i.utilisateur as Utilisateur) = enleveDonneesPrivees(i.utilisateur);
   return i;
@@ -174,8 +185,10 @@ const idees: { idee: Idee & { dateSuppression?: string }, utilisateur: Utilisate
 
 @Injectable()
 export class DevBackendInterceptor implements HttpInterceptor {
-
-  intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
+  intercept(
+    request: HttpRequest<unknown>,
+    next: HttpHandler,
+  ): Observable<HttpEvent<unknown>> {
     const { url, method, headers, body } = request;
 
     // wrap in delayed observable to simulate server api call
@@ -194,28 +207,24 @@ export class DevBackendInterceptor implements HttpInterceptor {
 
         if (urlApi === '/connexion') {
           if (method === 'POST') return postConnexion();
-        }
-        else if ((match = urlApi.match(/\/utilisateur\/(\d+)$/))) {
+        } else if ((match = urlApi.match(/\/utilisateur\/(\d+)$/))) {
           const [, idUtilisateur] = match;
           if (method === 'GET') return getUtilisateur(+idUtilisateur);
           if (method === 'PUT') return putUtilisateur(+idUtilisateur);
-        }
-        else if (urlApi === '/idee') {
+        } else if (urlApi === '/idee') {
           if (method === 'POST') return postIdee();
-        }
-        else if ((match = urlApi.match(/\/idee\?idUtilisateur=(\d+)&supprimees=0$/))) {
+        } else if (
+          (match = urlApi.match(/\/idee\?idUtilisateur=(\d+)&supprimees=0$/))
+        ) {
           const [, idUtilisateur] = match;
           if (method === 'GET') return getIdees(+idUtilisateur);
-        }
-        else if ((match = urlApi.match(/\/idee\/(\d+)\/suppression/))) {
+        } else if ((match = urlApi.match(/\/idee\/(\d+)\/suppression/))) {
           const [, idIdee] = match;
           if (method === 'POST') return postSuppressionIdee(+idIdee);
-        }
-        else if ((match = urlApi.match(/\/occasion\?idParticipant=(\d+)$/))) {
+        } else if ((match = urlApi.match(/\/occasion\?idParticipant=(\d+)$/))) {
           const [, idParticipant] = match;
           if (method === 'GET') return getListeOccasions(+idParticipant);
-        }
-        else if ((match = urlApi.match(/\/occasion\/(\d+)$/))) {
+        } else if ((match = urlApi.match(/\/occasion\/(\d+)$/))) {
           const [, idOccasion] = match;
           if (method === 'GET') return getOccasion(+idOccasion);
         }
@@ -229,9 +238,11 @@ export class DevBackendInterceptor implements HttpInterceptor {
     }
 
     function postConnexion() {
-      const { identifiant, mdp } = body as { identifiant: string, mdp: string };
+      const { identifiant, mdp } = body as { identifiant: string; mdp: string };
 
-      const utilisateur = utilisateursAvecMdp.find(u => (u.identifiant === identifiant) && (u.mdp === mdp));
+      const utilisateur = utilisateursAvecMdp.find(
+        (u) => u.identifiant === identifiant && u.mdp === mdp,
+      );
       if (!utilisateur) return badRequest('identifiants invalides');
 
       const { id, nom, admin } = utilisateur;
@@ -244,8 +255,16 @@ export class DevBackendInterceptor implements HttpInterceptor {
 
     function putUtilisateur(idUtilisateur: number) {
       return authGuard(() => {
-        const utilisateur = utilisateursAvecMdp.find(u => u.id === idUtilisateur);
-        const { email, nom, mdp, genre, prefNotifIdees } = body as { email: string, nom: string, mdp: string, genre: Genre, prefNotifIdees: string };
+        const utilisateur = utilisateursAvecMdp.find(
+          (u) => u.id === idUtilisateur,
+        );
+        const { email, nom, mdp, genre, prefNotifIdees } = body as {
+          email: string;
+          nom: string;
+          mdp: string;
+          genre: Genre;
+          prefNotifIdees: string;
+        };
 
         if (email) utilisateur!.email = email;
         if (nom) utilisateur!.nom = nom;
@@ -254,39 +273,57 @@ export class DevBackendInterceptor implements HttpInterceptor {
         if (prefNotifIdees) utilisateur!.prefNotifIdees = prefNotifIdees;
 
         return ok();
-      })
+      });
     }
 
     function getListeOccasions(idParticipant: number) {
-      return authGuard(() => ok(occasions.filter(o => o.participants.some(u => u.id === idParticipant))));
+      return authGuard(() =>
+        ok(
+          occasions.filter((o) =>
+            o.participants.some((u) => u.id === idParticipant),
+          ),
+        ),
+      );
     }
 
     function getOccasion(idOccasion: number) {
       return authGuard(() => {
-        const occasion = occasions.find(o => o.id === idOccasion);
+        const occasion = occasions.find((o) => o.id === idOccasion);
         return occasion ? ok(occasion) : notFound();
       });
     }
 
     function getIdees(idUtilisateur: number) {
-      return authGuard(() => ok({
-        utilisateur: enleveDonneesPrivees(utilisateursAvecMdp[idUtilisateur]),
-        idees: idees.filter(i => (i.utilisateur.id === idUtilisateur) && !i.idee.dateSuppression).map(i => i.idee),
-      }));
+      return authGuard(() =>
+        ok({
+          utilisateur: enleveDonneesPrivees(utilisateursAvecMdp[idUtilisateur]),
+          idees: idees
+            .filter(
+              (i) =>
+                i.utilisateur.id === idUtilisateur && !i.idee.dateSuppression,
+            )
+            .map((i) => i.idee),
+        }),
+      );
     }
 
     function postIdee() {
       return authGuard((utilisateurConnecte) => {
-        const { idUtilisateur, description } = body as { idUtilisateur: number, description: string };
+        const { idUtilisateur, description } = body as {
+          idUtilisateur: number;
+          description: string;
+        };
 
         idees.push({
           utilisateur: enleveDonneesPrivees(utilisateursAvecMdp[idUtilisateur]),
           idee: {
-            id: nextId(idees.map(i => i.idee)),
+            id: nextId(idees.map((i) => i.idee)),
             description,
             auteur: enleveDonneesPrivees(utilisateurConnecte),
-            dateProposition: moment().locale('fr').format('YYYY-MM-DDTHH:mm:ssZ'),
-          }
+            dateProposition: moment()
+              .locale('fr')
+              .format('YYYY-MM-DDTHH:mm:ssZ'),
+          },
         });
 
         return ok();
@@ -294,12 +331,12 @@ export class DevBackendInterceptor implements HttpInterceptor {
     }
 
     function nextId(liste: { id: number }[]): number {
-      return liste.length === 0 ? 0 : Math.max(...liste.map(i => i.id)) + 1;
+      return liste.length === 0 ? 0 : Math.max(...liste.map((i) => i.id)) + 1;
     }
 
     function postSuppressionIdee(idIdee: number) {
       return authGuard(() => {
-        const idee = idees.find(i => i.idee.id === idIdee);
+        const idee = idees.find((i) => i.idee.id === idIdee);
         idee!.idee.dateSuppression = new Date().toJSON();
 
         return ok();
@@ -308,13 +345,15 @@ export class DevBackendInterceptor implements HttpInterceptor {
 
     // helper functions
 
-    function authGuard(next: (utilisateur: UtilisateurAvecMdp) => Observable<HttpEvent<unknown>>) {
+    function authGuard(
+      next: (utilisateur: UtilisateurAvecMdp) => Observable<HttpEvent<unknown>>,
+    ) {
       const authorizationHeader = headers.get('Authorization');
       if (!authorizationHeader) return forbidden();
       const match = authorizationHeader.match(/Bearer (.*)/);
       if (!match) return forbidden();
       if (match[1] === 'invalid') return unauthorized();
-      const u = utilisateursAvecMdp.find(u => u.identifiant === match![1])
+      const u = utilisateursAvecMdp.find((u) => u.identifiant === match![1]);
       if (!u) return unauthorized();
       return next(u);
     }
@@ -325,8 +364,12 @@ export class DevBackendInterceptor implements HttpInterceptor {
     }
 
     function ko(status: number, statusText: string, error?: object) {
-      console.log(`DevBackendInterceptor: ${method} ${url} ${status} ${statusText}`);
-      return throwError(() => new HttpErrorResponse({ url, status, statusText, error }));
+      console.log(
+        `DevBackendInterceptor: ${method} ${url} ${status} ${statusText}`,
+      );
+      return throwError(
+        () => new HttpErrorResponse({ url, status, statusText, error }),
+      );
     }
 
     function badRequest(message: string) {
@@ -349,7 +392,8 @@ export class DevBackendInterceptor implements HttpInterceptor {
 
 function enleveDonneesPrivees(u: UtilisateurAvecMdp): Utilisateur {
   /* eslint-disable-next-line no-unused-vars */
-  const { email, admin, identifiant, prefNotifIdees, ...donneesPubliques } = enleveMdp(u);
+  const { email, admin, identifiant, prefNotifIdees, ...donneesPubliques } =
+    enleveMdp(u);
   return donneesPubliques;
 }
 

@@ -1,4 +1,4 @@
-import { cy } from 'local-cypress'
+import { cy } from 'local-cypress';
 
 import { ConnexionPage } from 'cypress/po/connexion.po';
 import { DeconnexionPage } from 'cypress/po/deconnexion.po';
@@ -10,8 +10,7 @@ export function jeSuisConnecteEnTantQue(u: Utilisateur) {
     if (ctx.utilisateurConnecte !== u) {
       if (!ctx.pageCourante) {
         cy.visit('/');
-      }
-      else if (ctx.pageCourante !== 'connexion') {
+      } else if (ctx.pageCourante !== 'connexion') {
         const anyPage = new AppPage();
         anyPage.boutonSeDeconnecter().click();
 
@@ -27,5 +26,5 @@ export function jeSuisConnecteEnTantQue(u: Utilisateur) {
       ctx.utilisateurConnecte = u;
       ctx.pageCourante = 'occasion';
     }
-  }
+  };
 }

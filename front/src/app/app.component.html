@@ -3,17 +3,19 @@
 <app-header></app-header>
 
 <main role="main" class="container">
-
   <div class="router-outlet">
     <router-outlet></router-outlet>
   </div>
 
-  <div *ngIf="erreurBackend$ | async as erreurBackend" class="alert alert-danger">
-    Le serveur a répondu : "{{erreurBackend}}"
+  <div
+    *ngIf="erreurBackend$ | async as erreurBackend"
+    class="alert alert-danger"
+  >
+    Le serveur a répondu : "{{ erreurBackend }}"
   </div>
 
   <div class="credits fixed-bottom">
-    <a href="https://github.com/mleguen/tkdo">tkdo</a> v{{version}}
+    <a href="https://github.com/mleguen/tkdo">tkdo</a> v{{ version }}
     &mdash;
     <a href="https://github.com/mleguen/tkdo/issues">Signaler une anomalie</a>
   </div>

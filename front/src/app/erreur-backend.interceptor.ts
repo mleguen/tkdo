@@ -3,7 +3,7 @@ import {
   HttpHandler,
   HttpEvent,
   HttpInterceptor,
-  HttpErrorResponse
+  HttpErrorResponse,
 } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
@@ -14,13 +14,15 @@ import { BackendService } from './backend.service';
 
 @Injectable()
 export class ErreurBackendInterceptor implements HttpInterceptor {
-
   constructor(
     private readonly backend: BackendService,
-    private readonly router: Router
-  ) { }
+    private readonly router: Router,
+  ) {}
 
-  intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
+  intercept(
+    request: HttpRequest<unknown>,
+    next: HttpHandler,
+  ): Observable<HttpEvent<unknown>> {
     if (!this.backend.estUrlBackend(request.url)) return next.handle(request);
 
     return next.handle(request).pipe(
@@ -31,14 +33,16 @@ export class ErreurBackendInterceptor implements HttpInterceptor {
           // Redirige vers la page de connexion en cas de problème d'authentification
           if (error.status === 401) {
             const state = this.router.routerState.snapshot;
-            this.router.navigate(['connexion'], { queryParams: { retour: state.url } });
+            this.router.navigate(['connexion'], {
+              queryParams: { retour: state.url },
+            });
           }
           // Et construit le message d'erreur backend dans les autres cas d'erreur
           else {
             this.backend.notifieErreurHTTP(error);
           }
-        }
-      })
+        },
+      }),
     );
   }
 }

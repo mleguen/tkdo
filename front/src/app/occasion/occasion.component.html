@@ -1,12 +1,17 @@
-<ng-container *ngIf="occasion$|async as o; else veuillezPatienter">
-  <h1 id="occasion">{{o.titre}}</h1>
+<ng-container *ngIf="occasion$ | async as o; else veuillezPatienter">
+  <h1 id="occasion">{{ o.titre }}</h1>
 
   <ng-container [ngSwitch]="o.estPassee">
     <div *ngSwitchCase="true" class="alert alert-warning col-12" role="alert">
       Cette occasion est passée.
     </div>
-    <div id="dateRemiseCadeaux" *ngSwitchCase="false" class="alert alert-primary col-12" role="alert">
-      Date de remise des cadeaux : {{o.date}}
+    <div
+      id="dateRemiseCadeaux"
+      *ngSwitchCase="false"
+      class="alert alert-primary col-12"
+      role="alert"
+    >
+      Date de remise des cadeaux : {{ o.date }}
     </div>
   </ng-container>
 
@@ -22,17 +27,25 @@
   </div>
   <div class="container">
     <div class="row justify-content-center">
-      <div *ngFor="let p of o.participants" class="col-sm-6 col-md-4 col-lg-3 col-xl-2">
-        <div class="card" [ngClass]="{
+      <div
+        *ngFor="let p of o.participants"
+        class="col-sm-6 col-md-4 col-lg-3 col-xl-2"
+      >
+        <div
+          class="card"
+          [ngClass]="{
             'bg-primary': p.estQuiRecoitDeMoi,
             'bg-muted': p.estMoi,
             'bg-secondary': !p.estMoi && !p.estQuiRecoitDeMoi,
             'text-white': !p.estMoi,
             estMoi: p.estMoi,
             estQuiRecoitDeMoi: p.estQuiRecoitDeMoi
-          }" [routerLink]="['/idee']" [queryParams]="{idUtilisateur: p.id}">
+          }"
+          [routerLink]="['/idee']"
+          [queryParams]="{ idUtilisateur: p.id }"
+        >
           <div class="card-body">
-            <h3 class="card-title">{{p.nom}}</h3>
+            <h3 class="card-title">{{ p.nom }}</h3>
             <div class="card-text" *ngIf="p.estMoi">C'est vous !</div>
             <div class="card-text" *ngIf="p.estQuiRecoitDeMoi">
               C'est à

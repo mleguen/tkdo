@@ -1,5 +1,5 @@
 import { VERSION } from './version';
 
 export const environment = {
-    version: VERSION.semverString,
+  version: VERSION.semverString,
 };

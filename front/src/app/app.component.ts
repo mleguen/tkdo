@@ -10,31 +10,26 @@ import { BackendService } from './backend.service';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [
-    RouterOutlet,
-    CommonModule,
-    HeaderComponent,
-  ],
+  imports: [RouterOutlet, CommonModule, HeaderComponent],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+  styleUrl: './app.component.scss',
 })
 export class AppComponent implements OnInit {
-
   erreurBackend$ = this.backend.erreur$;
   menuOuvert = false;
   version = environment.version;
 
   constructor(
     private readonly backend: BackendService,
-    private readonly router: Router
-  ) { }
+    private readonly router: Router,
+  ) {}
 
   ngOnInit() {
-    this.router.events.pipe(
-      filter(e => e instanceof NavigationStart)
-    ).subscribe(() => {
-      if (this.menuOuvert) this.toggleMenu();
-    });
+    this.router.events
+      .pipe(filter((e) => e instanceof NavigationStart))
+      .subscribe(() => {
+        if (this.menuOuvert) this.toggleMenu();
+      });
   }
 
   toggleMenu() {

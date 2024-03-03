@@ -1,9 +1,8 @@
-import { cy } from 'local-cypress'
+import { cy } from 'local-cypress';
 
 export class AppPage {
-
   invaliderSession() {
-    cy.window().then(w => w.localStorage.setItem("backend-token", "invalid"));
+    cy.window().then((w) => w.localStorage.setItem('backend-token', 'invalid'));
   }
 
   boutonSeDeconnecter() {

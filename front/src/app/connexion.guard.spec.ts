@@ -11,10 +11,7 @@ describe('connexionGuard', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [
-        RouterTestingModule,
-        HttpClientTestingModule,
-      ]
+      imports: [RouterTestingModule, HttpClientTestingModule],
     });
   });
 

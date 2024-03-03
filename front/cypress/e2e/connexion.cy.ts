@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, cy, describe, expect, it } from 'local-cypress'
+import { afterEach, beforeEach, cy, describe, expect, it } from 'local-cypress';
 
 import { AppPage } from 'cypress/po/app.po';
 import { ConnexionPage } from 'cypress/po/connexion.po';
@@ -8,7 +8,6 @@ import { jeSuisConnecteEnTantQue } from 'cypress/preconditions/connexion.pre';
 import { etantDonneQue } from 'cypress/preconditions/preconditions';
 
 describe('connexion/déconnexion/reconnexion', () => {
-
   let expectNoSevereLogs: boolean;
 
   beforeEach(() => {
@@ -20,13 +19,13 @@ describe('connexion/déconnexion/reconnexion', () => {
       .then((console) => cy.spy(console, 'log').as('log'));
   });
 
-  it("se connecter", () => {
+  it('se connecter', () => {
     cy.visit('/');
 
     const connexionPage = new ConnexionPage();
     connexionPage.titre().should('have.text', 'Connexion');
 
-    cy.fixture('utilisateurs').then(utilisateurs => {
+    cy.fixture('utilisateurs').then((utilisateurs) => {
       connexionPage.identifiant().type(utilisateurs.soi.identifiant);
       connexionPage.motDePasse().type(utilisateurs.soi.mdp);
       connexionPage.boutonSeConnecter().click();
@@ -34,31 +33,31 @@ describe('connexion/déconnexion/reconnexion', () => {
     });
   });
 
-  it("ne pas demander de se reconnecter quand la session est toujours valide", () => {
-    cy.fixture('utilisateurs').then(utilisateurs => {
+  it('ne pas demander de se reconnecter quand la session est toujours valide', () => {
+    cy.fixture('utilisateurs').then((utilisateurs) => {
       etantDonneQue(jeSuisConnecteEnTantQue(utilisateurs.soi));
 
       const anyPage = new AppPage();
       anyPage.menuMonProfil().click();
 
       const profilPage = new ProfilPage();
-      profilPage.titre().should('have.text', "Mon profil");
+      profilPage.titre().should('have.text', 'Mon profil');
 
       cy.reload();
 
-      profilPage.titre().should('have.text', "Mon profil");
+      profilPage.titre().should('have.text', 'Mon profil');
     });
   });
 
-  it("se reconnecter quand la session est invalide et ramener ensuite à la même page", () => {
-    cy.fixture('utilisateurs').then(utilisateurs => {
+  it('se reconnecter quand la session est invalide et ramener ensuite à la même page', () => {
+    cy.fixture('utilisateurs').then((utilisateurs) => {
       etantDonneQue(jeSuisConnecteEnTantQue(utilisateurs.soi));
 
       const anyPage = new AppPage();
       anyPage.menuMonProfil().click();
 
       const profilPage = new ProfilPage();
-      profilPage.titre().should('have.text', "Mon profil");
+      profilPage.titre().should('have.text', 'Mon profil');
 
       profilPage.invaliderSession();
       expectNoSevereLogs = false;
@@ -71,12 +70,12 @@ describe('connexion/déconnexion/reconnexion', () => {
       connexionPage.motDePasse().type(utilisateurs.soi.mdp);
       connexionPage.boutonSeConnecter().click();
 
-      profilPage.titre().should('have.text', "Mon profil");
+      profilPage.titre().should('have.text', 'Mon profil');
     });
   });
 
-  it("se déconnecter et se reconnecter avec un autre identifiant", () => {
-    cy.fixture('utilisateurs').then(utilisateurs => {
+  it('se déconnecter et se reconnecter avec un autre identifiant', () => {
+    cy.fixture('utilisateurs').then((utilisateurs) => {
       etantDonneQue(jeSuisConnecteEnTantQue(utilisateurs.soi));
 
       const anyPage = new AppPage();
@@ -92,8 +91,10 @@ describe('connexion/déconnexion/reconnexion', () => {
       connexionPage.motDePasse().type(utilisateurs.quiRecoitDeSoi.mdp);
       connexionPage.boutonSeConnecter().click();
 
-      connexionPage.nomUtilisateur().should('have.text', utilisateurs.quiRecoitDeSoi.nom);
-    })
+      connexionPage
+        .nomUtilisateur()
+        .should('have.text', utilisateurs.quiRecoitDeSoi.nom);
+    });
   });
 
   afterEach(async () => {
@@ -103,8 +104,8 @@ describe('connexion/déconnexion/reconnexion', () => {
         .each((call: sinon.SinonSpyCall<string[], void>) => {
           // inspect each console.log argument
           call.args.forEach((arg) => {
-            expect(arg).to.not.contain('error')
-          })
+            expect(arg).to.not.contain('error');
+          });
         });
     }
   });

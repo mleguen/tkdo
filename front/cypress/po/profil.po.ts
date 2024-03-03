@@ -1,4 +1,3 @@
 import { AppPage } from './app.po';
 
-export class ProfilPage extends AppPage {
-}
+export class ProfilPage extends AppPage {}

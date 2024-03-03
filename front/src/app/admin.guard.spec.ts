@@ -10,9 +10,7 @@ describe('adminGuard', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule,
-      ],
+      imports: [HttpClientTestingModule],
     });
   });
 

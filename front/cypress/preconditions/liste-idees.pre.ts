@@ -14,31 +14,39 @@ export function jeSuisSurLaPageListeDIdeesPour(u: Utilisateur) {
       occasionPage.participant(u).click();
       ctx.pageCourante = pageCible;
     }
-  }
+  };
 }
 
-export function uneIdeeAEteProposeeParPour(description: string, par: Utilisateur, pour: Utilisateur) {
+export function uneIdeeAEteProposeeParPour(
+  description: string,
+  par: Utilisateur,
+  pour: Utilisateur,
+) {
   return (ctx: ContextePreconditions) => {
     jeSuisConnecteEnTantQue(par)(ctx);
     jeSuisSurLaPageListeDIdeesPour(pour)(ctx);
 
     const listeIdeesPage = new ListeIdeesPage();
     // listeIdeesPage.idees(description) ne peut pas être utilisé comme on n'est pas sûr que l'idée existe
-    listeIdeesPage.idees().then($i => {
+    listeIdeesPage.idees().then(($i) => {
       if (!$i.is(`:contains("${description}")`)) {
         listeIdeesPage.descriptionNouvelleIdee().type(description);
         listeIdeesPage.boutonAjouterNouvelleIdee().click();
       }
     });
-  }
+  };
 }
 
-export function uneIdeeAEteSuprimeeParPour(description: string, par: Utilisateur, pour: Utilisateur) {
+export function uneIdeeAEteSuprimeeParPour(
+  description: string,
+  par: Utilisateur,
+  pour: Utilisateur,
+) {
   return (ctx: ContextePreconditions) => {
     uneIdeeAEteProposeeParPour(description, par, pour)(ctx);
     jeSuisSurLaPageListeDIdeesPour(pour)(ctx);
 
     const listeIdeesPage = new ListeIdeesPage();
     listeIdeesPage.boutonSupprimerIdee(description).click();
-  }
+  };
 }

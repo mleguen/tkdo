@@ -1,20 +1,21 @@
 .form-text {
-  color: rgba(255, 255, 255, 0.5)
+  color: rgba(255, 255, 255, 0.5);
 }
 
 // Palliatif en attendant le vrai dropdown-menu-dark de bootstrap v5
-.dropdown-menu-dark, .dropdown-menu-dark .dropdown-item:hover {
-  background: #343a40
+.dropdown-menu-dark,
+.dropdown-menu-dark .dropdown-item:hover {
+  background: #343a40;
 }
 .dropdown-menu-dark .dropdown-item {
-  color: rgba(255,255,255,.5);
+  color: rgba(255, 255, 255, 0.5);
 }
 .dropdown-menu-dark .dropdown-item:hover {
-  color: rgba(255,255,255, .75);
+  color: rgba(255, 255, 255, 0.75);
 }
 .dropdown-menu-dark .dropdown-item.active {
-  color: rgba(255,255,255);
+  color: rgba(255, 255, 255);
 }
 .dropdown-menu-dark .dropdown-item.active:hover {
-  background: #007bff
+  background: #007bff;
 }

@@ -9,15 +9,16 @@ import { httpInterceptorProviders } from './http-interceptors';
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideRouter(routes, withRouterConfig({
-      onSameUrlNavigation: 'reload'
-    })),
-    importProvidersFrom(
-      HttpClientModule
+    provideRouter(
+      routes,
+      withRouterConfig({
+        onSameUrlNavigation: 'reload',
+      }),
     ),
+    importProvidersFrom(HttpClientModule),
     // Les guards sont des fonctions reposant sur des classes qu'elles doivent donc pouvoir injecter
     AdminGuard,
     ConnexionGuard,
     httpInterceptorProviders,
-  ]
+  ],
 };

@@ -11,15 +11,11 @@ import { BackendService, IdeesPour, Idee, Genre } from '../backend.service';
 @Component({
   selector: 'app-liste-idees',
   standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-  ],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './liste-idees.component.html',
-  styleUrl: './liste-idees.component.scss'
+  styleUrl: './liste-idees.component.scss',
 })
 export class ListeIdeesComponent {
-
   Genre = Genre;
 
   formAjout = this.fb.group({
@@ -40,24 +36,34 @@ export class ListeIdeesComponent {
     this.listeIdees$ = this.route.queryParamMap.pipe(
       combineLatestWith(this.backend.utilisateurConnecte$, this.actualise$),
       switchMap(([queryParams, utilisateurConnecte]) => {
-        if (!queryParams.has('idUtilisateur') || utilisateurConnecte === null) return of(null);
-        this.idUtilisateur = +(queryParams.get('idUtilisateur')!);
+        if (!queryParams.has('idUtilisateur') || utilisateurConnecte === null)
+          return of(null);
+        this.idUtilisateur = +queryParams.get('idUtilisateur')!;
         return this.backend.getIdees(this.idUtilisateur).pipe(
-          map(li => {
-            const idees = li.idees.map(i => Object.assign({}, i, {
-              dateProposition: moment(i.dateProposition, 'YYYY-MM-DDTHH:mm:ssZ').locale('fr').format('L à LT'),
-              estDeMoi: i.auteur.id === utilisateurConnecte.id,
-            }));
+          map((li) => {
+            const idees = li.idees.map((i) =>
+              Object.assign({}, i, {
+                dateProposition: moment(
+                  i.dateProposition,
+                  'YYYY-MM-DDTHH:mm:ssZ',
+                )
+                  .locale('fr')
+                  .format('L à LT'),
+                estDeMoi: i.auteur.id === utilisateurConnecte.id,
+              }),
+            );
             return Object.assign({}, li, {
               estPourMoi: li.utilisateur.id === utilisateurConnecte.id,
-              idees: idees.filter(i => i.auteur.id === this.idUtilisateur),
-              autresIdees: idees.filter(i => i.auteur.id !== this.idUtilisateur),
+              idees: idees.filter((i) => i.auteur.id === this.idUtilisateur),
+              autresIdees: idees.filter(
+                (i) => i.auteur.id !== this.idUtilisateur,
+              ),
             });
           }),
           // Les erreurs backend sont déjà affichées par AppComponent
-          catchError(() => of(null))
+          catchError(() => of(null)),
         );
-      })
+      }),
     );
   }
 
@@ -66,7 +72,8 @@ export class ListeIdeesComponent {
   }
 
   async ajoute() {
-    if (this.idUtilisateur === undefined) throw new Error("pas encore initialisé");
+    if (this.idUtilisateur === undefined)
+      throw new Error('pas encore initialisé');
 
     const { description } = this.formAjout.value;
     try {
@@ -74,9 +81,9 @@ export class ListeIdeesComponent {
       this.erreurAjoutSuppression = undefined;
       this.formAjout.reset();
       this.actualise();
-    }
-    catch (err) {
-      this.erreurAjoutSuppression = (err instanceof Error ? err.message : undefined) || 'ajout impossible';
+    } catch (err) {
+      this.erreurAjoutSuppression =
+        (err instanceof Error ? err.message : undefined) || 'ajout impossible';
     }
   }
 
@@ -85,9 +92,10 @@ export class ListeIdeesComponent {
       await this.backend.supprimeIdee(idIdee);
       this.erreurAjoutSuppression = undefined;
       this.actualise();
-    }
-    catch (err) {
-      this.erreurAjoutSuppression = (err instanceof Error ? err.message : undefined) || 'suppression impossible';
+    } catch (err) {
+      this.erreurAjoutSuppression =
+        (err instanceof Error ? err.message : undefined) ||
+        'suppression impossible';
     }
   }
 }

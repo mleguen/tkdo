@@ -3,14 +3,32 @@
 <form [formGroup]="formConnexion" (ngSubmit)="connecte()">
   <div class="form-group">
     <label for="identifiant">Identifiant :</label>
-    <input id="identifiant" type="text" formControlName="identifiant" class="form-control">
+    <input
+      id="identifiant"
+      type="text"
+      formControlName="identifiant"
+      class="form-control"
+    />
   </div>
   <div class="form-group">
     <label for="mdp">Mot de passe :</label>
-    <input id="mdp" type="password" formControlName="mdp" class="form-control">
-  </div>  
-  <button id="btnSeConnecter" class="btn btn-primary" type="submit" [disabled]="!formConnexion.valid">Se connecter</button>
+    <input
+      id="mdp"
+      type="password"
+      formControlName="mdp"
+      class="form-control"
+    />
+  </div>
+  <button
+    id="btnSeConnecter"
+    class="btn btn-primary"
+    type="submit"
+    [disabled]="!formConnexion.valid"
+  >
+    Se connecter
+  </button>
 </form>
 
-<div *ngIf="erreurConnexion" class="alert alert-danger">{{erreurConnexion}}</div>
-
+<div *ngIf="erreurConnexion" class="alert alert-danger">
+  {{ erreurConnexion }}
+</div>

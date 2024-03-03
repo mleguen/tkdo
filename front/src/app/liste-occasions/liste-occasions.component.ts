@@ -8,10 +8,9 @@ import { BackendService, Occasion } from '../backend.service';
   selector: 'app-liste-occasions',
   standalone: true,
   templateUrl: './liste-occasions.component.html',
-  styleUrl: './liste-occasions.component.scss'
+  styleUrl: './liste-occasions.component.scss',
 })
 export class ListeOccasionsComponent implements OnInit, OnDestroy {
-
   protected occasions$: Observable<Occasion[] | null>;
   protected lastSubscription: Subscription | null = null;
 
@@ -22,22 +21,26 @@ export class ListeOccasionsComponent implements OnInit, OnDestroy {
     this.occasions$ = this.backend.occasions$.pipe(
       tap(async (occasions) => {
         if (occasions !== null) {
-          let occasion = occasions.find(o => {
+          let occasion = occasions.find((o) => {
             const d = new Date(o.date);
             return d.getTime() > Date.now();
           });
 
-          if (!occasion && (occasions.length > 0)) {
+          if (!occasion && occasions.length > 0) {
             occasion = occasions[occasions.length - 1];
           }
 
           if (occasion) {
             await this.router.navigate(['occasion', occasion.id]);
           } else {
-            await this.router.navigate(['idee'], { queryParams: { idUtilisateur: await this.backend.getIdUtilisateurConnecte() } });
+            await this.router.navigate(['idee'], {
+              queryParams: {
+                idUtilisateur: await this.backend.getIdUtilisateurConnecte(),
+              },
+            });
           }
         }
-      })
+      }),
     );
   }
 

@@ -9,5 +9,5 @@ export function jeSuisSurLaPageOccasion() {
       anyPage.menuMesOccasionsItems().first().click();
       ctx.pageCourante = 'occasion';
     }
-  }
+  };
 }
