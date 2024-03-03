@@ -24,6 +24,10 @@ rm front/package*.json
 # (see https://github.com/cypress-io/cypress/issues/7552#issuecomment-1842066053)
 ./npm install --save-dev local-cypress
 
+# Have eslint prevent deprecated code
+./npm install --save-dev eslint-plugin-deprecation
+
+ESLINTRC_JSON=$(cat front/.eslintrc.json)
 ANGULAR_JSON=$(cat front/angular.json)
 PACKAGE_JSON=$(cat front/package.json)
 TSCONFIG_JSON=$(sed -e '/^\w*\/\*.*/d' front/tsconfig.json)
@@ -53,6 +57,12 @@ CYPRESS_TSCONFIG_JSON=$(jq <<<$CYPRESS_TSCONFIG_JSON 'del(.compilerOptions.types
 # Add npm run ct
 PACKAGE_JSON=$(jq <<<$PACKAGE_JSON '.scripts.ct = "ng run tkdo-front:ct"')
 
+# Setup eslint-plugin-deprecation
+ESLINTRC_JSON=$(jq <<<$ESLINTRC_JSON '.overrides[0].extends += ["plugin:deprecation/recommended"]')
+ESLINTRC_JSON=$(jq <<<$ESLINTRC_JSON '.overrides[0].parserOptions.project = "./tsconfig.json"')
+PACKAGE_JSON=$(jq <<<$PACKAGE_JSON '.scripts.test |= "ng lint && " + .')
+
+cat <<<$ESLINTRC_JSON > front/.eslintrc.json
 cat <<<$ANGULAR_JSON > front/angular.json
 cat <<<$PACKAGE_JSON > front/package.json
 cat <<<$TSCONFIG_JSON > front/tsconfig.json
@@ -62,6 +72,9 @@ cat <<<$CYPRESS_TSCONFIG_JSON > front/cypress/tsconfig.json
 sed -E '1i import { cy, describe, it } from '\''local-cypress'\'\\n -i front/cypress/e2e/spec.cy.ts
 # Ensure cy.mount is built into local Cypress types for component tests (cf. comment about installing local-cypress above)
 sed -e '/import .* from '\''cypress\/angular'\''/a import { Cypress } from '\''local-cypress'\' -i front/cypress/support/component.ts
+
+# Ignore eslint error on Cypress namespace
+sed -e '/namespace Cypress/i \/\/ eslint-disable-next-line @typescript-eslint\/no-namespace -- A réactiver après implémentation' -i front/cypress/support/component.ts
 
 ./ng generate environments
 
@@ -81,8 +94,8 @@ done
 
 for g in admin connexion; do
     ./ng generate guard $g --implements=CanActivate
+    # Ignore eslint error on freshly created guard not implemented yet
+    sed -e '/export const .*Guard/i \/\/ eslint-disable-next-line @typescript-eslint\/no-unused-vars -- A réactiver après implémentation' -i front/src/app/$g.guard.ts
 done
 
-./npm test
-./npm run ct
-./npm run e2e
+./npm test && ./npm run ct && ./npm run e2e
