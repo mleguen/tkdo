@@ -17,9 +17,9 @@ où sera installé tkdo.
 
 ### Pré-requis
 
-- environnement local (pour la construction) :
-  - docker et docker-composer
-  - droits d'exécution de docker sans `sudo`
+- pour la construction du package d'installation :
+  - docker et son plugin compose installés
+  - utilisateur membre du groupe `docker` (pour exécuter `docker` et `docker compose` sans `sudo`)
 - serveur :
   - php 7.3 avec les extensions `dom`, `mbstring`, `pdo_mysql` et `zip`
   - Apache avec le module `mod_rewrite`

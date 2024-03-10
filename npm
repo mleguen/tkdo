@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-COMPOSE_FILE=docker-compose.yml:front/docker/docker-compose.yml docker-compose run --publish=4200:4200 --rm npm "$@"
+docker compose run --publish=4200:4200 --rm npm "$@"

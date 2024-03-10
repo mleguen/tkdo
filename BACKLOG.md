@@ -1,13 +1,11 @@
 # Travaux futurs
 
-- monter la version de node et des dépendances front (en commençant par angular)
+- simplifier les conteneurs slim en utilisant php-fpm au lieu de php-apache, et en utilisation directement l'uid/gid du développeur
+- renommer le conteneur slim-cli en composer (sur le même principe que le conteneur npm)
 - rendre personnalisable la signature des emails, pour faire un peu moins "machine"
-- passer à `docker compose` et standardiser son utilisation (un unique `docker-compose.yml`)
-- remplacer `protractor` par `cypress` pour les tests e2e, en ne dépendant plus de quoi que ce soit d'autre que docker sur le host
 - trier les participants par ordre alphabétique
 - couper proprement les noms de participants trop longs
 - support de AWS en serverless avec ansible, et 2 stacks dev/prod
-- renommer le conteneur slim-cli en composer (sur le même principe que le conteneur npm)
 - remplacer apache-pack par un outil de build digne de ce nom ou le supprimer complètement
 - renommer fixtures en install, et renseigner un email admin par défaut
   (l'admin pourra ensuite le modifier par lui-même)

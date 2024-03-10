@@ -1,30 +1,39 @@
 # Guide du développeur
 
+## Prérequis
+
+- docker et son plugin compose installés
+- utilisateur membre du groupe `docker` (pour exécuter `docker` et `docker compose` sans `sudo`)
+- id d'utilisateur (`id -u`) et de groupe (`id -g`) défini dans le `.env` à la racine du projet, si différents de 1000
+  (pour s'assurer que les différents conteneurs s'exécutent en tant que l'utilisateur pour avoir les mêmes droits)
+
 ## Utiliser l'environnement de développement complet
 
 Démarrer et initialiser l'environnement :
 
 ```bash
-docker-compose up -d front
+docker compose up -d front
+./npm install
+./npm run build -- --configuration production
 ```
 
 Puis ouvrez votre navigateur sur http://localhost:8080
 
-Les logs sont affichés sur la sortie standard des conteneurs et collectés par docker-compose.
+Les logs sont affichés sur la sortie standard des conteneurs et collectés par docker compose.
 Pour les consulter ou fil de l'eau :
 
 ```bash
-docker-compose logs -f
+docker compose logs -f
 ```
 
 > Attention : chaque démarrage de l'environnement Docker
 > réinitialisera la base de données et recréera les fixtures
-> (`docker-compose run --rm slim-cli ./install-with-fixtures.sh`)
+> (`docker compose run --rm slim-cli ./install-with-fixtures.sh`)
 
 ## Tests de bout en bout
 
 ```bash
-docker-compose up -d front
+docker compose up -d front
 ./npm run e2e
 ```
 
@@ -34,23 +43,16 @@ docker-compose up -d front
 > Ce jeu de test doit être raffraichi entre 2 exécutions des tests :
 > 
 > ```bash
-> docker-compose up -d slim-cli
+> docker compose up -d slim-cli
 > ```
-
-## Prérequis globaux
-
-- docker et docker-compose installés
-- utilisateur membre du groupe `docker` (pour exécuter docker et docker-compose sans `sudo`)
-- id d'utilisateur (`id -u`) et de groupe (`id -g`) défini dans le `.env` à la racine du projet, si différents de 1000
-  (pour s'assurer que les différents conteneurs s'exécutent en tant que l'utilisateur pour avoir les mêmes droits)
 
 ## Front
 
 ### Outils
 
-Les différents outils front (cypress, npm, ng) s'exécutent dans le conteneur docker `npm`, de manière à ne pas nécessiter l'installation de dépendances sur le poste du développeur, et maîtriser les versions utilisées.
+Les différents outils front (cypress, ng, npm, npx) s'exécutent dans le conteneur docker `npm`, de manière à ne pas nécessiter l'installation de dépendances sur le poste du développeur, et maîtriser les versions utilisées.
 
-Des scripts sont disponibles à la racine du projet pour simplifier leur appel via docker : `./cypress`, `./ng`, `./npm`.
+Des scripts sont disponibles à la racine du projet pour simplifier leur appel via docker : `./cypress`, `./ng`, `./npm`, `./npx`.
 Ces scripts s'exécutent directement dans le contexte du répertoire `front`.
 
 ### Installation des dépendances
@@ -129,23 +131,30 @@ Procédure à suivre pour que le projet continue d'utiliser angular de la maniè
 
 ## API
 
+### Outils
+
+Les différents outils back (composer, doctrine, console) s'exécutent dans le conteneur docker `slim-cli`, de manière à ne pas nécessiter l'installation de dépendances sur le poste du développeur, et maîtriser les versions utilisées.
+
+Des scripts sont disponibles à la racine du projet pour simplifier leur appel via docker : `./composer`, `./doctrine`, `./console`.
+Ces scripts s'exécutent directement dans le contexte du répertoire `api`.
+
 ### Tests
 
 - tous les tests (unitaires et intégration) :
 
   ```bash
-  docker-compose run --rm slim-cli ./run-test.sh
+  docker compose run --rm slim-cli ./run-test.sh
   ```
 
 - ou seulement les tests d'intégration :
 
   ```bash
-  docker-compose run --rm slim-cli ./run-test.sh --filter '/Test\\Int/'
+  docker compose run --rm slim-cli ./run-test.sh --filter '/Test\\Int/'
   ```
 
 > Attention : l'exécution des tests d'intégration
 > réinitialise la base de données de l'environnement de développement
-> (`docker-compose run --rm slim-cli ./install.sh`)
+> (`docker compose run --rm slim-cli ./install.sh`)
 
 ### Créer une nouvelle migration de base de données
 
@@ -153,24 +162,22 @@ Commencer par réinitialiser l'environnement de développement
 et s'assurer que la base de données est au niveau de la dernière migration :
 
 ```bash
-docker-compose run --rm slim-cli ./install.sh
+docker compose run --rm slim-cli ./install.sh
 ```
 
 Puis générer automatiquement la nouvelle migration :
 
 ```bash
-docker-compose run --rm slim-cli -c '
-  ./composer.phar doctrine -- orm:clear-cache:metadata &&
-  ./composer.phar doctrine -- orm:clear-cache:query &&
-  ./composer.phar doctrine -- orm:clear-cache:result &&
-  for d in $(find var/doctrine/cache -mindepth 1 -type d); do rm -rf "$d"; done &&
-  ./composer.phar doctrine -- migrations:diff'
+./doctrine orm:clear-cache:metadata
+./doctrine orm:clear-cache:query
+./doctrine orm:clear-cache:result
+docker compose run --rm slim-cli -c 'for d in $(find var/doctrine/cache -mindepth 1 -type d); do rm -rf "$d"; done'
+./doctrine migrations:diff
 ```
 
 Finalement, après vérification/finalisation de la migration, la tester :
 
 ```bash
-docker-compose run --rm slim-cli -c '
-  ./composer.phar doctrine -- migrations:migrate &&
-  ./composer.phar console -- fixtures'
+./doctrine migrations:migrate
+./console fixtures
 ```

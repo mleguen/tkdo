@@ -1,6 +1,104 @@
-version: '3.8'
+volumes:
+  cache:
+  doctrine:
 
-# Ce docker-compose.yml vide est à appeler en 1er
-# pour forcer ./ à correspondre au répertoire racine du projet
-# dans les différents docker-compose.yml des sous-répertoires
-# (cf .env pour la liste des docker-compose.yml utilisés)
+services:
+  angular:
+    build: ./front/docker/angular
+    volumes:
+      - ./front/dist:/mnt/dist
+
+  front:
+    build: ./docker/front
+    depends_on:
+      - angular
+      - slim
+      - slim-cli
+    ports:
+      - 8080:80
+
+  mailhog:
+    image: mailhog/mailhog
+    ports:
+      - 8025:8025
+
+  mysql:
+    environment:
+      MYSQL_DATABASE: tkdo
+      MYSQL_USER: tkdo
+      MYSQL_PASSWORD: mdptkdo
+      MYSQL_ROOT_PASSWORD: mdproot
+    image: mysql:5.6
+
+  npm:
+    build:
+      context: ./front/docker/npm
+      args:
+        DEV_GID: ${DEV_GID:-1000}
+        DEV_UID: ${DEV_UID:-1000}
+    cap_add:
+      # Mandatory to be able to run chrome without --no-sandbox option
+      - SYS_ADMIN
+    environment:
+      - CYPRESS_CACHE_FOLDER=/mnt/tkdo/.cache/Cypress
+      - NG_CLI_ANALYTICS=false
+      - NPM_CONFIG_CACHE=/mnt/tkdo/.cache/npm
+    volumes:
+      - ./:/mnt/tkdo
+
+  slim:
+    build: ./api/docker/slim
+    depends_on:
+      - mailhog
+      - mysql
+    environment:
+      docker: "true"
+      MHSENDMAIL_OPTIONS: --smtp-addr=mailhog:1025
+      MYSQL_DATABASE: tkdo
+      MYSQL_HOST: mysql
+      MYSQL_PASSWORD: mdptkdo
+      MYSQL_PORT: 3306
+      MYSQL_USER: tkdo
+      TKDO_BASE_URI: http://slim
+      TKDO_MAILER_FROM: noreply@slim
+    volumes:
+      - ./api/public:/var/www/html/public
+      - ./api/src:/var/www/html/src
+      - ./api/var/auth:/var/www/html/var/auth
+      - cache:/var/www/html/var/cache
+      - doctrine:/var/www/html/var/doctrine
+      - ./api/vendor:/var/www/html/vendor
+      - ./api/.env:/var/www/html/.env
+
+  slim-cli:
+    build: ./api/docker/slim-cli
+    command: ./install-with-fixtures.sh
+    depends_on:
+      - mysql
+      - slim
+    environment:
+      docker: "true"
+      MAILHOG_BASE_URI: http://mailhog:8025/
+      MHSENDMAIL_OPTIONS: --smtp-addr=mailhog:1025
+      MYSQL_DATABASE: tkdo
+      MYSQL_HOST: mysql
+      MYSQL_PASSWORD: mdptkdo
+      MYSQL_PORT: 3306
+      MYSQL_USER: tkdo
+      TKDO_BASE_URI: http://slim
+      TKDO_MAILER_FROM: noreply@slim
+    restart: "no"
+    volumes:
+      - ./api/bin:/usr/src/tkdo/bin
+      - ./api/src:/usr/src/tkdo/src
+      - ./api/test:/usr/src/tkdo/test
+      - ./api/var/auth:/usr/src/tkdo/var/auth
+      - cache:/usr/src/tkdo/var/cache
+      - doctrine:/usr/src/tkdo/var/doctrine
+      - ./api/vendor:/usr/src/tkdo/vendor
+      - ./api/.env:/usr/src/tkdo/.env
+      - ./api/cli-config.php:/usr/src/tkdo/cli-config.php
+      - ./api/composer.json:/usr/src/tkdo/composer.json
+      - ./api/composer.lock:/usr/src/tkdo/composer.lock
+      - ./api/composer.phar:/usr/src/tkdo/composer.phar
+      - ./api/phpunit.xml:/usr/src/tkdo/phpunit.xml

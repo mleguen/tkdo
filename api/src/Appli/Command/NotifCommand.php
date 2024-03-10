@@ -13,7 +13,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Envoie les notifications périodiques d'idées créées/supprimées
  * 
- * Usage : ./composer-api console notif -p Q
+ * Usage : ./console notif -p Q
  */
 class NotifCommand extends Command
 {

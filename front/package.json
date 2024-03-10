@@ -5,7 +5,6 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "install-build-watch": "npm install && npm run build -- --watch",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "npx prettier . --write && ng lint && ng test",
