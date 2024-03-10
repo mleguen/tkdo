@@ -1,9 +1,9 @@
 # Guide du développeur
 
-## Prérequis globaux
+## Prérequis
 
-- docker et docker-compose installés
-- utilisateur membre du groupe `docker` (pour exécuter docker et docker-compose sans `sudo`)
+- docker et son plugin compose installés
+- utilisateur membre du groupe `docker` (pour exécuter `docker` et `docker compose` sans `sudo`)
 - id d'utilisateur (`id -u`) et de groupe (`id -g`) défini dans le `.env` à la racine du projet, si différents de 1000
   (pour s'assurer que les différents conteneurs s'exécutent en tant que l'utilisateur pour avoir les mêmes droits)
 
@@ -11,9 +11,9 @@
 
 ### Outils
 
-Les différents outils front (cypress, npm, ng) s'exécutent dans le conteneur docker `npm`, de manière à ne pas nécessiter l'installation de dépendances sur le poste du développeur, et maîtriser les versions utilisées.
+Les différents outils front (cypress, ng, npm, npx) s'exécutent dans le conteneur docker `npm`, de manière à ne pas nécessiter l'installation de dépendances sur le poste du développeur, et maîtriser les versions utilisées.
 
-Des scripts sont disponibles à la racine du projet pour simplifier leur appel via docker : `./cypress`, `./ng`, `./npm`.
+Des scripts sont disponibles à la racine du projet pour simplifier leur appel via docker : `./cypress`, `./ng`, `./npm`, `./npx`.
 Ces scripts s'exécutent directement dans le contexte du répertoire `front`.
 
 ### Installation des dépendances

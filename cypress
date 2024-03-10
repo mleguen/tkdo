@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-docker-compose run --rm --entrypoint="node_modules/.bin/cypress" npm "$@"
+docker compose run --rm --entrypoint="node_modules/.bin/cypress" npm "$@"
