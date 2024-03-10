@@ -1,11 +1,11 @@
 FROM httpd:2.4
 RUN sed -ri -e '/LoadModule rewrite_module/s/^#//g' /usr/local/apache2/conf/httpd.conf \
         && echo '\n\
-        <Directory /mnt/dist/tkdo-front>\n\
+        <Directory /mnt/dist/tkdo-front/browser>\n\
                 Require all granted\n\
         </Directory>\n\
         <VirtualHost *:80>\n\
-                DocumentRoot /mnt/dist/tkdo-front\n\
+                DocumentRoot /mnt/dist/tkdo-front/browser\n\
                 RewriteEngine On\n\
                 \n\
                 RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI} -f [OR]\n\
