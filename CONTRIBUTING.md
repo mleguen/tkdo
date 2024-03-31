@@ -70,7 +70,7 @@ Ces scripts s'exécutent directement dans le contexte du répertoire `front`.
   ```
 
   > *A faire* : les tests unitaires sont minimalistes (instanciation des singleton).
-  > Une partie des tests faits en e2e devrait être repassée en tests unitaires
+  > Une partie des tests faits en int/e2e devrait être repassée en tests unitaires
 
 - tests de composants :
 
@@ -79,18 +79,18 @@ Ces scripts s'exécutent directement dans le contexte du répertoire `front`.
   ```
 
   > *A faire* : les tests de composants sont minimalistes (montage des composants).
-  > Une partie des tests faits en e2e devrait être repassée en tests de composants
+  > Une partie des tests faits en int/e2e devrait être repassée en tests de composants
 
 - tests d'intégration :
 
   ```bash
-  ./npm run e2e
+  ./npm run int
   ```
 
   ou pour n'exécuter que certains fichiers de tests :
 
   ```bash
-  ./npm run e2e --- -spec '**/liste-idees.cy.ts'
+  ./npm run int --- -spec '**/liste-idees.cy.ts'
   ```
 
   (pour n'exécuter qu'une partie des tests au sein d'un fichier,
