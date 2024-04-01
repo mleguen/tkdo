@@ -1,111 +1,55 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
-import moment from 'moment';
-import { BehaviorSubject, Observable, of } from 'rxjs';
-import { switchMap, catchError, map, combineLatestWith } from 'rxjs/operators';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 
-import { BackendService, IdeesPour, Idee, Genre } from '../backend.service';
+import { IdeeComponent } from '../idee/idee.component';
+import { IdeesPour, Idee, Genre, Utilisateur } from '../backend.service';
 
 @Component({
   selector: 'app-liste-idees',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, IdeeComponent],
   templateUrl: './liste-idees.component.html',
   styleUrl: './liste-idees.component.scss',
 })
 export class ListeIdeesComponent {
+  @Input() utilisateurConnecte?: Utilisateur;
+
+  @Output() actualise = new EventEmitter();
+  @Output() ajoute = new EventEmitter<string>();
+  @Output() supprime = new EventEmitter<number>();
+
   Genre = Genre;
+  autresIdees: Idee[] = [];
+  formAjout: FormGroup;
+  propresIdees: Idee[] = [];
+  utilisateur?: Utilisateur;
 
-  formAjout = this.fb.group({
-    description: ['', Validators.required],
-  });
-  erreurAjoutSuppression?: string;
-  listeIdees$: Observable<IdeesAfficheesPour | null>;
+  constructor(fb: FormBuilder) {
+    this.formAjout = fb.group({
+      description: ['', Validators.required],
+    });
+  }
 
-  protected idUtilisateur?: number;
-  protected actualise$ = new BehaviorSubject(true);
-
-  constructor(
-    private readonly fb: FormBuilder,
-    private readonly backend: BackendService,
-    private readonly route: ActivatedRoute,
-  ) {
-    // subscribe/unsubscribe automatiques par le template html
-    this.listeIdees$ = this.route.queryParamMap.pipe(
-      combineLatestWith(this.backend.utilisateurConnecte$, this.actualise$),
-      switchMap(([queryParams, utilisateurConnecte]) => {
-        if (!queryParams.has('idUtilisateur') || utilisateurConnecte === null)
-          return of(null);
-        this.idUtilisateur = +queryParams.get('idUtilisateur')!;
-        return this.backend.getIdees(this.idUtilisateur).pipe(
-          map((li) => {
-            const idees = li.idees.map((i) =>
-              Object.assign({}, i, {
-                dateProposition: moment(
-                  i.dateProposition,
-                  'YYYY-MM-DDTHH:mm:ssZ',
-                )
-                  .locale('fr')
-                  .format('L à LT'),
-                estDeMoi: i.auteur.id === utilisateurConnecte.id,
-              }),
-            );
-            return Object.assign({}, li, {
-              estPourMoi: li.utilisateur.id === utilisateurConnecte.id,
-              idees: idees.filter((i) => i.auteur.id === this.idUtilisateur),
-              autresIdees: idees.filter(
-                (i) => i.auteur.id !== this.idUtilisateur,
-              ),
-            });
-          }),
-          // Les erreurs backend sont déjà affichées par AppComponent
-          catchError(() => of(null)),
-        );
-      }),
+  @Input()
+  set ideesPour(ip: IdeesPour) {
+    this.utilisateur = ip.utilisateur;
+    this.propresIdees = ip.idees.filter(
+      (i) => i.auteur.id === ip.utilisateur.id,
+    );
+    this.autresIdees = ip.idees.filter(
+      (i) => i.auteur.id !== ip.utilisateur.id,
     );
   }
 
-  actualise() {
-    this.actualise$.next(true);
-  }
-
-  async ajoute() {
-    if (this.idUtilisateur === undefined)
-      throw new Error('pas encore initialisé');
-
+  ajouteEtReset() {
     const { description } = this.formAjout.value;
-    try {
-      await this.backend.ajouteIdee(this.idUtilisateur, description || '');
-      this.erreurAjoutSuppression = undefined;
-      this.formAjout.reset();
-      this.actualise();
-    } catch (err) {
-      this.erreurAjoutSuppression =
-        (err instanceof Error ? err.message : undefined) || 'ajout impossible';
-    }
+    this.ajoute.emit(description);
+    this.formAjout.reset();
   }
-
-  async supprime(idIdee: number) {
-    try {
-      await this.backend.supprimeIdee(idIdee);
-      this.erreurAjoutSuppression = undefined;
-      this.actualise();
-    } catch (err) {
-      this.erreurAjoutSuppression =
-        (err instanceof Error ? err.message : undefined) ||
-        'suppression impossible';
-    }
-  }
-}
-
-interface IdeesAfficheesPour extends IdeesPour {
-  autresIdees: IdeeAffichee[];
-  estPourMoi: boolean;
-  idees: IdeeAffichee[];
-}
-
-interface IdeeAffichee extends Idee {
-  estDeMoi: boolean;
 }

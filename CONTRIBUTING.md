@@ -78,7 +78,13 @@ Ces scripts s'exécutent directement dans le contexte du répertoire `front`.
   ./npm run ct
   ```
 
-  > *A faire* : les tests de composants sont minimalistes (montage des composants).
+  ou pour n'exécuter que certains fichiers de tests :
+
+  ```bash
+  ./npm run cy -- --spec '**/liste-idees.component.cy.ts'
+  ```
+
+  > *A faire* : les tests de composants sont pour la plupart minimalistes (montage du composant uniquement).
   > Une partie des tests faits en int/e2e devrait être repassée en tests de composants
 
 - tests d'intégration :
@@ -90,7 +96,7 @@ Ces scripts s'exécutent directement dans le contexte du répertoire `front`.
   ou pour n'exécuter que certains fichiers de tests :
 
   ```bash
-  ./npm run int --- -spec '**/liste-idees.cy.ts'
+  ./npm run int -- --spec '**/liste-idees.cy.ts'
   ```
 
   (pour n'exécuter qu'une partie des tests au sein d'un fichier,
