@@ -63,7 +63,8 @@ PACKAGE_JSON=$(jq <<<$PACKAGE_JSON '.scripts.ct = "ng run tkdo-front:ct"')
 # Setup eslint-plugin-deprecation
 ESLINTRC_JSON=$(jq <<<$ESLINTRC_JSON '.overrides[0].extends += ["plugin:deprecation/recommended"]')
 ESLINTRC_JSON=$(jq <<<$ESLINTRC_JSON '.overrides[0].parserOptions.project = "./tsconfig.json"')
-PACKAGE_JSON=$(jq <<<$PACKAGE_JSON '.scripts.test |= "npx prettier . --write && ng lint && " + .')
+PACKAGE_JSON=$(jq <<<$PACKAGE_JSON '.scripts.format = "npx prettier . --write | grep -v unchanged || true"')
+PACKAGE_JSON=$(jq <<<$PACKAGE_JSON '.scripts.test |= "npm run format && ng lint && " + .')
 
 cat <<<$ESLINTRC_JSON > front/.eslintrc.json
 cat <<<$ANGULAR_JSON > front/angular.json
@@ -81,9 +82,12 @@ sed -E '1i import { cy, describe, it } from '\''local-cypress'\'\\n -i front/cyp
 # Ensure cy.mount is built into local Cypress types for component tests (cf. comment about installing local-cypress above)
 sed -e '/import .* from '\''cypress\/angular'\''/a import { Cypress } from '\''local-cypress'\' -i front/cypress/support/component.ts
 
+# Ignore eslint error on Cypress namespace
+sed -e '/namespace Cypress/i \/\/ eslint-disable-next-line @typescript-eslint\/no-namespace -- A réactiver après implémentation' -i front/cypress/support/component.ts
+
 ./ng generate environments
 
-for c in admin connexion deconnexion header liste-idees liste-occasions occasion profil; do
+for c in admin connexion deconnexion header idee liste-idees liste-occasions occasion page-idees profil; do
     # Another bug in @cypress/schematic:component prevents the base Angular component from working without --standalone
     # (it doesn't know the app is standalone and therefore looks for a module ng new no longer creates - apps are now standalone by default)
     ./ng generate component $c --standalone
