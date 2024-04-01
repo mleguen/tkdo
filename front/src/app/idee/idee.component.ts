@@ -9,6 +9,7 @@ import {
   SimpleChanges,
 } from '@angular/core';
 import moment from 'moment';
+import 'moment/locale/fr';
 
 import { Idee, Utilisateur } from '../backend.service';
 
