@@ -1,5 +1,5 @@
 <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
-  <a class="navbar-brand" href="#">Tirage cadeaux</a>
+  <a class="navbar-brand ms-2" href="#">Tirage cadeaux</a>
   <button
     class="navbar-toggler"
     type="button"
@@ -17,7 +17,7 @@
     class="collapse navbar-collapse"
     id="navbarsExampleDefault"
   >
-    <ul class="navbar-nav mr-auto">
+    <ul class="navbar-nav me-auto">
       <ng-container *ngIf="occasions$ | async as occasions">
         <li ngbDropdown class="nav-item dropdown" *ngIf="occasions.length > 0">
           <button
@@ -89,7 +89,7 @@
     <form class="form-inline">
       <span
         id="nomUtilisateur"
-        class="form-text mr-2"
+        class="form-text me-2"
         data-toggle="collapse"
         data-target=".navbar-collapse.show"
         >{{ utilisateur.nom }}</span
@@ -97,7 +97,7 @@
       <button
         id="btnSeDeconnecter"
         [routerLink]="['/deconnexion']"
-        class="btn btn-secondary my-2 my-sm-0"
+        class="btn btn-secondary me-2"
         data-toggle="collapse"
         data-target=".navbar-collapse.show"
       >
