@@ -1,6 +1,7 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { RouterTestingModule } from '@angular/router/testing';
+import { provideRouter } from '@angular/router';
+
 import { BackendService } from './backend.service';
 
 describe('BackendService', () => {
@@ -8,7 +9,8 @@ describe('BackendService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [RouterTestingModule, HttpClientTestingModule],
+      imports: [HttpClientTestingModule],
+      providers: [provideRouter([])],
     });
     service = TestBed.inject(BackendService);
   });
