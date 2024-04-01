@@ -6,12 +6,13 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "npx prettier . --write && ng lint && ng test",
+    "test": "npm run format && ng lint && ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
     "cypress:open": "cypress open",
     "cypress:run": "cypress run",
-    "ct": "ng run tkdo-front:ct"
+    "ct": "ng run tkdo-front:ct",
+    "format": "npx prettier . --write | grep -v unchanged || true"
   },
   "private": true,
   "dependencies": {
