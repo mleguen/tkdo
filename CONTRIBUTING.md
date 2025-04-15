@@ -34,6 +34,7 @@ docker compose logs -f
 
 ```bash
 docker compose up -d front
+./npm install
 ./npm run e2e
 ```
 
@@ -43,7 +44,7 @@ docker compose up -d front
 > Ce jeu de test doit être raffraichi entre 2 exécutions des tests :
 > 
 > ```bash
-> docker compose up -d slim-cli
+> docker compose up slim-cli
 > ```
 
 ## Front

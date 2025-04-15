@@ -5,8 +5,8 @@
 - correctifs :
   - api : n'envoie les notifs instantanées qu'aux personnes concernées
 - tâches techniques :
-  - api : montée de version des dépendances
-  - front : montée de version des dépendances
+  - api : montée de version des dépendances (nov. 2023)
+  - front : montée de version des dépendances (déc. 2023)
 
 ## V1.4.0 (25/11/2023)
 
