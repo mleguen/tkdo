@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tests\Domain\Occasion;
@@ -8,7 +9,7 @@ use Tests\TestCase;
 
 class OccasionTest extends TestCase
 {
-    public function occasionProvider()
+    public function occasionProvider(): array
     {
         return [
             [1, 'bill.gates', 'Bill', 'Gates'],
@@ -21,12 +22,12 @@ class OccasionTest extends TestCase
 
     /**
      * @dataProvider occasionProvider
-     * @param $id
-     * @param $occasionname
-     * @param $firstName
-     * @param $lastName
+     * @param int    $id
+     * @param string $occasionname
+     * @param string $firstName
+     * @param string $lastName
      */
-    public function testGetters($id, $occasionname, $firstName, $lastName)
+    public function testGetters(int $id, string $occasionname, string $firstName, string $lastName)
     {
         $occasion = new Occasion($id, $occasionname, $firstName, $lastName);
 
@@ -38,12 +39,12 @@ class OccasionTest extends TestCase
 
     /**
      * @dataProvider occasionProvider
-     * @param $id
-     * @param $occasionname
-     * @param $firstName
-     * @param $lastName
+     * @param int    $id
+     * @param string $occasionname
+     * @param string $firstName
+     * @param string $lastName
      */
-    public function testJsonSerialize($id, $occasionname, $firstName, $lastName)
+    public function testJsonSerialize(int $id, string $occasionname, string $firstName, string $lastName)
     {
         $occasion = new Occasion($id, $occasionname, $firstName, $lastName);
 

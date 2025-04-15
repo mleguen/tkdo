@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Application\Actions\Resultat;
@@ -15,7 +16,7 @@ class ViewResultatAction extends ResultatAction
         $resultatId = (int) $this->resolveArg('id');
         $resultat = $this->resultatRepository->findResultatOfId($resultatId);
 
-        $this->logger->info("Resultat of id `${userId}` was viewed.");
+        $this->logger->info("Resultat of id `${resultatId}` was viewed.");
 
         return $this->respondWithData($resultat);
     }

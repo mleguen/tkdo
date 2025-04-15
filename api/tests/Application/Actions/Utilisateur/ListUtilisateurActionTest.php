@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tests\Application\Actions\Utilisateur;
@@ -28,7 +29,7 @@ class ListUtilisateurActionTest extends TestCase
 
         $container->set(UtilisateurRepository::class, $utilisateurRepositoryProphecy->reveal());
 
-        $request = $this->createRequest('GET', '/users');
+        $request = $this->createRequest('GET', '/utilisateur');
         $response = $app->handle($request);
 
         $payload = (string) $response->getBody();

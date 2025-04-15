@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tests\Application\Actions\Occasion;
@@ -32,7 +33,7 @@ class ViewOccasionActionTest extends TestCase
 
         $container->set(OccasionRepository::class, $occasionRepositoryProphecy->reveal());
 
-        $request = $this->createRequest('GET', '/users/1');
+        $request = $this->createRequest('GET', '/occasion/1');
         $response = $app->handle($request);
 
         $payload = (string) $response->getBody();
@@ -50,7 +51,7 @@ class ViewOccasionActionTest extends TestCase
         $responseFactory = $app->getResponseFactory();
 
         $errorHandler = new HttpErrorHandler($callableResolver, $responseFactory);
-        $errorMiddleware = new ErrorMiddleware($callableResolver, $responseFactory, true, false ,false);
+        $errorMiddleware = new ErrorMiddleware($callableResolver, $responseFactory, true, false, false);
         $errorMiddleware->setDefaultErrorHandler($errorHandler);
 
         $app->add($errorMiddleware);
@@ -66,7 +67,7 @@ class ViewOccasionActionTest extends TestCase
 
         $container->set(OccasionRepository::class, $occasionRepositoryProphecy->reveal());
 
-        $request = $this->createRequest('GET', '/users/1');
+        $request = $this->createRequest('GET', '/occasion/1');
         $response = $app->handle($request);
 
         $payload = (string) $response->getBody();

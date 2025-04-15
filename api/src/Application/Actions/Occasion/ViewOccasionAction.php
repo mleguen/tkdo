@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Application\Actions\Occasion;
@@ -15,7 +16,7 @@ class ViewOccasionAction extends OccasionAction
         $occasionId = (int) $this->resolveArg('id');
         $occasion = $this->occasionRepository->findOccasionOfId($occasionId);
 
-        $this->logger->info("Occasion of id `${userId}` was viewed.");
+        $this->logger->info("Occasion of id `${occasionId}` was viewed.");
 
         return $this->respondWithData($occasion);
     }

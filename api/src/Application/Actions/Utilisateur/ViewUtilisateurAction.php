@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Application\Actions\Utilisateur;
@@ -15,7 +16,7 @@ class ViewUtilisateurAction extends UtilisateurAction
         $utilisateurId = (int) $this->resolveArg('id');
         $utilisateur = $this->utilisateurRepository->findUtilisateurOfId($utilisateurId);
 
-        $this->logger->info("Utilisateur of id `${userId}` was viewed.");
+        $this->logger->info("Utilisateur of id `${utilisateurId}` was viewed.");
 
         return $this->respondWithData($utilisateur);
     }

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Domain\Idee;
@@ -7,32 +8,14 @@ use JsonSerializable;
 
 class Idee implements JsonSerializable
 {
-    /**
-     * @var int|null
-     */
-    private $id;
+    private ?int $id;
 
-    /**
-     * @var string
-     */
-    private $ideename;
+    private string $ideename;
 
-    /**
-     * @var string
-     */
-    private $firstName;
+    private string $firstName;
 
-    /**
-     * @var string
-     */
-    private $lastName;
+    private string $lastName;
 
-    /**
-     * @param int|null  $id
-     * @param string    $ideename
-     * @param string    $firstName
-     * @param string    $lastName
-     */
     public function __construct(?int $id, string $ideename, string $firstName, string $lastName)
     {
         $this->id = $id;
@@ -41,42 +24,28 @@ class Idee implements JsonSerializable
         $this->lastName = ucfirst($lastName);
     }
 
-    /**
-     * @return int|null
-     */
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * @return string
-     */
     public function getIdeename(): string
     {
         return $this->ideename;
     }
 
-    /**
-     * @return string
-     */
     public function getFirstName(): string
     {
         return $this->firstName;
     }
 
-    /**
-     * @return string
-     */
     public function getLastName(): string
     {
         return $this->lastName;
     }
 
-    /**
-     * @return array
-     */
-    public function jsonSerialize()
+    #[\ReturnTypeWillChange]
+    public function jsonSerialize(): array
     {
         return [
             'id' => $this->id,

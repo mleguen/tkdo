@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Infrastructure\Persistence\Occasion;
@@ -12,12 +13,10 @@ class InMemoryOccasionRepository implements OccasionRepository
     /**
      * @var Occasion[]
      */
-    private $occasions;
+    private array $occasions;
 
     /**
-     * InMemoryOccasionRepository constructor.
-     *
-     * @param array|null $occasions
+     * @param Occasion[]|null $occasions
      */
     public function __construct(array $occasions = null)
     {

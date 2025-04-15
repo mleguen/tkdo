@@ -35,34 +35,41 @@ function copy-entity {
   name=$1
   lname=$(lowercase $name)
   
-  sed -Ee "s/(\/\/.*)User/\1Xxx/;s/InMemory/Doctrine/;/User/{h;s/User/${name}/g;p;g}" -i api/app/repositories.php
+  # Replace User in comment lines by Xxx
+  # Duplicate other lines with User, replacing User by the entity name in the 1st copy
+  sed -Ee "s/(\/\/.*)Users?/\1Xxx/;s/InMemory/Doctrine/;/Users?/{h;s/Users?/${name}/g;p;g}" -i api/app/repositories.php
+
+  # Consider lines containing ->group and the 3 following lines as a block 
+  # Duplicate lines or group blocks with User, replacing User/user by the entity name in the 1st copy
+  sed -Ee "/->group\('\/users?'/{N;N;N};/Users?/{h;s/Users?/${name}/g;s/\/users?/\/${lname}/g;p;g}" -i api/app/routes.php
   
   mkdir $ACTION_DIR/$name
-  sed -Ee "s/Users?/$name/g;s/(\\\$| |->)user/\1$lname/g" $ACTION_DIR/User/UserAction.php > $ACTION_DIR/$name/${name}Action.php
-  sed -Ee "s/Users?/$name/g;s/(\\\$| |->)user/\1$lname/g" $ACTION_DIR/User/ListUsersAction.php > $ACTION_DIR/$name/List${name}Action.php
-  sed -Ee "s/Users?/$name/g;s/(\\\$| |->)user/\1$lname/g" $ACTION_DIR/User/ViewUserAction.php > $ACTION_DIR/$name/View${name}Action.php
+  sed -Ee "s/Users?/$name/g;s/(\\\$\{?| |->)user/\1$lname/g;s/\/users?/\/$lname/g" $ACTION_DIR/User/UserAction.php > $ACTION_DIR/$name/${name}Action.php
+  sed -Ee "s/Users?/$name/g;s/(\\\$\{?| |->)user/\1$lname/g;s/\/users?/\/$lname/g" $ACTION_DIR/User/ListUsersAction.php > $ACTION_DIR/$name/List${name}Action.php
+  sed -Ee "s/Users?/$name/g;s/(\\\$\{?| |->)user/\1$lname/g;s/\/users?/\/$lname/g" $ACTION_DIR/User/ViewUserAction.php > $ACTION_DIR/$name/View${name}Action.php
   
   mkdir $DOMAIN_DIR/$name
-  sed -Ee "s/Users?/$name/g;s/(\\\$| |->)user/\1$lname/g" $DOMAIN_DIR/User/User.php > $DOMAIN_DIR/$name/$name.php
-  sed -Ee "s/Users?/$name/g;s/(\\\$| |->)user/\1$lname/g" $DOMAIN_DIR/User/UserNotFoundException.php > $DOMAIN_DIR/$name/${name}NotFoundException.php
-  sed -Ee "s/Users?/$name/g;s/(\\\$| |->)user/\1$lname/g" $DOMAIN_DIR/User/UserRepository.php > $DOMAIN_DIR/$name/${name}Repository.php
+  sed -Ee "s/Users?/$name/g;s/(\\\$\{?| |->)user/\1$lname/g;s/\/users?/\/$lname/g" $DOMAIN_DIR/User/User.php > $DOMAIN_DIR/$name/$name.php
+  sed -Ee "s/Users?/$name/g;s/(\\\$\{?| |->)user/\1$lname/g;s/\/users?/\/$lname/g" $DOMAIN_DIR/User/UserNotFoundException.php > $DOMAIN_DIR/$name/${name}NotFoundException.php
+  sed -Ee "s/Users?/$name/g;s/(\\\$\{?| |->)user/\1$lname/g;s/\/users?/\/$lname/g" $DOMAIN_DIR/User/UserRepository.php > $DOMAIN_DIR/$name/${name}Repository.php
   
   mkdir $PERSISTENCE_DIR/$name
-  sed -Ee "s/Users?/$name/g;s/(\\\$| |->)user/\1$lname/g" $PERSISTENCE_DIR/User/InMemoryUserRepository.php > $PERSISTENCE_DIR/$name/InMemory${name}Repository.php
+  sed -Ee "s/Users?/$name/g;s/(\\\$\{?| |->)user/\1$lname/g;s/\/users?/\/$lname/g" $PERSISTENCE_DIR/User/InMemoryUserRepository.php > $PERSISTENCE_DIR/$name/InMemory${name}Repository.php
   
   mkdir $ACTION_TEST_DIR/$name
-  sed -Ee "s/Users?/$name/g;s/(\\\$| |->)user/\1$lname/g" $ACTION_TEST_DIR/User/ListUserActionTest.php > $ACTION_TEST_DIR/$name/List${name}ActionTest.php
-  sed -Ee "s/Users?/$name/g;s/(\\\$| |->)user/\1$lname/g" $ACTION_TEST_DIR/User/ViewUserActionTest.php > $ACTION_TEST_DIR/$name/View${name}ActionTest.php
+  sed -Ee "s/Users?/$name/g;s/(\\\$\{?| |->)user/\1$lname/g;s/\/users?/\/$lname/g" $ACTION_TEST_DIR/User/ListUserActionTest.php > $ACTION_TEST_DIR/$name/List${name}ActionTest.php
+  sed -Ee "s/Users?/$name/g;s/(\\\$\{?| |->)user/\1$lname/g;s/\/users?/\/$lname/g" $ACTION_TEST_DIR/User/ViewUserActionTest.php > $ACTION_TEST_DIR/$name/View${name}ActionTest.php
   
   mkdir $DOMAIN_TEST_DIR/$name
-  sed -Ee "s/Users?/$name/g;s/(\\\$| |->)user/\1$lname/g" $DOMAIN_TEST_DIR/User/UserTest.php > $DOMAIN_TEST_DIR/$name/${name}Test.php
+  sed -Ee "s/Users?/$name/g;s/(\\\$\{?| |->)user/\1$lname/g;s/\/users?/\/$lname/g" $DOMAIN_TEST_DIR/User/UserTest.php > $DOMAIN_TEST_DIR/$name/${name}Test.php
   
   mkdir $PERSISTENCE_TEST_DIR/$name
-  sed -Ee "s/Users?/$name/g;s/(\\\$| |->)user/\1$lname/g" $PERSISTENCE_TEST_DIR/User/InMemoryUserRepositoryTest.php > $PERSISTENCE_TEST_DIR/$name/InMemory${name}RepositoryTest.php
+  sed -Ee "s/Users?/$name/g;s/(\\\$\{?| |->)user/\1$lname/g;s/\/users?/\/$lname/g" $PERSISTENCE_TEST_DIR/User/InMemoryUserRepositoryTest.php > $PERSISTENCE_TEST_DIR/$name/InMemory${name}RepositoryTest.php
 }
 
 function delete-entity-template {
   sed -Ee "/User/d" -i api/app/repositories.php
+  sed -Ee "/->group/{N;N;N};/User/d" -i api/app/routes.php
 
   rm -f $ACTION_DIR/User/ListUsersAction.php
   rm -f $ACTION_DIR/User/UserAction.php
@@ -110,3 +117,5 @@ copy-entity Occasion
 copy-entity Idee
 copy-entity Resultat
 delete-entity-template
+
+./composer test

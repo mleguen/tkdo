@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tests\Application\Actions\Occasion;
@@ -28,7 +29,7 @@ class ListOccasionActionTest extends TestCase
 
         $container->set(OccasionRepository::class, $occasionRepositoryProphecy->reveal());
 
-        $request = $this->createRequest('GET', '/users');
+        $request = $this->createRequest('GET', '/occasion');
         $response = $app->handle($request);
 
         $payload = (string) $response->getBody();

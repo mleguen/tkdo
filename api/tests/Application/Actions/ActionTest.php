@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tests\Application\Actions;
@@ -18,14 +19,14 @@ class ActionTest extends TestCase
         $container = $app->getContainer();
         $logger = $container->get(LoggerInterface::class);
 
-        $testAction = new class($logger) extends Action {
+        $testAction = new class ($logger) extends Action {
             public function __construct(
                 LoggerInterface $loggerInterface
             ) {
                 parent::__construct($loggerInterface);
             }
 
-            public function action() :Response
+            public function action(): Response
             {
                 return $this->respond(
                     new ActionPayload(
@@ -51,14 +52,14 @@ class ActionTest extends TestCase
         $container = $app->getContainer();
         $logger = $container->get(LoggerInterface::class);
 
-        $testAction = new class($logger) extends Action {
+        $testAction = new class ($logger) extends Action {
             public function __construct(
                 LoggerInterface $loggerInterface
             ) {
                 parent::__construct($loggerInterface);
             }
 
-            public function action() :Response
+            public function action(): Response
             {
                 return $this->respondWithData(
                     [

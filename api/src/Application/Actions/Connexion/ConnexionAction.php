@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Application\Actions\Connexion;
@@ -9,15 +10,8 @@ use Psr\Log\LoggerInterface;
 
 abstract class ConnexionAction extends Action
 {
-    /**
-     * @var ConnexionRepository
-     */
-    protected $connexionRepository;
+    protected ConnexionRepository $connexionRepository;
 
-    /**
-     * @param LoggerInterface $logger
-     * @param ConnexionRepository  $connexionRepository
-     */
     public function __construct(LoggerInterface $logger, ConnexionRepository $connexionRepository)
     {
         parent::__construct($logger);

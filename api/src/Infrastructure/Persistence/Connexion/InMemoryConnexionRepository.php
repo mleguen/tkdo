@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Infrastructure\Persistence\Connexion;
@@ -12,12 +13,10 @@ class InMemoryConnexionRepository implements ConnexionRepository
     /**
      * @var Connexion[]
      */
-    private $connexions;
+    private array $connexions;
 
     /**
-     * InMemoryConnexionRepository constructor.
-     *
-     * @param array|null $connexions
+     * @param Connexion[]|null $connexions
      */
     public function __construct(array $connexions = null)
     {

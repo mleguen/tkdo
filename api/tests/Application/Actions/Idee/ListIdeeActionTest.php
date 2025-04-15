@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tests\Application\Actions\Idee;
@@ -28,7 +29,7 @@ class ListIdeeActionTest extends TestCase
 
         $container->set(IdeeRepository::class, $ideeRepositoryProphecy->reveal());
 
-        $request = $this->createRequest('GET', '/users');
+        $request = $this->createRequest('GET', '/idee');
         $response = $app->handle($request);
 
         $payload = (string) $response->getBody();

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Application\Actions\Connexion;
@@ -15,7 +16,7 @@ class ViewConnexionAction extends ConnexionAction
         $connexionId = (int) $this->resolveArg('id');
         $connexion = $this->connexionRepository->findConnexionOfId($connexionId);
 
-        $this->logger->info("Connexion of id `${userId}` was viewed.");
+        $this->logger->info("Connexion of id `${connexionId}` was viewed.");
 
         return $this->respondWithData($connexion);
     }

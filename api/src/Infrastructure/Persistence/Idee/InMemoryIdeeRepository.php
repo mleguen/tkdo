@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Infrastructure\Persistence\Idee;
@@ -12,12 +13,10 @@ class InMemoryIdeeRepository implements IdeeRepository
     /**
      * @var Idee[]
      */
-    private $idees;
+    private array $idees;
 
     /**
-     * InMemoryIdeeRepository constructor.
-     *
-     * @param array|null $idees
+     * @param Idee[]|null $idees
      */
     public function __construct(array $idees = null)
     {

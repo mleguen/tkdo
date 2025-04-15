@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tests\Domain\Connexion;
@@ -8,7 +9,7 @@ use Tests\TestCase;
 
 class ConnexionTest extends TestCase
 {
-    public function connexionProvider()
+    public function connexionProvider(): array
     {
         return [
             [1, 'bill.gates', 'Bill', 'Gates'],
@@ -21,12 +22,12 @@ class ConnexionTest extends TestCase
 
     /**
      * @dataProvider connexionProvider
-     * @param $id
-     * @param $connexionname
-     * @param $firstName
-     * @param $lastName
+     * @param int    $id
+     * @param string $connexionname
+     * @param string $firstName
+     * @param string $lastName
      */
-    public function testGetters($id, $connexionname, $firstName, $lastName)
+    public function testGetters(int $id, string $connexionname, string $firstName, string $lastName)
     {
         $connexion = new Connexion($id, $connexionname, $firstName, $lastName);
 
@@ -38,12 +39,12 @@ class ConnexionTest extends TestCase
 
     /**
      * @dataProvider connexionProvider
-     * @param $id
-     * @param $connexionname
-     * @param $firstName
-     * @param $lastName
+     * @param int    $id
+     * @param string $connexionname
+     * @param string $firstName
+     * @param string $lastName
      */
-    public function testJsonSerialize($id, $connexionname, $firstName, $lastName)
+    public function testJsonSerialize(int $id, string $connexionname, string $firstName, string $lastName)
     {
         $connexion = new Connexion($id, $connexionname, $firstName, $lastName);
 

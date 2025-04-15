@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tests\Domain\Resultat;
@@ -8,7 +9,7 @@ use Tests\TestCase;
 
 class ResultatTest extends TestCase
 {
-    public function resultatProvider()
+    public function resultatProvider(): array
     {
         return [
             [1, 'bill.gates', 'Bill', 'Gates'],
@@ -21,12 +22,12 @@ class ResultatTest extends TestCase
 
     /**
      * @dataProvider resultatProvider
-     * @param $id
-     * @param $resultatname
-     * @param $firstName
-     * @param $lastName
+     * @param int    $id
+     * @param string $resultatname
+     * @param string $firstName
+     * @param string $lastName
      */
-    public function testGetters($id, $resultatname, $firstName, $lastName)
+    public function testGetters(int $id, string $resultatname, string $firstName, string $lastName)
     {
         $resultat = new Resultat($id, $resultatname, $firstName, $lastName);
 
@@ -38,12 +39,12 @@ class ResultatTest extends TestCase
 
     /**
      * @dataProvider resultatProvider
-     * @param $id
-     * @param $resultatname
-     * @param $firstName
-     * @param $lastName
+     * @param int    $id
+     * @param string $resultatname
+     * @param string $firstName
+     * @param string $lastName
      */
-    public function testJsonSerialize($id, $resultatname, $firstName, $lastName)
+    public function testJsonSerialize(int $id, string $resultatname, string $firstName, string $lastName)
     {
         $resultat = new Resultat($id, $resultatname, $firstName, $lastName);
 

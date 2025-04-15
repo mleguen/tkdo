@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tests\Application\Actions\Idee;
@@ -32,7 +33,7 @@ class ViewIdeeActionTest extends TestCase
 
         $container->set(IdeeRepository::class, $ideeRepositoryProphecy->reveal());
 
-        $request = $this->createRequest('GET', '/users/1');
+        $request = $this->createRequest('GET', '/idee/1');
         $response = $app->handle($request);
 
         $payload = (string) $response->getBody();
@@ -50,7 +51,7 @@ class ViewIdeeActionTest extends TestCase
         $responseFactory = $app->getResponseFactory();
 
         $errorHandler = new HttpErrorHandler($callableResolver, $responseFactory);
-        $errorMiddleware = new ErrorMiddleware($callableResolver, $responseFactory, true, false ,false);
+        $errorMiddleware = new ErrorMiddleware($callableResolver, $responseFactory, true, false, false);
         $errorMiddleware->setDefaultErrorHandler($errorHandler);
 
         $app->add($errorMiddleware);
@@ -66,7 +67,7 @@ class ViewIdeeActionTest extends TestCase
 
         $container->set(IdeeRepository::class, $ideeRepositoryProphecy->reveal());
 
-        $request = $this->createRequest('GET', '/users/1');
+        $request = $this->createRequest('GET', '/idee/1');
         $response = $app->handle($request);
 
         $payload = (string) $response->getBody();

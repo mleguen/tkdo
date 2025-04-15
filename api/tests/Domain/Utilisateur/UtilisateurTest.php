@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tests\Domain\Utilisateur;
@@ -8,7 +9,7 @@ use Tests\TestCase;
 
 class UtilisateurTest extends TestCase
 {
-    public function utilisateurProvider()
+    public function utilisateurProvider(): array
     {
         return [
             [1, 'bill.gates', 'Bill', 'Gates'],
@@ -21,12 +22,12 @@ class UtilisateurTest extends TestCase
 
     /**
      * @dataProvider utilisateurProvider
-     * @param $id
-     * @param $utilisateurname
-     * @param $firstName
-     * @param $lastName
+     * @param int    $id
+     * @param string $utilisateurname
+     * @param string $firstName
+     * @param string $lastName
      */
-    public function testGetters($id, $utilisateurname, $firstName, $lastName)
+    public function testGetters(int $id, string $utilisateurname, string $firstName, string $lastName)
     {
         $utilisateur = new Utilisateur($id, $utilisateurname, $firstName, $lastName);
 
@@ -38,12 +39,12 @@ class UtilisateurTest extends TestCase
 
     /**
      * @dataProvider utilisateurProvider
-     * @param $id
-     * @param $utilisateurname
-     * @param $firstName
-     * @param $lastName
+     * @param int    $id
+     * @param string $utilisateurname
+     * @param string $firstName
+     * @param string $lastName
      */
-    public function testJsonSerialize($id, $utilisateurname, $firstName, $lastName)
+    public function testJsonSerialize(int $id, string $utilisateurname, string $firstName, string $lastName)
     {
         $utilisateur = new Utilisateur($id, $utilisateurname, $firstName, $lastName);
 

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tests\Application\Actions\Resultat;
@@ -28,7 +29,7 @@ class ListResultatActionTest extends TestCase
 
         $container->set(ResultatRepository::class, $resultatRepositoryProphecy->reveal());
 
-        $request = $this->createRequest('GET', '/users');
+        $request = $this->createRequest('GET', '/resultat');
         $response = $app->handle($request);
 
         $payload = (string) $response->getBody();

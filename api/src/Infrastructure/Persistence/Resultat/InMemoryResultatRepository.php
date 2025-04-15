@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Infrastructure\Persistence\Resultat;
@@ -12,12 +13,10 @@ class InMemoryResultatRepository implements ResultatRepository
     /**
      * @var Resultat[]
      */
-    private $resultats;
+    private array $resultats;
 
     /**
-     * InMemoryResultatRepository constructor.
-     *
-     * @param array|null $resultats
+     * @param Resultat[]|null $resultats
      */
     public function __construct(array $resultats = null)
     {

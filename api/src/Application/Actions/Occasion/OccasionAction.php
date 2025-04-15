@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Application\Actions\Occasion;
@@ -9,15 +10,8 @@ use Psr\Log\LoggerInterface;
 
 abstract class OccasionAction extends Action
 {
-    /**
-     * @var OccasionRepository
-     */
-    protected $occasionRepository;
+    protected OccasionRepository $occasionRepository;
 
-    /**
-     * @param LoggerInterface $logger
-     * @param OccasionRepository  $occasionRepository
-     */
     public function __construct(LoggerInterface $logger, OccasionRepository $occasionRepository)
     {
         parent::__construct($logger);

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Infrastructure\Persistence\Utilisateur;
@@ -12,12 +13,10 @@ class InMemoryUtilisateurRepository implements UtilisateurRepository
     /**
      * @var Utilisateur[]
      */
-    private $utilisateurs;
+    private array $utilisateurs;
 
     /**
-     * InMemoryUtilisateurRepository constructor.
-     *
-     * @param array|null $utilisateurs
+     * @param Utilisateur[]|null $utilisateurs
      */
     public function __construct(array $utilisateurs = null)
     {
