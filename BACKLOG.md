@@ -1,7 +1,7 @@
 # Travaux futurs
 
-- simplifier les conteneurs slim en utilisant php-fpm au lieu de php-apache, et en utilisation directement l'uid/gid du développeur
-- renommer le conteneur slim-cli en composer (sur le même principe que le conteneur npm)
+- se débarrasser de mhsendmail
+- passer à mysql 8
 - rendre personnalisable la signature des emails, pour faire un peu moins "machine"
 - séparer PageOccasionComponent/OccasionComponent/ParticipantComponent sur le modèle de PageIdeesComponent/ListeIdeesComponent/IdeeComponent
 - trier les participants par ordre alphabétique

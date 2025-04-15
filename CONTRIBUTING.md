@@ -26,10 +26,6 @@ Pour les consulter ou fil de l'eau :
 docker compose logs -f
 ```
 
-> Attention : chaque démarrage de l'environnement Docker
-> réinitialisera la base de données et recréera les fixtures
-> (`docker compose run --rm slim-cli ./install-with-fixtures.sh`)
-
 ## Tests de bout en bout
 
 ```bash
@@ -44,7 +40,7 @@ docker compose up -d front
 > Ce jeu de test doit être raffraichi entre 2 exécutions des tests :
 > 
 > ```bash
-> docker compose up slim-cli
+> ./composer run install-fixtures
 > ```
 
 ## Front
@@ -140,28 +136,28 @@ Procédure à suivre pour que le projet continue d'utiliser angular de la maniè
 
 ### Outils
 
-Les différents outils back (composer, doctrine, console) s'exécutent dans le conteneur docker `slim-cli`, de manière à ne pas nécessiter l'installation de dépendances sur le poste du développeur, et maîtriser les versions utilisées.
+`composer` et les autres outils back (doctrine, console, etc.) s'exécutent dans le conteneur docker `composer`, de manière à ne pas nécessiter l'installation de dépendances sur le poste du développeur, et maîtriser les versions utilisées.
 
 Des scripts sont disponibles à la racine du projet pour simplifier leur appel via docker : `./composer`, `./doctrine`, `./console`.
-Ces scripts s'exécutent directement dans le contexte du répertoire `api`.
+Ces scripts, bien que placés à la racine du projet pour être plus facilement accessibles, s'exécutent directement dans le contexte du répertoire `api`.
 
 ### Tests
 
 - tous les tests (unitaires et intégration) :
 
   ```bash
-  docker compose run --rm slim-cli ./run-test.sh
+  ./composer test
   ```
 
 - ou seulement les tests d'intégration :
 
   ```bash
-  docker compose run --rm slim-cli ./run-test.sh --filter '/Test\\Int/'
+  ./composer test -- --filter '/Test\\Int/'
   ```
 
-> Attention : l'exécution des tests d'intégration
-> réinitialise la base de données de l'environnement de développement
-> (`docker compose run --rm slim-cli ./install.sh`)
+> Attention : entre 2 exécution des tests d'intégration,
+> réinitialiser la base de données de l'environnement de développement
+> (`./composer run reset-doctrine`)
 
 ### Créer une nouvelle migration de base de données
 
@@ -169,7 +165,7 @@ Commencer par réinitialiser l'environnement de développement
 et s'assurer que la base de données est au niveau de la dernière migration :
 
 ```bash
-docker compose run --rm slim-cli ./install.sh
+./composer run reset-doctrine
 ```
 
 Puis générer automatiquement la nouvelle migration :
@@ -178,7 +174,7 @@ Puis générer automatiquement la nouvelle migration :
 ./doctrine orm:clear-cache:metadata
 ./doctrine orm:clear-cache:query
 ./doctrine orm:clear-cache:result
-docker compose run --rm slim-cli -c 'for d in $(find var/doctrine/cache -mindepth 1 -type d); do rm -rf "$d"; done'
+for d in $(find api/var/doctrine/cache -mindepth 1 -type d); do rm -rf "$d"; done
 ./doctrine migrations:diff
 ```
 

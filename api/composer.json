@@ -1,70 +1,80 @@
 {
-    "name": "slim/slim-skeleton",
-    "description": "A Slim Framework skeleton application for rapid development",
-    "keywords": [
-        "microframework",
-        "rest",
-        "router",
-        "psr7"
-    ],
-    "homepage": "http://github.com/slimphp/Slim-Skeleton",
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "Josh Lockhart",
-            "email": "info@joshlockhart.com",
-            "homepage": "http://www.joshlockhart.com/"
-        },
-        {
-            "name": "Pierre Berube",
-            "email": "pierre@lgse.com",
-            "homepage": "http://www.lgse.com/"
-        }
-    ],
-    "require": {
-        "php": ">=7.3",
-        "ext-json": "*",
-        "doctrine/annotations": "^2.0",
-        "doctrine/data-fixtures": "^1.6",
-        "doctrine/migrations": "^3.4",
-        "doctrine/orm": "^2.17",
-        "firebase/php-jwt": "^6.4",
-        "monolog/monolog": "^2.9",
-        "php-di/php-di": "^6.3",
-        "slim/psr7": "^1.5",
-        "slim/slim": "^4.9",
-        "symfony/cache": "^5.4",
-        "vlucas/phpdotenv": "^5.6"
+  "name": "slim/slim-skeleton",
+  "description": "A Slim Framework skeleton application for rapid development",
+  "keywords": [
+    "microframework",
+    "rest",
+    "router",
+    "psr7"
+  ],
+  "homepage": "http://github.com/slimphp/Slim-Skeleton",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Josh Lockhart",
+      "email": "info@joshlockhart.com",
+      "homepage": "http://www.joshlockhart.com/"
     },
-    "require-dev": {
-        "guzzlehttp/guzzle": "^7.8",
-        "php-http/guzzle7-adapter": "^1.0",
-        "php-http/message": "^1.16",
-        "phpspec/prophecy-phpunit": "^2.0",
-        "phpunit/phpunit": "^9.6",
-        "rpkamp/mailhog-client": "^1.0"
-    },
-    "config": {
-        "platform": {
-            "php": "7.3"
-        },
-        "process-timeout": 0,
-        "sort-packages": true
-    },
-    "autoload": {
-        "psr-4": {
-            "App\\": "src/"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "Test\\": "test/"
-        }
-    },
-    "scripts": {
-        "console": "php bin/console.php",
-        "doctrine": "php bin/doctrine.php",
-        "start": "php -S localhost:8080 -t public",
-        "test": "phpunit"
+    {
+      "name": "Pierre Berube",
+      "email": "pierre@lgse.com",
+      "homepage": "http://www.lgse.com/"
     }
+  ],
+  "require": {
+    "php": ">=7.3",
+    "ext-json": "*",
+    "doctrine/annotations": "^2.0",
+    "doctrine/data-fixtures": "^1.6",
+    "doctrine/migrations": "^3.4",
+    "doctrine/orm": "^2.17",
+    "firebase/php-jwt": "^6.4",
+    "monolog/monolog": "^2.9",
+    "php-di/php-di": "^6.3",
+    "slim/psr7": "^1.5",
+    "slim/slim": "^4.9",
+    "symfony/cache": "^5.4",
+    "vlucas/phpdotenv": "^5.6"
+  },
+  "require-dev": {
+    "guzzlehttp/guzzle": "^7.8",
+    "php-http/guzzle7-adapter": "^1.0",
+    "php-http/message": "^1.16",
+    "phpspec/prophecy-phpunit": "^2.0",
+    "phpunit/phpunit": "^9.6",
+    "rpkamp/mailhog-client": "^1.0"
+  },
+  "config": {
+    "platform": {
+      "php": "7.3"
+    },
+    "process-timeout": 0,
+    "sort-packages": true
+  },
+  "autoload": {
+    "psr-4": {
+      "App\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Test\\": "test/"
+    }
+  },
+  "scripts": {
+    "console": "@php bin/console.php",
+    "doctrine": "@php bin/doctrine.php",
+    "reset-doctrine": [
+      "@composer install",
+      "rm -rf ./var/cache/* ./var/doctrine/cache/* ./var/doctrine/proxy/*",
+      "@doctrine orm:schema-tool:drop --force --full-database",
+      "@doctrine orm:generate-proxies",
+      "@doctrine migrations:migrate --no-interaction"
+    ],
+    "install-fixtures": [
+      "@reset-doctrine",
+      "@console -- fixtures"
+    ],
+    "test": "phpunit"
+  }
 }

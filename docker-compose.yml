@@ -1,19 +1,36 @@
-volumes:
-  cache:
-  doctrine:
-
 services:
   angular:
     build: ./front/docker/angular
     volumes:
       - ./front/dist:/mnt/dist
 
+  composer:
+    build: docker/composer
+    entrypoint: composer
+    environment:
+      XDG_CACHE_HOME: /opt/tkdo/.cache
+      docker: "true"
+      MAILHOG_BASE_URI: http://mailhog:8025/
+      MHSENDMAIL_OPTIONS: --smtp-addr=mailhog:1025
+      MYSQL_DATABASE: tkdo
+      MYSQL_HOST: mysql
+      MYSQL_PASSWORD: mdptkdo
+      MYSQL_PORT: 3306
+      MYSQL_USER: tkdo
+      TKDO_BASE_URI: http://slim-web
+      TKDO_MAILER_FROM: noreply@slim
+    profiles:
+      - tools
+    user: ${UID:-1000}:${GID:-1000}
+    volumes:
+      - .:/opt/tkdo
+    working_dir: /opt/tkdo/api
+  
   front:
     build: ./docker/front
     depends_on:
       - angular
-      - slim
-      - slim-cli
+      - slim-web
     ports:
       - 8080:80
 
@@ -23,12 +40,20 @@ services:
       - 8025:8025
 
   mysql:
+    image: mysql:5.6
     environment:
       MYSQL_DATABASE: tkdo
       MYSQL_USER: tkdo
       MYSQL_PASSWORD: mdptkdo
       MYSQL_ROOT_PASSWORD: mdproot
-    image: mysql:5.6
+    healthcheck:
+      test: >
+        out=$$(mysqladmin ping -h localhost -P 3306 -u $$MYSQL_USER --password=$$MYSQL_PASSWORD 2>&1);
+        echo $$out | grep 'mysqld is alive' || { echo $$out; exit 1; }
+      interval: 5s
+      retries: 10
+      start_interval: 1s
+      start_period: 30s
 
   npm:
     build:
@@ -46,11 +71,13 @@ services:
     volumes:
       - ./:/mnt/tkdo
 
-  slim:
-    build: ./api/docker/slim
+  slim-fpm:
+    build: ./docker/slim-fpm
     depends_on:
-      - mailhog
-      - mysql
+      mysql:
+        condition: service_healthy
+      mailhog:
+        condition: service_started
     environment:
       docker: "true"
       MHSENDMAIL_OPTIONS: --smtp-addr=mailhog:1025
@@ -59,46 +86,21 @@ services:
       MYSQL_PASSWORD: mdptkdo
       MYSQL_PORT: 3306
       MYSQL_USER: tkdo
-      TKDO_BASE_URI: http://slim
+      TKDO_BASE_URI: http://slim-web
       TKDO_MAILER_FROM: noreply@slim
+      WWW_GID: ${GID:-1000}
+      WWW_UID: ${UID:-1000}
     volumes:
-      - ./api/public:/var/www/html/public
-      - ./api/src:/var/www/html/src
-      - ./api/var/auth:/var/www/html/var/auth
-      - cache:/var/www/html/var/cache
-      - doctrine:/var/www/html/var/doctrine
-      - ./api/vendor:/var/www/html/vendor
-      - ./api/.env:/var/www/html/.env
+      - ./api:/var/www/html
+      - ./docker/slim-fpm/docker-php-entrypoint:/usr/local/bin/docker-php-entrypoint
 
-  slim-cli:
-    build: ./api/docker/slim-cli
-    command: ./install-with-fixtures.sh
+  slim-web:
     depends_on:
-      - mysql
-      - slim
-    environment:
-      docker: "true"
-      MAILHOG_BASE_URI: http://mailhog:8025/
-      MHSENDMAIL_OPTIONS: --smtp-addr=mailhog:1025
-      MYSQL_DATABASE: tkdo
-      MYSQL_HOST: mysql
-      MYSQL_PASSWORD: mdptkdo
-      MYSQL_PORT: 3306
-      MYSQL_USER: tkdo
-      TKDO_BASE_URI: http://slim
-      TKDO_MAILER_FROM: noreply@slim
-    restart: "no"
+      - slim-fpm
+    image: nginx:1.27
+    ports:
+      - "8081:80"
     volumes:
-      - ./api/bin:/usr/src/tkdo/bin
-      - ./api/src:/usr/src/tkdo/src
-      - ./api/test:/usr/src/tkdo/test
-      - ./api/var/auth:/usr/src/tkdo/var/auth
-      - cache:/usr/src/tkdo/var/cache
-      - doctrine:/usr/src/tkdo/var/doctrine
-      - ./api/vendor:/usr/src/tkdo/vendor
-      - ./api/.env:/usr/src/tkdo/.env
-      - ./api/cli-config.php:/usr/src/tkdo/cli-config.php
-      - ./api/composer.json:/usr/src/tkdo/composer.json
-      - ./api/composer.lock:/usr/src/tkdo/composer.lock
-      - ./api/composer.phar:/usr/src/tkdo/composer.phar
-      - ./api/phpunit.xml:/usr/src/tkdo/phpunit.xml
+      - ./api:/var/www/html
+      - ./docker/slim-web/default.conf:/etc/nginx/conf.d/default.conf
+

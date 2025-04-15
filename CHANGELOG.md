@@ -2,6 +2,11 @@
 
 ## Prochaine release
 
+- tâches techniques :
+  - api : PHP 8.4 et slim 4.10 (avr. 2025)
+
+## V1.4.2 (01/04/2024)
+
 - correctifs :
   - api : n'envoie les notifs instantanées qu'aux personnes concernées
 - tâches techniques :
