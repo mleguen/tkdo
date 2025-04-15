@@ -1,16 +1,10 @@
-volumes:
-  logs:
-    driver: local
-
 services:
-  slim-cli:
-    image: php:7-alpine
-    working_dir: /var/www
-    command: php -S 0.0.0.0:8080 -t public
+  composer:
+    build: docker/composer
+    entrypoint: composer
     environment:
-      docker: "true"
-    ports:
-      - 8080:8080
+      XDG_CACHE_HOME: /opt/tkdo/.cache
+    user: composer
     volumes:
-      - .:/var/www
-      - logs:/var/www/logs
+      - .:/opt/tkdo
+    working_dir: /opt/tkdo/api

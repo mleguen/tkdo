@@ -10,8 +10,8 @@ mv api/var/doctrine api_backup/
 rm -r api
 
 # See https://github.com/slimphp/Slim-Skeleton
-# required php extensions apt packages: php-xml php-mbstring
-composer create-project slim/slim-skeleton api
+# no use of ./composer here as we need composer to run at the repo root
+docker compose run --rm --interactive --workdir /opt/tkdo composer create-project slim/slim-skeleton api
 
 # Restaure le paramétrage local non versionné
 mv api_backup/{auth,doctrine} api/var/
