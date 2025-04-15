@@ -1,4 +1,4 @@
-FROM php:7.3-cli
+FROM php:7.4-cli
 COPY --from=composer:2.8 /usr/bin/composer /usr/bin/composer
 
 RUN apt update && apt install --yes \

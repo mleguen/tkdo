@@ -168,6 +168,9 @@ class Bootstrap
         // Add Routing Middleware
         $this->slimApp->addRoutingMiddleware();
 
+        // Add Body Parsing Middleware
+        $this->slimApp->addBodyParsingMiddleware();
+
         return $this->slimApp;
     }
 
