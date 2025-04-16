@@ -11,7 +11,7 @@ class OccasionFixture extends AppAbstractFixture
     public function load(ObjectManager $em)
     {
         if ($this->devMode) {
-            $annee = (new DateTime())->format('Y');
+            $annee = new DateTime()->format('Y');
             if (new DateTime("$annee-12-25") > new DateTime('now')) {
                 $anneeProchaine = $annee;
                 $anneePassee = $annee-1;
@@ -21,7 +21,7 @@ class OccasionFixture extends AppAbstractFixture
             }
 
             foreach([
-                'noelPasse' => (new OccasionAdaptor())
+                'noelPasse' => new OccasionAdaptor()
                     ->setDate(new DateTime("$anneePassee-12-25"))
                     ->setTitre("Noël $anneePassee")
                     ->setParticipants([
@@ -30,7 +30,7 @@ class OccasionFixture extends AppAbstractFixture
                         $this->getReference('charlie'),
                         $this->getReference('david'),
                     ]),
-                'noelProchain' => (new OccasionAdaptor())
+                'noelProchain' => new OccasionAdaptor()
                     ->setDate(new DateTime("$anneeProchaine-12-25"))
                     ->setTitre("Noël $anneeProchaine")
                     ->setParticipants([

@@ -12,12 +12,10 @@ class UriService
 {
   /** @var UriInterface */
   private $baseUri;
-  private $settings;
 
-  public function __construct(UriSettings $settings)
+  public function __construct(private readonly UriSettings $settings)
   {
-    $this->settings = $settings;
-    $this->baseUri = (new UriFactory())->createUri($this->settings->baseUri);
+    $this->baseUri = new UriFactory()->createUri($this->settings->baseUri);
   }
   
   public function getHost()

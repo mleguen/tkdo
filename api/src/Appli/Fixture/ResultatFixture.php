@@ -27,7 +27,7 @@ class ResultatFixture extends AppAbstractFixture
             ] as $nomOccasion => $tirage) {
                 foreach ($tirage as $nomQuiDonne => $nomQuiRecoit) {
                     $em->persist(
-                        (new ResultatAdaptor($this->getReference($nomOccasion), $this->getReference($nomQuiDonne)))
+                        new ResultatAdaptor($this->getReference($nomOccasion), $this->getReference($nomQuiDonne))
                             ->setQuiRecoit($this->getReference($nomQuiRecoit))
                     );
                 }

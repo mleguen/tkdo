@@ -15,16 +15,8 @@ use Exception;
 
 class JsonService
 {
-    private $authService;
-    private $dateService;
-    
-    public function __construct(
-        AuthService $authService,
-        DateService $dateService
-    )
+    public function __construct(private readonly AuthService $authService, private readonly DateService $dateService)
     {
-        $this->authService = $authService;
-        $this->dateService = $dateService;
     }
 
     private function getPayloadConnexion(Utilisateur $utilisateur): array
@@ -78,9 +70,7 @@ class JsonService
         return [
             "utilisateur" => $this->getPayloadUtilisateur($utilisateur),
             "idees" => array_map(
-                function (Idee $i) {
-                    return $this->getPayloadIdee($i);
-                },
+                fn(Idee $i) => $this->getPayloadIdee($i),
                 // Obligatoire pour être encodé comme un tableau en JSON
                 array_values($idees)
             ),
@@ -103,15 +93,11 @@ class JsonService
     {
         return array_merge($this->getPayloadOccasion($occasion), [
             'participants' => array_map(
-                function (Utilisateur $u) {
-                    return $this->getPayloadUtilisateur($u);
-                },
+                fn(Utilisateur $u) => $this->getPayloadUtilisateur($u),
                 $occasion->getParticipants()
             ),
             'resultats' => array_map(
-                function (Resultat $rt) {
-                    return $this->getPayloadResultat($rt);
-                },
+                fn(Resultat $rt) => $this->getPayloadResultat($rt),
                 $resultats
             ),
         ]);
@@ -181,7 +167,7 @@ class JsonService
      */
     public function encodeListeExclusions(array $exclusions): string
     {
-        return $this->encode(array_map([$this, 'getPayloadExclusion'], $exclusions));
+        return $this->encode(array_map($this->getPayloadExclusion(...), $exclusions));
     }
 
     /**
@@ -189,7 +175,7 @@ class JsonService
      */
     public function encodeListeOccasions(array $occasions): string
     {
-        return $this->encode(array_map([$this, 'getPayloadOccasion'], $occasions));
+        return $this->encode(array_map($this->getPayloadOccasion(...), $occasions));
     }
 
     /**

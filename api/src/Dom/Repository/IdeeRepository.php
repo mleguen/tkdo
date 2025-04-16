@@ -30,7 +30,7 @@ interface IdeeRepository
     /**
      * @return Idee[]
      */
-    public function readAllByUtilisateur(Utilisateur $utilisateur, bool $supprimees = null): array;
+    public function readAllByUtilisateur(Utilisateur $utilisateur, ?bool $supprimees = null): array;
     
     public function update(Idee $idee): Idee;
 }

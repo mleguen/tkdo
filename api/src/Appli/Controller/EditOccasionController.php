@@ -37,6 +37,7 @@ class EditOccasionController extends AuthController
         $this->occasionRepository = $occasionRepository;
     }
 
+    #[\Override]
     public function __invoke(ServerRequestInterface $request, ResponseInterface $response, $args): ResponseInterface
     {
         $response = parent::__invoke($request, $response, $args);

@@ -12,6 +12,7 @@ use Doctrine\Migrations\AbstractMigration;
  */
 final class Version20201025220841 extends AbstractMigration
 {
+    #[\Override]
     public function getDescription() : string
     {
         return 'Version initiale';
@@ -34,6 +35,7 @@ final class Version20201025220841 extends AbstractMigration
         $this->addSql('ALTER TABLE tkdo_resultat ADD CONSTRAINT FK_C30A2EFD891C8F2 FOREIGN KEY (quiRecoit_id) REFERENCES tkdo_utilisateur (id)');
     }
 
+    #[\Override]
     public function down(Schema $schema) : void
     {
         // this down() migration is auto-generated, please modify it to your needs

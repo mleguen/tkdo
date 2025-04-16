@@ -27,21 +27,8 @@ use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 
 class OccasionPort
 {
-    private $mailPlugin;
-    private $exclusionRepository;
-    private $occasionRepository;
-    private $resultatRepository;
-
-    public function __construct(
-        MailPlugin $mailPlugin,
-        ExclusionRepository $exclusionRepository,
-        OccasionRepository $occasionRepository,
-        ResultatRepository $resultatRepository
-    ) {
-        $this->mailPlugin = $mailPlugin;
-        $this->exclusionRepository = $exclusionRepository;
-        $this->occasionRepository = $occasionRepository;
-        $this->resultatRepository = $resultatRepository;
+    public function __construct(private readonly MailPlugin $mailPlugin, private readonly ExclusionRepository $exclusionRepository, private readonly OccasionRepository $occasionRepository, private readonly ResultatRepository $resultatRepository)
+    {
     }
 
     /**
@@ -59,7 +46,7 @@ class OccasionPort
 
         try {
             $occasion = $this->occasionRepository->update($occasion);
-        } catch (UniqueConstraintViolationException $err) {
+        } catch (UniqueConstraintViolationException) {
             throw new UtilisateurDejaParticipantException();
         }
 
@@ -85,15 +72,15 @@ class OccasionPort
 
         $participants = $occasion->getParticipants();
         if (
-            !ArrayTools::some($participants, [$quiOffre, 'estUtilisateur']) ||
-            !ArrayTools::some($participants, [$quiRecoit, 'estUtilisateur'])
+            !ArrayTools::some($participants, $quiOffre->estUtilisateur(...)) ||
+            !ArrayTools::some($participants, $quiRecoit->estUtilisateur(...))
         ) {
             throw new PasParticipantException();
         }
 
         try {
             $resultat = $this->resultatRepository->create($occasion, $quiOffre, $quiRecoit);
-        } catch (UniqueConstraintViolationException $err) {
+        } catch (UniqueConstraintViolationException) {
             throw new UtilisateurOffreOuRecoitDejaException();
         }
 
@@ -129,19 +116,17 @@ class OccasionPort
     public function getOccasion(
         Auth $auth,
         Occasion $occasion,
-        array &$resultats = null
+        ?array &$resultats = null
     ): Occasion {
         if (
             !$auth->estAdmin() &&
-            !ArrayTools::some($occasion->getParticipants(), [$auth, 'estUtilisateur'])
+            !ArrayTools::some($occasion->getParticipants(), $auth->estUtilisateur(...))
         ) {
             throw new PasParticipantNiAdminException();
         }
         $resultats = array_values(array_filter(
             $this->resultatRepository->readByOccasion($occasion),
-            function (Resultat $resultat) use ($auth) {
-                return $auth->estUtilisateur($resultat->getQuiOffre());
-            }
+            fn(Resultat $resultat) => $auth->estUtilisateur($resultat->getQuiOffre())
         ));
         return $occasion;
     }
@@ -210,7 +195,7 @@ class OccasionPort
      */
     private function lanceTirage_(int $nbParticipants, array $tabExclusions)
     {
-        srand();
+        mt_srand();
 
         $dejaTire = array_fill(0, $nbParticipants, false);
         $tabResultats = array_fill(0, $nbParticipants, 0);
@@ -225,7 +210,7 @@ class OccasionPort
 
             if (count($tabPossibilites) == 0) return false;
 
-            $quiRecoit = $tabPossibilites[rand(0, count($tabPossibilites) - 1)];
+            $quiRecoit = $tabPossibilites[random_int(0, count($tabPossibilites) - 1)];
             $tabResultats[$quiOffre] = $quiRecoit;
             $dejaTire[$quiRecoit] = true;
         }

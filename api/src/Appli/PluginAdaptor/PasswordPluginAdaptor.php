@@ -11,7 +11,7 @@ class PasswordPluginAdaptor implements PasswordPlugin
     public function randomPassword(int $length = 8, array $characters = ['lower_case', 'upper_case', 'numbers', 'special_symbols'])
     {
         // define variables used within the function
-        $symbols = array();
+        $symbols = [];
         $used_symbols = '';
 
         // an array of different character types
@@ -27,7 +27,7 @@ class PasswordPluginAdaptor implements PasswordPlugin
 
         $pass = '';
         for ($i = 0; $i < $length; $i++) {
-            $n = rand(0, $symbols_length); // get a random character from the string with all characters
+            $n = random_int(0, $symbols_length); // get a random character from the string with all characters
             $pass .= $used_symbols[$n]; // add the character to the password string
         }
 

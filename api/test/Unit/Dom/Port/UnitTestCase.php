@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 
 class UnitTestCase extends TestCase
 {
-    public function provideDataTestAdmin(): array
+    public static function provideDataTestAdmin(): array
     {
         return [
             ['admin' => false],

@@ -34,7 +34,7 @@ class IdeeRepositoryAdaptor implements IdeeRepository
         DateTime $dateProposition
     ): Idee
     {
-        $idee = (new IdeeAdaptor())
+        $idee = new IdeeAdaptor()
             ->setUtilisateur($utilisateur)
             ->setDescription($description)
             ->setAuteur($auteur)
@@ -82,7 +82,7 @@ EOS;
     /**
      * {@inheritdoc}
      */
-    public function readAllByUtilisateur(Utilisateur $utilisateur, bool $supprimees = null): array
+    public function readAllByUtilisateur(Utilisateur $utilisateur, ?bool $supprimees = null): array
     {
         $qb = $this->em->createQueryBuilder()
             ->select('i')

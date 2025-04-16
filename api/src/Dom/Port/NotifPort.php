@@ -15,18 +15,8 @@ use DateTime;
 
 class NotifPort
 {
-    private $ideeRepository;
-    private $mailPlugin;
-    private $utilisateurRepository;
-
-    public function __construct(
-        IdeeRepository $ideeRepository,
-        MailPlugin $mailPlugin,
-        UtilisateurRepository $utilisateurRepository
-    ) {
-        $this->ideeRepository = $ideeRepository;
-        $this->mailPlugin = $mailPlugin;
-        $this->utilisateurRepository = $utilisateurRepository;
+    public function __construct(private readonly IdeeRepository $ideeRepository, private readonly MailPlugin $mailPlugin, private readonly UtilisateurRepository $utilisateurRepository)
+    {
     }
 
     private function _getDebutPeriode(
@@ -34,14 +24,10 @@ class NotifPort
         string $periode
     ) {
         $debutPeriode = clone $dateNotif;
-        switch ($periode) {
-            case PrefNotifIdees::Quotidienne:
-                $debutPeriode->setTime(0, 0, 0);
-                break;
-
-            default:
-                throw new PrefNotifIdeesPasPeriodiqueException();
-        }
+        match ($periode) {
+            PrefNotifIdees::Quotidienne => $debutPeriode->setTime(0, 0, 0),
+            default => throw new PrefNotifIdeesPasPeriodiqueException(),
+        };
         return $debutPeriode;
     }
 
@@ -49,14 +35,14 @@ class NotifPort
         Auth $auth,
         Idee $idee
     ): void {
-        $this->envoieNotifsInstantanees($auth, $idee, [$this->mailPlugin, 'envoieMailIdeeCreation']);
+        $this->envoieNotifsInstantanees($auth, $idee, $this->mailPlugin->envoieMailIdeeCreation(...));
     }
 
     public function envoieNotifsInstantaneesSuppression(
         Auth $auth,
         Idee $idee
     ): void {
-        $this->envoieNotifsInstantanees($auth, $idee, [$this->mailPlugin, 'envoieMailIdeeSuppression']);
+        $this->envoieNotifsInstantanees($auth, $idee, $this->mailPlugin->envoieMailIdeeSuppression(...));
     }
 
     private function envoieNotifsInstantanees(
@@ -74,7 +60,7 @@ class NotifPort
 
     public function envoieNotifsPeriodiques(
         string $periode,
-        callable $avantEnvoiMail = null
+        ?callable $avantEnvoiMail = null
     ): void {
         $dateNotif = new DateTime();
         $dateDebutPeriode = $this->_getDebutPeriode($dateNotif, $periode);

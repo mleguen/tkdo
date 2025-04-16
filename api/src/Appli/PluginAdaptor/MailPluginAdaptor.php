@@ -20,19 +20,8 @@ Cordialement,
 Votre administrateur Tkdo.
 EOS;
 
-    private $mailService;
-    private $settings;
-    private $uriService;
-
-    public function __construct(
-        MailService $mailService,
-        MailSettings $settings,
-        UriService $uriService
-    )
+    public function __construct(private readonly MailService $mailService, private readonly MailSettings $settings, private readonly UriService $uriService)
     {
-        $this->mailService = $mailService;
-        $this->settings = $settings;
-        $this->uriService = $uriService;
     }
     
     public function envoieMailAjoutParticipant(

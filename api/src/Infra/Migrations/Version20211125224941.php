@@ -12,6 +12,7 @@ use Doctrine\Migrations\AbstractMigration;
  */
 final class Version20211125224941 extends AbstractMigration
 {
+    #[\Override]
     public function getDescription() : string
     {
         return 'Ajout des exclusions pour le tirage automatique';
@@ -25,6 +26,7 @@ final class Version20211125224941 extends AbstractMigration
         $this->addSql('ALTER TABLE tkdo_exclusion ADD CONSTRAINT FK_80DDB4EA7433AA56 FOREIGN KEY (quiNeDoitPasRecevoir_id) REFERENCES tkdo_utilisateur (id)');
     }
 
+    #[\Override]
     public function down(Schema $schema) : void
     {
         // this down() migration is auto-generated, please modify it to your needs

@@ -41,7 +41,7 @@ class UtilisateurRepositoryAdaptor implements UtilisateurRepository
         DateTime $dateDerniereNotifPeriodique
     ): Utilisateur
     {
-        $utilisateur = (new UtilisateurAdaptor())
+        $utilisateur = new UtilisateurAdaptor()
             ->setIdentifiant($identifiant)
             ->setEmail($email)
             ->setMdpClair($mdpClair)
@@ -53,7 +53,7 @@ class UtilisateurRepositoryAdaptor implements UtilisateurRepository
         try {
             $this->em->persist($utilisateur);
             $this->em->flush();
-        } catch (UniqueConstraintViolationException $err) {
+        } catch (UniqueConstraintViolationException) {
             throw new IdentifiantDejaUtiliseException();
         }
         return $utilisateur;
@@ -142,7 +142,7 @@ EOS;
         try {
             $this->em->persist($utilisateur);
             $this->em->flush();
-        } catch (UniqueConstraintViolationException $e) {
+        } catch (UniqueConstraintViolationException) {
             throw new IdentifiantDejaUtiliseException();
         }
         return $utilisateur;

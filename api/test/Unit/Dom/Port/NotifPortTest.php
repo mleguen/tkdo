@@ -58,7 +58,7 @@ class NotifPortTest extends TestCase
         $this->utilisateurANotifierProphecy = $this->prophesize(Utilisateur::class);
     }
 
-    /** @dataProvider provideDataEnvoieNotifsPeriodiques */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideDataEnvoieNotifsPeriodiques')]
     public function testEnvoieNotifsPeriodiques(string $periode, bool $mailEnvoye)
     {
         $utilisateurANotifier = $this->utilisateurANotifierProphecy->reveal();
@@ -84,28 +84,28 @@ class NotifPortTest extends TestCase
         $this->notifPort->envoieNotifsPeriodiques($periode);
     }
 
-    public function provideDataEnvoieNotifsPeriodiques(): Iterator
+    public static function provideDataEnvoieNotifsPeriodiques(): Iterator
     {
-        foreach($this->provideDataMailEnvoye() as $data) {
+        foreach(self::provideDataMailEnvoye() as $data) {
             yield array_merge([PrefNotifIdees::Quotidienne], $data);
         }
     }
 
-    /** @dataProvider provideDataEnvoieNotifsPeriodiquesPrefNotifIdeesPasPeriodique */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideDataEnvoieNotifsPeriodiquesPrefNotifIdeesPasPeriodique')]
     public function testEnvoieNotifsPeriodiquesPrefNotifIdeesPasPeriodique(string $prefNotifIdees): void
     {
         $this->expectException(PrefNotifIdeesPasPeriodiqueException::class);
         $this->notifPort->envoieNotifsPeriodiques($prefNotifIdees);
     }
 
-    public function provideDataEnvoieNotifsPeriodiquesPrefNotifIdeesPasPeriodique(): Iterator
+    public static function provideDataEnvoieNotifsPeriodiquesPrefNotifIdeesPasPeriodique(): Iterator
     {
         foreach ([PrefNotifIdees::Instantanee, 'invalide'] as $prefNotifIdees) {
             yield [$prefNotifIdees];
         }
     }
 
-    /** @dataProvider provideDataMailEnvoye */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideDataMailEnvoye')]
     public function testEnvoieNotifsInstantaneesCreation(bool $mailEnvoye)
     {
         $utilisateurAuth = $this->prophesize(Utilisateur::class)->reveal();
@@ -131,7 +131,7 @@ class NotifPortTest extends TestCase
         $this->notifPort->envoieNotifsInstantaneesCreation($this->authProphecy->reveal(), $idee);
     }
 
-    /** @dataProvider provideDataMailEnvoye */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideDataMailEnvoye')]
     public function testEnvoieNotifsInstantaneesSuppression(bool $mailEnvoye)
     {
         $utilisateurAuth = $this->prophesize(Utilisateur::class)->reveal();
@@ -157,7 +157,7 @@ class NotifPortTest extends TestCase
         $this->notifPort->envoieNotifsInstantaneesSuppression($this->authProphecy->reveal(), $idee);
     }
 
-    public function provideDataMailEnvoye(): Iterator
+    public static function provideDataMailEnvoye(): Iterator
     {
         foreach ([true, false] as $mailEnvoye) {
             yield [$mailEnvoye];

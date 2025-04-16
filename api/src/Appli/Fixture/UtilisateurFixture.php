@@ -23,7 +23,7 @@ class UtilisateurFixture extends AppAbstractFixture
         $this->host = $uriService->getHost();
     }
 
-    public function setAdminEmail(string $adminEmail = null): self
+    public function setAdminEmail(?string $adminEmail = null): self
     {
         $this->adminEmail = $adminEmail;
         return $this;
@@ -33,7 +33,7 @@ class UtilisateurFixture extends AppAbstractFixture
     {
         if ($this->devMode) {
             $utilisateurs = [
-                'alice' => (new UtilisateurAdaptor())
+                'alice' => new UtilisateurAdaptor()
                     ->setEmail("alice@$this->host")
                     ->setAdmin(true)
                     ->setGenre(Genre::Feminin)
@@ -41,7 +41,7 @@ class UtilisateurFixture extends AppAbstractFixture
                     ->setNom('Alice')
                     ->setMdpClair('mdpalice')
                     ->setDateDerniereNotifPeriodique(new DateTime('2 days ago')),
-                'bob' => (new UtilisateurAdaptor())
+                'bob' => new UtilisateurAdaptor()
                     ->setEmail("bob@$this->host")
                     ->setGenre(Genre::Masculin)
                     ->setIdentifiant('bob')
@@ -49,7 +49,7 @@ class UtilisateurFixture extends AppAbstractFixture
                     ->setMdpClair('mdpbob')
                     ->setPrefNotifIdees(PrefNotifIdees::Instantanee)
                     ->setDateDerniereNotifPeriodique(new DateTime('2 days ago')),
-                'charlie' => (new UtilisateurAdaptor())
+                'charlie' => new UtilisateurAdaptor()
                     ->setEmail("charlie@$this->host")
                     ->setGenre(Genre::Masculin)
                     ->setIdentifiant('charlie')
@@ -57,14 +57,14 @@ class UtilisateurFixture extends AppAbstractFixture
                     ->setNom('Charlie')
                     ->setPrefNotifIdees(PrefNotifIdees::Quotidienne)
                     ->setDateDerniereNotifPeriodique(new DateTime('2 days ago')),
-                'david' => (new UtilisateurAdaptor())
+                'david' => new UtilisateurAdaptor()
                     ->setEmail("david@$this->host")
                     ->setGenre(Genre::Masculin)
                     ->setIdentifiant('david')
                     ->setMdpClair('mdpdavid')
                     ->setNom('David')
                     ->setDateDerniereNotifPeriodique(new DateTime('2 days ago')),
-                'eve' => (new UtilisateurAdaptor())
+                'eve' => new UtilisateurAdaptor()
                     ->setEmail("eve@$this->host")
                     ->setGenre(Genre::Feminin)
                     ->setIdentifiant('eve')
@@ -74,7 +74,7 @@ class UtilisateurFixture extends AppAbstractFixture
             ];
         } else {
             $utilisateurs = [
-                'admin' => (new UtilisateurAdaptor())
+                'admin' => new UtilisateurAdaptor()
                     ->setEmail($this->adminEmail ?? "admin@$this->host")
                     ->setAdmin(true)
                     ->setGenre(Genre::Masculin)

@@ -15,16 +15,8 @@ use DateTime;
 
 class IdeePort
 {
-    private $ideeRepository;
-    private $notifPort;
-
-    public function __construct(
-        IdeeRepository $ideeRepository,
-        NotifPort $notifPort
-    )
+    public function __construct(private readonly IdeeRepository $ideeRepository, private readonly NotifPort $notifPort)
     {
-        $this->ideeRepository = $ideeRepository;
-        $this->notifPort = $notifPort;
     }
 
     /**
@@ -59,21 +51,16 @@ class IdeePort
     public function listeIdees(
         Auth $auth,
         Utilisateur $utilisateur,
-        bool $supprimees = null
+        ?bool $supprimees = null
     ): array
     {
         if (($supprimees !== false) && !$auth->estAdmin()) throw new PasAdminException();
 
         return array_values(array_filter(
             $this->ideeRepository->readAllByUtilisateur($utilisateur, $supprimees),
-            function (Idee $i) use ($auth) {
-                return (
-                    // L'utilisateur authentifié ne peut voir que les idées dont il est l'auteur
-                    $auth->estUtilisateur($i->getAuteur()) ||
-                    // ou qui ont été proposées pour quelqu'un d'autre que lui
-                    !$auth->estUtilisateur($i->getUtilisateur())
-                );
-            }
+            fn(Idee $i) => $auth->estUtilisateur($i->getAuteur()) ||
+            // ou qui ont été proposées pour quelqu'un d'autre que lui
+            !$auth->estUtilisateur($i->getUtilisateur())
         ));
     }
 

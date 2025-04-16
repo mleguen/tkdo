@@ -12,6 +12,7 @@ use Doctrine\Migrations\AbstractMigration;
  */
 final class Version20201129203322 extends AbstractMigration
 {
+    #[\Override]
     public function getDescription() : string
     {
         return 'Unicité des identifiants';
@@ -23,6 +24,7 @@ final class Version20201129203322 extends AbstractMigration
         $this->addSql('CREATE UNIQUE INDEX UNIQ_FFA04FADC90409EC ON tkdo_utilisateur (identifiant)');
     }
 
+    #[\Override]
     public function down(Schema $schema) : void
     {
         // this down() migration is auto-generated, please modify it to your needs

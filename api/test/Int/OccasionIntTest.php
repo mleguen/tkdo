@@ -11,8 +11,8 @@ use Iterator;
 
 class OccasionIntTest extends IntTestCase
 {
-    /** @dataProvider provideCurl */
-    function testCasNominal(bool $curl): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
+    public function testCasNominal(bool $curl): void
     {
         $admin = $this->creeUtilisateurEnBase('admin', ['admin' => true]);
         $occasion = $this->creeOccasionEnMemoire();
@@ -166,8 +166,8 @@ class OccasionIntTest extends IntTestCase
         }
     }
 
-    /** @dataProvider provideCurl */
-    function testAjouteParticipantOccasionNonAuthentifie(bool $curl)
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
+    public function testAjouteParticipantOccasionNonAuthentifie(bool $curl)
     {
         $participant = $this->creeUtilisateurEnBase('participant');
         $occasion = $this->creeOccasionEnBase();
@@ -189,8 +189,8 @@ class OccasionIntTest extends IntTestCase
         ], $body);
     }
 
-    /** @dataProvider provideCurl */
-    function testAjouteParticipantOccasionPasAdmin(bool $curl)
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
+    public function testAjouteParticipantOccasionPasAdmin(bool $curl)
     {
         $participant = $this->creeUtilisateurEnBase('participant');
         $occasion = $this->creeOccasionEnBase();
@@ -214,8 +214,8 @@ class OccasionIntTest extends IntTestCase
         ], $body);
     }
 
-    /** @dataProvider provideCurl */
-    function testAjouteParticipantOccasionInconnue(bool $curl)
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
+    public function testAjouteParticipantOccasionInconnue(bool $curl)
     {
         $admin = $this->creeUtilisateurEnBase('admin', ['admin' => true]);
         $participant = $this->creeUtilisateurEnBase('participant');
@@ -241,8 +241,8 @@ class OccasionIntTest extends IntTestCase
         ], $body);
     }
 
-    /** @dataProvider provideCurl */
-    function testAjouteParticipantOccasionUtilisateurInconnu(bool $curl)
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
+    public function testAjouteParticipantOccasionUtilisateurInconnu(bool $curl)
     {
         $admin = $this->creeUtilisateurEnBase('admin', ['admin' => true]);
         $idParticipantInconnu = $admin->getId() + 1;
@@ -267,8 +267,8 @@ class OccasionIntTest extends IntTestCase
         ], $body);
     }
 
-    /** @dataProvider provideCurl */
-    function testAjouteParticipantOccasion2Fois(bool $curl)
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
+    public function testAjouteParticipantOccasion2Fois(bool $curl)
     {
         $admin = $this->creeUtilisateurEnBase('admin', ['admin' => true]);
         $participant = $this->creeUtilisateurEnBase('participant');
@@ -293,8 +293,8 @@ class OccasionIntTest extends IntTestCase
         ], $body);
     }
 
-    /** @dataProvider provideCurl */
-    function testAjouteResultatOccasionNonAuthentifie(bool $curl)
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
+    public function testAjouteResultatOccasionNonAuthentifie(bool $curl)
     {
         $quiOffre = $this->creeUtilisateurEnBase('quiOffre');
         $quiRecoit = $this->creeUtilisateurEnBase('quiRecoit');
@@ -318,8 +318,8 @@ class OccasionIntTest extends IntTestCase
         ], $body);
     }
 
-    /** @dataProvider provideCurl */
-    function testAjouteResultatOccasionPasAdmin(bool $curl)
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
+    public function testAjouteResultatOccasionPasAdmin(bool $curl)
     {
         $quiOffre = $this->creeUtilisateurEnBase('quiOffre');
         $quiRecoit = $this->creeUtilisateurEnBase('quiRecoit');
@@ -345,8 +345,8 @@ class OccasionIntTest extends IntTestCase
         ], $body);
     }
 
-    /** @dataProvider provideCurl */
-    function testAjouteResultatOccasionInconnue(bool $curl)
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
+    public function testAjouteResultatOccasionInconnue(bool $curl)
     {
         $admin = $this->creeUtilisateurEnBase('admin', ['admin' => true]);
         $quiOffre = $this->creeUtilisateurEnBase('quiOffre');
@@ -374,8 +374,8 @@ class OccasionIntTest extends IntTestCase
         ], $body);
     }
 
-    /** @dataProvider provideDataAjouteResultatOccasionUtilisateurInconnu */
-    function testAjouteResultatOccasionUtilisateurInconnu(bool $curl, bool $quiOffreInconnu, bool $quiRecoitInconnu)
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideDataAjouteResultatOccasionUtilisateurInconnu')]
+    public function testAjouteResultatOccasionUtilisateurInconnu(bool $curl, bool $quiOffreInconnu, bool $quiRecoitInconnu)
     {
         $quiOffre = $this->creeUtilisateurEnBase('quiOffre');
         $quiRecoit = $this->creeUtilisateurEnBase('quiRecoit');
@@ -406,17 +406,17 @@ class OccasionIntTest extends IntTestCase
         ], $body);
     }
 
-    function provideDataAjouteResultatOccasionUtilisateurInconnu(): Iterator
+    public static function provideDataAjouteResultatOccasionUtilisateurInconnu(): Iterator
     {
-        foreach($this->provideCurl() as $data) {
+        foreach(self::provideCurl() as $data) {
             yield array_merge($data, [true, false]);
             yield array_merge($data, [false, true]);
             yield array_merge($data, [true, true]);
         }
     }
 
-    /** @dataProvider provideDataAjouteResultatOccasion2Fois */
-    function testAjouteResultatOccasion2Fois(bool $curl, bool $quiOffreDeja, bool $quiRecoitDeja)
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideDataAjouteResultatOccasion2Fois')]
+    public function testAjouteResultatOccasion2Fois(bool $curl, bool $quiOffreDeja, bool $quiRecoitDeja)
     {
         $admin = $this->creeUtilisateurEnBase('admin', ['admin' => true]);
         $quiOffre = $this->creeUtilisateurEnBase('quiOffre');
@@ -451,17 +451,17 @@ class OccasionIntTest extends IntTestCase
         ], $body);
     }
 
-    function provideDataAjouteResultatOccasion2Fois(): Iterator
+    public static function provideDataAjouteResultatOccasion2Fois(): Iterator
     {
-        foreach ($this->provideCurl() as $data) {
+        foreach (self::provideCurl() as $data) {
             yield array_merge($data, [true, false]);
             yield array_merge($data, [false, true]);
             yield array_merge($data, [true, true]);
         }
     }
 
-    /** @dataProvider provideCurl */
-    function testCreeOccasionNonAuthentifie(bool $curl)
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
+    public function testCreeOccasionNonAuthentifie(bool $curl)
     {
         $occasion = $this->creeOccasionEnMemoire();
 
@@ -483,8 +483,8 @@ class OccasionIntTest extends IntTestCase
         ], $body);
     }
 
-    /** @dataProvider provideCurl */
-    function testCreeOccasionPasAdmin(bool $curl) {
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
+    public function testCreeOccasionPasAdmin(bool $curl) {
         $occasion = $this->creeOccasionEnMemoire();
 
         $this->postConnexion($curl);
@@ -507,8 +507,8 @@ class OccasionIntTest extends IntTestCase
         ], $body);
     }
 
-    /** @dataProvider provideCurl */
-    function testGetOccasionNonAuthentifie(bool $curl)
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
+    public function testGetOccasionNonAuthentifie(bool $curl)
     {
         $occasion = $this->creeOccasionEnBase();
 
@@ -525,8 +525,8 @@ class OccasionIntTest extends IntTestCase
         ], $body);
     }
 
-    /** @dataProvider provideCurl */
-    function testGetOccasionPasParticipantNiAdmin(bool $curl)
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
+    public function testGetOccasionPasParticipantNiAdmin(bool $curl)
     {
         $occasion = $this->creeOccasionEnBase();
         $this->postConnexion($curl);
@@ -544,8 +544,8 @@ class OccasionIntTest extends IntTestCase
         ], $body);
     }
 
-    /** @dataProvider provideCurl */
-    function testGetOccasionInconnue(bool $curl)
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
+    public function testGetOccasionInconnue(bool $curl)
     {
         $admin = $this->creeUtilisateurEnBase('admin', ['admin' => true]);
         $occasion = $this->creeOccasionEnBase();
@@ -566,8 +566,8 @@ class OccasionIntTest extends IntTestCase
         ], $body);
     }
 
-    /** @dataProvider provideCurl */
-    function testListeOccasionsNonAuthentifie(bool $curl)
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
+    public function testListeOccasionsNonAuthentifie(bool $curl)
     {
         $this->requestApi(
             $curl,
@@ -582,8 +582,8 @@ class OccasionIntTest extends IntTestCase
         ], $body);
     }
 
-    /** @dataProvider provideCurl */
-    function testListeOccasionsPasAdmin(bool $curl)
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
+    public function testListeOccasionsPasAdmin(bool $curl)
     {
         $this->postConnexion($curl);
 
@@ -600,8 +600,8 @@ class OccasionIntTest extends IntTestCase
         ], $body);
     }
 
-    /** @dataProvider provideCurl */
-    function testListeOccasionsParticipantNonAuthentifie(bool $curl)
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
+    public function testListeOccasionsParticipantNonAuthentifie(bool $curl)
     {
         $participant = $this->creeUtilisateurEnBase('participant');
 
@@ -619,8 +619,8 @@ class OccasionIntTest extends IntTestCase
         ], $body);
     }
 
-    /** @dataProvider provideCurl */
-    function testListeOccasionsParticipantPasUtilisateur(bool $curl)
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
+    public function testListeOccasionsParticipantPasUtilisateur(bool $curl)
     {
         $participant = $this->creeUtilisateurEnBase('participant');
         $this->postConnexion($curl);
@@ -639,8 +639,8 @@ class OccasionIntTest extends IntTestCase
         ], $body);
     }
 
-    /** @dataProvider provideCurl */
-    function testListeOccasionsParticipantUtilisateurInconnu(bool $curl)
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
+    public function testListeOccasionsParticipantUtilisateurInconnu(bool $curl)
     {
         $admin = $this->creeUtilisateurEnBase('admin', ['admin' => true]);
         $idParticipant = $admin->getId() + 1;
@@ -661,8 +661,8 @@ class OccasionIntTest extends IntTestCase
         ], $body);
     }
 
-    /** @dataProvider provideCurl */
-    function testListeOccasionsTiers(bool $curl)
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
+    public function testListeOccasionsTiers(bool $curl)
     {
         $participant = $this->creeUtilisateurEnBase('participant');
         $this->creeOccasionEnBase(['participants' => [$participant]]);
@@ -681,8 +681,8 @@ class OccasionIntTest extends IntTestCase
         $this->assertEquals([], $body);
     }
 
-    /** @dataProvider provideCurl */
-    function testModifieOccasionNonAuthentifie(bool $curl)
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
+    public function testModifieOccasionNonAuthentifie(bool $curl)
     {
         $occasion = $this->creeOccasionEnBase();
 
@@ -701,8 +701,8 @@ class OccasionIntTest extends IntTestCase
         ], $body);
     }
 
-    /** @dataProvider provideCurl */
-    function testModifieOccasionPasAdmin(bool $curl)
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
+    public function testModifieOccasionPasAdmin(bool $curl)
     {
         $occasion = $this->creeOccasionEnBase();
 
@@ -723,8 +723,8 @@ class OccasionIntTest extends IntTestCase
         ], $body);
     }
 
-    /** @dataProvider provideCurl */
-    function testModifieOccasionInconnue(bool $curl)
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
+    public function testModifieOccasionInconnue(bool $curl)
     {
         $admin = $this->creeUtilisateurEnBase('admin', ['admin' => true]);
         $occasion = $this->creeOccasionEnBase();

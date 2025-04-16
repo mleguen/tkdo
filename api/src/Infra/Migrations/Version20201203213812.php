@@ -12,6 +12,7 @@ use Doctrine\Migrations\AbstractMigration;
  */
 final class Version20201203213812 extends AbstractMigration
 {
+    #[\Override]
     public function getDescription() : string
     {
         return "Ajout de la date des occasions";
@@ -23,6 +24,7 @@ final class Version20201203213812 extends AbstractMigration
         $this->addSql('ALTER TABLE tkdo_occasion ADD date DATETIME NOT NULL');
     }
 
+    #[\Override]
     public function down(Schema $schema) : void
     {
         // this down() migration is auto-generated, please modify it to your needs

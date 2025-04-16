@@ -20,31 +20,19 @@ use Symfony\Component\Console\Output\OutputInterface;
 class FixturesCommand extends Command
 {
     private $devMode;
-    private $em;
-    private $exclusionFixture;
-    private $ideeFixture;
-    private $occasionFixture;
-    private $resultatFixture;
-    private $utilisateurFixture;
 
     public function __construct(
         Bootstrap $bootstrap,
-        EntityManager $em,
-        ExclusionFixture $exclusionFixture,
-        IdeeFixture $ideeFixture,
-        OccasionFixture $occasionFixture,
-        ResultatFixture $resultatFixture,
-        UtilisateurFixture $utilisateurFixture
+        private readonly EntityManager $em,
+        private readonly ExclusionFixture $exclusionFixture,
+        private readonly IdeeFixture $ideeFixture,
+        private readonly OccasionFixture $occasionFixture,
+        private readonly ResultatFixture $resultatFixture,
+        private readonly UtilisateurFixture $utilisateurFixture
     )
     {
         parent::__construct('fixtures');
         $this->devMode = $bootstrap->devMode;
-        $this->em = $em;
-        $this->exclusionFixture = $exclusionFixture;
-        $this->ideeFixture = $ideeFixture;
-        $this->occasionFixture = $occasionFixture;
-        $this->resultatFixture = $resultatFixture;
-        $this->utilisateurFixture = $utilisateurFixture;
     }
 
     protected function configure(): void

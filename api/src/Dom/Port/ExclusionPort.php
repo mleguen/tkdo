@@ -13,13 +13,8 @@ use App\Dom\Repository\ExclusionRepository;
 
 class ExclusionPort
 {
-    private $exclusionRepository;
-
-    public function __construct(
-        ExclusionRepository $exclusionRepository
-    )
+    public function __construct(private readonly ExclusionRepository $exclusionRepository)
     {
-        $this->exclusionRepository = $exclusionRepository;
     }
 
     /**

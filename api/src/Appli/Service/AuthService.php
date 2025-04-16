@@ -15,12 +15,9 @@ class AuthService
 {
     private $clePrivee;
     private $clePublique;
-    private $settings;
 
-    public function __construct(AuthSettings $settings)
+    public function __construct(private readonly AuthSettings $settings)
     {
-        $this->settings = $settings;
-        
         if (!($this->clePrivee = file_get_contents($this->settings->fichierClePrivee))) {
             throw new Exception("Impossible de lire la clé privée dans {$this->settings->fichierClePrivee}");
         }
@@ -44,7 +41,7 @@ class AuthService
                 isset($payload->adm) && $payload->adm
             );
         }
-        catch (Exception $err) {
+        catch (Exception) {
             throw new AuthTokenInvalideException();
         }
     }

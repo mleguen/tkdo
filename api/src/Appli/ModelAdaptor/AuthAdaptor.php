@@ -8,21 +8,13 @@ use App\Dom\Model\Utilisateur;
 
 class AuthAdaptor implements Auth
 {
-    private $idUtilisateur;
-    private $admin;
-
     public static function fromUtilisateur(Utilisateur $utilisateur): AuthAdaptor
     {
         return new AuthAdaptor($utilisateur->getId(), $utilisateur->getAdmin());
     }
 
-    public function __construct(
-        int $idUtilisateur,
-        bool $admin
-    )
+    public function __construct(private readonly int $idUtilisateur, private readonly bool $admin)
     {
-        $this->idUtilisateur = $idUtilisateur;
-        $this->admin = $admin;
     }
 
     public function estAdmin(): bool

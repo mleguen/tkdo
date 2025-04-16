@@ -46,7 +46,7 @@ class ResultatAdaptor implements Resultat
      */
     private $quiRecoit;
 
-    public function __construct(Occasion $occasion= NULL, Utilisateur $quiOffre = NULL)
+    public function __construct(?Occasion $occasion= NULL, ?Utilisateur $quiOffre = NULL)
     {
         if (isset($occasion)) $this->occasion = $occasion;
         if (isset($quiOffre)) $this->quiOffre = $quiOffre;

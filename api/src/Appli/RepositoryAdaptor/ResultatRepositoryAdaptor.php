@@ -25,7 +25,7 @@ class ResultatRepositoryAdaptor implements ResultatRepository
 
     public function create(Occasion $occasion, Utilisateur $quiOffre, Utilisateur $quiRecoit): Resultat
     {
-        $resultat = (new ResultatAdaptor())
+        $resultat = new ResultatAdaptor()
             ->setOccasion($occasion)
             ->setQuiOffre($quiOffre)
             ->setQuiRecoit($quiRecoit);

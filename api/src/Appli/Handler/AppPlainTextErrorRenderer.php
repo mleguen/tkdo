@@ -9,6 +9,7 @@ use Throwable;
 
 class AppPlainTextErrorRenderer extends PlainTextErrorRenderer
 {
+    #[\Override]
     public function __invoke(Throwable $exception, bool $displayErrorDetails): string
     {
         if ($exception instanceof HttpSpecializedException) {

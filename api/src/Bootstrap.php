@@ -89,12 +89,10 @@ class Bootstrap
 
             Bootstrap::class => $this,
 
-            EntityManager::class => function (DoctrineSettings $settings) {
-                return EntityManager::create(
-                    $settings->connection,
-                    $settings->config
-                );
-            },
+            EntityManager::class => fn(DoctrineSettings $settings) => EntityManager::create(
+                $settings->connection,
+                $settings->config
+            ),
 
             ExclusionRepository::class => \DI\autowire(ExclusionRepositoryAdaptor::class),
             IdeeRepository::class => \DI\autowire(IdeeRepositoryAdaptor::class),
@@ -129,10 +127,9 @@ class Bootstrap
 
         $this->slimApp->add(AuthMiddleware::class);
 
-        $this->slimApp->options('/{routes:.*}', function (Request $request, Response $response) {
+        $this->slimApp->options('/{routes:.*}', fn(Request $request, Response $response) =>
             // CORS Pre-Flight OPTIONS Request Handler
-            return $response;
-        });
+            $response);
 
         $this->slimApp->post('/connexion', CreateConnexionController::class);
         $this->slimApp->group('/idee', function (RouteCollectorProxyInterface $group) {

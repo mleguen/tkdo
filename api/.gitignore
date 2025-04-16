@@ -4,5 +4,7 @@
 /vendor/
 /logs/*
 !/logs/README.md
+.phpunit.cache
 .phpunit.result.cache
-/.env.prod
+/.env*
+phpunit.xml.bak

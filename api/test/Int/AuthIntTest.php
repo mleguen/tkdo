@@ -9,7 +9,7 @@ namespace Test\Int;
  */
 class AuthIntTest extends IntTestCase
 {
-    /** @dataProvider provideCurl */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
     function testGetUtilisateurTokenInvalide(bool $curl)
     {
         $utilisateur = $this->creeUtilisateurEnBase('utilisateur');

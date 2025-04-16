@@ -6,7 +6,7 @@ namespace Test\Int;
 
 class UtilisateurIntTest extends IntTestCase
 {
-    /** @dataProvider provideCurl */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
     public function testCasNominal(bool $curl): void
     {
         $admin = $this->creeUtilisateurEnBase('admin', ['admin' => true]);
@@ -165,7 +165,7 @@ class UtilisateurIntTest extends IntTestCase
         $this->depileDerniersEmailsRecus();
     }
 
-    /** @dataProvider provideCurl */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
     function testCreeUtilisateurNonAuthentifie(bool $curl)
     {
         $utilisateur = $this->creeUtilisateurEnMemoire('utilisateur');
@@ -190,7 +190,7 @@ class UtilisateurIntTest extends IntTestCase
         ], $body);
     }
 
-    /** @dataProvider provideCurl */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
     function testCreeUtilisateurPasAdmin(bool $curl)
     {
         $utilisateur = $this->creeUtilisateurEnMemoire('utilisateur');
@@ -216,7 +216,7 @@ class UtilisateurIntTest extends IntTestCase
         ], $body);
     }
 
-    /** @dataProvider provideCurl */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
     function testCreeUtilisateurDoublonIdentifiant(bool $curl)
     {
         $admin = $this->creeUtilisateurEnBase('admin', ['admin' => true]);
@@ -244,7 +244,7 @@ class UtilisateurIntTest extends IntTestCase
         ], $body);
     }
 
-    /** @dataProvider provideCurl */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
     function testCreeUtilisateurEmailInvalide(bool $curl)
     {
         $admin = $this->creeUtilisateurEnBase('admin', ['admin' => true]);
@@ -272,7 +272,7 @@ class UtilisateurIntTest extends IntTestCase
         ], $body);
     }
 
-    /** @dataProvider provideCurl */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
     function testCreeUtilisateurPrefNotifIdeesInvalide(bool $curl)
     {
         $admin = $this->creeUtilisateurEnBase('admin', ['admin' => true]);
@@ -301,7 +301,7 @@ class UtilisateurIntTest extends IntTestCase
         ], $body);
     }
 
-    /** @dataProvider provideCurl */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
     function testCreeUtilisateurGenreInvalide(bool $curl)
     {
         $admin = $this->creeUtilisateurEnBase('admin', ['admin' => true]);
@@ -330,7 +330,7 @@ class UtilisateurIntTest extends IntTestCase
         ], $body);
     }
 
-    /** @dataProvider provideCurl */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
     function testResetMdpUtilisateurNonAuthentifie(bool $curl)
     {
         $utilisateur = $this->creeUtilisateurEnBase('utilisateur');
@@ -348,7 +348,7 @@ class UtilisateurIntTest extends IntTestCase
         ], $body);
     }
 
-    /** @dataProvider provideCurl */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
     function testResetMdpUtilisateurPasAdmin(bool $curl)
     {
         $utilisateur = $this->creeUtilisateurEnBase('utilisateur');
@@ -367,7 +367,7 @@ class UtilisateurIntTest extends IntTestCase
         ], $body);
     }
 
-    /** @dataProvider provideCurl */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
     function testResetMdpUtilisateurUtilisateurInconnu(bool $curl)
     {
         $admin = $this->creeUtilisateurEnBase('admin', ['admin' => true]);
@@ -387,7 +387,7 @@ class UtilisateurIntTest extends IntTestCase
         ], $body);
     }
 
-    /** @dataProvider provideCurl */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
     function testModifieUtilisateurNonAuthentifie(bool $curl)
     {
         $utilisateur = $this->creeUtilisateurEnBase('utilisateur');
@@ -407,7 +407,7 @@ class UtilisateurIntTest extends IntTestCase
         ], $body);
     }
 
-    /** @dataProvider provideCurl */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
     function testModifieUtilisateurUtilisateurInconnu(bool $curl)
     {
         $admin = $this->creeUtilisateurEnBase('admin', ['admin' => true]);
@@ -429,7 +429,7 @@ class UtilisateurIntTest extends IntTestCase
         ], $body);
     }
 
-    /** @dataProvider provideCurl */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
     function testModifieUtilisateurPasUtilisateur(bool $curl)
     {
         $utilisateur = $this->creeUtilisateurEnBase('utilisateur');
@@ -450,7 +450,7 @@ class UtilisateurIntTest extends IntTestCase
         ], $body);
     }
 
-    /** @dataProvider provideCurl */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
     function testModifieUtilisateurPasAdmin(bool $curl)
     {
         $utilisateur = $this->creeUtilisateurEnBase('utilisateur');
@@ -473,7 +473,7 @@ class UtilisateurIntTest extends IntTestCase
         ], $body);
     }
 
-    /** @dataProvider provideCurl */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
     function testModifieUtilisateurModificationMdpInterdite(bool $curl)
     {
         $admin = $this->creeUtilisateurEnBase('admin', ['admin' => true]);
@@ -497,7 +497,7 @@ class UtilisateurIntTest extends IntTestCase
         ], $body);
     }
 
-    /** @dataProvider provideCurl */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
     function testModifieUtilisateurDoublonIdentifiant(bool $curl)
     {
         $utilisateur = $this->creeUtilisateurEnBase('utilisateur');
@@ -521,7 +521,7 @@ class UtilisateurIntTest extends IntTestCase
         ], $body);
     }
 
-    /** @dataProvider provideCurl */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
     function testModifieUtilisateurEmailInvalide(bool $curl)
     {
         $utilisateur = $this->creeUtilisateurEnBase('utilisateur');
@@ -544,7 +544,7 @@ class UtilisateurIntTest extends IntTestCase
         ], $body);
     }
 
-    /** @dataProvider provideCurl */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
     function testModifieUtilisateurPrefNotifIdeesInvalide(bool $curl)
     {
         $utilisateur = $this->creeUtilisateurEnBase('utilisateur');
@@ -567,7 +567,7 @@ class UtilisateurIntTest extends IntTestCase
         ], $body);
     }
 
-    /** @dataProvider provideCurl */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
     function testModifieUtilisateurGenreInvalide(bool $curl)
     {
         $utilisateur = $this->creeUtilisateurEnBase('utilisateur');
@@ -590,7 +590,7 @@ class UtilisateurIntTest extends IntTestCase
         ], $body);
     }
 
-    /** @dataProvider provideCurl */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
     function testListeUtilisateursPasAdmin(bool $curl)
     {
         $this->postConnexion($curl);
@@ -608,7 +608,7 @@ class UtilisateurIntTest extends IntTestCase
         ], $body);
     }
 
-    /** @dataProvider provideCurl */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
     function testGetUtilisateurNonAuthentifie(bool $curl)
     {
         $utilisateur = $this->creeUtilisateurEnBase('utilisateur');
@@ -626,7 +626,7 @@ class UtilisateurIntTest extends IntTestCase
         ], $body);
     }
 
-    /** @dataProvider provideCurl */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
     function testGetUtilisateurPasUtilisateur(bool $curl)
     {
         $utilisateur = $this->creeUtilisateurEnBase('utilisateur');
@@ -645,7 +645,7 @@ class UtilisateurIntTest extends IntTestCase
         ], $body);
     }
 
-    /** @dataProvider provideCurl */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
     function testGetUtilisateurUtilisateurInconnu(bool $curl)
     {
         $admin = $this->creeUtilisateurEnBase('admin', ['admin' => true]);

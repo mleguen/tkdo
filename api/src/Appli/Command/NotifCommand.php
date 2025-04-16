@@ -17,17 +17,12 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class NotifCommand extends Command
 {
-    private $logger;
-    private $notifPort;
-
     public function __construct(
-        LoggerInterface $logger,
-        NotifPort $notifPort
+        private readonly LoggerInterface $logger,
+        private readonly NotifPort $notifPort
     )
     {
         parent::__construct('notif');
-        $this->logger = $logger;
-        $this->notifPort = $notifPort;
     }
 
     protected function configure(): void

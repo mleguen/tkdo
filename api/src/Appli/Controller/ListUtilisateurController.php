@@ -13,19 +13,15 @@ use Slim\Exception\HttpForbiddenException;
 
 class ListUtilisateurController extends AuthController
 {
-    private $jsonService;
-    private $utilisateurPort;
-
     public function __construct(
-        JsonService $jsonService,
+        private readonly JsonService $jsonService,
         RouteService $routeService,
-        UtilisateurPort $utilisateurPort
+        private readonly UtilisateurPort $utilisateurPort
     ) {
         parent::__construct($routeService);
-        $this->jsonService = $jsonService;
-        $this->utilisateurPort = $utilisateurPort;
     }
 
+    #[\Override]
     public function __invoke(ServerRequestInterface $request, ResponseInterface $response, $args): ResponseInterface
     {
         $response = parent::__invoke($request, $response, $args);

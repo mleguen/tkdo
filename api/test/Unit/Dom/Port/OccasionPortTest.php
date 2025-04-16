@@ -74,7 +74,7 @@ class OccasionPortTest extends UnitTestCase
         $this->resultatProphecy = $this->prophesize(Resultat::class);
     }
 
-    /** @dataProvider provideDataAjouteParticipantOccasion */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideDataAjouteParticipantOccasion')]
     public function testAjouteParticipantOccasion($passee, $envoiEmailReussi = true)
     {
         $participant = $this->utilisateurProphecy->reveal();
@@ -103,7 +103,7 @@ class OccasionPortTest extends UnitTestCase
         $this->assertEquals($occasionAttendue, $occasion);
     }
 
-    public function provideDataAjouteParticipantOccasion(): Iterator
+    public static function provideDataAjouteParticipantOccasion(): Iterator
     {
         foreach([true, false] as $envoiEmailReussi) {
             yield [false, $envoiEmailReussi];
@@ -123,7 +123,7 @@ class OccasionPortTest extends UnitTestCase
         );
     }
 
-    /** @dataProvider provideDataAjouteResultatOccasion */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideDataAjouteResultatOccasion')]
     public function testAjouteResultatOccasion($passee, $envoiEmailReussi = true)
     {
         $quiOffre = $this->utilisateurProphecy->reveal();
@@ -166,7 +166,7 @@ class OccasionPortTest extends UnitTestCase
         $this->assertEquals($resultatAttendu, $resultat);
     }
 
-    public function provideDataAjouteResultatOccasion(): Iterator
+    public static function provideDataAjouteResultatOccasion(): Iterator
     {
         foreach([true, false] as $envoiEmailReussi) {
             yield [false, $envoiEmailReussi];
@@ -188,7 +188,7 @@ class OccasionPortTest extends UnitTestCase
         );
     }
 
-    /** @dataProvider provideDataAjouteResultatOccasionPasParticipant */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideDataAjouteResultatOccasionPasParticipant')]
     public function testAjouteResultatOccasionPasParticipant(bool $quiOffreParticipe, bool $quiRecoitParticipe)
     {
         $quiOffre = $this->utilisateurProphecy->reveal();
@@ -217,7 +217,7 @@ class OccasionPortTest extends UnitTestCase
         );
     }
 
-    public function provideDataAjouteResultatOccasionPasParticipant(): Iterator
+    public static function provideDataAjouteResultatOccasionPasParticipant(): Iterator
     {
         yield([true, false]);
         yield([false, true]);
@@ -260,7 +260,7 @@ class OccasionPortTest extends UnitTestCase
         );
     }
 
-    /** @dataProvider provideDataGetOccasion */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideDataGetOccasion')]
     public function testGetOccasion(bool $admin, bool $avecResultat)
     {
         $utilisateur = $this->utilisateurProphecy->reveal();
@@ -290,7 +290,7 @@ class OccasionPortTest extends UnitTestCase
         $this->assertEquals($resultatsAttendus, $resultats);
     }
 
-    public function provideDataGetOccasion(): Iterator
+    public static function provideDataGetOccasion(): Iterator
     {
         foreach([true, false] as $admin) {
             foreach([true, false] as $avecResultat) {
@@ -342,9 +342,7 @@ class OccasionPortTest extends UnitTestCase
         );
     }
 
-    /**
-     * @dataProvider provideDataTestAdmin
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideDataTestAdmin')]
     public function testListeOccasionsParticipant(bool $admin)
     {
         $participant = $this->utilisateurProphecy->reveal();

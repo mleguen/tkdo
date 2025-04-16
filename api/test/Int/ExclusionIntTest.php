@@ -8,7 +8,7 @@ use App\Dom\Model\Utilisateur;
 
 class ExclusionIntTest extends IntTestCase
 {
-    /** @dataProvider provideCurl */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
     public function testCasNominal(bool $curl): void
     {
         $admin = $this->creeUtilisateurEnBase('admin', ['admin' => true]);
@@ -86,7 +86,7 @@ class ExclusionIntTest extends IntTestCase
         ]), $body);
     }
 
-    /** @dataProvider provideCurl */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
     function testCreeExceptionNonAuthentifie(bool $curl)
     {
         $quiOffre = $this->creeUtilisateurEnBase('quiOffre');
@@ -109,7 +109,7 @@ class ExclusionIntTest extends IntTestCase
         ], $body);
     }
 
-    /** @dataProvider provideCurl */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
     function testCreeExceptionPasAdmin(bool $curl)
     {
         $this->postConnexion($curl);
@@ -133,7 +133,7 @@ class ExclusionIntTest extends IntTestCase
         ], $body);
     }
 
-    /** @dataProvider provideCurl */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
     function testCreeExceptionDoublon(bool $curl)
     {
         $admin = $this->creeUtilisateurEnBase('admin', ['admin' => true]);
@@ -162,7 +162,7 @@ class ExclusionIntTest extends IntTestCase
         ], $body);
     }
 
-    /** @dataProvider provideCurl */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
     function testCreeExceptionQuiOffreInconnu(bool $curl)
     {
         $admin = $this->creeUtilisateurEnBase('admin', ['admin' => true]);
@@ -187,7 +187,7 @@ class ExclusionIntTest extends IntTestCase
         ], $body);
     }
 
-    /** @dataProvider provideCurl */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
     function testCreeExceptionQuiNeDoitPasRecevoirInconnu(bool $curl)
     {
         $admin = $this->creeUtilisateurEnBase('admin', ['admin' => true]);
@@ -212,7 +212,7 @@ class ExclusionIntTest extends IntTestCase
         ], $body);
     }
 
-    /** @dataProvider provideCurl */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
     function testListeExceptionNonAuthentifie(bool $curl)
     {
         $quiOffre = $this->creeUtilisateurEnBase('quiOffre');
@@ -230,7 +230,7 @@ class ExclusionIntTest extends IntTestCase
         ], $body);
     }
 
-    /** @dataProvider provideCurl */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
     function testListeExceptionPasAdmin(bool $curl)
     {
         $this->postConnexion($curl);
@@ -249,7 +249,7 @@ class ExclusionIntTest extends IntTestCase
         ], $body);
     }
 
-    /** @dataProvider provideCurl */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
     function testListeExceptionQuiOffreInconnu(bool $curl)
     {
         $admin = $this->creeUtilisateurEnBase('admin', ['admin' => true]);

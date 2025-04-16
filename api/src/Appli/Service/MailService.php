@@ -9,11 +9,8 @@ use Exception;
 
 class MailService
 {
-    private $settings;
-
-    public function __construct(MailSettings $settings)
+    public function __construct(private readonly MailSettings $settings)
     {
-        $this->settings = $settings;
     }
     
     public function envoieMail(string $to, string $subject, string $message) : bool
@@ -25,7 +22,7 @@ class MailService
 
             return mail($to, $subject, $message, $additional_headers);
         }
-        catch (Exception $e) {
+        catch (Exception) {
             return false;
         }
     }

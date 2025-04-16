@@ -59,7 +59,7 @@ class UtilisateurPortTest extends UnitTestCase
         $this->utilisateurProphecy = $this->prophesize(Utilisateur::class);
     }
 
-    /** @dataProvider provideDataTestAdmin */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideDataTestAdmin')]
     public function testCreeUtilisateur(bool $admin)
     {
         $utilisateurAttendu = $this->utilisateurProphecy->reveal();
@@ -233,7 +233,7 @@ class UtilisateurPortTest extends UnitTestCase
         );
     }
 
-    /** @dataProvider provideDataTestAdmin */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideDataTestAdmin')]
     public function testModifieUtilisateur(bool $admin)
     {
         $utilisateurAttendu = $this->utilisateurProphecy->reveal();
@@ -424,7 +424,7 @@ class UtilisateurPortTest extends UnitTestCase
         );
     }
 
-    /** @dataProvider provideDataTestAdmin */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideDataTestAdmin')]
     public function testGetUtilisateur(bool $admin)
     {
         $utilisateurAttendu = $this->utilisateurProphecy->reveal();

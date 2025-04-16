@@ -6,13 +6,13 @@ namespace Test\Int;
 
 class ConnexionIntTest extends IntTestCase
 {
-    /** @dataProvider provideCurl */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
     public function testCasNominal(bool $curl): void
     {
         $this->postConnexion($curl);
     }
 
-    /** @dataProvider provideCurl */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
     public function testMauvaisMdp(bool $curl): void
     {
         $utilisateur = $this->creeUtilisateurEnBase('utilisateur');
@@ -36,7 +36,7 @@ class ConnexionIntTest extends IntTestCase
         ], $body ?: []);
     }
 
-    /** @dataProvider provideCurl */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
     public function testIdentifiantInconnu(bool $curl): void
     {
         $this->requestApi(

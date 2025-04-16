@@ -31,7 +31,7 @@ class ExclusionAdaptor implements Exclusion
      */
     private $quiNeDoitPasRecevoir;
 
-    public function __construct(Utilisateur $quiOffre = NULL, Utilisateur $quiNeDoitPasRecevoir = NULL)
+    public function __construct(?Utilisateur $quiOffre = NULL, ?Utilisateur $quiNeDoitPasRecevoir = NULL)
     {
         if (isset($quiOffre)) $this->quiOffre = $quiOffre;
         if (isset($quiNeDoitPasRecevoir)) $this->quiNeDoitPasRecevoir = $quiNeDoitPasRecevoir;

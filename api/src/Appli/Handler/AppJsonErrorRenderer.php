@@ -17,15 +17,11 @@ use Throwable;
 
 class AppJsonErrorRenderer extends JsonErrorRenderer
 {
-    private $jsonService;
-
-    public function __construct(
-        JsonService $jsonService
-    )
+    public function __construct(private readonly JsonService $jsonService)
     {
-        $this->jsonService = $jsonService;
     }
 
+    #[\Override]
     public function __invoke(Throwable $exception, bool $displayErrorDetails): string
     {
         if ($exception instanceof HttpSpecializedException) {

@@ -17,23 +17,17 @@ use Slim\Exception\HttpNotFoundException;
 
 class CreateUtilisateurReinitMdpController extends AuthController
 {
-    private $jsonService;
-    private $utilisateurPort;
-    private $utilisateurRepository;
-
     public function __construct(
-        JsonService $jsonService,
+        private readonly JsonService $jsonService,
         RouteService $routeService,
-        UtilisateurPort $utilisateurPort,
-        UtilisateurRepository $utilisateurRepository
+        private readonly UtilisateurPort $utilisateurPort,
+        private readonly UtilisateurRepository $utilisateurRepository
     )
     {
         parent::__construct($routeService);
-        $this->jsonService = $jsonService;
-        $this->utilisateurPort = $utilisateurPort;
-        $this->utilisateurRepository = $utilisateurRepository;
     }
 
+    #[\Override]
     public function __invoke(ServerRequestInterface $request, ResponseInterface $response, $args): ResponseInterface
     {
         $response = parent::__invoke($request, $response, $args);

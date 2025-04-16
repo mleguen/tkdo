@@ -12,6 +12,7 @@ use Doctrine\Migrations\AbstractMigration;
  */
 final class Version20201210201133 extends AbstractMigration
 {
+    #[\Override]
     public function getDescription() : string
     {
         return "Ajout de la date d'envoi de la dernière notification périodique";
@@ -23,6 +24,7 @@ final class Version20201210201133 extends AbstractMigration
         $this->addSql('ALTER TABLE tkdo_utilisateur ADD dateDerniereNotifPeriodique DATETIME NOT NULL');
     }
 
+    #[\Override]
     public function down(Schema $schema) : void
     {
         // this down() migration is auto-generated, please modify it to your needs

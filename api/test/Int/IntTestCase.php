@@ -19,8 +19,8 @@ use DateTime;
 use DateTimeInterface;
 use Doctrine\ORM\EntityManager;
 use GuzzleHttp\Client as GuzzleClient;
+use GuzzleHttp\Psr7\HttpFactory;
 use Http\Adapter\Guzzle7\Client as GuzzleAdapter;
-use Http\Message\MessageFactory\GuzzleMessageFactory;
 use Iterator;
 use PHPUnit\Framework\TestCase;
 use rpkamp\Mailhog\MailhogClient;
@@ -55,7 +55,8 @@ class IntTestCase extends TestCase
     public function setUp(): void
     {
         $this->client = new GuzzleClient();
-        $this->mhclient = new MailhogClient(new GuzzleAdapter($this->client), new GuzzleMessageFactory(), getenv('MAILHOG_BASE_URI'));
+        $factory = new HttpFactory();
+        $this->mhclient = new MailhogClient(new GuzzleAdapter($this->client), $factory, $factory, getenv('MAILHOG_BASE_URI'));
         $this->mhclient->purgeMessages();
     }
 
@@ -101,7 +102,7 @@ class IntTestCase extends TestCase
 
     protected function creeIdeeEnMemoire(array $options = []): IdeeAdaptor
     {
-        $idee = (new IdeeAdaptor())
+        $idee = new IdeeAdaptor()
             ->setUtilisateur($options['utilisateur'] ?? $this->creeUtilisateurEnBase('utilisateur'))
             ->setDescription($options['description'] ?? 'nouvelle idée')
             ->setAuteur($options['auteur'] ?? $this->creeUtilisateurEnBase('auteur'))
@@ -126,7 +127,7 @@ class IntTestCase extends TestCase
      */
     protected function creeOccasionEnMemoire(array $options = []): OccasionAdaptor
     {
-        return (new OccasionAdaptor())
+        return new OccasionAdaptor()
             ->setDate($options['date'] ?? new DateTime('tomorrow'))
             ->setParticipants($options['participants'] ?? [])
             ->setTitre($options['titre'] ?? 'demain');
@@ -151,7 +152,7 @@ class IntTestCase extends TestCase
         UtilisateurAdaptor $quiRecoit
     ): ResultatAdaptor
     {
-        return (new ResultatAdaptor())
+        return new ResultatAdaptor()
             ->setOccasion($occasion)
             ->setQuiOffre($quiOffre)
             ->setQuiRecoit($quiRecoit);
@@ -170,7 +171,7 @@ class IntTestCase extends TestCase
 
     protected function creeUtilisateurEnMemoire(string $identifiant, array $options = []): UtilisateurAdaptor
     {
-        return (new UtilisateurAdaptor())
+        return new UtilisateurAdaptor()
             ->setEmail($options['email'] ?? $identifiant . '@localhost')
             ->setAdmin($options['admin'] ?? false)
             ->setGenre($options['genre'] ?? Genre::Masculin)
@@ -190,7 +191,7 @@ class IntTestCase extends TestCase
         return $emailsRecus;
     }
 
-    protected function postConnexion(bool $curl, UtilisateurAdaptor $utilisateur = null): UtilisateurAdaptor
+    protected function postConnexion(bool $curl, ?UtilisateurAdaptor $utilisateur = null): UtilisateurAdaptor
     {
         if (!$utilisateur) $utilisateur = $this->creeUtilisateurEnBase('connecte');
         $this->requestApi(
@@ -226,10 +227,10 @@ class IntTestCase extends TestCase
         bool $curl,
         string $method,
         string $path,
-        int &$statusCode = null,
-        array &$body = null,
+        ?int &$statusCode = null,
+        ?array &$body = null,
         $query = '',
-        array $data = null
+        ?array $data = null
     ): void {
         if ($curl) {
             $uParam = $this->token ? "-u {$this->token}:" : '';
@@ -315,7 +316,7 @@ class IntTestCase extends TestCase
         ];
     }
 
-    public function provideCurl(): Iterator
+    public static function provideCurl(): Iterator
     {
         foreach([false, true] as $curl) {
             yield [$curl];

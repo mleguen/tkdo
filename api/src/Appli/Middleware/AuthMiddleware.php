@@ -17,16 +17,8 @@ use Slim\Exception\HttpUnauthorizedException;
 
 class AuthMiddleware implements MiddlewareInterface
 {
-    private $logger;
-    private $authService;
-
-    public function __construct(
-        LoggerInterface $logger,
-        AuthService $authService
-    )
+    public function __construct(private readonly LoggerInterface $logger, private readonly AuthService $authService)
     {
-        $this->logger = $logger;
-        $this->authService = $authService;
     }
 
     /**

@@ -33,13 +33,13 @@ class ExclusionRepositoryAdaptor implements ExclusionRepository
         Utilisateur $quiNeDoitPasRecevoir
     ): Exclusion
     {
-        $exclusion = (new ExclusionAdaptor())
+        $exclusion = new ExclusionAdaptor()
             ->setQuiOffre($quiOffre)
             ->setQuiNeDoitPasRecevoir($quiNeDoitPasRecevoir);
         try {
             $this->em->persist($exclusion);
             $this->em->flush();
-        } catch (UniqueConstraintViolationException $err) {
+        } catch (UniqueConstraintViolationException) {
             throw new DoublonExclusionException();
         }
         return $exclusion;

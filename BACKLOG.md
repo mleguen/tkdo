@@ -1,5 +1,6 @@
 # Travaux futurs
 
+- faire une PR dans rpkamp/mailhog-client pour corriger deprecation "str_getcsv(): the $escape parameter must be provided as its default value will change"
 - se débarrasser de mhsendmail
 - passer à mysql 8
 - rendre personnalisable la signature des emails, pour faire un peu moins "machine"

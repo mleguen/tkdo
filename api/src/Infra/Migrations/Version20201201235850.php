@@ -12,6 +12,7 @@ use Doctrine\Migrations\AbstractMigration;
  */
 final class Version20201201235850 extends AbstractMigration
 {
+    #[\Override]
     public function getDescription() : string
     {
         return 'Ajout des préférences de notification pour les nouvelles idées';
@@ -23,6 +24,7 @@ final class Version20201201235850 extends AbstractMigration
         $this->addSql('ALTER TABLE tkdo_utilisateur ADD prefNotifIdees VARCHAR(255) NOT NULL');
     }
 
+    #[\Override]
     public function down(Schema $schema) : void
     {
         // this down() migration is auto-generated, please modify it to your needs

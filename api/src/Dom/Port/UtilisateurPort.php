@@ -21,19 +21,8 @@ use DateTime;
 
 class UtilisateurPort
 {
-    private $mailPlugin;
-    private $passwordPlugin;
-    private $utilisateurRepository;
-
-    public function __construct(
-        MailPlugin $mailPlugin,
-        PasswordPlugin $passwordPlugin,
-        UtilisateurRepository $utilisateurRepository
-    )
+    public function __construct(private readonly MailPlugin $mailPlugin, private readonly PasswordPlugin $passwordPlugin, private readonly UtilisateurRepository $utilisateurRepository)
     {
-        $this->mailPlugin = $mailPlugin;
-        $this->passwordPlugin = $passwordPlugin;
-        $this->utilisateurRepository = $utilisateurRepository;
     }
 
     /**
@@ -49,12 +38,12 @@ class UtilisateurPort
         string $email,
         string $nom,
         string $genre,
-        bool $admin = null,
-        string $prefNotifIdees = null
+        ?bool $admin = null,
+        ?string $prefNotifIdees = null
     ): Utilisateur
     {
         if (!$auth->estAdmin()) throw new PasAdminException();
-        $this->assertEstEmail($email);
+        self::assertEstEmail($email);
         if (!in_array($genre, Genre::Tous)) throw new GenreInvalideException();
         if ($prefNotifIdees && !in_array($prefNotifIdees, PrefNotifIdees::Toutes)) throw new PrefNotifIdeesInvalideException();
 
@@ -112,7 +101,7 @@ class UtilisateurPort
 
         if (isset($modifications['identifiant'])) $utilisateur->setIdentifiant($modifications['identifiant']);
         if (isset($modifications['email'])) {
-            $this->assertEstEmail($modifications['email']);
+            self::assertEstEmail($modifications['email']);
             $utilisateur->setEmail($modifications['email']);
         }
         if (isset($modifications['nom'])) $utilisateur->setNom($modifications['nom']);

@@ -10,7 +10,7 @@ use Iterator;
 
 class IdeeIntTest extends IntTestCase
 {
-    /** @dataProvider provideCurl */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
     public function testCasNominal(bool $curl): void
     {
         $idee = $this->creeIdeeEnMemoire();
@@ -177,8 +177,8 @@ class IdeeIntTest extends IntTestCase
         $this->assertCount(0, $emailsRecus);
     }
 
-    /** @dataProvider provideCurl */
-    function testCreeIdeeNonAuthentifie(bool $curl)
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
+    public function testCreeIdeeNonAuthentifie(bool $curl)
     {
         $idee = $this->creeIdeeEnMemoire();
         $auteur = $idee->getAuteur();
@@ -203,8 +203,8 @@ class IdeeIntTest extends IntTestCase
         ], $body);
     }
 
-    /** @dataProvider provideCurl */
-    function testCreeIdeeUtilisateurInconnu(bool $curl) {
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
+    public function testCreeIdeeUtilisateurInconnu(bool $curl) {
         $idee = $this->creeIdeeEnMemoire([
             'utilisateur' => $this->creeUtilisateurEnMemoire('utilisateurInconnu'),
         ]);
@@ -232,8 +232,8 @@ class IdeeIntTest extends IntTestCase
         ], $body);
     }
 
-    /** @dataProvider provideCurl */
-    function testCreeIdeePasLAuteur(bool $curl) {
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
+    public function testCreeIdeePasLAuteur(bool $curl) {
         $idee = $this->creeIdeeEnMemoire();
         $auteur = $idee->getAuteur();
         $utilisateur = $idee->getUtilisateur();
@@ -259,8 +259,8 @@ class IdeeIntTest extends IntTestCase
         ], $body);
     }
 
-    /** @dataProvider provideCurl */
-    function testListeIdeeNonAuthentifie(bool $curl)
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
+    public function testListeIdeeNonAuthentifie(bool $curl)
     {
         $utilisateur = $this->creeUtilisateurEnBase('utilisateur');
 
@@ -278,8 +278,8 @@ class IdeeIntTest extends IntTestCase
         ], $body);
     }
 
-    /** @dataProvider provideDataListeIdeePasAdmin */
-    function testListeIdeePasAdmin(bool $curl, ?int $supprimees)
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideDataListeIdeePasAdmin')]
+    public function testListeIdeePasAdmin(bool $curl, ?int $supprimees)
     {
         $utilisateur = $this->creeUtilisateurEnBase('utilisateur');
         $this->postConnexion($curl);
@@ -298,17 +298,17 @@ class IdeeIntTest extends IntTestCase
         ], $body);
     }
 
-    function provideDataListeIdeePasAdmin(): Iterator
+    public static function provideDataListeIdeePasAdmin(): Iterator
     {
-        foreach($this->provideCurl() as $data) {
+        foreach(self::provideCurl() as $data) {
             foreach([1, null] as $supprimees) {
                 yield array_merge($data, [$supprimees]);
             }
         }
     }
 
-    /** @dataProvider provideCurl */
-    function testListeIdeeUtilisateurInconnu(bool $curl)
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
+    public function testListeIdeeUtilisateurInconnu(bool $curl)
     {
         $connecte = $this->postConnexion($curl);
         $idUtilisateur = $connecte->getId() + 1;
@@ -327,8 +327,8 @@ class IdeeIntTest extends IntTestCase
         ], $body);
     }
 
-    /** @dataProvider provideCurl */
-    function testMarqueIdeeCommeSupprimeeNonAuthentifie(bool $curl)
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
+    public function testMarqueIdeeCommeSupprimeeNonAuthentifie(bool $curl)
     {
         $idee = $this->creeIdeeEnBase();
 
@@ -345,8 +345,8 @@ class IdeeIntTest extends IntTestCase
         ], $body);
     }
 
-    /** @dataProvider provideCurl */
-    function testMarqueIdeeCommeSupprimeeInconnue(bool $curl)
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
+    public function testMarqueIdeeCommeSupprimeeInconnue(bool $curl)
     {
         $this->postConnexion($curl);
 
@@ -363,8 +363,8 @@ class IdeeIntTest extends IntTestCase
         ], $body);
     }
 
-    /** @dataProvider provideCurl */
-    function testMarqueIdeeCommeSupprimeeDejaSupprimee(bool $curl)
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
+    public function testMarqueIdeeCommeSupprimeeDejaSupprimee(bool $curl)
     {
         $idee = $this->creeIdeeEnBase(['dateSuppression' => new DateTime()]);
 

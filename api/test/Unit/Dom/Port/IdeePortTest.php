@@ -60,15 +60,15 @@ class IdeePortTest extends UnitTestCase
         $this->ideeProphecy = $this->prophesize(Idee::class);
     }
 
-    /** @dataProvider provideDataTestAdmin */
-    public function testCreeIdee(bool $getAdmin)
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideDataTestAdmin')]
+    public function testCreeIdee(bool $admin)
     {
         $auteur = $this->auteurProphecy->reveal();
         $utilisateur = $this->utilisateurProphecy->reveal();
         
         $auth = $this->authProphecy->reveal();
-        $this->authProphecy->estAdmin()->willReturn($getAdmin);
-        $this->authProphecy->estUtilisateur($auteur)->willReturn(!$getAdmin);
+        $this->authProphecy->estAdmin()->willReturn($admin);
+        $this->authProphecy->estUtilisateur($auteur)->willReturn(!$admin);
 
         $description = 'nouvelle idée';
 
@@ -144,17 +144,15 @@ class IdeePortTest extends UnitTestCase
         );
     }
 
-    /**
-     * @dataProvider provideDataTestAdmin
-     */
-    public function testMarqueIdeeCommeSupprimee(bool $getAdmin)
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideDataTestAdmin')]
+    public function testMarqueIdeeCommeSupprimee(bool $admin)
     {
         $auteur = $this->auteurProphecy->reveal();
         $utilisateur = $this->utilisateurProphecy->reveal();
 
         $auth = $this->authProphecy->reveal();
-        $this->authProphecy->estAdmin()->willReturn($getAdmin);
-        $this->authProphecy->estUtilisateur($auteur)->willReturn(!$getAdmin);
+        $this->authProphecy->estAdmin()->willReturn($admin);
+        $this->authProphecy->estUtilisateur($auteur)->willReturn(!$admin);
 
         $this->ideeProphecy->getAuteur()->willReturn($auteur);
         $this->ideeProphecy->getUtilisateur()->willReturn($utilisateur);
@@ -168,9 +166,7 @@ class IdeePortTest extends UnitTestCase
         
         $callTime = new DateTime();
         
-        $this->ideeProphecy->setDateSuppression(Argument::that(function($dateSuppression) use ($callTime) {
-            return ($dateSuppression >= $callTime) && ($dateSuppression <= new DateTime());
-        }))
+        $this->ideeProphecy->setDateSuppression(Argument::that(fn($dateSuppression) => ($dateSuppression >= $callTime) && ($dateSuppression <= new DateTime())))
             ->willReturn($ideeAttendue)
             ->shouldBeCalledOnce();
 
@@ -221,13 +217,11 @@ class IdeePortTest extends UnitTestCase
         );
     }
 
-    /**
-     * @dataProvider provideDataListeIdees
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideDataListeIdees')]
     public function testListeIdees(
         bool $estUtilisateur,
         bool $getAdmin,
-        bool $supprimees = null
+        ?bool $supprimees = null
     )
     {
         $auteur = $this->auteurProphecy->reveal();
@@ -283,7 +277,7 @@ class IdeePortTest extends UnitTestCase
         $this->assertEquals($ideesAttendues, $idees);
     }
 
-    public function provideDataListeIdees()
+    public static function provideDataListeIdees()
     {
         return [
             // utilisateur, idées non supprimées
@@ -335,12 +329,10 @@ class IdeePortTest extends UnitTestCase
         ];
     }
 
-    /**
-     * @dataProvider provideDataListeIdeesToutesPasAdmin
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideDataListeIdeesToutesPasAdmin')]
     public function testListeIdeesToutesPasAdmin(
         bool $estUtilisateur,
-        bool $supprimees = null
+        ?bool $supprimees = null
     ) {
         $auteur = $this->auteurProphecy->reveal();
         $utilisateur = $this->utilisateurProphecy->reveal();
@@ -357,7 +349,7 @@ class IdeePortTest extends UnitTestCase
         );
     }
 
-    public function provideDataListeIdeesToutesPasAdmin()
+    public static function provideDataListeIdeesToutesPasAdmin()
     {
         return [
             // utilisateur, idées supprimées

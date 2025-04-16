@@ -46,7 +46,7 @@ class CreateConnexionController
             $this->logger->info("Utilisateur {$utilisateur->getId()} ({$utilisateur->getNom()}) connecté" . ($utilisateur->getAdmin() ? ' (admin)' : ''));
 
             return $this->routeService->getResponseWithJsonBody($response, $this->jsonService->encodeConnexion($utilisateur));
-        } catch (UtilisateurInconnuException $err) {
+        } catch (UtilisateurInconnuException) {
             throw new HttpBadRequestException($request, 'identifiants invalides');
         }
     }

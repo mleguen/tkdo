@@ -26,7 +26,7 @@ class OccasionRepositoryAdaptor implements OccasionRepository
         string $titre
     ): Occasion
     {
-        $occasion = (new OccasionAdaptor())
+        $occasion = new OccasionAdaptor()
             ->setDate($date)
             ->setTitre($titre);
         $this->em->persist($occasion);

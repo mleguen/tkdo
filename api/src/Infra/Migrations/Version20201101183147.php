@@ -12,6 +12,7 @@ use Doctrine\Migrations\AbstractMigration;
  */
 final class Version20201101183147 extends AbstractMigration
 {
+    #[\Override]
     public function getDescription() : string
     {
         return 'Ajout du genre des utilisateurs';
@@ -23,6 +24,7 @@ final class Version20201101183147 extends AbstractMigration
         $this->addSql('ALTER TABLE tkdo_utilisateur ADD genre VARCHAR(255) NOT NULL');
     }
 
+    #[\Override]
     public function down(Schema $schema) : void
     {
         // this down() migration is auto-generated, please modify it to your needs

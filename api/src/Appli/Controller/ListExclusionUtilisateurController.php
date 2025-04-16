@@ -33,6 +33,7 @@ class ListExclusionUtilisateurController extends AuthController
         $this->utilisateurRepository = $utilisateurRepository;
     }
 
+    #[\Override]
     public function __invoke(ServerRequestInterface $request, ResponseInterface $response, $args): ResponseInterface
     {
         $response = parent::__invoke($request, $response, $args);
