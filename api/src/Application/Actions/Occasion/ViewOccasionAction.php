@@ -16,7 +16,7 @@ class ViewOccasionAction extends OccasionAction
         $occasionId = (int) $this->resolveArg('id');
         $occasion = $this->occasionRepository->findOccasionOfId($occasionId);
 
-        $this->logger->info("Occasion of id `${occasionId}` was viewed.");
+        $this->logger->info("Occasion of id `{$occasionId}` was viewed.");
 
         return $this->respondWithData($occasion);
     }

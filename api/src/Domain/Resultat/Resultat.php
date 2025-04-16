@@ -8,17 +8,14 @@ use JsonSerializable;
 
 class Resultat implements JsonSerializable
 {
-    private ?int $id;
+    private readonly string $resultatname;
 
-    private string $resultatname;
+    private readonly string $firstName;
 
-    private string $firstName;
+    private readonly string $lastName;
 
-    private string $lastName;
-
-    public function __construct(?int $id, string $resultatname, string $firstName, string $lastName)
+    public function __construct(private readonly ?int $id, string $resultatname, string $firstName, string $lastName)
     {
-        $this->id = $id;
         $this->resultatname = strtolower($resultatname);
         $this->firstName = ucfirst($firstName);
         $this->lastName = ucfirst($lastName);

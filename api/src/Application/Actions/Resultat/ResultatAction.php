@@ -10,11 +10,8 @@ use Psr\Log\LoggerInterface;
 
 abstract class ResultatAction extends Action
 {
-    protected ResultatRepository $resultatRepository;
-
-    public function __construct(LoggerInterface $logger, ResultatRepository $resultatRepository)
+    public function __construct(LoggerInterface $logger, protected ResultatRepository $resultatRepository)
     {
         parent::__construct($logger);
-        $this->resultatRepository = $resultatRepository;
     }
 }

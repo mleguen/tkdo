@@ -18,7 +18,7 @@ class InMemoryIdeeRepository implements IdeeRepository
     /**
      * @param Idee[]|null $idees
      */
-    public function __construct(array $idees = null)
+    public function __construct(?array $idees = null)
     {
         $this->idees = $idees ?? [
             1 => new Idee(1, 'bill.gates', 'Bill', 'Gates'),

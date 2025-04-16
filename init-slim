@@ -118,4 +118,45 @@ copy-entity Idee
 copy-entity Resultat
 delete-entity-template
 
+# slim-skeleton is not yet PHP >8.1 compatible, so upgrade it ourselves
+./composer require php:^8.4 php-di/php-di:^7.0
+./composer remove --dev \
+  jangregor/phpstan-prophecy \
+  phpspec/prophecy-phpunit \
+  phpstan/extension-installer \
+  phpstan/phpstan \
+  phpunit/phpunit
+./composer config allow-plugins.phpstan/extension-installer true
+./composer require --dev --no-interaction \
+  jangregor/phpstan-prophecy \
+  phpspec/prophecy-phpunit \
+  phpstan/extension-installer \
+  phpstan/phpstan \
+  phpunit/phpunit \
+  rector/rector
+
+cat > api/rector.php <<EOF
+<?php
+
+use Rector\Config\RectorConfig;
+use Rector\PHPUnit\Set\PHPUnitSetList;
+
+return RectorConfig::configure()
+    ->withPaths([
+        __DIR__ . '/app',
+        __DIR__ . '/public',
+        __DIR__ . '/src',
+        __DIR__ . '/tests',
+    ])
+    ->withPhpSets()
+    ->withSets([
+        PHPUnitSetList::PHPUNIT_90,
+        PHPUnitSetList::PHPUNIT_100,
+        PHPUnitSetList::PHPUNIT_110,
+    ]);
+EOF
+sed -E '/"test":/{h;s/"test":.*/"rector": "rector",/;p;g}' -i api/composer.json
+./composer run rector
+./composer test -- --migrate-configuration
+
 ./composer test

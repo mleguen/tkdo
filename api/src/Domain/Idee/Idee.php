@@ -8,17 +8,14 @@ use JsonSerializable;
 
 class Idee implements JsonSerializable
 {
-    private ?int $id;
+    private readonly string $ideename;
 
-    private string $ideename;
+    private readonly string $firstName;
 
-    private string $firstName;
+    private readonly string $lastName;
 
-    private string $lastName;
-
-    public function __construct(?int $id, string $ideename, string $firstName, string $lastName)
+    public function __construct(private readonly ?int $id, string $ideename, string $firstName, string $lastName)
     {
-        $this->id = $id;
         $this->ideename = strtolower($ideename);
         $this->firstName = ucfirst($firstName);
         $this->lastName = ucfirst($lastName);

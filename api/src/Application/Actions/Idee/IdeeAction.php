@@ -10,11 +10,8 @@ use Psr\Log\LoggerInterface;
 
 abstract class IdeeAction extends Action
 {
-    protected IdeeRepository $ideeRepository;
-
-    public function __construct(LoggerInterface $logger, IdeeRepository $ideeRepository)
+    public function __construct(LoggerInterface $logger, protected IdeeRepository $ideeRepository)
     {
         parent::__construct($logger);
-        $this->ideeRepository = $ideeRepository;
     }
 }

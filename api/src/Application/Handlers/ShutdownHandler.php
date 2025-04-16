@@ -10,20 +10,14 @@ use Slim\Exception\HttpInternalServerErrorException;
 
 class ShutdownHandler
 {
-    private Request $request;
-
-    private HttpErrorHandler $errorHandler;
-
-    private bool $displayErrorDetails;
+    private readonly HttpErrorHandler $errorHandler;
 
     public function __construct(
-        Request $request,
+        private readonly Request $request,
         HttpErrorHandler $errorHandler,
-        bool $displayErrorDetails
+        private readonly bool $displayErrorDetails
     ) {
-        $this->request = $request;
         $this->errorHandler = $errorHandler;
-        $this->displayErrorDetails = $displayErrorDetails;
     }
 
     public function __invoke()

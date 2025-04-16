@@ -9,7 +9,7 @@ use Tests\TestCase;
 
 class UtilisateurTest extends TestCase
 {
-    public function utilisateurProvider(): array
+    public static function utilisateurProvider(): array
     {
         return [
             [1, 'bill.gates', 'Bill', 'Gates'],
@@ -21,12 +21,12 @@ class UtilisateurTest extends TestCase
     }
 
     /**
-     * @dataProvider utilisateurProvider
      * @param int    $id
      * @param string $utilisateurname
      * @param string $firstName
      * @param string $lastName
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('utilisateurProvider')]
     public function testGetters(int $id, string $utilisateurname, string $firstName, string $lastName)
     {
         $utilisateur = new Utilisateur($id, $utilisateurname, $firstName, $lastName);
@@ -38,12 +38,12 @@ class UtilisateurTest extends TestCase
     }
 
     /**
-     * @dataProvider utilisateurProvider
      * @param int    $id
      * @param string $utilisateurname
      * @param string $firstName
      * @param string $lastName
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('utilisateurProvider')]
     public function testJsonSerialize(int $id, string $utilisateurname, string $firstName, string $lastName)
     {
         $utilisateur = new Utilisateur($id, $utilisateurname, $firstName, $lastName);

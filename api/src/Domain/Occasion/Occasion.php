@@ -8,17 +8,14 @@ use JsonSerializable;
 
 class Occasion implements JsonSerializable
 {
-    private ?int $id;
+    private readonly string $occasionname;
 
-    private string $occasionname;
+    private readonly string $firstName;
 
-    private string $firstName;
+    private readonly string $lastName;
 
-    private string $lastName;
-
-    public function __construct(?int $id, string $occasionname, string $firstName, string $lastName)
+    public function __construct(private readonly ?int $id, string $occasionname, string $firstName, string $lastName)
     {
-        $this->id = $id;
         $this->occasionname = strtolower($occasionname);
         $this->firstName = ucfirst($firstName);
         $this->lastName = ucfirst($lastName);

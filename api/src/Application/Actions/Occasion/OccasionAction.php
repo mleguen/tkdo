@@ -10,11 +10,8 @@ use Psr\Log\LoggerInterface;
 
 abstract class OccasionAction extends Action
 {
-    protected OccasionRepository $occasionRepository;
-
-    public function __construct(LoggerInterface $logger, OccasionRepository $occasionRepository)
+    public function __construct(LoggerInterface $logger, protected OccasionRepository $occasionRepository)
     {
         parent::__construct($logger);
-        $this->occasionRepository = $occasionRepository;
     }
 }

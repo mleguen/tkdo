@@ -18,7 +18,7 @@ class InMemoryOccasionRepository implements OccasionRepository
     /**
      * @param Occasion[]|null $occasions
      */
-    public function __construct(array $occasions = null)
+    public function __construct(?array $occasions = null)
     {
         $this->occasions = $occasions ?? [
             1 => new Occasion(1, 'bill.gates', 'Bill', 'Gates'),

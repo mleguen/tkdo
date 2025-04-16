@@ -10,11 +10,8 @@ use Psr\Log\LoggerInterface;
 
 abstract class ConnexionAction extends Action
 {
-    protected ConnexionRepository $connexionRepository;
-
-    public function __construct(LoggerInterface $logger, ConnexionRepository $connexionRepository)
+    public function __construct(LoggerInterface $logger, protected ConnexionRepository $connexionRepository)
     {
         parent::__construct($logger);
-        $this->connexionRepository = $connexionRepository;
     }
 }

@@ -18,7 +18,7 @@ class InMemoryConnexionRepository implements ConnexionRepository
     /**
      * @param Connexion[]|null $connexions
      */
-    public function __construct(array $connexions = null)
+    public function __construct(?array $connexions = null)
     {
         $this->connexions = $connexions ?? [
             1 => new Connexion(1, 'bill.gates', 'Bill', 'Gates'),

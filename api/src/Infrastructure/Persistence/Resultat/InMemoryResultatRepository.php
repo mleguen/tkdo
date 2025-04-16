@@ -18,7 +18,7 @@ class InMemoryResultatRepository implements ResultatRepository
     /**
      * @param Resultat[]|null $resultats
      */
-    public function __construct(array $resultats = null)
+    public function __construct(?array $resultats = null)
     {
         $this->resultats = $resultats ?? [
             1 => new Resultat(1, 'bill.gates', 'Bill', 'Gates'),

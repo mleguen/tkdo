@@ -9,7 +9,7 @@ use Tests\TestCase;
 
 class ResultatTest extends TestCase
 {
-    public function resultatProvider(): array
+    public static function resultatProvider(): array
     {
         return [
             [1, 'bill.gates', 'Bill', 'Gates'],
@@ -21,12 +21,12 @@ class ResultatTest extends TestCase
     }
 
     /**
-     * @dataProvider resultatProvider
      * @param int    $id
      * @param string $resultatname
      * @param string $firstName
      * @param string $lastName
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('resultatProvider')]
     public function testGetters(int $id, string $resultatname, string $firstName, string $lastName)
     {
         $resultat = new Resultat($id, $resultatname, $firstName, $lastName);
@@ -38,12 +38,12 @@ class ResultatTest extends TestCase
     }
 
     /**
-     * @dataProvider resultatProvider
      * @param int    $id
      * @param string $resultatname
      * @param string $firstName
      * @param string $lastName
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('resultatProvider')]
     public function testJsonSerialize(int $id, string $resultatname, string $firstName, string $lastName)
     {
         $resultat = new Resultat($id, $resultatname, $firstName, $lastName);

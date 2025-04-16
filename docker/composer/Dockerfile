@@ -1,4 +1,4 @@
-FROM php:8.1-cli
+FROM php:8.4-cli
 COPY --from=composer:2.8 /usr/bin/composer /usr/bin/composer
 
 # Create the dev user with specified GID and UID

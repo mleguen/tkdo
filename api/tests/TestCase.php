@@ -78,7 +78,7 @@ class TestCase extends PHPUnit_TestCase
     ): Request {
         $uri = new Uri('', '', 80, $path);
         $handle = fopen('php://temp', 'w+');
-        $stream = (new StreamFactory())->createStreamFromResource($handle);
+        $stream = new StreamFactory()->createStreamFromResource($handle);
 
         $h = new Headers();
         foreach ($headers as $name => $value) {

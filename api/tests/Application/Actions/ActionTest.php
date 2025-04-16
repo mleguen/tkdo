@@ -32,7 +32,7 @@ class ActionTest extends TestCase
                     new ActionPayload(
                         202,
                         [
-                            'willBeDoneAt' => (new DateTimeImmutable())->format(DateTimeImmutable::ATOM)
+                            'willBeDoneAt' => new DateTimeImmutable()->format(DateTimeImmutable::ATOM)
                         ]
                     )
                 );
@@ -63,7 +63,7 @@ class ActionTest extends TestCase
             {
                 return $this->respondWithData(
                     [
-                        'willBeDoneAt' => (new DateTimeImmutable())->format(DateTimeImmutable::ATOM)
+                        'willBeDoneAt' => new DateTimeImmutable()->format(DateTimeImmutable::ATOM)
                     ],
                     202
                 );

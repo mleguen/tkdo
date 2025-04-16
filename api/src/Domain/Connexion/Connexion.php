@@ -8,17 +8,14 @@ use JsonSerializable;
 
 class Connexion implements JsonSerializable
 {
-    private ?int $id;
+    private readonly string $connexionname;
 
-    private string $connexionname;
+    private readonly string $firstName;
 
-    private string $firstName;
+    private readonly string $lastName;
 
-    private string $lastName;
-
-    public function __construct(?int $id, string $connexionname, string $firstName, string $lastName)
+    public function __construct(private readonly ?int $id, string $connexionname, string $firstName, string $lastName)
     {
-        $this->id = $id;
         $this->connexionname = strtolower($connexionname);
         $this->firstName = ucfirst($firstName);
         $this->lastName = ucfirst($lastName);

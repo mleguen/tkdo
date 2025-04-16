@@ -16,7 +16,7 @@ class ViewResultatAction extends ResultatAction
         $resultatId = (int) $this->resolveArg('id');
         $resultat = $this->resultatRepository->findResultatOfId($resultatId);
 
-        $this->logger->info("Resultat of id `${resultatId}` was viewed.");
+        $this->logger->info("Resultat of id `{$resultatId}` was viewed.");
 
         return $this->respondWithData($resultat);
     }

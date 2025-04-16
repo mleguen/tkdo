@@ -18,7 +18,7 @@ class InMemoryUtilisateurRepository implements UtilisateurRepository
     /**
      * @param Utilisateur[]|null $utilisateurs
      */
-    public function __construct(array $utilisateurs = null)
+    public function __construct(?array $utilisateurs = null)
     {
         $this->utilisateurs = $utilisateurs ?? [
             1 => new Utilisateur(1, 'bill.gates', 'Bill', 'Gates'),

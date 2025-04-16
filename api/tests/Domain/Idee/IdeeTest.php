@@ -9,7 +9,7 @@ use Tests\TestCase;
 
 class IdeeTest extends TestCase
 {
-    public function ideeProvider(): array
+    public static function ideeProvider(): array
     {
         return [
             [1, 'bill.gates', 'Bill', 'Gates'],
@@ -21,12 +21,12 @@ class IdeeTest extends TestCase
     }
 
     /**
-     * @dataProvider ideeProvider
      * @param int    $id
      * @param string $ideename
      * @param string $firstName
      * @param string $lastName
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('ideeProvider')]
     public function testGetters(int $id, string $ideename, string $firstName, string $lastName)
     {
         $idee = new Idee($id, $ideename, $firstName, $lastName);
@@ -38,12 +38,12 @@ class IdeeTest extends TestCase
     }
 
     /**
-     * @dataProvider ideeProvider
      * @param int    $id
      * @param string $ideename
      * @param string $firstName
      * @param string $lastName
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('ideeProvider')]
     public function testJsonSerialize(int $id, string $ideename, string $firstName, string $lastName)
     {
         $idee = new Idee($id, $ideename, $firstName, $lastName);

@@ -16,7 +16,7 @@ class ViewIdeeAction extends IdeeAction
         $ideeId = (int) $this->resolveArg('id');
         $idee = $this->ideeRepository->findIdeeOfId($ideeId);
 
-        $this->logger->info("Idee of id `${ideeId}` was viewed.");
+        $this->logger->info("Idee of id `{$ideeId}` was viewed.");
 
         return $this->respondWithData($idee);
     }

@@ -9,7 +9,7 @@ use Tests\TestCase;
 
 class ConnexionTest extends TestCase
 {
-    public function connexionProvider(): array
+    public static function connexionProvider(): array
     {
         return [
             [1, 'bill.gates', 'Bill', 'Gates'],
@@ -21,12 +21,12 @@ class ConnexionTest extends TestCase
     }
 
     /**
-     * @dataProvider connexionProvider
      * @param int    $id
      * @param string $connexionname
      * @param string $firstName
      * @param string $lastName
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('connexionProvider')]
     public function testGetters(int $id, string $connexionname, string $firstName, string $lastName)
     {
         $connexion = new Connexion($id, $connexionname, $firstName, $lastName);
@@ -38,12 +38,12 @@ class ConnexionTest extends TestCase
     }
 
     /**
-     * @dataProvider connexionProvider
      * @param int    $id
      * @param string $connexionname
      * @param string $firstName
      * @param string $lastName
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('connexionProvider')]
     public function testJsonSerialize(int $id, string $connexionname, string $firstName, string $lastName)
     {
         $connexion = new Connexion($id, $connexionname, $firstName, $lastName);
