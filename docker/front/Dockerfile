@@ -3,8 +3,8 @@ RUN sed -ri -e '/LoadModule (proxy_module|proxy_http_module)/s/^#//g' /usr/local
         echo '\n\
 <VirtualHost *:80>\n\
         ServerName front\n\
-        ProxyPass "/api/" "http://slim-web/"\n\
-        ProxyPassReverse "/api/" "http://slim-web/"\n\
+        ProxyPass "/api-v1/" "http://slim-web/"\n\
+        ProxyPassReverse "/api-v1/" "http://slim-web/"\n\
         ProxyPass "/" "http://angular/"\n\
         ProxyPassReverse "/" "http://angular/"\n\
 </VirtualHost>\n\

@@ -13,7 +13,7 @@ RewriteCond %{HTTPS} !on
 RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI}
 
 # Redirection of API requests to index.php
-RewriteRule ^api/?(.*) api/public/index.php [NC,L]
+RewriteRule ^api-v1/?(.*) api-v1/public/index.php [NC,L]
 
 # Redirection of requests to index.html
 RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI} -f [OR]

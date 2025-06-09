@@ -53,7 +53,7 @@ export interface Idee {
   dateProposition: string;
 }
 
-const URL_API = '/api';
+const URL_API = '/api-v1';
 const URL_CONNEXION = `${URL_API}/connexion`;
 const URL_LISTE_OCCASIONS = `${URL_API}/occasion`;
 const URL_OCCASION = (idOccasion: number) =>

@@ -1,6 +1,7 @@
 .idea/
 .vscode/
 /coverage/
+/src/Appli/Fixture/*.data.php
 /vendor/
 /logs/*
 !/logs/README.md

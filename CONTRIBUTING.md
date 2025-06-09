@@ -139,7 +139,7 @@ Procédure à suivre pour que le projet continue d'utiliser angular de la maniè
 `composer` et les autres outils back (doctrine, console, etc.) s'exécutent dans le conteneur docker `composer`, de manière à ne pas nécessiter l'installation de dépendances sur le poste du développeur, et maîtriser les versions utilisées.
 
 Des scripts sont disponibles à la racine du projet pour simplifier leur appel via docker : `./composer`, `./doctrine`, `./console`.
-Ces scripts, bien que placés à la racine du projet pour être plus facilement accessibles, s'exécutent directement dans le contexte du répertoire `api`.
+Ces scripts, bien que placés à la racine du projet pour être plus facilement accessibles, s'exécutent directement dans le contexte du répertoire `api-v1`.
 
 ### Tests
 
@@ -174,7 +174,7 @@ Puis générer automatiquement la nouvelle migration :
 ./doctrine orm:clear-cache:metadata
 ./doctrine orm:clear-cache:query
 ./doctrine orm:clear-cache:result
-for d in $(find api/var/doctrine/cache -mindepth 1 -type d); do rm -rf "$d"; done
+for d in $(find api-v1/var/doctrine/cache -mindepth 1 -type d); do rm -rf "$d"; done
 ./doctrine migrations:diff
 ```
 

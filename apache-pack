@@ -18,18 +18,18 @@ tar -cvf $TAR_FILE -C apache .
 # Fichiers front
 tar -rvf $TAR_FILE -C front/dist/tkdo-front/browser .
 
-# Fichiers api
+# Fichiers api-v1
 tar -rvf $TAR_FILE --transform='s/\.prod$//' \
-  ./api/bin \
-  ./api/public \
-  ./api/src \
-  ./api/var/auth/*.prod \
-  ./api/var/cache/.gitignore \
-  ./api/var/doctrine/{cache,proxy}/.gitignore \
-  ./api/vendor \
-  ./api/.env.prod \
-  ./api/*.php \
-  ./api/composer.{json,lock,phar}
+  ./api-v1/bin \
+  ./api-v1/public \
+  ./api-v1/src \
+  ./api-v1/var/auth/*.prod \
+  ./api-v1/var/cache/.gitignore \
+  ./api-v1/var/doctrine/{cache,proxy}/.gitignore \
+  ./api-v1/vendor \
+  ./api-v1/.env.prod \
+  ./api-v1/*.php \
+  ./api-v1/composer.{json,lock,phar}
 
 # Finalisation
 gzip -f $TAR_FILE

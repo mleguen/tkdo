@@ -33,9 +33,9 @@ où sera installé tkdo.
 ### Configuration
 
 Plusieurs variables d'environnement permettent de configurer Tkdo
-(voir [le fichier .env](./api/.env) pour la liste de ces variables).
+(voir [le fichier .env](./api-v1/.env) pour la liste de ces variables).
 
-Tout ou partie de ces variables peuvent être redéfinies dans un fichier `api/.env.prod`,
+Tout ou partie de ces variables peuvent être redéfinies dans un fichier `api-v1/.env.prod`,
 qui sera automatiquement intégré au package d'installation à l'étape suivante,
 et/ou directement dans les variables d'environnement du serveur Apache.
 
@@ -50,19 +50,19 @@ et/ou directement dans les variables d'environnement du serveur Apache.
 Décompresser dans le répertoire d'installation l'archive `tkdo-v*.tar.gz` obtenue.
 
 > **Attention** : certains hébergeurs proposent des fonctions d'upload d'archives les décompressant automatiquement,
-> mais qui peuvent parfois tronquer les noms de fichiers si l'arborescence est trop profonde (`api/vendor` par exemple).
+> mais qui peuvent parfois tronquer les noms de fichiers si l'arborescence est trop profonde (`api-v1/vendor` par exemple).
 > Télécharger dans ce cas plutôt l'archive en tant que simple fichier, et la décompresser manuellement.
 
 Puis, depuis le répertoire d'installation :
 
 ```bash
-$ cd api
+$ cd api-v1
 $ ./composer.phar doctrine -- orm:generate-proxies
 
  Processing entity "xxx"
 [...]
 
- Proxy classes generated to "/home/lgnby/www/tkdo/api/var/doctrine/proxy"
+ Proxy classes generated to "/home/lgnby/www/tkdo/api-v1/var/doctrine/proxy"
 $ ./composer.phar doctrine -- migrations:migrate
 [...]
   ------------------------
@@ -75,11 +75,11 @@ $ ./composer.phar doctrine -- migrations:migrate
 ### Scripts
 
 L'envoi des notifications périodiques par mail nécessite la configuration d'une tâche planifiée
-pour exécuter `api/bin/notif-quotidienne.php` une fois par jour, à l'heure de votre choix.
+pour exécuter `api-v1/bin/notif-quotidienne.php` une fois par jour, à l'heure de votre choix.
 Par exemple :
 
 ```crontab
-0 6 * * * php /var/www/api/bin/notif-quotidienne.php
+0 6 * * * php /var/www/api-v1/bin/notif-quotidienne.php
 ```
 
 ### Création d'un premier compte administrateur

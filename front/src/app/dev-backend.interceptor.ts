@@ -191,7 +191,7 @@ export class DevBackendInterceptor implements HttpInterceptor {
   ): Observable<HttpEvent<unknown>> {
     const { url, method, headers, body } = request;
 
-    // wrap in delayed observable to simulate server api call
+    // wrap in delayed observable to simulate server api-v1 call
     return of(null)
       .pipe(mergeMap(handleRoute))
       .pipe(materialize()) // call materialize and dematerialize to ensure delay even if an error is thrown (https://github.com/Reactive-Extensions/RxJS/issues/648)
@@ -202,7 +202,7 @@ export class DevBackendInterceptor implements HttpInterceptor {
       let match: string[] | null;
 
       // API
-      if ((match = url.match(/^\/api(\/.+)?$/))) {
+      if ((match = url.match(/^\/api-v1(\/.+)?$/))) {
         const [, urlApi] = match;
 
         if (urlApi === '/connexion') {
@@ -229,7 +229,7 @@ export class DevBackendInterceptor implements HttpInterceptor {
           if (method === 'GET') return getOccasion(+idOccasion);
         }
 
-        // all other api routes are unknown
+        // all other api-v1 routes are unknown
         return notFound();
       }
 

@@ -10,7 +10,7 @@ use Monolog\Logger;
 class LogSettings
 {
     public $level = Logger::DEBUG;
-    public $name = 'api';
+    public $name = 'api-v1';
     public $stream;
 
     public function __construct(

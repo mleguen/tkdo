@@ -9,7 +9,7 @@ function echec {
 }
 
 # Génération des clés d'authentification (si pas déjà fait)
-AUTH_RSA=./api/var/auth/auth_rsa
+AUTH_RSA=./api-v1/var/auth/auth_rsa
 [ ! -f $AUTH_RSA.prod ] && openssl genrsa -out $AUTH_RSA.prod
 openssl pkey -in $AUTH_RSA.prod -pubout -out $AUTH_RSA.pub.prod
 

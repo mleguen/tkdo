@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+./composer-v1 run console -- "$@"
