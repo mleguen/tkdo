@@ -1,9 +1,10 @@
 # Historique des changements
 
-## Prochaine release
+## V1.4.3 (01/04/2024)
 
 - tâches techniques :
   - api : PHP 8.4 et slim 4.10 (avr. 2025)
+  - front : correctifs de sécurité
 
 ## V1.4.2 (01/04/2024)
 
