@@ -4,28 +4,6 @@ services:
     volumes:
       - ./front/dist:/mnt/dist
 
-  composer:
-    build: docker/composer
-    entrypoint: composer
-    environment:
-      XDG_CACHE_HOME: /opt/tkdo/.cache
-      docker: "true"
-      MAILHOG_BASE_URI: http://mailhog:8025/
-      MHSENDMAIL_OPTIONS: --smtp-addr=mailhog:1025
-      MYSQL_DATABASE: tkdo
-      MYSQL_HOST: mysql
-      MYSQL_PASSWORD: mdptkdo
-      MYSQL_PORT: 3306
-      MYSQL_USER: tkdo
-      TKDO_BASE_URI: http://slim-web
-      TKDO_MAILER_FROM: noreply@slim
-    profiles:
-      - tools
-    user: ${UID:-1000}:${GID:-1000}
-    volumes:
-      - .:/opt/tkdo
-    working_dir: /opt/tkdo/api
-  
   front:
     build: ./docker/front
     depends_on:
@@ -70,6 +48,29 @@ services:
       - NPM_CONFIG_CACHE=/mnt/tkdo/.cache/npm
     volumes:
       - ./:/mnt/tkdo
+
+
+  php-cli:
+    build: docker/php-cli
+    environment:
+      HOME: /opt/tkdo
+      XDG_CACHE_HOME: /opt/tkdo/.cache
+      docker: "true"
+      MAILHOG_BASE_URI: http://mailhog:8025/
+      MHSENDMAIL_OPTIONS: --smtp-addr=mailhog:1025
+      MYSQL_DATABASE: tkdo
+      MYSQL_HOST: mysql
+      MYSQL_PASSWORD: mdptkdo
+      MYSQL_PORT: 3306
+      MYSQL_USER: tkdo
+      TKDO_BASE_URI: http://slim-web
+      TKDO_MAILER_FROM: noreply@slim
+    profiles:
+      - tools
+    user: ${UID:-1000}:${GID:-1000}
+    volumes:
+      - .:/opt/tkdo
+    working_dir: /opt/tkdo/api
 
   slim-fpm:
     build: ./docker/slim-fpm
