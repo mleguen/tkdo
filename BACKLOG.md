@@ -1,5 +1,6 @@
 # Travaux futurs
 
+- monter la version d'angular (>= 20) pour corriger les vulnérabilités modérées
 - faire une PR dans rpkamp/mailhog-client pour corriger deprecation "str_getcsv(): the $escape parameter must be provided as its default value will change"
 - se débarrasser de mhsendmail
 - passer à mysql 8
