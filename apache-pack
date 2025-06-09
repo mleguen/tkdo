@@ -16,7 +16,7 @@ function echec {
 tar -cvf $TAR_FILE -C apache .
 
 # Fichiers front
-tar -rvf $TAR_FILE -C front/dist/tkdo-front .
+tar -rvf $TAR_FILE -C front/dist/tkdo-front/browser .
 
 # Fichiers api
 tar -rvf $TAR_FILE --transform='s/\.prod$//' \
