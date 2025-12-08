@@ -21,7 +21,7 @@ où sera installé tkdo.
   - docker et son plugin compose installés
   - utilisateur membre du groupe `docker` (pour exécuter `docker` et `docker compose` sans `sudo`)
 - serveur :
-  - php 7.3 avec les extensions `dom`, `mbstring`, `pdo_mysql` et `zip`
+  - php 8.4 avec les extensions `dom`, `mbstring`, `pdo_mysql` et `zip`
   - Apache avec le module `mod_rewrite`
   - l'utilisation de fichiers `.htaccess` dans le répertoire d'installation est autorisée 
     (à défaut, copier le contenu de [.htaccess](./apache/.htaccess) dans une directive `Directory` dans la configuration Apache)
