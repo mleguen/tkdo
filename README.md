@@ -47,11 +47,13 @@ et/ou directement dans les variables d'environnement du serveur Apache.
 
 ### Installation
 
-Décompresser dans le répertoire d'installation l'archive `tkdo-v*.tar.gz` obtenue.
+Décompresser dans le répertoire d'installation l'archive `tkdo-v*.tar.gz` obtenue, par exemple :
 
-> **Attention** : certains hébergeurs proposent des fonctions d'upload d'archives les décompressant automatiquement,
-> mais qui peuvent parfois tronquer les noms de fichiers si l'arborescence est trop profonde (`api/vendor` par exemple).
-> Télécharger dans ce cas plutôt l'archive en tant que simple fichier, et la décompresser manuellement.
+```bash
+$ mkdir -p www/tkdo-v1.4.4
+$ cd www/tkdo-v1.4.4
+$ tar -xvzf ../../tkdo-v1.4.4.tar.gz
+```
 
 Puis, depuis le répertoire d'installation :
 
