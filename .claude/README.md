@@ -51,6 +51,23 @@ graph TB
   - No orphaned or outdated documentation
   - Easier code reviews with full context
 
+**BACKLOG.md Management:**
+- **Remove completed tasks entirely** from BACKLOG.md (don't mark as completed, delete them)
+- Renumber remaining tasks sequentially after removal
+- This keeps the backlog focused on future work, not past accomplishments
+- Completed work is tracked in git history and documentation itself
+
+**Markdown Tables:**
+- **Always add proper indentation/spacing** to markdown tables for readability in raw markdown
+- Align columns with spaces so tables are readable without rendering
+- Example:
+  ```markdown
+  | Column 1     | Column 2                | Column 3        |
+  |--------------|-------------------------|-----------------|
+  | Short        | Longer content here     | Medium          |
+  | Value        | Another value           | Third value     |
+  ```
+
 **Example commit:**
 ```
 feat(api): add exclusion management endpoints
