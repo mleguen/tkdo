@@ -1,97 +1,137 @@
-# Historique des changements
+# Changelog
 
-## V1.4.3 (01/04/2024)
+## Next Release
 
-- tâches techniques :
-  - api : PHP 8.4 et slim 4.10 (avr. 2025)
-  - front : correctifs de sécurité
+### Contributors
+- **Documentation:**
+  - Translate project backlog from French to English
+  - Create comprehensive documentation section in backlog with 17 planned tasks
+  - Create project overview documentation (docs/en/README.md) with Mermaid architecture diagram
+  - Create comprehensive end-user guide (docs/en/user-guide.md)
+  - Translate changelog from French to English with audience/scope grouping structure
+  - Fix PHP version mention in documentation (PHP 8.4, not PHP 7)
+- **Project Configuration:**
+  - Add commit conventions for Claude Code (Conventional Commits format, English, attribution)
+  - Add preference requiring Mermaid diagrams for all technical diagrams
+  - Require documentation updates in same commit as related code changes
+  - Require proper indentation/spacing in markdown tables for raw readability
+  - Configure backlog management (remove completed tasks, don't mark them)
+  - Configure changelog maintenance (update in same commit, group by audience/scope)
+  - Deny Claude Code access to api/.env.prod file
 
-## V1.4.2 (01/04/2024)
+## V1.4.3 (April 1, 2024)
 
-- correctifs :
-  - api : n'envoie les notifs instantanées qu'aux personnes concernées
-- tâches techniques :
-  - api : montée de version des dépendances (nov. 2023)
-  - front : montée de version des dépendances (déc. 2023)
+### Contributors
+- **Technical Tasks:**
+  - API: Upgrade to PHP 8.4 and Slim 4.10 (April 2025)
+  - Frontend: Security fixes
 
-## V1.4.0 (25/11/2023)
+## V1.4.2 (April 1, 2024)
 
-- tri des participants à une occasion, de manière à avoir :
-  - la personne à qui offrir en premier (si le tirage a été fait)
-  - la personne connectée ensuite
-  - et enfin les autres participants, par ordre alphabétique
-- route admin de création et d'affichage des exclusions
-- correctifs :
-  - apache-pack :
-    - n'utlise plus la version locale de php pour installer les dépendances
-    - construit le front en mode prod
-  - api :
-    - chargement du fichier .env
-    - valeur par défaut pour TKDO_MAILER_FROM
-    - typo dans les mails de notifications (#12)
-    - envoi des notifs quotidiennes tous les jours, pas 1 jour sur 2 (#18)
-  - front :
-    - redirection vers la page de connexion quand la session est expirée (#17)
-    - scroll pour afficher le message de succès ou d'erreur à l'enregistrement du profil (#14)
+### Users
+- **Bug Fixes:**
+  - API: Send instant notifications only to concerned people
 
-## V1.3.0 (02/12/2021)
+### Contributors
+- **Technical Tasks:**
+  - API: Update dependencies (November 2023)
+  - Frontend: Update dependencies (December 2023)
 
-- refactorisation du code de l'API
-- ajout de tests de bout en bout
-- route admin de génération automatique du tirage au sort
+## V1.4.0 (November 25, 2023)
 
-## V1.2.0 (21/12/2020)
+### Users
+- **Features:**
+  - Sort occasion participants to show:
+    - The person you should give to first (if draw has been performed)
+    - Yourself next
+    - Other participants alphabetically
 
-- ajout de l'email au profil utilisateur, pour le notifier :
-  - à la création de son compte
-  - à la réinitialisation de son mot de passe
-  - à sa participation à une nouvelle occasion
-  - à l'ajout d'un résultat de tirage le concernant
-- ajout d'une date aux occations.
-  L'occasion affichée par défaut à la connexion est maintenant la prochaine occasion à venir,
-  ou à défaut la dernière occasion passée
-- les idées ne sont plus supprimées, mais marquées comme telles (et toujours présentes en base de données)
-- ajout de préférences de notification des créations/suppressions d'idées au profil utilisateur, pour le notifier :
-  - à chaque création/suppression d'idée pour un participant d'une occasion à venir
-  - une fois par jour (par un email récapitulatif)
-  - ou pas du tout
+### Administrators
+- **Features:**
+  - Admin route to create and display exclusions
 
-## V1.1.0 (29/11/2020)
+### Contributors
+- **Bug Fixes:**
+  - apache-pack:
+    - No longer uses local PHP version to install dependencies
+    - Builds frontend in production mode
+  - API:
+    - Load .env file correctly
+    - Default value for TKDO_MAILER_FROM
+    - Fix typo in notification emails (#12)
+    - Send daily notifications every day, not every other day (#18)
+  - Frontend:
+    - Redirect to login page when session expires (#17)
+    - Scroll to show success or error message when saving profile (#14)
 
-- un menu "Mes occasions" permet d'accéder à toutes les occasions
-  auxquelles l'utilisateur participe ou a participé (et seulement celles-là).
-  La dernière occasion créée à laquelle il participe est la page par défaut quand il se connecte
-- un menu "Mes idées" permet d'accéder directement à la liste d'idées de l'utilisateur connecté.
-  C'est la page par défaut quand il se connecte s'il ne participe encore à aucune occasion
-- possibilité d'appeler l'API directement en ligne de commande avec curl
-  (avec `-u $token:` pour fournir le token d'authentification
-  et `-d cle=valeur` pour passer un à un les paramètres)
-- droits d'administration permettant :
-  - côté API :
-    - un accès étendu à certaines routes standard :
-      - GET /api/utilisateur/:idUtilisateur pour n'importe quel id utilisateur
-      - GET /api/occasion pour toutes les occasions,
-        ou les occasions de n'importe quel utilisateur
-      - GET /api/occasion/:idOccasion pour n'importe quelle occasion
-    - un accès à de nouvelles routes réservées aux administrateurs
-      (et accessibles uniquement en ligne de commande) :
-      - GET et POST /api/utilisateur
-      - POST /api/utilisateur/:idUtilisateur/reinitmdp
-      - POST et PUT /api/occasion
-      - POST /api/occasion/:idOccasion/participant
-      - POST /api/occasion/:idOccasion/resultat
-  - côté front : l'accès à une page d'administration
-    détaillant l'utilisation de ces routes en ligne de commande
+## V1.3.0 (December 2, 2021)
 
-## V1.0.0 (01/11/2020)
+### Administrators
+- **Features:**
+  - Admin route for automatic draw generation
 
-Produit viable minimum :
+### Contributors
+- **Technical Tasks:**
+  - Refactor API code
+  - Add end-to-end tests
 
-- connexion/déconnexion
-- consultation/modification du profil de l'utilisateur connecté
-- consultation de la dernière occasion à laquelle l'utilisateur connecté participe :
-  - liste des autres participants
-  - résultat du tirage en ce qui le concerne (à qui il doit faire un cadeau)
-- consultation/ajout/suppression des idées de cadeau pour chacun des participants
-  (l'utilisateur connecté ne pouvant pas voir les idées que d'autres auraient proposées pour lui)
-- suppression des idées de cadeau que l'utilisateur connecté a lui-même proposées
+## V1.2.0 (December 21, 2020)
+
+### Users
+- **Features:**
+  - Add email to user profile for notifications:
+    - Account creation
+    - Password reset
+    - New occasion participation
+    - Draw result assignment
+  - Add date to occasions
+    - Default occasion at login is now the next upcoming occasion, or the most recent past occasion
+  - Gift ideas are now soft-deleted (marked as deleted but kept in database)
+  - Add gift idea notification preferences to user profile:
+    - Instant notification for each idea creation/deletion for upcoming occasions
+    - Daily digest email
+    - No notifications
+
+## V1.1.0 (November 29, 2020)
+
+### Users
+- **Features:**
+  - "My occasions" menu to access all occasions the user participates in
+    - Default page at login is the latest created occasion the user participates in
+  - "My ideas" menu for direct access to the connected user's gift ideas list
+    - Default page at login if user doesn't participate in any occasion yet
+
+### Administrators
+- **Features:**
+  - API command-line access with curl:
+    - Use `-u $token:` to provide authentication token
+    - Use `-d key=value` to pass parameters
+  - Administration rights with:
+    - API side:
+      - Extended access to standard routes:
+        - GET /api/utilisateur/:idUtilisateur for any user ID
+        - GET /api/occasion for all occasions or any user's occasions
+        - GET /api/occasion/:idOccasion for any occasion
+      - Access to new administrator-only routes (command-line only):
+        - GET and POST /api/utilisateur
+        - POST /api/utilisateur/:idUtilisateur/reinitmdp
+        - POST and PUT /api/occasion
+        - POST /api/occasion/:idOccasion/participant
+        - POST /api/occasion/:idOccasion/resultat
+    - Frontend side:
+      - Administration page detailing command-line usage for these routes
+
+## V1.0.0 (November 1, 2020)
+
+Minimum Viable Product:
+
+### Users
+- **Features:**
+  - Login/logout
+  - View and modify connected user's profile
+  - View latest occasion the connected user participates in:
+    - List of other participants
+    - Draw result (who they should give a gift to)
+  - View, add, and delete gift ideas for each participant
+    - Connected user cannot see ideas others suggested for them
+  - Delete gift ideas the connected user suggested themselves

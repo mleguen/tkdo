@@ -57,6 +57,41 @@ graph TB
 - This keeps the backlog focused on future work, not past accomplishments
 - Completed work is tracked in git history and documentation itself
 
+**CHANGELOG.md Maintenance:**
+- **Always update CHANGELOG.md** in the same commit as related changes
+- Add changes to "Next Release" section until a new version tag is created
+- **Release ordering:** "Next Release" first, then newest to oldest releases
+- **Changes within a release:** Group by audience and scope, NOT by commit time
+  - Audiences: Users, Administrators, Contributors
+  - Scopes: Features, Bug Fixes, Technical Tasks, Documentation, Project Configuration, etc.
+- **Format:**
+  ```markdown
+  ## Next Release
+
+  ### [Audience]
+  - **[Scope]:**
+    - [Change description]
+    - [Another change]
+
+  ## V1.x.x (Month Day, Year)
+
+  ### Users
+  - **Features:**
+    - [User-facing feature]
+  - **Bug Fixes:**
+    - [User-facing fix]
+
+  ### Administrators
+  - **Features:**
+    - [Admin feature]
+
+  ### Contributors
+  - **Technical Tasks:**
+    - [Technical change]
+  - **Documentation:**
+    - [Doc change]
+  ```
+
 **Markdown Tables:**
 - **Always add proper indentation/spacing** to markdown tables for readability in raw markdown
 - Align columns with spaces so tables are readable without rendering
