@@ -5,9 +5,10 @@
 ### Contributors
 - **Documentation:**
   - Translate project backlog from French to English
-  - Create comprehensive documentation section in backlog with 17 planned tasks
+  - Create comprehensive documentation section in backlog with 16 planned tasks left
   - Create project overview documentation (docs/en/README.md) with Mermaid architecture diagram
   - Create comprehensive end-user guide (docs/en/user-guide.md)
+  - Create comprehensive administrator guide (docs/en/admin-guide.md) with API reference
   - Translate changelog from French to English with audience/scope grouping structure
   - Fix PHP version mention in documentation (PHP 8.4, not PHP 7)
 - **Project Configuration:**
