@@ -20,14 +20,14 @@
   - Configure changelog maintenance (update in same commit, group by audience/scope)
   - Deny Claude Code access to api/.env.prod file
 
-## V1.4.3 (April 1, 2024)
+## V1.4.3 (April 1, 2025)
 
 ### Contributors
 - **Technical Tasks:**
   - API: Upgrade to PHP 8.4 and Slim 4.10 (April 2025)
   - Frontend: Security fixes
 
-## V1.4.2 (April 1, 2024)
+## V1.4.2 (April 1, 2025)
 
 ### Users
 - **Bug Fixes:**
