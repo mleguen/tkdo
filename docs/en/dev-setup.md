@@ -132,7 +132,7 @@ The `-d` flag runs containers in detached mode (background).
 **4. Build the frontend:**
 
 ```bash
-./npm run build -- --configuration production
+./npm run build
 ```
 
 **Wait for completion:** The initial build can take several minutes. You'll see output indicating compilation progress.
@@ -522,7 +522,7 @@ rm -rf api/vendor
 # Start fresh
 docker compose up -d front
 ./npm install
-./npm run build -- --configuration production
+./npm run build
 ```
 
 **⚠️ Warning:** This deletes all data, including the database. You'll need to reinitialize.
@@ -533,7 +533,7 @@ docker compose up -d front
 
 Now that your development environment is running:
 
-- **Frontend Development:** See [Frontend Development Guide](frontend-dev.md) *(coming soon)*
+- **Frontend Development:** See [Frontend Development Guide](frontend-dev.md)
 - **Backend Development:** See [Backend Development Guide](backend-dev.md) *(coming soon)*
 - **Database:** See [Database Documentation](database.md) *(coming soon)*
 - **Testing:** See [Testing Guide](testing.md) *(coming soon)*
