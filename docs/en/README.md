@@ -200,7 +200,7 @@ graph TB
    ```bash
    docker compose up -d front
    ./npm install
-   ./npm run build -- --configuration production
+   ./npm run build
    ```
 4. Access the application at http://localhost:8080
 
@@ -227,7 +227,7 @@ Default credentials: `admin` / `admin` (change password immediately!)
 
 ### Developer Documentation
 - [Development Environment Setup](dev-setup.md)
-- [Frontend Development Guide](frontend-dev.md) _(coming soon)_
+- [Frontend Development Guide](frontend-dev.md)
 - [Backend/API Development Guide](backend-dev.md) _(coming soon)_
 - [Database Documentation](database.md) _(coming soon)_
 - [Testing Guide](testing.md) _(coming soon)_

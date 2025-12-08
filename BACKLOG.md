@@ -45,25 +45,7 @@
 ## Documentation
 
 ### Developer Documentation
-**Task 1:** Create frontend development documentation
-- **File:** `docs/en/frontend-dev.md`
-- **Content:**
-  - Frontend architecture overview (Angular, standalone components, routing)
-  - Project structure explanation (`front/src/app/` organization)
-  - Available npm scripts and their usage
-  - Running unit tests (`./npm test`)
-  - Running component tests (`./npm run ct`) with Cypress
-  - Running integration tests (`./npm run int`)
-  - Using the Angular development server (`./npm start`)
-  - Understanding the dev backend interceptor for API mocking
-  - Building for production
-  - Upgrade procedures for Node, Angular, and dependencies (ngskel branch workflow)
-  - Code style and conventions
-  - Component architecture patterns (page components, display components)
-- **Estimated size:** ~500-600 lines
-- **Note:** After completion, check consistency with other documentation (remove "coming soon" links, update cross-references)
-
-**Task 2:** Create backend/API development documentation
+**Task 1:** Create backend/API development documentation
 - **File:** `docs/en/backend-dev.md`
 - **Content:**
   - Backend architecture overview (PHP 8.4, Slim Framework 4, Doctrine ORM)
@@ -81,7 +63,7 @@
 - **Estimated size:** ~400-500 lines
 - **Note:** After completion, check consistency with other documentation (remove "coming soon" links, update cross-references)
 
-**Task 3:** Create database documentation
+**Task 2:** Create database documentation
 - **File:** `docs/en/database.md`
 - **Content:**
   - Database schema overview
@@ -101,7 +83,7 @@
 - **Estimated size:** ~400-500 lines with schema diagrams
 - **Note:** After completion, check consistency with other documentation (remove "coming soon" links, update cross-references)
 
-**Task 4:** Create testing documentation
+**Task 3:** Create testing documentation
 - **File:** `docs/en/testing.md`
 - **Content:**
   - Testing philosophy and strategy
@@ -124,7 +106,7 @@
 - **Estimated size:** ~500-600 lines
 - **Note:** After completion, check consistency with other documentation (remove "coming soon" links, update cross-references)
 
-**Task 5:** Create API reference documentation
+**Task 4:** Create API reference documentation
 - **File:** `docs/en/api-reference.md`
 - **Content:**
   - API base URL and versioning
@@ -158,7 +140,7 @@
 - **Estimated size:** ~600-800 lines with examples
 - **Note:** After completion, check consistency with other documentation (remove "coming soon" links, update cross-references)
 
-**Task 6:** Create architecture and design decisions documentation
+**Task 5:** Create architecture and design decisions documentation
 - **File:** `docs/en/architecture.md`
 - **Content:**
   - System architecture overview
@@ -191,7 +173,7 @@
 - **Estimated size:** ~500-600 lines
 - **Note:** After completion, check consistency with other documentation (remove "coming soon" links, update cross-references)
 
-**Task 7:** Create contributing guidelines
+**Task 6:** Create contributing guidelines
 - **File:** `docs/en/CONTRIBUTING.md`
 - **Content:**
   - How to contribute (issues, pull requests)
@@ -215,7 +197,7 @@
 - **Note:** After completion, check consistency with other documentation (remove "coming soon" links, update cross-references)
 
 ### Deployment Documentation
-**Task 8:** Translate and enhance Apache deployment guide
+**Task 7:** Translate and enhance Apache deployment guide
 - **File:** `docs/en/deployment-apache.md`
 - **Content:**
   - Prerequisites:
@@ -252,7 +234,7 @@
 - **Estimated size:** ~400-500 lines
 - **Note:** After completion, check consistency with other documentation (remove "coming soon" links, update cross-references)
 
-**Task 9:** Create environment variables reference
+**Task 8:** Create environment variables reference
 - **File:** `docs/en/environment-variables.md`
 - **Content:**
   - Reading current `api/.env` file
@@ -268,7 +250,7 @@
 - **Estimated size:** ~200-300 lines
 - **Note:** After completion, check consistency with other documentation (remove "coming soon" links, update cross-references)
 
-**Task 10:** Create backup and maintenance guide
+**Task 9:** Create backup and maintenance guide
 - **File:** `docs/en/maintenance.md`
 - **Content:**
   - Database backup procedures:
@@ -297,7 +279,7 @@
 - **Estimated size:** ~300-400 lines
 - **Note:** After completion, check consistency with other documentation (remove "coming soon" links, update cross-references)
 
-**Task 11:** Create troubleshooting guide
+**Task 10:** Create troubleshooting guide
 - **File:** `docs/en/troubleshooting.md`
 - **Content:**
   - Common issues and solutions:
@@ -333,7 +315,7 @@
 - **Note:** After completion, check consistency with other documentation (remove "coming soon" links, update cross-references)
 
 ### Documentation Infrastructure
-**Task 12:** Create documentation index and navigation
+**Task 11:** Create documentation index and navigation
 - **File:** `docs/en/INDEX.md`
 - **Content:**
   - Welcome message
@@ -349,7 +331,7 @@
 - **Estimated size:** ~100-150 lines
 - **Note:** After completion, check consistency with other documentation (remove "coming soon" links, update cross-references)
 
-**Task 13:** Update main README.md with English content
+**Task 12:** Update main README.md with English content
 - **File:** `README.md`
 - **Action:** Keep both French and English versions
 - **Content:**
@@ -361,7 +343,7 @@
 - **Estimated size:** Additions of ~100-150 lines
 - **Note:** After completion, check consistency with other documentation (remove "coming soon" links, update cross-references)
 
-**Task 14:** Create documentation writing guide
+**Task 13:** Create documentation writing guide
 - **File:** `docs/DOCUMENTATION-GUIDE.md`
 - **Content:**
   - Documentation philosophy and principles
