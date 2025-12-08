@@ -36,6 +36,35 @@ graph TB
 ```
 ```
 
+**Documentation Updates:**
+- **Always update documentation in the same commit** as related code changes
+- This includes:
+  - README files when features change
+  - API documentation when endpoints change
+  - Architecture docs when design changes
+  - BACKLOG.md when tasks are completed or requirements change
+  - User guides when UI/functionality changes
+  - Developer guides when development processes change
+- Benefits:
+  - Documentation stays in sync with code
+  - Git history shows complete context of changes
+  - No orphaned or outdated documentation
+  - Easier code reviews with full context
+
+**Example commit:**
+```
+feat(api): add exclusion management endpoints
+
+Add POST and GET routes for managing exclusions between participants.
+Exclusions prevent specific users from drawing each other in the gift
+exchange draw.
+
+- Add CreateExclusionUtilisateurController
+- Add ListExclusionUtilisateurController
+- Update API reference documentation
+- Update BACKLOG.md to mark task as completed
+```
+
 ## Settings Files
 
 ### settings.local.json (in subdirectories)
