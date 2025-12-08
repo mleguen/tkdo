@@ -223,7 +223,7 @@ Default credentials: `admin` / `admin` (change password immediately!)
 ### User Documentation
 - [User Guide](user-guide.md) - For regular users
 - [Administrator Guide](admin-guide.md) - For administrators
-- [Email Notifications Reference](notifications.md) _(coming soon)_
+- [Email Notifications Reference](notifications.md)
 
 ### Developer Documentation
 - [Development Environment Setup](dev-setup.md) _(coming soon)_
