@@ -221,8 +221,8 @@ Default credentials: `admin` / `admin` (change password immediately!)
 ## Documentation
 
 ### User Documentation
-- [User Guide](user-guide.md) _(coming soon)_ - For regular users
-- [Administrator Guide](admin-guide.md) _(coming soon)_ - For administrators
+- [User Guide](user-guide.md) - For regular users
+- [Administrator Guide](admin-guide.md) - For administrators
 - [Email Notifications Reference](notifications.md) _(coming soon)_
 
 ### Developer Documentation
