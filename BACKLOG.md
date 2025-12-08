@@ -45,20 +45,7 @@
 ## Documentation
 
 ### User Documentation
-**Task 1:** Create end-user guide for regular users
-- **File:** `docs/en/user-guide.md`
-- **Content:**
-  - Getting started: First login, profile setup
-  - Managing your gift ideas list
-  - Participating in occasions
-  - Viewing draw results (who to give a gift to)
-  - Adding gift ideas for other participants
-  - Understanding email notifications
-  - Managing notification preferences
-  - Updating your profile (name, email, password)
-- **Estimated size:** ~400-500 lines with screenshots
-
-**Task 2:** Create administrator guide
+**Task 1:** Create administrator guide
 - **File:** `docs/en/admin-guide.md`
 - **Content:**
   - Administrator role overview
@@ -72,7 +59,7 @@
   - Using curl commands for API access with authentication tokens
 - **Estimated size:** ~400-500 lines with examples
 
-**Task 3:** Create email notifications reference guide
+**Task 2:** Create email notifications reference guide
 - **File:** `docs/en/notifications.md`
 - **Content:**
   - Overview of notification system
@@ -87,7 +74,7 @@
 - **Estimated size:** ~200-250 lines
 
 ### Developer Documentation
-**Task 4:** Translate and enhance development environment setup guide
+**Task 3:** Translate and enhance development environment setup guide
 - **File:** `docs/en/dev-setup.md`
 - **Content:**
   - Prerequisites (Docker, Docker Compose, user permissions)
@@ -100,7 +87,7 @@
   - Common setup troubleshooting
 - **Estimated size:** ~200-250 lines
 
-**Task 5:** Create frontend development documentation
+**Task 4:** Create frontend development documentation
 - **File:** `docs/en/frontend-dev.md`
 - **Content:**
   - Frontend architecture overview (Angular, standalone components, routing)
@@ -117,7 +104,7 @@
   - Component architecture patterns (page components, display components)
 - **Estimated size:** ~500-600 lines
 
-**Task 6:** Create backend/API development documentation
+**Task 5:** Create backend/API development documentation
 - **File:** `docs/en/backend-dev.md`
 - **Content:**
   - Backend architecture overview (PHP 8.4, Slim Framework 4, Doctrine ORM)
@@ -134,7 +121,7 @@
   - Error handling patterns
 - **Estimated size:** ~400-500 lines
 
-**Task 7:** Create database documentation
+**Task 6:** Create database documentation
 - **File:** `docs/en/database.md`
 - **Content:**
   - Database schema overview
@@ -153,7 +140,7 @@
   - Database initialization with fixtures
 - **Estimated size:** ~400-500 lines with schema diagrams
 
-**Task 8:** Create testing documentation
+**Task 7:** Create testing documentation
 - **File:** `docs/en/testing.md`
 - **Content:**
   - Testing philosophy and strategy
@@ -175,7 +162,7 @@
   - Known testing gaps (noted as "A faire" in current docs)
 - **Estimated size:** ~500-600 lines
 
-**Task 9:** Create API reference documentation
+**Task 8:** Create API reference documentation
 - **File:** `docs/en/api-reference.md`
 - **Content:**
   - API base URL and versioning
@@ -208,7 +195,7 @@
   - Using curl for API testing examples
 - **Estimated size:** ~600-800 lines with examples
 
-**Task 10:** Create architecture and design decisions documentation
+**Task 9:** Create architecture and design decisions documentation
 - **File:** `docs/en/architecture.md`
 - **Content:**
   - System architecture overview
@@ -240,7 +227,7 @@
   - Future architectural considerations (AWS serverless mentioned in backlog)
 - **Estimated size:** ~500-600 lines
 
-**Task 11:** Create contributing guidelines
+**Task 10:** Create contributing guidelines
 - **File:** `docs/en/CONTRIBUTING.md`
 - **Content:**
   - How to contribute (issues, pull requests)
@@ -263,7 +250,7 @@
 - **Estimated size:** ~400-500 lines
 
 ### Deployment Documentation
-**Task 12:** Translate and enhance Apache deployment guide
+**Task 11:** Translate and enhance Apache deployment guide
 - **File:** `docs/en/deployment-apache.md`
 - **Content:**
   - Prerequisites:
@@ -299,7 +286,7 @@
     - Using -n option to avoid server php.ini
 - **Estimated size:** ~400-500 lines
 
-**Task 13:** Create environment variables reference
+**Task 12:** Create environment variables reference
 - **File:** `docs/en/environment-variables.md`
 - **Content:**
   - Reading current `api/.env` file
@@ -314,7 +301,7 @@
   - Security considerations (never commit .env files with secrets)
 - **Estimated size:** ~200-300 lines
 
-**Task 14:** Create backup and maintenance guide
+**Task 13:** Create backup and maintenance guide
 - **File:** `docs/en/maintenance.md`
 - **Content:**
   - Database backup procedures:
@@ -342,7 +329,7 @@
   - Disaster recovery procedures
 - **Estimated size:** ~300-400 lines
 
-**Task 15:** Create troubleshooting guide
+**Task 14:** Create troubleshooting guide
 - **File:** `docs/en/troubleshooting.md`
 - **Content:**
   - Common issues and solutions:
@@ -377,7 +364,7 @@
 - **Estimated size:** ~400-500 lines
 
 ### Documentation Infrastructure
-**Task 16:** Create documentation index and navigation
+**Task 15:** Create documentation index and navigation
 - **File:** `docs/en/INDEX.md`
 - **Content:**
   - Welcome message
@@ -392,7 +379,7 @@
   - Documentation versioning strategy
 - **Estimated size:** ~100-150 lines
 
-**Task 17:** Update main README.md with English content
+**Task 16:** Update main README.md with English content
 - **File:** `README.md`
 - **Action:** Keep both French and English versions
 - **Content:**
@@ -403,7 +390,7 @@
   - Add table of contents for both languages
 - **Estimated size:** Additions of ~100-150 lines
 
-**Task 18:** Create documentation writing guide
+**Task 17:** Create documentation writing guide
 - **File:** `docs/DOCUMENTATION-GUIDE.md`
 - **Content:**
   - Documentation philosophy and principles
