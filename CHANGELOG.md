@@ -2,6 +2,10 @@
 
 ## Next Release
 
+### Users
+- **Bug Fixes:**
+  - front: hamburger menu not working
+
 ### Contributors
 - **Documentation:**
   - Translate project backlog from French to English

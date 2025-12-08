@@ -1,108 +1,105 @@
 <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
   <a class="navbar-brand ms-2" href="#">Tirage cadeaux</a>
-  <button
-    class="navbar-toggler"
-    type="button"
-    data-toggle="collapse"
-    data-target="#navbarsExampleDefault"
-    aria-controls="navbarsExampleDefault"
-    aria-expanded="false"
-    aria-label="Toggle navigation"
-  >
-    <span class="navbar-toggler-icon"></span>
-  </button>
 
-  <div
-    *ngIf="utilisateurConnecte$ | async as utilisateur"
-    class="collapse navbar-collapse"
-    id="navbarsExampleDefault"
-  >
-    <ul class="navbar-nav me-auto">
-      <ng-container *ngIf="occasions$ | async as occasions">
-        <li ngbDropdown class="nav-item dropdown" *ngIf="occasions.length > 0">
-          <button
-            class="nav-link"
-            id="menuMesOccasions"
-            [ngClass]="{ active: menuActif === '/occasion' }"
-            ngbDropdownToggle
-          >
-            Mes occasions
-          </button>
-          <div
-            ngbDropdownMenu
-            class="dropdown-menu-dark"
-            aria-labelledby="menuMesOccasions"
-          >
-            <a
-              ngbDropdownItem
-              class="menuMesOccasionsItem"
-              [routerLink]="['/occasion', o.id]"
-              *ngFor="let o of occasions"
-              [ngClass]="{
-                active: menuActif === '/occasion' && idOccasionActive === o.id
-              }"
-              >{{ o.titre }}</a
+  <ng-container *ngIf="utilisateurConnecte$ | async as utilisateur">
+    <button
+      class="navbar-toggler"
+      type="button"
+      (click)="isMenuCollapsed = !isMenuCollapsed"
+      aria-controls="navbarsExampleDefault"
+      [attr.aria-expanded]="!isMenuCollapsed"
+      aria-label="Toggle navigation"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div
+      class="collapse navbar-collapse"
+      id="navbarsExampleDefault"
+      [(ngbCollapse)]="isMenuCollapsed"
+    >
+      <ul class="navbar-nav me-auto">
+        <ng-container *ngIf="occasions$ | async as occasions">
+          <li ngbDropdown class="nav-item dropdown" *ngIf="occasions.length > 0">
+            <button
+              class="nav-link"
+              id="menuMesOccasions"
+              [ngClass]="{ active: menuActif === '/occasion' }"
+              ngbDropdownToggle
             >
-          </div>
+              Mes occasions
+            </button>
+            <div
+              ngbDropdownMenu
+              class="dropdown-menu-dark"
+              aria-labelledby="menuMesOccasions"
+            >
+              <a
+                ngbDropdownItem
+                class="menuMesOccasionsItem"
+                [routerLink]="['/occasion', o.id]"
+                (click)="isMenuCollapsed = true"
+                *ngFor="let o of occasions"
+                [ngClass]="{
+                  active: menuActif === '/occasion' && idOccasionActive === o.id,
+                }"
+                >{{ o.titre }}</a
+              >
+            </div>
+          </li>
+        </ng-container>
+        <li
+          class="nav-item"
+          [ngClass]="{
+            active: menuActif === '/idee?idUtilisateur=' + utilisateur.id,
+          }"
+        >
+          <a
+            class="nav-link"
+            [routerLink]="['/idee']"
+            [queryParams]="{ idUtilisateur: utilisateur.id }"
+            (click)="isMenuCollapsed = true"
+            >Mes idées</a
+          >
         </li>
-      </ng-container>
-      <li
-        class="nav-item"
-        [ngClass]="{
-          active: menuActif === '/idee?idUtilisateur=' + utilisateur.id
-        }"
-      >
-        <a
-          class="nav-link"
-          [routerLink]="['/idee']"
-          [queryParams]="{ idUtilisateur: utilisateur.id }"
-          data-toggle="collapse"
-          data-target=".navbar-collapse.show"
-          >Mes idées</a
+        <li class="nav-item" [ngClass]="{ active: menuActif === '/profil' }">
+          <a
+            class="nav-link"
+            [routerLink]="['/profil']"
+            (click)="isMenuCollapsed = true"
+            id="menuMonProfil"
+            >Mon profil</a
+          >
+        </li>
+        <li
+          class="nav-item"
+          *ngIf="utilisateur.admin"
+          [ngClass]="{ active: menuActif === '/admin' }"
         >
-      </li>
-      <li class="nav-item" [ngClass]="{ active: menuActif === '/profil' }">
-        <a
-          class="nav-link"
-          [routerLink]="['/profil']"
-          id="menuMonProfil"
-          data-toggle="collapse"
-          data-target=".navbar-collapse.show"
-          >Mon profil</a
-        >
-      </li>
-      <li
-        class="nav-item"
-        *ngIf="utilisateur.admin"
-        [ngClass]="{ active: menuActif === '/admin' }"
-      >
-        <a
-          class="nav-link"
-          [routerLink]="['/admin']"
-          data-toggle="collapse"
-          data-target=".navbar-collapse.show"
-          >Administration</a
-        >
-      </li>
-    </ul>
+          <a
+            class="nav-link"
+            [routerLink]="['/admin']"
+            (click)="isMenuCollapsed = true"
+            >Administration</a
+          >
+        </li>
+      </ul>
 
-    <form class="form-inline">
-      <span
-        id="nomUtilisateur"
-        class="form-text me-2"
-        data-toggle="collapse"
-        data-target=".navbar-collapse.show"
-        >{{ utilisateur.nom }}</span
-      >
-      <button
-        id="btnSeDeconnecter"
-        [routerLink]="['/deconnexion']"
-        class="btn btn-secondary me-2"
-        data-toggle="collapse"
-        data-target=".navbar-collapse.show"
-      >
-        Se déconnecter
-      </button>
-    </form>
-  </div>
+      <form class="form-inline">
+        <span
+          id="nomUtilisateur"
+          class="form-text me-2"
+          >{{ utilisateur.nom }}</span
+        >
+        <button
+          id="btnSeDeconnecter"
+          [routerLink]="['/deconnexion']"
+          (click)="isMenuCollapsed = true"
+          class="btn btn-secondary me-2"
+        >
+          Se déconnecter
+        </button>
+      </form>
+    </div>
+  </ng-container>
 </nav>
