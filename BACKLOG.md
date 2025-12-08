@@ -44,17 +44,6 @@
 
 ## Documentation
 
-### Project Overview Documentation
-**Task:** Create comprehensive project introduction and overview documentation
-- **File:** `docs/en/README.md`
-- **Content:**
-  - Project description: What is Tkdo (gift drawing application for family and friends)
-  - Key features overview (user management, occasions, gift ideas, draws, notifications)
-  - High-level architecture diagram (Frontend: Angular, Backend: PHP/Slim, Database: MySQL)
-  - Technology stack summary
-  - Links to other documentation sections
-- **Estimated size:** ~200-300 lines of documentation
-
 ### User Documentation
 **Task 1:** Create end-user guide for regular users
 - **File:** `docs/en/user-guide.md`
