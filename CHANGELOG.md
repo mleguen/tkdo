@@ -1,6 +1,6 @@
 # Changelog
 
-## Next Release
+## V1.4.4 (December 8, 2025)
 
 ### Users
 - **Bug Fixes:**
