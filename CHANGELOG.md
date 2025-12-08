@@ -1,5 +1,13 @@
 # Changelog
 
+## Next Release
+
+### Contributors
+- **Documentation:**
+  - Create backend/API development guide (docs/en/backend-dev.md) with hexagonal architecture documentation
+- **Project Configuration:**
+  - Add Mermaid diagram quality standards (high contrast colors, readability, proper layouts)
+
 ## V1.4.4 (December 8, 2025)
 
 ### Users

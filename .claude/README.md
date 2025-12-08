@@ -27,12 +27,26 @@ Claude Code will automatically reference these conventions when creating commits
 - Use appropriate Mermaid diagram types: `graph`, `flowchart`, `sequenceDiagram`, `classDiagram`, `erDiagram`, etc.
 - Avoid ASCII art diagrams or external image files for technical diagrams
 
+**Mermaid Diagram Quality Standards:**
+- **High Contrast Colors**: Use light backgrounds with dark text and borders for readability
+  - Example: `fill:#b3d9ff,stroke:#003d73,stroke-width:2px,color:#000`
+  - Always set `color:#000` (black text) explicitly for maximum contrast
+  - Use stroke-width of 2px for clear element separation
+- **Readability & Layout**:
+  - Use `flowchart LR` for left-to-right flows (more natural for reading)
+  - Use `flowchart TB` for top-to-bottom hierarchies
+  - For hexagonal architecture: nest subgraphs (Infrastructure → Application → Domain)
+  - Include descriptive labels and clear relationship arrows
+  - Add visual grouping with subgraphs for related components
+
 **Example:**
 ```markdown
 ```mermaid
-graph TB
+flowchart LR
     A[Frontend] --> B[Backend API]
     B --> C[Database]
+
+    classDef default fill:#b3d9ff,stroke:#003d73,stroke-width:2px,color:#000
 ```
 ```
 
@@ -51,6 +65,21 @@ graph TB
   - No orphaned or outdated documentation
   - Easier code reviews with full context
 
+**Documentation Consistency Checks:**
+- **CRITICAL: After creating or updating documentation, ALWAYS check for cross-references that need updating**
+- Common consistency checks required:
+  - Remove "coming soon" labels from newly created documentation files
+  - Update index/navigation pages (like `docs/en/README.md`) to link to new docs
+  - Update related documentation that references the new content
+  - Ensure all cross-references use correct file paths
+  - Check that all examples and code snippets are up-to-date
+- **How to check**: Use grep to search for references to the file you created/updated:
+  ```bash
+  grep -r "filename.md" docs/
+  grep -r "coming soon" docs/
+  ```
+- This prevents broken links and outdated "coming soon" markers in the documentation
+
 **BACKLOG.md Management:**
 - **Remove completed tasks entirely** from BACKLOG.md (don't mark as completed, delete them)
 - Renumber remaining tasks sequentially after removal
@@ -59,8 +88,12 @@ graph TB
 
 **CHANGELOG.md Maintenance:**
 - **Always update CHANGELOG.md** in the same commit as related changes
-- Add changes to "Next Release" section until a new version tag is created
-- **Release ordering:** "Next Release" first, then newest to oldest releases
+- **CRITICAL: ALL new changes MUST go in the "Next Release" section**
+  - **NEVER add entries to past release sections** (V1.x.x with dates) - those are final/immutable
+  - Only add to "Next Release" at the top of the changelog
+  - If "Next Release" section doesn't exist yet, create it
+  - Past releases document what was already released, not work in progress
+- **Release ordering:** "Next Release" first, then newest to oldest releases (V1.x.x)
 - **Changes within a release:** Group by audience and scope, NOT by commit time
   - Audiences: Users, Administrators, Contributors
   - Scopes: Features, Bug Fixes, Technical Tasks, Documentation, Project Configuration, etc.

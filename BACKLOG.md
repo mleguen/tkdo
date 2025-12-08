@@ -51,25 +51,7 @@
 ## Documentation
 
 ### Developer Documentation
-**Task 1:** Create backend/API development documentation
-- **File:** `docs/en/backend-dev.md`
-- **Content:**
-  - Backend architecture overview (PHP 8.4, Slim Framework 4, Doctrine ORM)
-  - Project structure explanation (`api/src/` organization)
-  - Dependency injection container setup
-  - Routing and middleware
-  - Authentication and authorization system
-  - Available composer scripts
-  - Running tests (`./composer test`)
-  - Running only integration tests
-  - Database reset procedures between test runs
-  - Using command-line tools (composer, doctrine, console) via Docker
-  - Code style and conventions
-  - Error handling patterns
-- **Estimated size:** ~400-500 lines
-- **Note:** After completion, check consistency with other documentation (remove "coming soon" links, update cross-references)
-
-**Task 2:** Create database documentation
+**Task 1:** Create database documentation
 - **File:** `docs/en/database.md`
 - **Content:**
   - Database schema overview
@@ -89,7 +71,7 @@
 - **Estimated size:** ~400-500 lines with schema diagrams
 - **Note:** After completion, check consistency with other documentation (remove "coming soon" links, update cross-references)
 
-**Task 3:** Create testing documentation
+**Task 2:** Create testing documentation
 - **File:** `docs/en/testing.md`
 - **Content:**
   - Testing philosophy and strategy
@@ -112,7 +94,7 @@
 - **Estimated size:** ~500-600 lines
 - **Note:** After completion, check consistency with other documentation (remove "coming soon" links, update cross-references)
 
-**Task 4:** Create API reference documentation
+**Task 3:** Create API reference documentation
 - **File:** `docs/en/api-reference.md`
 - **Content:**
   - API base URL and versioning
@@ -146,7 +128,7 @@
 - **Estimated size:** ~600-800 lines with examples
 - **Note:** After completion, check consistency with other documentation (remove "coming soon" links, update cross-references)
 
-**Task 5:** Create architecture and design decisions documentation
+**Task 4:** Create architecture and design decisions documentation
 - **File:** `docs/en/architecture.md`
 - **Content:**
   - System architecture overview
@@ -179,7 +161,7 @@
 - **Estimated size:** ~500-600 lines
 - **Note:** After completion, check consistency with other documentation (remove "coming soon" links, update cross-references)
 
-**Task 6:** Create contributing guidelines
+**Task 5:** Create contributing guidelines
 - **File:** `docs/en/CONTRIBUTING.md`
 - **Content:**
   - How to contribute (issues, pull requests)
@@ -203,7 +185,7 @@
 - **Note:** After completion, check consistency with other documentation (remove "coming soon" links, update cross-references)
 
 ### Deployment Documentation
-**Task 7:** Translate and enhance Apache deployment guide
+**Task 6:** Translate and enhance Apache deployment guide
 - **File:** `docs/en/deployment-apache.md`
 - **Content:**
   - Prerequisites:
@@ -240,7 +222,7 @@
 - **Estimated size:** ~400-500 lines
 - **Note:** After completion, check consistency with other documentation (remove "coming soon" links, update cross-references)
 
-**Task 8:** Create environment variables reference
+**Task 7:** Create environment variables reference
 - **File:** `docs/en/environment-variables.md`
 - **Content:**
   - Reading current `api/.env` file
@@ -256,7 +238,7 @@
 - **Estimated size:** ~200-300 lines
 - **Note:** After completion, check consistency with other documentation (remove "coming soon" links, update cross-references)
 
-**Task 9:** Create backup and maintenance guide
+**Task 8:** Create backup and maintenance guide
 - **File:** `docs/en/maintenance.md`
 - **Content:**
   - Database backup procedures:
@@ -285,7 +267,7 @@
 - **Estimated size:** ~300-400 lines
 - **Note:** After completion, check consistency with other documentation (remove "coming soon" links, update cross-references)
 
-**Task 10:** Create troubleshooting guide
+**Task 9:** Create troubleshooting guide
 - **File:** `docs/en/troubleshooting.md`
 - **Content:**
   - Common issues and solutions:
@@ -321,7 +303,7 @@
 - **Note:** After completion, check consistency with other documentation (remove "coming soon" links, update cross-references)
 
 ### Documentation Infrastructure
-**Task 11:** Create documentation index and navigation
+**Task 10:** Create documentation index and navigation
 - **File:** `docs/en/INDEX.md`
 - **Content:**
   - Welcome message
@@ -337,7 +319,7 @@
 - **Estimated size:** ~100-150 lines
 - **Note:** After completion, check consistency with other documentation (remove "coming soon" links, update cross-references)
 
-**Task 12:** Update main README.md with English content
+**Task 11:** Update main README.md with English content
 - **File:** `README.md`
 - **Action:** Keep both French and English versions
 - **Content:**
@@ -349,7 +331,7 @@
 - **Estimated size:** Additions of ~100-150 lines
 - **Note:** After completion, check consistency with other documentation (remove "coming soon" links, update cross-references)
 
-**Task 13:** Create documentation writing guide
+**Task 12:** Create documentation writing guide
 - **File:** `docs/DOCUMENTATION-GUIDE.md`
 - **Content:**
   - Documentation philosophy and principles

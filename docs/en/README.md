@@ -228,7 +228,7 @@ Default credentials: `admin` / `admin` (change password immediately!)
 ### Developer Documentation
 - [Development Environment Setup](dev-setup.md)
 - [Frontend Development Guide](frontend-dev.md)
-- [Backend/API Development Guide](backend-dev.md) _(coming soon)_
+- [Backend/API Development Guide](backend-dev.md)
 - [Database Documentation](database.md) _(coming soon)_
 - [Testing Guide](testing.md) _(coming soon)_
 - [API Reference](api-reference.md) _(coming soon)_
