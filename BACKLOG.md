@@ -45,20 +45,7 @@
 ## Documentation
 
 ### Developer Documentation
-**Task 1:** Translate and enhance development environment setup guide
-- **File:** `docs/en/dev-setup.md`
-- **Content:**
-  - Prerequisites (Docker, Docker Compose, user permissions)
-  - Environment variables configuration (`.env` file setup)
-  - Starting the development environment (`docker compose up -d front`)
-  - Installing dependencies (`./npm install`)
-  - Building the application
-  - Accessing the application (http://localhost:8080)
-  - Viewing logs with docker compose
-  - Common setup troubleshooting
-- **Estimated size:** ~200-250 lines
-
-**Task 2:** Create frontend development documentation
+**Task 1:** Create frontend development documentation
 - **File:** `docs/en/frontend-dev.md`
 - **Content:**
   - Frontend architecture overview (Angular, standalone components, routing)
@@ -74,8 +61,9 @@
   - Code style and conventions
   - Component architecture patterns (page components, display components)
 - **Estimated size:** ~500-600 lines
+- **Note:** After completion, check consistency with other documentation (remove "coming soon" links, update cross-references)
 
-**Task 3:** Create backend/API development documentation
+**Task 2:** Create backend/API development documentation
 - **File:** `docs/en/backend-dev.md`
 - **Content:**
   - Backend architecture overview (PHP 8.4, Slim Framework 4, Doctrine ORM)
@@ -91,8 +79,9 @@
   - Code style and conventions
   - Error handling patterns
 - **Estimated size:** ~400-500 lines
+- **Note:** After completion, check consistency with other documentation (remove "coming soon" links, update cross-references)
 
-**Task 4:** Create database documentation
+**Task 3:** Create database documentation
 - **File:** `docs/en/database.md`
 - **Content:**
   - Database schema overview
@@ -110,8 +99,9 @@
   - Doctrine proxy generation
   - Database initialization with fixtures
 - **Estimated size:** ~400-500 lines with schema diagrams
+- **Note:** After completion, check consistency with other documentation (remove "coming soon" links, update cross-references)
 
-**Task 5:** Create testing documentation
+**Task 4:** Create testing documentation
 - **File:** `docs/en/testing.md`
 - **Content:**
   - Testing philosophy and strategy
@@ -132,8 +122,9 @@
   - Test coverage expectations
   - Known testing gaps (noted as "A faire" in current docs)
 - **Estimated size:** ~500-600 lines
+- **Note:** After completion, check consistency with other documentation (remove "coming soon" links, update cross-references)
 
-**Task 6:** Create API reference documentation
+**Task 5:** Create API reference documentation
 - **File:** `docs/en/api-reference.md`
 - **Content:**
   - API base URL and versioning
@@ -165,8 +156,9 @@
   - Error responses and status codes
   - Using curl for API testing examples
 - **Estimated size:** ~600-800 lines with examples
+- **Note:** After completion, check consistency with other documentation (remove "coming soon" links, update cross-references)
 
-**Task 7:** Create architecture and design decisions documentation
+**Task 6:** Create architecture and design decisions documentation
 - **File:** `docs/en/architecture.md`
 - **Content:**
   - System architecture overview
@@ -197,8 +189,9 @@
     - Why these choices
   - Future architectural considerations (AWS serverless mentioned in backlog)
 - **Estimated size:** ~500-600 lines
+- **Note:** After completion, check consistency with other documentation (remove "coming soon" links, update cross-references)
 
-**Task 8:** Create contributing guidelines
+**Task 7:** Create contributing guidelines
 - **File:** `docs/en/CONTRIBUTING.md`
 - **Content:**
   - How to contribute (issues, pull requests)
@@ -219,9 +212,10 @@
   - Changelog update process
   - Release process overview
 - **Estimated size:** ~400-500 lines
+- **Note:** After completion, check consistency with other documentation (remove "coming soon" links, update cross-references)
 
 ### Deployment Documentation
-**Task 9:** Translate and enhance Apache deployment guide
+**Task 8:** Translate and enhance Apache deployment guide
 - **File:** `docs/en/deployment-apache.md`
 - **Content:**
   - Prerequisites:
@@ -256,8 +250,9 @@
     - Finding the right PHP binary
     - Using -n option to avoid server php.ini
 - **Estimated size:** ~400-500 lines
+- **Note:** After completion, check consistency with other documentation (remove "coming soon" links, update cross-references)
 
-**Task 10:** Create environment variables reference
+**Task 9:** Create environment variables reference
 - **File:** `docs/en/environment-variables.md`
 - **Content:**
   - Reading current `api/.env` file
@@ -271,8 +266,9 @@
   - Development vs production differences
   - Security considerations (never commit .env files with secrets)
 - **Estimated size:** ~200-300 lines
+- **Note:** After completion, check consistency with other documentation (remove "coming soon" links, update cross-references)
 
-**Task 11:** Create backup and maintenance guide
+**Task 10:** Create backup and maintenance guide
 - **File:** `docs/en/maintenance.md`
 - **Content:**
   - Database backup procedures:
@@ -299,8 +295,9 @@
     - Monitoring for vulnerabilities
   - Disaster recovery procedures
 - **Estimated size:** ~300-400 lines
+- **Note:** After completion, check consistency with other documentation (remove "coming soon" links, update cross-references)
 
-**Task 12:** Create troubleshooting guide
+**Task 11:** Create troubleshooting guide
 - **File:** `docs/en/troubleshooting.md`
 - **Content:**
   - Common issues and solutions:
@@ -333,9 +330,10 @@
     - How to provide useful error reports
     - Community resources
 - **Estimated size:** ~400-500 lines
+- **Note:** After completion, check consistency with other documentation (remove "coming soon" links, update cross-references)
 
 ### Documentation Infrastructure
-**Task 13:** Create documentation index and navigation
+**Task 12:** Create documentation index and navigation
 - **File:** `docs/en/INDEX.md`
 - **Content:**
   - Welcome message
@@ -349,8 +347,9 @@
   - How to contribute to documentation
   - Documentation versioning strategy
 - **Estimated size:** ~100-150 lines
+- **Note:** After completion, check consistency with other documentation (remove "coming soon" links, update cross-references)
 
-**Task 14:** Update main README.md with English content
+**Task 13:** Update main README.md with English content
 - **File:** `README.md`
 - **Action:** Keep both French and English versions
 - **Content:**
@@ -360,8 +359,9 @@
   - Keep existing French content below for compatibility
   - Add table of contents for both languages
 - **Estimated size:** Additions of ~100-150 lines
+- **Note:** After completion, check consistency with other documentation (remove "coming soon" links, update cross-references)
 
-**Task 15:** Create documentation writing guide
+**Task 14:** Create documentation writing guide
 - **File:** `docs/DOCUMENTATION-GUIDE.md`
 - **Content:**
   - Documentation philosophy and principles
@@ -374,3 +374,4 @@
   - Reviewing documentation changes
   - Localization process (English as source, how to add other languages)
 - **Estimated size:** ~200-250 lines
+- **Note:** After completion, check consistency with other documentation (remove "coming soon" links, update cross-references)

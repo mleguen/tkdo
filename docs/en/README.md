@@ -205,7 +205,7 @@ graph TB
 4. Access the application at http://localhost:8080
 
 For detailed setup instructions, see:
-- [Development Setup Guide](dev-setup.md) _(coming soon)_
+- [Development Setup Guide](dev-setup.md)
 - [Apache Deployment Guide](deployment-apache.md) _(coming soon)_
 
 ### First Admin Account
@@ -226,7 +226,7 @@ Default credentials: `admin` / `admin` (change password immediately!)
 - [Email Notifications Reference](notifications.md)
 
 ### Developer Documentation
-- [Development Environment Setup](dev-setup.md) _(coming soon)_
+- [Development Environment Setup](dev-setup.md)
 - [Frontend Development Guide](frontend-dev.md) _(coming soon)_
 - [Backend/API Development Guide](backend-dev.md) _(coming soon)_
 - [Database Documentation](database.md) _(coming soon)_
