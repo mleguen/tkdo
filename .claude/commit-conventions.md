@@ -72,6 +72,8 @@ REQUIRED for all Claude Code commits:
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 ```
 
+Do not use any other attribution line (e.g. "co-authored-by").
+
 ## Examples
 
 ### Simple feature
