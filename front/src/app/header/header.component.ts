@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { Router, Event, NavigationEnd, RouterModule } from '@angular/router';
-import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbCollapseModule, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { filter, map } from 'rxjs/operators';
 
 import { BackendService } from '../backend.service';
@@ -9,7 +9,7 @@ import { BackendService } from '../backend.service';
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule, RouterModule, NgbDropdownModule],
+  imports: [CommonModule, RouterModule, NgbCollapseModule, NgbDropdownModule],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss',
 })
@@ -20,6 +20,7 @@ export class HeaderComponent {
   utilisateurConnecte$ = this.backend.utilisateurConnecte$;
   menuActif = '';
   idOccasionActive = 0;
+  isMenuCollapsed = true;
 
   constructor(
     private readonly backend: BackendService,

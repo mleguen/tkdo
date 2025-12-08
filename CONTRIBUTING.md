@@ -78,7 +78,7 @@ Ces scripts s'exécutent directement dans le contexte du répertoire `front`.
   ou pour n'exécuter que certains fichiers de tests :
 
   ```bash
-  ./npm run cy -- --spec '**/liste-idees.component.cy.ts'
+  ./npm run ct -- --spec '**/liste-idees.component.cy.ts'
   ```
 
   > *A faire* : les tests de composants sont pour la plupart minimalistes (montage du composant uniquement).

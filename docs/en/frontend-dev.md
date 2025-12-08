@@ -320,7 +320,7 @@ describe('BackendService', () => {
 **Run specific component tests**:
 
 ```bash
-./npm run cy -- --spec '**/liste-idees.component.cy.ts'
+./npm run ct -- --spec '**/liste-idees.component.cy.ts'
 ```
 
 **Interactive mode**:
