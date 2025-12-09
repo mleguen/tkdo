@@ -50,6 +50,9 @@
 
 ## Documentation
 
+### Missing Documentation
+- Update the existing documentation to cover the new admin routes for re-sending emails
+
 ### Developer Documentation
 **Task 1:** Create architecture and design decisions documentation
 - **File:** `docs/en/architecture.md`

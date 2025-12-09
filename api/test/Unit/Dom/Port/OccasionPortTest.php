@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Test\Unit\Dom\Port;
 
+use App\Dom\Exception\OccasionPasseeException;
 use App\Dom\Exception\PasAdminException;
 use App\Dom\Exception\PasParticipantException;
 use App\Dom\Exception\PasParticipantNiAdminException;
 use App\Dom\Exception\PasUtilisateurNiAdminException;
+use App\Dom\Exception\TiragePasEncoreLanceException;
 use App\Dom\Model\Auth;
 use App\Dom\Model\Occasion;
 use App\Dom\Model\Resultat;
@@ -417,6 +419,176 @@ class OccasionPortTest extends UnitTestCase
                 'date' => new DateTime('3 months'),
                 'titre' => 'nouvelle occasion',
             ]
+        );
+    }
+
+    public function testRenvoieEmailAjoutParticipantOccasion()
+    {
+        $participant = $this->utilisateurProphecy->reveal();
+        $this->authProphecy->estAdmin()->willReturn(true);
+
+        $autreParticipant = $this->prophesize(Utilisateur::class);
+
+        $occasion = $this->occasionProphecy->reveal();
+        $this->occasionProphecy->getDate()->willReturn(new DateTime('tomorrow'));
+        $this->occasionProphecy->getParticipants()->willReturn([
+            $autreParticipant->reveal(),
+            $participant,
+        ]);
+
+        $this->utilisateurProphecy->estUtilisateur($autreParticipant->reveal())->willReturn(false);
+        $this->utilisateurProphecy->estUtilisateur($participant)->willReturn(true);
+        
+        $this->mailPluginProphecy->envoieMailAjoutParticipant($participant, $occasion)
+            ->shouldBeCalledOnce();
+        
+        $this->occasionPort->renvoieEmailAjoutParticipantOccasion(
+            $this->authProphecy->reveal(),
+            $occasion,
+            $participant
+        );
+    }
+
+    public function testRenvoieEmailAjoutParticipantOccasionPasAdmin()
+    {
+        $this->authProphecy->estAdmin()->willReturn(false);
+
+        $this->expectException(PasAdminException::class);
+        $this->occasionPort->renvoieEmailAjoutParticipantOccasion(
+            $this->authProphecy->reveal(),
+            $this->occasionProphecy->reveal(),
+            $this->utilisateurProphecy->reveal()
+        );
+    }
+
+    public function testRenvoieEmailAjoutParticipantOccasionPassee()
+    {
+        $this->authProphecy->estAdmin()->willReturn(true);
+        $this->occasionProphecy->getDate()->willReturn(new DateTime('yesterday'));
+        
+        $this->expectException(OccasionPasseeException::class);
+        $this->occasionPort->renvoieEmailAjoutParticipantOccasion(
+            $this->authProphecy->reveal(),
+            $this->occasionProphecy->reveal(),
+            $this->utilisateurProphecy->reveal()
+        );
+    }
+
+    public function testRenvoieEmailAjoutParticipantOccasionPasParticipant()
+    {
+        $this->authProphecy->estAdmin()->willReturn(true);
+       
+        $utilisateur1 = $this->prophesize(Utilisateur::class);
+        $utilisateur2 = $this->prophesize(Utilisateur::class);
+
+        $this->occasionProphecy->getDate()->willReturn(new DateTime('tomorrow'));
+        $this->occasionProphecy->getParticipants()->willReturn([
+            $utilisateur1->reveal(),
+            $utilisateur2->reveal(),
+        ]);
+
+        $this->utilisateurProphecy->estUtilisateur($utilisateur1->reveal())->willReturn(false);
+        $this->utilisateurProphecy->estUtilisateur($utilisateur2->reveal())->willReturn(false);
+
+        $this->expectException(PasParticipantException::class);
+        $this->occasionPort->renvoieEmailAjoutParticipantOccasion(
+            $this->authProphecy->reveal(),
+            $this->occasionProphecy->reveal(),
+            $this->utilisateurProphecy->reveal()
+        );
+    }
+
+    public function testRenvoieEmailLancementTirage()
+    {
+        $participant = $this->utilisateurProphecy->reveal();
+        $this->authProphecy->estAdmin()->willReturn(true);
+
+        $autreParticipant = $this->prophesize(Utilisateur::class);
+
+        $occasion = $this->occasionProphecy->reveal();
+        $this->occasionProphecy->getDate()->willReturn(new DateTime('tomorrow'));
+        $this->occasionProphecy->getParticipants()->willReturn([
+            $autreParticipant->reveal(),
+            $participant,
+        ]);
+
+        $this->utilisateurProphecy->estUtilisateur($autreParticipant->reveal())->willReturn(false);
+        $this->utilisateurProphecy->estUtilisateur($participant)->willReturn(true);
+
+        $this->resultatRepositoryProphecy->hasForOccasion($this->occasionProphecy->reveal())->willReturn(true);
+        
+        $this->mailPluginProphecy->envoieMailTirageFait($participant, $occasion)
+            ->shouldBeCalledOnce();
+        
+        $this->occasionPort->renvoieEmailLancementTirage(
+            $this->authProphecy->reveal(),
+            $occasion,
+            $participant
+        );
+    }
+
+    public function testRenvoieEmailLancementTiragePasAdmin()
+    {
+        $this->authProphecy->estAdmin()->willReturn(false);
+
+        $this->expectException(PasAdminException::class);
+        $this->occasionPort->renvoieEmailLancementTirage(
+            $this->authProphecy->reveal(),
+            $this->occasionProphecy->reveal(),
+            $this->utilisateurProphecy->reveal()
+        );
+    }
+
+    public function testRenvoieEmailLancementTirageOccasionPassee()
+    {
+        $this->authProphecy->estAdmin()->willReturn(true);
+        $this->occasionProphecy->getDate()->willReturn(new DateTime('yesterday'));
+        
+        $this->expectException(OccasionPasseeException::class);
+        $this->occasionPort->renvoieEmailLancementTirage(
+            $this->authProphecy->reveal(),
+            $this->occasionProphecy->reveal(),
+            $this->utilisateurProphecy->reveal()
+        );
+    }
+
+    public function testRenvoieEmailLancementTiragePasEncoreLance()
+    {
+        $this->authProphecy->estAdmin()->willReturn(true);
+        $this->occasionProphecy->getDate()->willReturn(new DateTime('tomorrow'));
+        $this->resultatRepositoryProphecy->hasForOccasion($this->occasionProphecy->reveal())->willReturn(false);
+        
+        $this->expectException(TiragePasEncoreLanceException::class);
+        $this->occasionPort->renvoieEmailLancementTirage(
+            $this->authProphecy->reveal(),
+            $this->occasionProphecy->reveal(),
+            $this->utilisateurProphecy->reveal()
+        );
+    }
+
+    public function testRenvoieEmailLancementTiragePasParticipant()
+    {
+        $this->authProphecy->estAdmin()->willReturn(true);
+       
+        $utilisateur1 = $this->prophesize(Utilisateur::class);
+        $utilisateur2 = $this->prophesize(Utilisateur::class);
+
+        $this->resultatRepositoryProphecy->hasForOccasion($this->occasionProphecy->reveal())->willReturn(true);
+
+        $this->occasionProphecy->getDate()->willReturn(new DateTime('tomorrow'));
+        $this->occasionProphecy->getParticipants()->willReturn([
+            $utilisateur1->reveal(),
+            $utilisateur2->reveal(),
+        ]);
+
+        $this->utilisateurProphecy->estUtilisateur($utilisateur1->reveal())->willReturn(false);
+        $this->utilisateurProphecy->estUtilisateur($utilisateur2->reveal())->willReturn(false);
+
+        $this->expectException(PasParticipantException::class);
+        $this->occasionPort->renvoieEmailLancementTirage(
+            $this->authProphecy->reveal(),
+            $this->occasionProphecy->reveal(),
+            $this->utilisateurProphecy->reveal()
         );
     }
 }

@@ -2,6 +2,10 @@
 
 ## Next Release
 
+### Administrators
+- **Features:**
+  - Admin routes to re-send emails (when a participant is added or a draw created)
+
 ### Contributors
 - **Documentation:**
   - Create backend/API development guide (docs/en/backend-dev.md) with hexagonal architecture documentation

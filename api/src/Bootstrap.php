@@ -19,6 +19,8 @@ use App\Appli\Controller\ListExclusionUtilisateurController;
 use App\Appli\Controller\ListIdeeController;
 use App\Appli\Controller\ListOccasionController;
 use App\Appli\Controller\ListUtilisateurController;
+use App\Appli\Controller\ResendCreateParticipantOccasionController;
+use App\Appli\Controller\ResendCreateTirageOccasionController;
 use App\Appli\Controller\ViewOccasionController;
 use App\Appli\Controller\ViewUtilisateurController;
 use App\Appli\Handler\AppJsonErrorRenderer;
@@ -144,6 +146,8 @@ class Bootstrap
                 $group->get('', ViewOccasionController::class);
                 $group->put('', EditOccasionController::class);
                 $group->post('/participant', CreateParticipantOccasionController::class);
+                $group->post('/resend-participant', ResendCreateParticipantOccasionController::class);
+                $group->post('/resend-tirage', ResendCreateTirageOccasionController::class);
                 $group->post('/resultat', CreateResultatOccasionController::class);
                 $group->post('/tirage', CreateTirageOccasionController::class);
             });

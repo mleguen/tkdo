@@ -11,6 +11,7 @@ use App\Dom\Exception\PasParticipantNiAdminException;
 use App\Dom\Exception\PasUtilisateurNiAdminException;
 use App\Dom\Exception\TirageDejaLanceException;
 use App\Dom\Exception\TirageEchoueException;
+use App\Dom\Exception\TiragePasEncoreLanceException;
 use App\Dom\Exception\UtilisateurDejaParticipantException;
 use App\Dom\Exception\UtilisateurOffreOuRecoitDejaException;
 use App\Dom\Model\Auth;
@@ -256,5 +257,54 @@ class OccasionPort
         if (isset($modifications['titre'])) $occasion->setTitre($modifications['titre']);
 
         return $this->occasionRepository->update($occasion);
+    }
+
+    /**
+     * @throws PasAdminException
+     * @throws OccasionPasseeException
+     * @throws PasParticipantException
+     */
+    public function renvoieEmailAjoutParticipantOccasion(
+        Auth $auth,
+        Occasion $occasion,
+        Utilisateur $participant
+    ) {
+        if (!$auth->estAdmin()) throw new PasAdminException();
+
+        if ($occasion->getDate() <= new DateTime()) throw new OccasionPasseeException();
+
+        $participants = $occasion->getParticipants();
+        if (!ArrayTools::some($participants, $participant->estUtilisateur(...))) {
+            throw new PasParticipantException();
+        }
+
+        $this->mailPlugin->envoieMailAjoutParticipant($participant, $occasion);
+    }
+
+    /**
+     * @throws PasAdminException
+     * @throws OccasionPasseeException
+     * @throws TiragePasEncoreLanceException
+     * @throws PasParticipantException
+     */
+    public function renvoieEmailLancementTirage(
+        Auth $auth,
+        Occasion $occasion,
+        Utilisateur $participant
+    ) {
+        if (!$auth->estAdmin()) throw new PasAdminException();
+
+        if ($occasion->getDate() <= new DateTime()) throw new OccasionPasseeException();
+
+        if (!$this->resultatRepository->hasForOccasion($occasion)) {
+            throw new TiragePasEncoreLanceException();
+        }
+
+        $participants = $occasion->getParticipants();
+        if (!ArrayTools::some($participants, $participant->estUtilisateur(...))) {
+            throw new PasParticipantException();
+        }
+
+        $this->mailPlugin->envoieMailTirageFait($participant, $occasion);
     }
 }
