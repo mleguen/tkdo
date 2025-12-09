@@ -1311,7 +1311,7 @@ class UtilisateurPortTest extends UnitTestCase
 
 ```bash
 # All unit tests
-./composer test -- --testsuite Unit
+./composer test -- --filter '/Test\\Unit/'
 
 # Specific test class
 ./composer test -- test/Unit/Dom/Port/UtilisateurPortTest.php
@@ -1413,7 +1413,7 @@ $messages = $this->mailhog->findMessagesByRecipient('user@example.com');
 
 ```bash
 # All integration tests
-./composer test -- --testsuite Int
+./composer test -- --filter '/Test\\Int/'
 
 # Specific test class
 ./composer test -- test/Int/UtilisateurIntTest.php
