@@ -28,11 +28,17 @@
 
 ## Technical Improvements
 
+### API enhancement
+- switch to JSON+HAL, to decouple front and API: front would no longer have to build routes, or decide which actions are possible,
+  as possible actions with their routes will already be provided with the state
+
 ### Dependencies & Security
 - Upgrade Angular version (>= 20) to fix moderate vulnerabilities
 - Make a PR in rpkamp/mailhog-client to fix deprecation "str_getcsv(): the $escape parameter must be provided as its default value will change"
+- add a unique random slug to each entity, and use them in routes instead of ids to make it more difficult to forge routes
 - Get rid of mhsendmail
 - Upgrade to MySQL 8
+- Implement a backup strategy
 
 ### Infrastructure & Deployment
 - AWS serverless support with Ansible, and 2 dev/prod stacks
