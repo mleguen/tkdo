@@ -76,13 +76,26 @@ See [Authentication](#authentication) section for details.
 
 ## Authentication
 
+### Setting Up Environment Variables
+
+For easier curl command usage, set up environment variables:
+
+```bash
+# Set base URL (choose appropriate one for your environment)
+export BASE_URL="https://your-tkdo-instance.com/api"    # Production
+# export BASE_URL="http://localhost:8080/api"            # Development
+
+# Set token (after obtaining it)
+export TOKEN="YOUR_TOKEN_HERE"
+```
+
 ### Using Your Current Session Token
 
 **On the Administration page**, your current authentication token is displayed. Use it with curl:
 
 ```bash
-curl -u YOUR_TOKEN_HERE: \
-https://your-tkdo-instance.com/api/endpoint
+curl -u $TOKEN: \
+$BASE_URL/endpoint
 ```
 
 **Important:** The colon (`:`) after the token is required. It tells curl to use HTTP Basic Authentication with the token as the username and no password.
@@ -101,7 +114,7 @@ Generate a new authentication token via the API:
 curl \
 -d identifiant='your_username' \
 -d mdp='your_password' \
--X POST https://your-tkdo-instance.com/api/connexion
+-X POST $BASE_URL/connexion
 ```
 
 **Response:**
@@ -119,7 +132,7 @@ curl \
 **Use the token** in subsequent requests:
 ```bash
 curl -u eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9...: \
-https://your-tkdo-instance.com/api/endpoint
+$BASE_URL/endpoint
 ```
 
 ## User Management
@@ -129,8 +142,8 @@ https://your-tkdo-instance.com/api/endpoint
 **Purpose:** View all users in the system
 
 ```bash
-curl -u TOKEN: \
-https://your-tkdo-instance.com/api/utilisateur
+curl -u $TOKEN: \
+$BASE_URL/utilisateur
 ```
 
 **Response:**
@@ -174,14 +187,14 @@ https://your-tkdo-instance.com/api/utilisateur
 **Purpose:** Create a new user account
 
 ```bash
-curl -u TOKEN: \
+curl -u $TOKEN: \
 -d identifiant='newuser' \
 -d email='newuser@example.com' \
 -d nom='New User' \
 -d genre=F \
 -d admin=0 \
 -d prefNotifIdees=N \
--X POST https://your-tkdo-instance.com/api/utilisateur
+-X POST $BASE_URL/utilisateur
 ```
 
 **Parameters:**
@@ -219,14 +232,14 @@ curl -u TOKEN: \
 **Purpose:** Get detailed information about a specific user
 
 ```bash
-curl -u TOKEN: \
-https://your-tkdo-instance.com/api/utilisateur/USER_ID
+curl -u $TOKEN: \
+$BASE_URL/utilisateur/USER_ID
 ```
 
 **Example:**
 ```bash
-curl -u TOKEN: \
-https://your-tkdo-instance.com/api/utilisateur/2
+curl -u $TOKEN: \
+$BASE_URL/utilisateur/2
 ```
 
 **Response:** Same format as listing users, but for a single user.
@@ -241,13 +254,13 @@ https://your-tkdo-instance.com/api/utilisateur/2
 **Purpose:** Update user information
 
 ```bash
-curl -u TOKEN: \
+curl -u $TOKEN: \
 -d nom='Updated Name' \
 -d email='newemail@example.com' \
 -d genre=F \
 -d admin=1 \
 -d prefNotifIdees=I \
--X PUT https://your-tkdo-instance.com/api/utilisateur/USER_ID
+-X PUT $BASE_URL/utilisateur/USER_ID
 ```
 
 **Important notes:**
@@ -260,23 +273,23 @@ curl -u TOKEN: \
 
 Change only the email:
 ```bash
-curl -u TOKEN: \
+curl -u $TOKEN: \
 -d email='updated@example.com' \
--X PUT https://your-tkdo-instance.com/api/utilisateur/2
+-X PUT $BASE_URL/utilisateur/2
 ```
 
 Grant admin privileges:
 ```bash
-curl -u TOKEN: \
+curl -u $TOKEN: \
 -d admin=1 \
--X PUT https://your-tkdo-instance.com/api/utilisateur/2
+-X PUT $BASE_URL/utilisateur/2
 ```
 
 Change notification preference:
 ```bash
-curl -u TOKEN: \
+curl -u $TOKEN: \
 -d prefNotifIdees=Q \
--X PUT https://your-tkdo-instance.com/api/utilisateur/2
+-X PUT $BASE_URL/utilisateur/2
 ```
 
 ### Resetting a User's Password
@@ -284,14 +297,14 @@ curl -u TOKEN: \
 **Purpose:** Generate a new password for a user who forgot theirs
 
 ```bash
-curl -u TOKEN: \
--X POST https://your-tkdo-instance.com/api/utilisateur/USER_ID/reinitmdp
+curl -u $TOKEN: \
+-X POST $BASE_URL/utilisateur/USER_ID/reinitmdp
 ```
 
 **Example:**
 ```bash
-curl -u TOKEN: \
--X POST https://your-tkdo-instance.com/api/utilisateur/2/reinitmdp
+curl -u $TOKEN: \
+-X POST $BASE_URL/utilisateur/2/reinitmdp
 ```
 
 **Response:**
@@ -322,8 +335,8 @@ curl -u TOKEN: \
 **Purpose:** View all occasions in the system
 
 ```bash
-curl -u TOKEN: \
-https://your-tkdo-instance.com/api/occasion
+curl -u $TOKEN: \
+$BASE_URL/occasion
 ```
 
 **Response:**
@@ -347,10 +360,10 @@ https://your-tkdo-instance.com/api/occasion
 **Purpose:** Create a new gift exchange occasion
 
 ```bash
-curl -u TOKEN: \
+curl -u $TOKEN: \
 -d titre='New Years 2026' \
 -d date='2026-01-01' \
--X POST https://your-tkdo-instance.com/api/occasion
+-X POST $BASE_URL/occasion
 ```
 
 **Parameters:**
@@ -379,8 +392,8 @@ curl -u TOKEN: \
 **Purpose:** Get detailed information about an occasion
 
 ```bash
-curl -u TOKEN: \
-https://your-tkdo-instance.com/api/occasion/OCCASION_ID
+curl -u $TOKEN: \
+$BASE_URL/occasion/OCCASION_ID
 ```
 
 **Response:**
@@ -424,10 +437,10 @@ https://your-tkdo-instance.com/api/occasion/OCCASION_ID
 **Purpose:** Update occasion details
 
 ```bash
-curl -u TOKEN: \
+curl -u $TOKEN: \
 -d titre='Updated Title' \
 -d date='2026-01-02' \
--X PUT https://your-tkdo-instance.com/api/occasion/OCCASION_ID
+-X PUT $BASE_URL/occasion/OCCASION_ID
 ```
 
 **Notes:**
@@ -440,16 +453,16 @@ curl -u TOKEN: \
 **Purpose:** Add a user to an occasion
 
 ```bash
-curl -u TOKEN: \
+curl -u $TOKEN: \
 -d idParticipant=USER_ID \
--X POST https://your-tkdo-instance.com/api/occasion/OCCASION_ID/participant
+-X POST $BASE_URL/occasion/OCCASION_ID/participant
 ```
 
 **Example:**
 ```bash
-curl -u TOKEN: \
+curl -u $TOKEN: \
 -d idParticipant=4 \
--X POST https://your-tkdo-instance.com/api/occasion/1/participant
+-X POST $BASE_URL/occasion/1/participant
 ```
 
 **Response:**
@@ -495,8 +508,8 @@ curl -u TOKEN: \
 **Purpose:** View who a user cannot draw
 
 ```bash
-curl -u TOKEN: \
-https://your-tkdo-instance.com/api/utilisateur/USER_ID/exclusion
+curl -u $TOKEN: \
+$BASE_URL/utilisateur/USER_ID/exclusion
 ```
 
 **Response:**
@@ -519,16 +532,16 @@ https://your-tkdo-instance.com/api/utilisateur/USER_ID/exclusion
 **Purpose:** Define who a user cannot give gifts to
 
 ```bash
-curl -u TOKEN: \
+curl -u $TOKEN: \
 -d idQuiNeDoitPasRecevoir=TARGET_USER_ID \
--X POST https://your-tkdo-instance.com/api/utilisateur/USER_ID/exclusion
+-X POST $BASE_URL/utilisateur/USER_ID/exclusion
 ```
 
 **Example:** Prevent Alice (id=2) from drawing Bob (id=3):
 ```bash
-curl -u TOKEN: \
+curl -u $TOKEN: \
 -d idQuiNeDoitPasRecevoir=3 \
--X POST https://your-tkdo-instance.com/api/utilisateur/2/exclusion
+-X POST $BASE_URL/utilisateur/2/exclusion
 ```
 
 **Response:**
@@ -548,14 +561,14 @@ To prevent both Alice and Bob from drawing each other:
 
 ```bash
 # Alice cannot draw Bob
-curl -u TOKEN: \
+curl -u $TOKEN: \
 -d idQuiNeDoitPasRecevoir=3 \
--X POST https://your-tkdo-instance.com/api/utilisateur/2/exclusion
+-X POST $BASE_URL/utilisateur/2/exclusion
 
 # Bob cannot draw Alice
-curl -u TOKEN: \
+curl -u $TOKEN: \
 -d idQuiNeDoitPasRecevoir=2 \
--X POST https://your-tkdo-instance.com/api/utilisateur/3/exclusion
+-X POST $BASE_URL/utilisateur/3/exclusion
 ```
 
 **Notes:**
@@ -588,10 +601,10 @@ A **draw** (tirage) randomly assigns who gives gifts to whom.
 **Purpose:** Generate a random, valid draw for an occasion
 
 ```bash
-curl -u TOKEN: \
+curl -u $TOKEN: \
 -d force=0 \
 -d nbMaxIter=10 \
--X POST https://your-tkdo-instance.com/api/occasion/OCCASION_ID/tirage
+-X POST $BASE_URL/occasion/OCCASION_ID/tirage
 ```
 
 **Parameters:**
@@ -637,9 +650,9 @@ curl -u TOKEN: \
 
 Use `force=1` to overwrite an existing draw:
 ```bash
-curl -u TOKEN: \
+curl -u $TOKEN: \
 -d force=1 \
--X POST https://your-tkdo-instance.com/api/occasion/1/tirage
+-X POST $BASE_URL/occasion/1/tirage
 ```
 
 **When to use force:**
@@ -658,18 +671,18 @@ curl -u TOKEN: \
 **Purpose:** Enter draw results from an external draw (paper slips, etc.)
 
 ```bash
-curl -u TOKEN: \
+curl -u $TOKEN: \
 -d idQuiOffre=GIVER_USER_ID \
 -d idQuiRecoit=RECEIVER_USER_ID \
--X POST https://your-tkdo-instance.com/api/occasion/OCCASION_ID/resultat
+-X POST $BASE_URL/occasion/OCCASION_ID/resultat
 ```
 
 **Example:** Alice (id=2) gives to Bob (id=3):
 ```bash
-curl -u TOKEN: \
+curl -u $TOKEN: \
 -d idQuiOffre=2 \
 -d idQuiRecoit=3 \
--X POST https://your-tkdo-instance.com/api/occasion/1/resultat
+-X POST $BASE_URL/occasion/1/resultat
 ```
 
 **Response:**
@@ -714,9 +727,9 @@ Possible causes:
 
 **Example with increased iterations:**
 ```bash
-curl -u TOKEN: \
+curl -u $TOKEN: \
 -d nbMaxIter=50 \
--X POST https://your-tkdo-instance.com/api/occasion/1/tirage
+-X POST $BASE_URL/occasion/1/tirage
 ```
 
 ## API Reference Quick Guide
@@ -732,7 +745,7 @@ https://your-tkdo-instance.com/api
 
 All requests require authentication:
 ```bash
-curl -u TOKEN: \
+curl -u $TOKEN: \
 [API_URL]
 ```
 
@@ -760,7 +773,7 @@ curl -u TOKEN: \
 
 **Multiple parameters:**
 ```bash
-curl -u TOKEN: \
+curl -u $TOKEN: \
 -d param1='value1' \
 -d param2='value2' \
 -d param3='value3' \
@@ -882,7 +895,7 @@ https://your-instance.com/api/utilisateur
 
 **Verify username availability:**
 ```bash
-curl -u TOKEN: \
+curl -u $TOKEN: \
 https://your-instance.com/api/utilisateur | grep 'desired_username'
 ```
 
@@ -899,20 +912,20 @@ https://your-instance.com/api/utilisateur | grep 'desired_username'
 
 1. **Check participant count:**
    ```bash
-   curl -u TOKEN: \
+   curl -u $TOKEN: \
    https://your-instance.com/api/occasion/OCCASION_ID
    ```
 
 2. **Review exclusions:**
    ```bash
    # For each participant
-   curl -u TOKEN: \
+   curl -u $TOKEN: \
    https://your-instance.com/api/utilisateur/USER_ID/exclusion
    ```
 
 3. **Try with more iterations:**
    ```bash
-   curl -u TOKEN: \
+   curl -u $TOKEN: \
    -d nbMaxIter=100 \
    -X POST https://your-instance.com/api/occasion/OCCASION_ID/tirage
    ```
@@ -932,7 +945,7 @@ https://your-instance.com/api/utilisateur | grep 'desired_username'
 
 **View user email:**
 ```bash
-curl -u TOKEN: \
+curl -u $TOKEN: \
 https://your-instance.com/api/utilisateur/USER_ID
 ```
 
@@ -945,11 +958,11 @@ https://your-instance.com/api/utilisateur/USER_ID
 1. **Missing backslash for line continuation:**
    ```bash
    # Wrong:
-   curl -u TOKEN:
+   curl -u $TOKEN:
    -d param='value'
 
    # Correct:
-   curl -u TOKEN: \
+   curl -u $TOKEN: \
    -d param='value'
    ```
 
@@ -974,12 +987,12 @@ https://your-instance.com/api/utilisateur/USER_ID
 4. **HTTP method not specified:**
    ```bash
    # Wrong (defaults to GET):
-   curl -u TOKEN: \
+   curl -u $TOKEN: \
    -d param='value' \
    [URL]
 
    # Correct:
-   curl -u TOKEN: \
+   curl -u $TOKEN: \
    -d param='value' \
    -X POST [URL]
    ```
@@ -1028,7 +1041,7 @@ If issues persist:
 
 **Need more help?** Refer to:
 - [User Guide](user-guide.md) - For general Tkdo usage
-- [API Reference](api-reference.md) _(coming soon)_ - Complete API documentation
+- [API Reference](api-reference.md) - Complete API documentation
 - [Troubleshooting Guide](troubleshooting.md) _(coming soon)_ - Common issues and solutions
 
 **Administrator responsibilities:**

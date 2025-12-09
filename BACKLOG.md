@@ -51,41 +51,7 @@
 ## Documentation
 
 ### Developer Documentation
-**Task 1:** Create API reference documentation
-- **File:** `docs/en/api-reference.md`
-- **Content:**
-  - API base URL and versioning
-  - Authentication: token-based authentication, obtaining tokens, passing tokens in requests
-  - Standard user routes:
-    - POST /api/connexion (login)
-    - DELETE /api/connexion (logout)
-    - GET /api/utilisateur/:idUtilisateur (get user, own profile only)
-    - PUT /api/utilisateur/:idUtilisateur (update user, own profile only)
-    - GET /api/occasion (list own occasions)
-    - GET /api/occasion/:idOccasion (get occasion details)
-    - GET /api/idee (list ideas for an occasion)
-    - POST /api/idee (create idea)
-    - DELETE /api/idee/:idIdee (delete own idea)
-  - Administrator-only routes:
-    - GET /api/utilisateur/:idUtilisateur (any user)
-    - GET /api/utilisateur (list all users)
-    - POST /api/utilisateur (create user)
-    - POST /api/utilisateur/:idUtilisateur/reinitmdp (reset password)
-    - GET /api/occasion (all occasions or by user)
-    - GET /api/occasion/:idOccasion (any occasion)
-    - POST /api/occasion (create occasion)
-    - PUT /api/occasion (update occasion)
-    - POST /api/occasion/:idOccasion/participant (add participant)
-    - POST /api/occasion/:idOccasion/resultat (perform draw)
-    - POST /api/occasion/:idOccasion/exclusion (create exclusion)
-    - GET /api/occasion/:idOccasion/exclusion (list exclusions)
-  - Request/response formats (JSON)
-  - Error responses and status codes
-  - Using curl for API testing examples
-- **Estimated size:** ~600-800 lines with examples
-- **Note:** After completion, check consistency with other documentation (remove "coming soon" links, update cross-references)
-
-**Task 2:** Create architecture and design decisions documentation
+**Task 1:** Create architecture and design decisions documentation
 - **File:** `docs/en/architecture.md`
 - **Content:**
   - System architecture overview
@@ -118,7 +84,7 @@
 - **Estimated size:** ~500-600 lines
 - **Note:** After completion, check consistency with other documentation (remove "coming soon" links, update cross-references)
 
-**Task 3:** Create contributing guidelines
+**Task 2:** Create contributing guidelines
 - **File:** `docs/en/CONTRIBUTING.md`
 - **Content:**
   - How to contribute (issues, pull requests)
@@ -142,7 +108,7 @@
 - **Note:** After completion, check consistency with other documentation (remove "coming soon" links, update cross-references)
 
 ### Deployment Documentation
-**Task 4:** Translate and enhance Apache deployment guide
+**Task 3:** Translate and enhance Apache deployment guide
 - **File:** `docs/en/deployment-apache.md`
 - **Content:**
   - Prerequisites:
@@ -179,7 +145,7 @@
 - **Estimated size:** ~400-500 lines
 - **Note:** After completion, check consistency with other documentation (remove "coming soon" links, update cross-references)
 
-**Task 5:** Create environment variables reference
+**Task 4:** Create environment variables reference
 - **File:** `docs/en/environment-variables.md`
 - **Content:**
   - Reading current `api/.env` file
@@ -195,7 +161,7 @@
 - **Estimated size:** ~200-300 lines
 - **Note:** After completion, check consistency with other documentation (remove "coming soon" links, update cross-references)
 
-**Task 6:** Create backup and maintenance guide
+**Task 5:** Create backup and maintenance guide
 - **File:** `docs/en/maintenance.md`
 - **Content:**
   - Database backup procedures:
@@ -224,7 +190,7 @@
 - **Estimated size:** ~300-400 lines
 - **Note:** After completion, check consistency with other documentation (remove "coming soon" links, update cross-references)
 
-**Task 7:** Create troubleshooting guide
+**Task 6:** Create troubleshooting guide
 - **File:** `docs/en/troubleshooting.md`
 - **Content:**
   - Common issues and solutions:
@@ -260,7 +226,7 @@
 - **Note:** After completion, check consistency with other documentation (remove "coming soon" links, update cross-references)
 
 ### Documentation Infrastructure
-**Task 8:** Create documentation index and navigation
+**Task 7:** Create documentation index and navigation
 - **File:** `docs/en/INDEX.md`
 - **Content:**
   - Welcome message
@@ -276,7 +242,7 @@
 - **Estimated size:** ~100-150 lines
 - **Note:** After completion, check consistency with other documentation (remove "coming soon" links, update cross-references)
 
-**Task 9:** Update main README.md with English content
+**Task 8:** Update main README.md with English content
 - **File:** `README.md`
 - **Action:** Keep both French and English versions
 - **Content:**
@@ -288,7 +254,7 @@
 - **Estimated size:** Additions of ~100-150 lines
 - **Note:** After completion, check consistency with other documentation (remove "coming soon" links, update cross-references)
 
-**Task 10:** Create documentation writing guide
+**Task 9:** Create documentation writing guide
 - **File:** `docs/DOCUMENTATION-GUIDE.md`
 - **Content:**
   - Documentation philosophy and principles
