@@ -5,6 +5,7 @@
 ### Contributors
 - **Documentation:**
   - Create backend/API development guide (docs/en/backend-dev.md) with hexagonal architecture documentation
+  - Create database documentation (docs/en/database.md) with schema diagrams, entity descriptions, and migration workflows
 - **Project Configuration:**
   - Add Mermaid diagram quality standards (high contrast colors, readability, proper layouts)
 

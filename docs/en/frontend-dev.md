@@ -1067,7 +1067,7 @@ OccasionComponent (page)
 Now that you understand frontend development:
 
 - **Backend Development**: See [Backend Development Guide](backend-dev.md)
-- **Database**: See [Database Documentation](database.md) *(coming soon)*
+- **Database**: See [Database Documentation](database.md)
 - **Testing**: See [Testing Guide](testing.md) *(coming soon)*
 - **API Reference**: See [API Reference](api-reference.md) *(coming soon)*
 
