@@ -536,7 +536,7 @@ Now that your development environment is running:
 - **Frontend Development:** See [Frontend Development Guide](frontend-dev.md)
 - **Backend Development:** See [Backend Development Guide](backend-dev.md)
 - **Database:** See [Database Documentation](database.md)
-- **Testing:** See [Testing Guide](testing.md) *(coming soon)*
+- **Testing:** See [Testing Guide](testing.md)
 
 ---
 

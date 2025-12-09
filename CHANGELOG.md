@@ -6,6 +6,7 @@
 - **Documentation:**
   - Create backend/API development guide (docs/en/backend-dev.md) with hexagonal architecture documentation
   - Create database documentation (docs/en/database.md) with schema diagrams, entity descriptions, and migration workflows
+  - Create testing guide (docs/en/testing.md) covering frontend, backend, and E2E testing strategies
 - **Project Configuration:**
   - Add Mermaid diagram quality standards (high contrast colors, readability, proper layouts)
 

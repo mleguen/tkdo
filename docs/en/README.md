@@ -230,7 +230,7 @@ Default credentials: `admin` / `admin` (change password immediately!)
 - [Frontend Development Guide](frontend-dev.md)
 - [Backend/API Development Guide](backend-dev.md)
 - [Database Documentation](database.md)
-- [Testing Guide](testing.md) _(coming soon)_
+- [Testing Guide](testing.md)
 - [API Reference](api-reference.md) _(coming soon)_
 - [Architecture & Design Decisions](architecture.md) _(coming soon)_
 - [Contributing Guidelines](CONTRIBUTING.md) _(coming soon)_
