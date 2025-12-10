@@ -8,6 +8,7 @@
   - Create database documentation (docs/en/database.md) with schema diagrams, entity descriptions, and migration workflows
   - Create testing guide (docs/en/testing.md) covering frontend, backend, and E2E testing strategies
   - Create API reference (docs/en/api-reference.md) with complete endpoint documentation and curl examples
+  - Create architecture and design decisions documentation (docs/en/architecture.md) covering system architecture, frontend/backend design rationale, database design decisions, authentication strategy, email notification system, and deployment architecture
 - **Project Configuration:**
   - Add Mermaid diagram quality standards (high contrast colors, readability, proper layouts)
 

@@ -51,40 +51,7 @@
 ## Documentation
 
 ### Developer Documentation
-**Task 1:** Create architecture and design decisions documentation
-- **File:** `docs/en/architecture.md`
-- **Content:**
-  - System architecture overview
-  - Frontend architecture:
-    - Why Angular standalone components
-    - Routing strategy
-    - State management approach (services vs stores)
-    - HTTP interceptors (authentication, dev backend mocking)
-    - Component hierarchy and communication patterns
-  - Backend architecture:
-    - Why Slim Framework
-    - Why Doctrine ORM
-    - Layered architecture (routes, services, repositories)
-    - Dependency injection strategy
-    - Middleware pipeline (authentication, error handling)
-  - Database design decisions:
-    - Soft deletes for gift ideas (preserving history)
-    - Exclusions modeling
-    - Draw results storage
-  - Authentication strategy: token-based, security considerations
-  - Email notification system architecture:
-    - Instant vs daily digest
-    - Mailer abstraction
-    - Daily notification script scheduling
-  - Deployment architecture:
-    - Docker for development
-    - Apache for production
-    - Why these choices
-  - Future architectural considerations (AWS serverless mentioned in backlog)
-- **Estimated size:** ~500-600 lines
-- **Note:** After completion, check consistency with other documentation (remove "coming soon" links, update cross-references)
-
-**Task 2:** Create contributing guidelines
+**Task 1:** Create contributing guidelines
 - **File:** `docs/en/CONTRIBUTING.md`
 - **Content:**
   - How to contribute (issues, pull requests)
@@ -108,7 +75,7 @@
 - **Note:** After completion, check consistency with other documentation (remove "coming soon" links, update cross-references)
 
 ### Deployment Documentation
-**Task 3:** Translate and enhance Apache deployment guide
+**Task 2:** Translate and enhance Apache deployment guide
 - **File:** `docs/en/deployment-apache.md`
 - **Content:**
   - Prerequisites:
@@ -145,7 +112,7 @@
 - **Estimated size:** ~400-500 lines
 - **Note:** After completion, check consistency with other documentation (remove "coming soon" links, update cross-references)
 
-**Task 4:** Create environment variables reference
+**Task 3:** Create environment variables reference
 - **File:** `docs/en/environment-variables.md`
 - **Content:**
   - Reading current `api/.env` file
@@ -161,7 +128,7 @@
 - **Estimated size:** ~200-300 lines
 - **Note:** After completion, check consistency with other documentation (remove "coming soon" links, update cross-references)
 
-**Task 5:** Create backup and maintenance guide
+**Task 4:** Create backup and maintenance guide
 - **File:** `docs/en/maintenance.md`
 - **Content:**
   - Database backup procedures:
@@ -190,7 +157,7 @@
 - **Estimated size:** ~300-400 lines
 - **Note:** After completion, check consistency with other documentation (remove "coming soon" links, update cross-references)
 
-**Task 6:** Create troubleshooting guide
+**Task 5:** Create troubleshooting guide
 - **File:** `docs/en/troubleshooting.md`
 - **Content:**
   - Common issues and solutions:
@@ -226,7 +193,7 @@
 - **Note:** After completion, check consistency with other documentation (remove "coming soon" links, update cross-references)
 
 ### Documentation Infrastructure
-**Task 7:** Create documentation index and navigation
+**Task 6:** Create documentation index and navigation
 - **File:** `docs/en/INDEX.md`
 - **Content:**
   - Welcome message
@@ -242,7 +209,7 @@
 - **Estimated size:** ~100-150 lines
 - **Note:** After completion, check consistency with other documentation (remove "coming soon" links, update cross-references)
 
-**Task 8:** Update main README.md with English content
+**Task 7:** Update main README.md with English content
 - **File:** `README.md`
 - **Action:** Keep both French and English versions
 - **Content:**
@@ -254,7 +221,7 @@
 - **Estimated size:** Additions of ~100-150 lines
 - **Note:** After completion, check consistency with other documentation (remove "coming soon" links, update cross-references)
 
-**Task 9:** Create documentation writing guide
+**Task 8:** Create documentation writing guide
 - **File:** `docs/DOCUMENTATION-GUIDE.md`
 - **Content:**
   - Documentation philosophy and principles

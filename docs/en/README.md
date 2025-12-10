@@ -232,7 +232,7 @@ Default credentials: `admin` / `admin` (change password immediately!)
 - [Database Documentation](database.md)
 - [Testing Guide](testing.md)
 - [API Reference](api-reference.md)
-- [Architecture & Design Decisions](architecture.md) _(coming soon)_
+- [Architecture & Design Decisions](architecture.md)
 - [Contributing Guidelines](CONTRIBUTING.md) _(coming soon)_
 
 ### Deployment Documentation
