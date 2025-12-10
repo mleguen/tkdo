@@ -9,6 +9,7 @@
   - Create testing guide (docs/en/testing.md) covering frontend, backend, and E2E testing strategies
   - Create API reference (docs/en/api-reference.md) with complete endpoint documentation and curl examples
   - Create architecture and design decisions documentation (docs/en/architecture.md) covering system architecture, frontend/backend design rationale, database design decisions, authentication strategy, email notification system, and deployment architecture
+  - Create contributing guidelines (docs/en/CONTRIBUTING.md) with development workflow, coding standards, testing requirements, commit conventions, pull request process, and release procedures
 - **Project Configuration:**
   - Add Mermaid diagram quality standards (high contrast colors, readability, proper layouts)
 

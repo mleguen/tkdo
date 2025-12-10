@@ -233,7 +233,7 @@ Default credentials: `admin` / `admin` (change password immediately!)
 - [Testing Guide](testing.md)
 - [API Reference](api-reference.md)
 - [Architecture & Design Decisions](architecture.md)
-- [Contributing Guidelines](CONTRIBUTING.md) _(coming soon)_
+- [Contributing Guidelines](CONTRIBUTING.md)
 
 ### Deployment Documentation
 - [Apache Deployment Guide](deployment-apache.md) _(coming soon)_

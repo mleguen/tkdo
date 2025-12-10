@@ -50,32 +50,8 @@
 
 ## Documentation
 
-### Developer Documentation
-**Task 1:** Create contributing guidelines
-- **File:** `docs/en/CONTRIBUTING.md`
-- **Content:**
-  - How to contribute (issues, pull requests)
-  - Code of conduct
-  - Development workflow:
-    - Forking and branching strategy
-    - Commit message conventions
-    - Pull request process
-    - Code review expectations
-  - Coding standards:
-    - Frontend: TypeScript/Angular conventions
-    - Backend: PHP PSR standards
-    - Naming conventions
-    - File organization
-  - Testing requirements for contributions
-  - Documentation requirements for contributions
-  - When to add migrations
-  - Changelog update process
-  - Release process overview
-- **Estimated size:** ~400-500 lines
-- **Note:** After completion, check consistency with other documentation (remove "coming soon" links, update cross-references)
-
 ### Deployment Documentation
-**Task 2:** Translate and enhance Apache deployment guide
+**Task 1:** Translate and enhance Apache deployment guide
 - **File:** `docs/en/deployment-apache.md`
 - **Content:**
   - Prerequisites:
@@ -112,7 +88,7 @@
 - **Estimated size:** ~400-500 lines
 - **Note:** After completion, check consistency with other documentation (remove "coming soon" links, update cross-references)
 
-**Task 3:** Create environment variables reference
+**Task 2:** Create environment variables reference
 - **File:** `docs/en/environment-variables.md`
 - **Content:**
   - Reading current `api/.env` file
@@ -128,7 +104,7 @@
 - **Estimated size:** ~200-300 lines
 - **Note:** After completion, check consistency with other documentation (remove "coming soon" links, update cross-references)
 
-**Task 4:** Create backup and maintenance guide
+**Task 3:** Create backup and maintenance guide
 - **File:** `docs/en/maintenance.md`
 - **Content:**
   - Database backup procedures:
@@ -157,7 +133,7 @@
 - **Estimated size:** ~300-400 lines
 - **Note:** After completion, check consistency with other documentation (remove "coming soon" links, update cross-references)
 
-**Task 5:** Create troubleshooting guide
+**Task 4:** Create troubleshooting guide
 - **File:** `docs/en/troubleshooting.md`
 - **Content:**
   - Common issues and solutions:
@@ -193,7 +169,7 @@
 - **Note:** After completion, check consistency with other documentation (remove "coming soon" links, update cross-references)
 
 ### Documentation Infrastructure
-**Task 6:** Create documentation index and navigation
+**Task 5:** Create documentation index and navigation
 - **File:** `docs/en/INDEX.md`
 - **Content:**
   - Welcome message
@@ -209,19 +185,18 @@
 - **Estimated size:** ~100-150 lines
 - **Note:** After completion, check consistency with other documentation (remove "coming soon" links, update cross-references)
 
-**Task 7:** Update main README.md with English content
+**Task 6:** Update main README.md with English content
 - **File:** `README.md`
-- **Action:** Keep both French and English versions
+- **Action:** Keep only English versions
 - **Content:**
-  - Add English section at the top
   - Brief project description in English
   - Link to English documentation (`docs/en/INDEX.md`)
-  - Keep existing French content below for compatibility
-  - Add table of contents for both languages
+  - Remove existing French content
+  - Add table of contents
 - **Estimated size:** Additions of ~100-150 lines
 - **Note:** After completion, check consistency with other documentation (remove "coming soon" links, update cross-references)
 
-**Task 8:** Create documentation writing guide
+**Task 7:** Create documentation writing guide
 - **File:** `docs/DOCUMENTATION-GUIDE.md`
 - **Content:**
   - Documentation philosophy and principles
