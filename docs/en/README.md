@@ -271,7 +271,7 @@ Contributions are welcome! This project follows:
 - Angular style guide for TypeScript
 - Test-driven development practices
 
-See [Contributing Guidelines](CONTRIBUTING.md) _(coming soon)_ for details.
+See [Contributing Guidelines](CONTRIBUTING.md) for details.
 
 ## License
 

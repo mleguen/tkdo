@@ -11,6 +11,10 @@
   - Create API reference (docs/en/api-reference.md) with complete endpoint documentation and curl examples
   - Create architecture and design decisions documentation (docs/en/architecture.md) covering system architecture, frontend/backend design rationale, database design decisions, authentication strategy, email notification system, and deployment architecture
   - Create contributing guidelines (docs/en/CONTRIBUTING.md) with development workflow, coding standards, testing requirements, commit conventions, pull request process, and release procedures
+  - Consolidate and streamline all English documentation (docs/en/) to remove redundancies and establish clear single sources of truth for each topic
+  - Fix terminology inconsistency in notifications.md: change `notifPref` to `prefNotifIdees` to match actual API parameter name
+  - Update BACKLOG documentation tasks to prevent duplication (added cross-references and anti-duplication notes)
+  - Fix inaccurate "coming soon" reference to CONTRIBUTING.md in README.md (document already exists)
 - **Project Configuration:**
   - Add Mermaid diagram quality standards (high contrast colors, readability, proper layouts)
 

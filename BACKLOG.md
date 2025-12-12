@@ -51,29 +51,25 @@
 ## Documentation
 
 ### Documentation Quality
-**Task 1:** Review and consolidate existing documentation
-- **Files affected:** All existing documentation in `docs/en/`
-- **Objectives:**
-  - Identify and remove redundancies (content explained multiple times)
-  - Identify and resolve inconsistencies (same topic explained differently across documents)
-  - Establish single source of truth for each topic
-  - Replace duplicated content with cross-references
-  - Add brief summaries only where helpful and maintainable
-- **Areas to review:**
-  - Development setup procedures (dev-setup.md, CONTRIBUTING.md, architecture.md)
-  - Testing workflows (testing.md, CONTRIBUTING.md, frontend-dev.md, backend-dev.md)
-  - Commit conventions (CONTRIBUTING.md, CHANGELOG.md references)
-  - Database migrations (database.md, CONTRIBUTING.md, backend-dev.md)
-  - Architecture explanations (architecture.md, frontend-dev.md, backend-dev.md, README.md)
-  - API usage examples (api-reference.md, admin-guide.md, backend-dev.md)
-- **Approach:**
-  - For each topic, decide which document is the authoritative source
-  - In other documents, replace detailed explanations with: "See [Document](link.md) for details"
-  - Keep only context-specific summaries that add value
-  - Ensure consistency in terminology, examples, and procedures
-- **Review remaining documentation tasks** to avoid creating new redundancies
-- **Estimated effort:** Review all existing docs, create consolidation plan, implement changes
-- **Note:** Complete this before creating additional documentation to avoid compounding the problem
+~~**Task 1:** Review and consolidate existing documentation~~ **[COMPLETED - 2025-12-12]**
+
+**Summary of changes made:**
+- Streamlined `architecture.md` by removing ~400 lines of redundant content
+- Established clear single sources of truth:
+  - `api-reference.md`: Authentication usage and API endpoints
+  - `notifications.md`: Email notification types and configuration
+  - `database.md`: Database schema and entity details
+  - `dev-setup.md`: Development environment setup procedures
+  - `admin-guide.md`: Deployment and administration procedures (cross-referenced)
+- Added cross-references throughout `architecture.md` to link to authoritative documents
+- Fixed terminology inconsistency: `notifPref` → `prefNotifIdees` in `notifications.md`
+- Verified consistent use of terminology across all documents
+- `architecture.md` now focuses exclusively on architectural decisions and rationale
+
+**Impact:**
+- Reduced maintenance burden - updates only needed in one authoritative location
+- Improved documentation discoverability - clear direction to the right document
+- Eliminated conflicting information between documents
 
 ### Deployment Documentation
 **Task 2:** Translate and enhance Apache deployment guide
@@ -85,7 +81,7 @@
     - .htaccess file usage permissions
     - HTTPS requirement
   - Environment configuration:
-    - Available environment variables reference
+    - **Cross-reference to environment-variables.md (Task 3)** for complete variable documentation
     - Creating `api/.env.prod` file
     - Setting environment variables in Apache
   - Building the installation package:
@@ -103,15 +99,20 @@
     - Default credentials
     - Changing default password for security
   - Setting up daily notification cron job:
-    - Example crontab entry
-    - Choosing notification time
-  - Troubleshooting:
+    - **Cross-reference to notifications.md#for-administrators** for complete cron setup
+    - Quick reference example crontab entry
+  - Troubleshooting deployment-specific issues:
     - SSH alternatives (Web Console)
     - PHP CGI vs CLI issues
     - Finding the right PHP binary
     - Using -n option to avoid server php.ini
-- **Estimated size:** ~400-500 lines
+    - **Cross-reference to troubleshooting.md (Task 5)** for general troubleshooting
+- **Estimated size:** ~300-400 lines
 - **Note:** After completion, check consistency with other documentation (remove "coming soon" links, update cross-references)
+- **Anti-duplication notes:**
+  - Do NOT duplicate environment variable definitions (reference Task 3)
+  - Do NOT duplicate notification cron details (reference notifications.md)
+  - Do NOT duplicate general troubleshooting (reference Task 5)
 
 **Task 3:** Create environment variables reference
 - **File:** `docs/en/environment-variables.md`
@@ -137,11 +138,12 @@
     - Backup frequency recommendations
     - Backup storage and retention
   - Database restore procedures
-  - Application updates:
+  - Application updates and upgrades:
+    - Update vs upgrade distinction
     - Backing up before updates
-    - Building new package
-    - Deploying new version
-    - Running new migrations
+    - **Cross-reference to deployment-apache.md (Task 2)** for building new package
+    - **Cross-reference to deployment-apache.md (Task 2)** for deployment steps
+    - Running new migrations (quick reference with link to database.md)
     - Testing after deployment
   - Log file management:
     - Where logs are stored
@@ -157,19 +159,24 @@
   - Disaster recovery procedures
 - **Estimated size:** ~300-400 lines
 - **Note:** After completion, check consistency with other documentation (remove "coming soon" links, update cross-references)
+- **Anti-duplication notes:**
+  - Do NOT duplicate build/packaging procedures (reference Task 2)
+  - Do NOT duplicate deployment steps (reference Task 2)
+  - Keep focus on ongoing maintenance, not initial deployment
 
 **Task 5:** Create troubleshooting guide
 - **File:** `docs/en/troubleshooting.md`
 - **Content:**
+  - **Note:** This should become the SINGLE SOURCE for all troubleshooting
   - Common issues and solutions:
     - Login problems
-    - Email delivery issues
+    - Email delivery issues (consolidate with notifications.md troubleshooting)
     - Database connection errors
     - Permission issues
     - Session expiration
     - Draw generation failures
   - Development environment issues:
-    - Docker problems
+    - Docker problems (consolidate with dev-setup.md troubleshooting)
     - Container startup failures
     - Port conflicts
     - File permission issues in containers
@@ -178,6 +185,7 @@
     - .htaccess not working
     - PHP version mismatches
     - Missing PHP extensions
+    - Deployment-specific issues (consolidate with Task 2 troubleshooting)
   - Frontend issues:
     - Build failures
     - Test failures
@@ -190,8 +198,17 @@
     - Where to report bugs
     - How to provide useful error reports
     - Community resources
-- **Estimated size:** ~400-500 lines
-- **Note:** After completion, check consistency with other documentation (remove "coming soon" links, update cross-references)
+- **Estimated size:** ~500-600 lines
+- **Note:** After completion:
+  - Remove troubleshooting sections from other docs and replace with cross-references
+  - Update all "coming soon" links to troubleshooting.md
+- **Post-completion cleanup required:**
+  - dev-setup.md: Replace troubleshooting section with cross-reference
+  - notifications.md: Replace troubleshooting section with cross-reference to specific anchors
+  - database.md: Update troubleshooting reference
+  - user-guide.md: Update troubleshooting reference
+  - admin-guide.md: Update troubleshooting reference
+  - frontend-dev.md: Update troubleshooting reference
 
 ### Documentation Infrastructure
 **Task 6:** Create documentation index and navigation

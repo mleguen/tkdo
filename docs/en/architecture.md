@@ -562,38 +562,7 @@ public function process(Request $request, RequestHandler $handler): Response {
 
 **Decision:** Mark gift ideas as deleted with a timestamp instead of physically removing them from the database.
 
-**Implementation:** `api/src/Appli/ModelAdaptor/IdeeAdaptor.php`
-
-```php
-/**
- * @ORM\Entity
- * @ORM\Table(name="tkdo_idee")
- */
-class IdeeAdaptor implements Idee {
-    /**
-     * @ORM\Column(name="dateSuppression", type="datetime", nullable=true)
-     */
-    private ?DateTime $dateSuppression = null;
-
-    public function hasDateSuppression(): bool {
-        return $this->dateSuppression !== null;
-    }
-}
-```
-
-**Schema:**
-```sql
-CREATE TABLE tkdo_idee (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    utilisateur_id INT NOT NULL,
-    auteur_id INT NOT NULL,
-    description VARCHAR(255) NOT NULL,
-    dateProposition DATETIME NOT NULL,
-    dateSuppression DATETIME NULL,
-    FOREIGN KEY (utilisateur_id) REFERENCES tkdo_utilisateur(id),
-    FOREIGN KEY (auteur_id) REFERENCES tkdo_utilisateur(id)
-);
-```
+**Implementation:** `dateSuppression` column in `tkdo_idee` table (see [Database Documentation](./database.md#table-tkdo_idee))
 
 **Rationale:**
 - **Preserve History** - Gift ideas are valuable data for understanding user behavior
@@ -601,69 +570,16 @@ CREATE TABLE tkdo_idee (
 - **Audit Trail** - Track when ideas were deleted
 - **Notification Requirements** - Daily digest needs to report deletions
 
-**Filtering Logic:**
-```php
-// Repository: readAllByUtilisateur()
-$qb = $this->entityManager->createQueryBuilder();
-$qb->select('i')->from(IdeeAdaptor::class, 'i');
-
-if ($supprimees === false) {
-    $qb->where('i.dateSuppression IS NULL');
-} elseif ($supprimees === true) {
-    $qb->where('i.dateSuppression IS NOT NULL');
-}
-// null = both active and deleted
-```
-
 **Trade-offs:**
 - Slightly more complex queries (need to filter by `dateSuppression`)
 - Table grows over time (mitigated by relatively low idea volume)
 - Database storage for deleted records
 
+For complete schema details and entity relationships, see [Database Documentation](./database.md).
+
 ### Exclusions Modeling
 
 **Decision:** Use a join table with composite primary key to represent exclusion rules.
-
-**Schema:** `api/src/Appli/ModelAdaptor/ExclusionAdaptor.php`
-
-```sql
-CREATE TABLE tkdo_exclusion (
-    quiOffre_id INT NOT NULL,
-    quiNeDoitPasRecevoir_id INT NOT NULL,
-    PRIMARY KEY (quiOffre_id, quiNeDoitPasRecevoir_id),
-    FOREIGN KEY (quiOffre_id) REFERENCES tkdo_utilisateur(id),
-    FOREIGN KEY (quiNeDoitPasRecevoir_id) REFERENCES tkdo_utilisateur(id)
-);
-```
-
-**Doctrine Mapping:**
-```php
-/**
- * @ORM\Entity
- * @ORM\Table(name="tkdo_exclusion")
- */
-class ExclusionAdaptor implements Exclusion {
-    /**
-     * @ORM\Id
-     * @ORM\ManyToOne(targetEntity="UtilisateurAdaptor")
-     */
-    private UtilisateurAdaptor $quiOffre;
-
-    /**
-     * @ORM\Id
-     * @ORM\ManyToOne(targetEntity="UtilisateurAdaptor")
-     */
-    private UtilisateurAdaptor $quiNeDoitPasRecevoir;
-}
-```
-
-**Domain Model:**
-```php
-interface Exclusion {
-    public function getQuiOffre(): Utilisateur;
-    public function getQuiNeDoitPasRecevoir(): Utilisateur;
-}
-```
 
 **Rationale:**
 - **Composite Primary Key** - Ensures one exclusion per (giver, receiver) pair
@@ -671,47 +587,17 @@ interface Exclusion {
 - **Prevents Duplicates** - Database-level constraint
 - **Simple Queries** - Easy to check exclusions during draw generation
 
-**Usage in Draw Algorithm:**
-```php
-// Check if assignment violates exclusion
-foreach ($exclusions as $exclusion) {
-    if ($exclusion->getQuiOffre() === $giver &&
-        $exclusion->getQuiNeDoitPasRecevoir() === $receiver) {
-        // Invalid assignment, try different receiver
-    }
-}
-```
-
 **Trade-offs:**
 - Composite primary key requires both fields for updates
 - No auto-increment ID (not needed for this use case)
 
+**Usage:** Exclusions are checked during draw algorithm to ensure valid gift assignments that respect user preferences.
+
+For complete schema details and entity structure, see [Database Documentation](./database.md#table-tkdo_exclusion).
+
 ### Draw Results Storage
 
 **Decision:** Store draw assignments as individual records in a results table.
-
-**Schema:** `api/src/Appli/ModelAdaptor/ResultatAdaptor.php`
-
-```sql
-CREATE TABLE tkdo_resultat (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    occasion_id INT NOT NULL,
-    quiOffre_id INT NOT NULL,
-    quiRecoit_id INT NOT NULL,
-    FOREIGN KEY (occasion_id) REFERENCES tkdo_occasion(id),
-    FOREIGN KEY (quiOffre_id) REFERENCES tkdo_utilisateur(id),
-    FOREIGN KEY (quiRecoit_id) REFERENCES tkdo_utilisateur(id)
-);
-```
-
-**Domain Model:**
-```php
-interface Resultat {
-    public function getOccasion(): Occasion;
-    public function getQuiOffre(): Utilisateur;
-    public function getQuiRecoit(): Utilisateur;
-}
-```
 
 **Rationale:**
 - **Simplicity** - One record per assignment
@@ -720,38 +606,9 @@ interface Resultat {
 - **Privacy** - Can query only what user is allowed to see
 - **Future Flexibility** - Easy to add metadata (e.g., draw timestamp)
 
-**Query Examples:**
-```php
-// Find who user should give to
-SELECT * FROM tkdo_resultat
-WHERE occasion_id = ? AND quiOffre_id = ?;
+**Privacy Enforcement:** Repository layer enforces that regular users can only see who they give to, not who gives to them. Admins can view all assignments.
 
-// Admin: view all assignments
-SELECT * FROM tkdo_resultat
-WHERE occasion_id = ?;
-```
-
-**Privacy Enforcement:**
-```php
-// Users can only see:
-// 1. Who they give to (quiRecoit where quiOffre = self)
-// 2. NOT who gives to them (hidden)
-
-public function readAllByOccasion(Auth $auth, Occasion $occasion): array {
-    $qb = $this->entityManager->createQueryBuilder();
-    $qb->select('r')->from(ResultatAdaptor::class, 'r')
-       ->where('r.occasion = :occasion')
-       ->setParameter('occasion', $occasion);
-
-    if (!$auth->isAdmin()) {
-        // Non-admin: only see own giving assignment
-        $qb->andWhere('r.quiOffre = :utilisateur')
-           ->setParameter('utilisateur', $auth->getUtilisateur());
-    }
-
-    return $qb->getQuery()->getResult();
-}
-```
+For complete schema details and relationships, see [Database Documentation](./database.md#table-tkdo_resultat).
 
 ## Authentication Strategy
 
@@ -760,50 +617,6 @@ public function readAllByOccasion(Auth $auth, Occasion $occasion): array {
 **Decision:** Use JWT (JSON Web Tokens) with RS256 algorithm for stateless authentication.
 
 **Implementation:** `api/src/Appli/Service/AuthService.php`
-
-**Token Structure:**
-```json
-{
-  "sub": 123,           // User ID
-  "exp": 1700000000,    // Expiration timestamp
-  "adm": true           // Admin flag
-}
-```
-
-**Key Generation:**
-```bash
-# Private key for signing tokens
-openssl genrsa -out private-key.prod 2048
-
-# Public key for verifying tokens
-openssl rsa -in private-key.prod -pubout -out public-key.prod
-```
-
-**Encoding (Login):**
-```php
-public function encode(AuthAdaptor $auth): string {
-    $privateKey = file_get_contents($this->privateKeyFile);
-    $payload = [
-        'sub' => $auth->getUtilisateur()->getId(),
-        'exp' => time() + $this->validitySeconds,
-        'adm' => $auth->isAdmin()
-    ];
-    return JWT::encode($payload, $privateKey, 'RS256');
-}
-```
-
-**Decoding (Request Validation):**
-```php
-public function decode(string $token): AuthAdaptor {
-    $publicKey = file_get_contents($this->publicKeyFile);
-    $decoded = JWT::decode($token, new Key($publicKey, 'RS256'));
-
-    $utilisateur = $this->utilisateurRepository->read($decoded->sub);
-    return (new AuthAdaptor())
-        ->setUtilisateur($utilisateur)
-        ->setAdmin($decoded->adm);
-}
-```
 
 **Rationale:**
 - **RS256 Algorithm** - Asymmetric encryption for production security
@@ -822,36 +635,21 @@ public function decode(string $token): AuthAdaptor {
 - Slightly larger payload than session IDs
 - Client must store token securely (localStorage XSS risk)
 
+For complete details on token structure, obtaining tokens, and authentication usage, see the [API Reference Authentication section](./api-reference.md#authentication).
+
 ### Security Considerations
 
-**Token Storage (Frontend):**
-```typescript
-// localStorage (vulnerable to XSS but convenient)
-localStorage.setItem('backend-token', token);
-```
+**Key Security Features:**
+- **Signature Verification** - Ensures token not tampered with
+- **Expiration Check** - Automatic with JWT library
+- **User Existence** - Validates user ID exists in database
+- **Admin Flag** - Double-checked for sensitive operations
+- **HTTPS Enforcement** - Required in production
+- **Authorization Header Passthrough** - Configured in Apache `.htaccess`
 
-**Mitigation Strategies:**
-- Token expiration (default: 30 days)
-- HTTPS required in production
-- Content Security Policy headers
-- Regular token refresh on active sessions
-
-**Backend Validation:**
-1. **Signature Verification** - Ensures token not tampered with
-2. **Expiration Check** - Automatic with JWT library
-3. **User Existence** - Validates user ID exists in database
-4. **Admin Flag** - Double-checked for sensitive operations
-
-**HTTPS Enforcement:** `apache/.htaccess`
-```apache
-RewriteCond %{HTTPS} !on
-RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI}
-```
-
-**Authorization Header Passthrough:**
-```apache
-SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1
-```
+**Trade-offs and Mitigations:**
+- localStorage XSS risk mitigated by token expiration and HTTPS
+- No server-side revocation compensated by short validity period
 
 **Future Improvements:**
 - Refresh token mechanism
@@ -859,11 +657,15 @@ SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1
 - HttpOnly cookies instead of localStorage
 - Short-lived access tokens with long-lived refresh tokens
 
+For authentication security best practices and implementation details, see the [API Reference](./api-reference.md#authentication).
+
 ## Email Notification System
 
 ### Architecture Overview
 
 **Decision:** Implement a plugin-based email system with support for instant and daily digest notifications.
+
+For complete user-facing documentation on notification types, preferences, and troubleshooting, see the [Email Notifications Reference](./notifications.md).
 
 ```mermaid
 flowchart TB
@@ -915,140 +717,17 @@ class PrefNotifIdees {
 }
 ```
 
-**Database Storage:**
-```sql
-ALTER TABLE tkdo_utilisateur
-ADD COLUMN prefNotifIdees CHAR(1) NOT NULL DEFAULT 'I';
-```
+**Architectural Rationale:**
+- **Instant notifications** - Immediate feedback for active users, real-time collaboration
+- **Daily digest** - Reduces email fatigue, batch processing efficiency
+- **User choice** - Flexibility to match user preferences and engagement levels
 
-#### Instant Notifications
+**Implementation Pattern:**
+- Instant: Triggered immediately when ideas are created/deleted (`IdeePort`)
+- Daily: Triggered by cron job executing console command with period flag
+- Both: Filter recipients based on preference, occasion participation, and timing
 
-**Trigger Points:** `api/src/Dom/Port/IdeePort.php`
-
-```php
-public function creeIdee(Auth $auth, Utilisateur $u, string $desc,
-                        Utilisateur $auteur): Idee {
-    // Create idea...
-    $idee = $this->ideeRepository->create();
-    // ...
-
-    // Send instant notifications
-    $this->notifPort->envoieNotifsInstantaneesCreation($auth, $idee);
-
-    return $idee;
-}
-
-public function marqueIdeeCommeSupprimee(Auth $auth, Idee $idee): Idee {
-    // Mark deleted...
-    $idee->setDateSuppression(new DateTime());
-
-    // Send instant notifications
-    $this->notifPort->envoieNotifsInstantaneesSuppression($auth, $idee);
-
-    return $idee;
-}
-```
-
-**Notification Logic:** `api/src/Dom/Port/NotifPort.php`
-
-```php
-public function envoieNotifsInstantaneesCreation(Auth $auth, Idee $idee): void {
-    // Find users with instant notification preference
-    $utilisateurs = $this->utilisateurRepository
-        ->readAllByNotifInstantaneePourIdees($idee->getUtilisateur());
-
-    foreach ($utilisateurs as $utilisateur) {
-        $this->mailPlugin->envoieMailIdeeCreation($utilisateur, $idee);
-    }
-}
-```
-
-**Recipient Query:**
-```php
-// Users who should receive instant notification
-SELECT DISTINCT u FROM UtilisateurAdaptor u
-INNER JOIN u.occasions o
-WHERE u.prefNotifIdees = 'I'
-  AND o.date > CURRENT_TIMESTAMP()
-  AND :ideaOwner MEMBER OF o.participants
-  AND u <> :ideaAuthor
-```
-
-**Rationale:**
-- Immediate feedback for active users
-- Real-time collaboration
-- User choice and control
-
-#### Daily Digest Notifications
-
-**Trigger:** Cron job executes `api/bin/notif-quotidienne.php` daily
-
-**Cron Configuration:**
-```bash
-# Execute at 6:00 AM every day
-0 6 * * * cd /var/www/api && ./composer.phar run console -- notif -p Q
-```
-
-**Script:** `api/bin/notif-quotidienne.php`
-```php
-#!/usr/bin/env php
-<?php
-require_once __DIR__ . '/../vendor/autoload.php';
-
-$bootstrap = new Bootstrap();
-$container = $bootstrap->buildContainer();
-
-$command = $container->get(NotifCommand::class);
-$command->run(['--periode' => 'Q']);
-```
-
-**Notification Logic:**
-```php
-public function envoieNotifsPeriodiques(string $periode): void {
-    $dateNotif = new DateTime();
-
-    // Get users with daily digest preference
-    $utilisateurs = $this->utilisateurRepository
-        ->readAllByNotifPeriodiquePourIdees($periode);
-
-    foreach ($utilisateurs as $utilisateur) {
-        // Get ideas created/deleted since last notification
-        $idees = $this->ideeRepository->readAllByNotifPeriodique(
-            $utilisateur,
-            $utilisateur->getDateDerniereNotifPeriodique(),
-            $dateNotif
-        );
-
-        if (!empty($idees)) {
-            $this->mailPlugin->envoieMailNotifPeriodique($utilisateur, $idees);
-        }
-
-        // Update last notification timestamp
-        $utilisateur->setDateDerniereNotifPeriodique($dateNotif);
-        $this->utilisateurRepository->update($utilisateur);
-    }
-}
-```
-
-**Query for Ideas:**
-```sql
-SELECT DISTINCT i FROM tkdo_idee i
-INNER JOIN i.utilisateur u
-INNER JOIN u.occasions o
-WHERE i.auteur <> :user
-  AND ((i.dateProposition > :lastNotif AND i.dateProposition <= :now)
-       OR (i.dateSuppression IS NOT NULL
-           AND i.dateSuppression > :lastNotif
-           AND i.dateSuppression <= :now))
-  AND u <> :user
-  AND o.date > CURRENT_TIMESTAMP()
-  AND :user MEMBER OF o.participants
-```
-
-**Rationale:**
-- Reduces email fatigue for less active users
-- Batch processing for efficiency
-- Scheduled execution during low-traffic hours
+For detailed notification types, configuration, and troubleshooting, see [Email Notifications Reference](./notifications.md). For administrator setup instructions (cron configuration, email settings), see [Email Notifications Reference - For Administrators](./notifications.md#for-administrators).
 
 ### Mailer Abstraction
 
@@ -1118,35 +797,16 @@ class MailService {
 
 ### Daily Notification Script Scheduling
 
-**Production Crontab:**
-```bash
-# Edit crontab
-crontab -e
+**Implementation:** Cron job executes console command with period flag.
 
-# Add daily notification at 6:00 AM
-0 6 * * * cd /var/www/api && ./composer.phar run console -- notif -p Q
-```
-
-**Alternative Times:**
-```bash
-# Midnight
-0 0 * * * cd /var/www/api && ./composer.phar run console -- notif -p Q
-
-# 9:00 AM (better for user engagement)
-0 9 * * * cd /var/www/api && ./composer.phar run console -- notif -p Q
-```
-
-**Monitoring:**
-```bash
-# Log output for debugging
-0 6 * * * cd /var/www/api && ./composer.phar run console -- notif -p Q >> /var/log/tkdo-notif.log 2>&1
-```
-
-**Considerations:**
+**Key Considerations:**
 - Choose time when users typically check email
 - Avoid server maintenance windows
 - Consider timezone of user base
 - Monitor script execution time and success rate
+- Log output for debugging
+
+For detailed cron setup instructions and scheduling options, see [Email Notifications Reference - For Administrators](./notifications.md#for-administrators).
 
 ## Deployment Architecture
 
@@ -1154,78 +814,27 @@ crontab -e
 
 **Decision:** Use Docker Compose to create a consistent, reproducible development environment.
 
-**Services:** `docker-compose.yml`
-
-```yaml
-services:
-  angular:    # Builds Angular app to /mnt/dist
-  front:      # Apache serving frontend + API proxy
-  mysql:      # MySQL 5.6 database
-  mailhog:    # Email testing UI
-  npm:        # Node.js tools (Cypress, npm)
-  php-cli:    # PHP CLI (Composer, Doctrine)
-  slim-fpm:   # PHP-FPM for API execution
-  slim-web:   # Nginx for API routing
-```
-
-**Development URLs:**
-- Frontend (Apache): http://localhost:8080
-- API (Nginx): http://localhost:8081
-- MailHog UI: http://localhost:8025
+**Key Services:** Angular build, Apache frontend, MySQL database, MailHog email testing, PHP-FPM API, Nginx API routing
 
 **Why Docker for Development:**
 - **Consistency** - Same environment for all developers
 - **No Local Dependencies** - No need to install PHP, MySQL, Node.js locally
 - **Isolation** - Multiple projects don't conflict
-- **Easy Onboarding** - `docker compose up -d` to start
+- **Easy Onboarding** - Simple startup command
 - **Match Production** - Similar to production environment
 
-**Development Workflow:**
-```bash
-# Start environment
-docker compose up -d front
+**Trade-offs:**
+- Additional complexity for newcomers unfamiliar with Docker
+- Resource overhead on development machines
+- Potential performance issues on some platforms (mitigated by proper configuration)
 
-# Install frontend dependencies
-./npm install
-
-# Build frontend
-./npm run build
-
-# Run backend migrations
-./composer console -- migrations:migrate
-
-# Create admin account
-./composer console -- fixtures --admin-email admin@example.com
-```
-
-**Wrapper Scripts:**
-- `./npm` - Executes npm in Docker container
-- `./composer` - Executes composer in Docker container
-- `./cypress` - Runs Cypress tests in Docker
+For complete development setup instructions, service details, and troubleshooting, see [Development Setup Guide](./dev-setup.md).
 
 ### Apache for Production
 
 **Decision:** Deploy to Apache web server with mod_rewrite for routing.
 
-**Configuration:** `apache/.htaccess`
-
-```apache
-# Force HTTPS
-RewriteCond %{HTTPS} !on
-RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI}
-
-# API routing: /api/* → api/public/index.php
-RewriteRule ^api/?(.*) api/public/index.php [NC,L]
-
-# SPA routing: unknown paths → index.html
-RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI} -f [OR]
-RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI} -d
-RewriteRule ^.*$ - [NC,L]
-RewriteRule ^(.*) index.html [NC,L]
-
-# JWT authorization header passthrough
-SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1
-```
+**Key Configuration:** `apache/.htaccess` handles HTTPS enforcement, API routing, SPA fallback, and JWT authorization header passthrough.
 
 **Why Apache:**
 - **Widely Available** - Supported by most hosting providers
@@ -1234,121 +843,20 @@ SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1
 - **HTTPS Support** - Easy SSL/TLS configuration
 - **Stable** - Battle-tested web server
 
-**Prerequisites:**
-- Apache 2.4+ with mod_rewrite enabled
-- .htaccess file support (`AllowOverride All`)
-- HTTPS certificate (required)
-- PHP 8.4 with extensions: dom, mbstring, pdo_mysql, zip
+**Trade-offs:**
+- **Apache vs Nginx** - Slightly lower performance than Nginx (negligible for Tkdo's scale) but broader hosting support and simpler shared hosting configuration
+- **Docker vs Vagrant** - Docker is lighter weight, faster startup, better resource utilization, and industry standard
 
-**Why These Choices:**
-
-**Docker vs Vagrant:**
-- Lighter weight than full VMs
-- Faster startup times
-- Better resource utilization
-- Industry standard for containerization
-
-**Apache vs Nginx (Production):**
-- Broader hosting support
-- .htaccess flexibility
-- Simpler configuration for shared hosting
-- Trade-off: slightly lower performance than Nginx (negligible for Tkdo's scale)
-
-**Nginx for API (Development):**
-- Better FastCGI performance
-- Used in `slim-web` service for API in development
-- Matches production PHP-FPM setup
+**Note:** Detailed deployment procedures documentation is planned (see BACKLOG Task 2: Apache deployment guide).
 
 ### Build and Packaging
 
-**Build Script:** `build`
+**Strategy:** Single artifact deployment with pre-compiled assets.
 
-```bash
-#!/bin/bash
-# Build frontend
-docker compose up -d angular
-while [ ! -f front/dist/browser/index.html ]; do sleep 1; done
-docker compose stop angular
-
-# Install backend dependencies (production)
-./composer install --no-dev
-```
-
-**Packaging Script:** `apache-pack`
-
-```bash
-#!/bin/bash
-# Run build
-./build
-
-# Create tarball
-tar czf tkdo-$(git describe --always).tar.gz \
-    apache/ \
-    front/dist/ \
-    api/src/ \
-    api/public/ \
-    api/bin/ \
-    api/vendor/ \
-    api/*.prod
-```
-
-**Deployment Steps:**
-
-1. **Build Package:**
-   ```bash
-   ./apache-pack
-   # Creates: tkdo-v1.4.3.tar.gz
-   ```
-
-2. **Upload to Server:**
-   ```bash
-   scp tkdo-v1.4.3.tar.gz user@server:/var/www/
-   ```
-
-3. **Extract:**
-   ```bash
-   ssh user@server
-   cd /var/www
-   tar xzf tkdo-v1.4.3.tar.gz
-   ```
-
-4. **Configure Environment:**
-   ```bash
-   # If api/.env.prod was not already present when running apache-pack
-   # and therefore not included as api/.env in the tar.gz:
-   cp api/.env.prod api/.env
-   # Edit api/.env with database credentials, SMTP settings
-   ```
-
-5. **Generate Doctrine Proxies:**
-   ```bash
-   cd /var/www/api
-   ./composer.phar run doctrine -- orm:generate-proxies
-   ```
-
-6. **Run Migrations:**
-   ```bash
-   cd /var/www/api
-   ./composer.phar run doctrine -- migrations:migrate
-   ```
-
-7. **Create Admin Account:**
-   ```bash
-   cd /var/www/api
-   ./composer.phar run console -- fixtures --admin-email admin@example.com
-   ```
-
-8. **Set Permissions:**
-   ```bash
-   chmod -R 755 .
-   chmod -R 777 api/var/cache
-   ```
-
-9. **Setup Cron Job:**
-   ```bash
-   crontab -e
-   # Add: 0 6 * * * cd /var/www/api && ./composer.phar run console -- notif -p Q
-   ```
+**Build Process:**
+1. Build Angular frontend in Docker
+2. Install backend production dependencies (excludes dev tools)
+3. Create versioned tarball with all necessary files
 
 **Why This Packaging Strategy:**
 - **Single Artifact** - One tarball contains everything needed
@@ -1361,6 +869,8 @@ tar czf tkdo-$(git describe --always).tar.gz \
 - Manual deployment process (no CI/CD automation yet)
 - Requires SSH access to server
 - Database migrations must be run manually
+
+**Note:** Detailed build and packaging procedures documentation is planned (see BACKLOG Task 2: Apache deployment guide).
 
 ## Future Architectural Considerations
 

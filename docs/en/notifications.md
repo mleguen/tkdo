@@ -317,7 +317,7 @@ You can control how you receive gift idea notifications (types 5, 6, and 7 above
 
 ```bash
 curl -u $TOKEN: -X PUT https://tkdo.example.com/api/utilisateur/$USER_ID \
-  -d notifPref=Q
+  -d prefNotifIdees=Q
 ```
 
 Replace:
@@ -706,13 +706,13 @@ Check server logs for SMTP errors.
 curl -u $ADMIN_TOKEN: https://tkdo.example.com/api/utilisateur/$USER_ID
 ```
 
-Response includes `notifPref` field (N, I, or Q).
+Response includes `prefNotifIdees` field (N, I, or Q).
 
 **Changing user preferences:**
 
 ```bash
 curl -u $ADMIN_TOKEN: -X PUT https://tkdo.example.com/api/utilisateur/$USER_ID \
-  -d notifPref=Q
+  -d prefNotifIdees=Q
 ```
 
 **Default preference:** When creating users, set an appropriate default (recommend Q for most users).
@@ -751,7 +751,7 @@ curl -u $ADMIN_TOKEN: -X PUT https://tkdo.example.com/api/utilisateur/$USER_ID \
 curl -u $TOKEN: https://tkdo.example.com/api/utilisateur/$USER_ID
 
 # Update user preferences (API)
-curl -u $TOKEN: -X PUT https://tkdo.example.com/api/utilisateur/$USER_ID -d notifPref=Q
+curl -u $TOKEN: -X PUT https://tkdo.example.com/api/utilisateur/$USER_ID -d prefNotifIdees=Q
 ```
 
 ---
