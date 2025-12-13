@@ -59,58 +59,9 @@
 
 ## Documentation
 
-### Deployment Documentation
-
-**Task 1:** Create troubleshooting guide
-
-- **File:** `docs/en/troubleshooting.md`
-- **Content:**
-  - **Note:** This should become the SINGLE SOURCE for all troubleshooting
-  - Common issues and solutions:
-    - Login problems
-    - Email delivery issues (consolidate with notifications.md troubleshooting)
-    - Database connection errors
-    - Permission issues
-    - Session expiration
-    - Draw generation failures
-  - Development environment issues:
-    - Docker problems (consolidate with dev-setup.md troubleshooting)
-    - Container startup failures
-    - Port conflicts
-    - File permission issues in containers
-  - Production environment issues:
-    - Apache configuration problems
-    - .htaccess not working
-    - PHP version mismatches
-    - Missing PHP extensions
-    - Deployment-specific issues (consolidate with deployment-apache.md troubleshooting)
-  - Frontend issues:
-    - Build failures
-    - Test failures
-    - Browser compatibility
-  - Backend issues:
-    - Migration failures
-    - Doctrine proxy issues
-    - Composer dependency conflicts
-  - Getting help:
-    - Where to report bugs
-    - How to provide useful error reports
-    - Community resources
-- **Estimated size:** ~500-600 lines
-- **Note:** After completion:
-  - Remove troubleshooting sections from other docs and replace with cross-references
-  - Update all "coming soon" links to troubleshooting.md
-- **Post-completion cleanup required:**
-  - dev-setup.md: Replace troubleshooting section with cross-reference
-  - notifications.md: Replace troubleshooting section with cross-reference to specific anchors
-  - database.md: Update troubleshooting reference
-  - user-guide.md: Update troubleshooting reference
-  - admin-guide.md: Update troubleshooting reference
-  - frontend-dev.md: Update troubleshooting reference
-
 ### Documentation Infrastructure
 
-**Task 2:** Create documentation index and navigation
+**Task 1:** Create documentation index and navigation
 
 - **File:** `docs/en/INDEX.md`
 - **Content:**
@@ -127,7 +78,7 @@
 - **Estimated size:** ~100-150 lines
 - **Note:** After completion, check consistency with other documentation (remove "coming soon" links & duplicates, update cross-references)
 
-**Task 3:** Update main README.md with English content
+**Task 2:** Update main README.md with English content
 
 - **File:** `README.md`
 - **Action:** Keep only English versions
@@ -139,7 +90,7 @@
 - **Estimated size:** Additions of ~100-150 lines
 - **Note:** After completion, check consistency with other documentation (remove "coming soon" links & duplicates, update cross-references)
 
-**Task 4:** Create documentation writing guide
+**Task 3:** Create documentation writing guide
 
 - **File:** `docs/DOCUMENTATION-GUIDE.md`
 - **Content:**

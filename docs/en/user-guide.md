@@ -410,114 +410,7 @@ These notifications tell you when:
 
 ## Troubleshooting
 
-### Common Issues and Solutions
-
-#### Cannot Log In
-
-**Problem:** Login fails with "connexion impossible" or similar error
-
-**Solutions:**
-1. Verify username and password are correct (check for typos)
-2. Check caps lock isn't on
-3. If forgotten password, contact administrator for reset
-4. Clear browser cache and cookies, then try again
-5. Try a different browser
-
-#### Session Expired
-
-**Problem:** "Session expirée" message or automatic redirect to login
-
-**Why it happens:** Your session expires after a period of inactivity for security
-
-**Solution:**
-1. Simply log in again
-2. Your data is safe and preserved
-
-#### Cannot Delete Gift Idea
-
-**Problem:** No delete button or deletion fails
-
-**Possible reasons:**
-1. You're trying to delete someone else's idea (only delete your own)
-2. The idea was already deleted
-
-**Solution:**
-- Only delete ideas you personally suggested
-- Navigate to that participant's list to see delete buttons on your ideas
-
-#### Profile Changes Won't Save
-
-**Problem:** "Enregistrement impossible" or changes not persisting
-
-**Solutions:**
-1. Check all field validations:
-   - Name: minimum 3 characters
-   - Email: valid email format (user@domain.com)
-   - Password: minimum 8 characters
-   - Password confirmation: must match password
-2. Make sure you've changed at least one field
-3. Check for error messages indicating which field is invalid
-4. Try updating fewer fields at once
-5. Refresh the page and try again
-
-#### Notifications Not Received
-
-**Problem:** Expected emails aren't arriving
-
-**Solutions:**
-1. Verify email address in profile is correct
-2. Check spam/junk folder
-3. Ensure notification preference isn't set to "None" (N)
-4. For daily digest, wait until the scheduled send time
-5. Add Tkdo sender email to your contacts
-6. Contact administrator if problem persists
-
-#### Draw Assignment Not Showing
-
-**Problem:** Cannot see who you should give a gift to
-
-**Possible reasons:**
-1. Draw hasn't been performed yet (wait for administrator)
-2. Page needs refresh (F5)
-3. You're looking at the wrong occasion
-
-**Solution:**
-- Check your email for draw result notification
-- Go to the specific occasion via **Mes occasions**
-- Look at your participant card for assignment
-- Contact administrator if draw should have been done
-
-#### Page Displays Incorrectly
-
-**Problem:** Layout issues, missing buttons, strange formatting
-
-**Solutions:**
-1. Clear browser cache and cookies
-2. Hard refresh (Ctrl+F5 or Cmd+Shift+R)
-3. Update your browser to the latest version
-4. Try a different modern browser (Chrome, Firefox, Safari, Edge)
-5. Check if JavaScript is enabled in browser settings
-6. Disable browser extensions that might interfere
-
-### Getting Help
-
-If you encounter issues not covered here:
-
-1. **Check this guide** thoroughly
-2. **Contact your administrator** - they have additional tools and access
-3. **Report bugs** - help improve Tkdo by reporting issues to the development team
-4. **Document the problem** - note what you were doing, error messages, and steps to reproduce
-
-### Browser Compatibility
-
-Tkdo works best with modern browsers:
-- ✅ Chrome/Chromium (latest)
-- ✅ Firefox (latest)
-- ✅ Safari (latest)
-- ✅ Edge (latest)
-- ⚠️ Older browsers may have compatibility issues
-
-**Recommendation:** Keep your browser updated for the best experience and security.
+For common user issues (login problems, session expiration, profile updates, notifications, etc.), see the [Troubleshooting Guide - User Issues](troubleshooting.md#user-issues).
 
 ---
 
@@ -552,6 +445,6 @@ Tkdo works best with modern browsers:
 
 ---
 
-**Need more help?** Contact your administrator or refer to the [Troubleshooting Guide](troubleshooting.md) _(coming soon)_.
+**Need more help?** Contact your administrator or refer to the [Troubleshooting Guide](troubleshooting.md).
 
 **Happy gift exchanging!**

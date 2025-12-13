@@ -1073,7 +1073,7 @@ Now that you understand frontend development:
 
 ---
 
-**Need help?** Check the [Troubleshooting Guide](troubleshooting.md) *(coming soon)* or refer to:
+**Need help?** Check the [Troubleshooting Guide](troubleshooting.md) or refer to:
 - [Angular Documentation](https://angular.io/docs)
 - [Cypress Documentation](https://docs.cypress.io)
 - [Bootstrap Documentation](https://getbootstrap.com/docs)

@@ -599,4 +599,4 @@ All other variables will use defaults suitable for typical installations.
 - [Apache Deployment Guide](deployment-apache.md) - Detailed deployment instructions
 - [Development Setup Guide](dev-setup.md) - Local development environment
 - [Admin Guide](admin-guide.md) - Administration and configuration
-- [Troubleshooting Guide](troubleshooting.md) _(coming soon)_ - Common configuration issues
+- [Troubleshooting Guide](troubleshooting.md) - Common configuration issues
