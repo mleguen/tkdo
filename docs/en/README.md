@@ -253,7 +253,6 @@ Default credentials: `admin` / `admin` (change password immediately!)
 
 - [Apache Deployment Guide](deployment-apache.md)
 - [Environment Variables Reference](environment-variables.md)
-- [Backup & Maintenance Guide](maintenance.md) _(coming soon)_
 - [Troubleshooting Guide](troubleshooting.md) _(coming soon)_
 
 ### French Documentation

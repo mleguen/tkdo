@@ -963,7 +963,6 @@ SELECT 'exclusion', COUNT(*) FROM tkdo_exclusion;
 
 - [Backend/API Development Guide](./backend-dev.md) - Working with Doctrine ORM and entities
 - [Testing Guide](./testing.md) - Database testing strategies
-- [Maintenance Guide](./maintenance.md) _(coming soon)_ - Backup and recovery procedures
 - [Troubleshooting Guide](./troubleshooting.md) _(coming soon)_ - Resolving database issues
 
 ---

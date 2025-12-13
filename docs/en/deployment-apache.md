@@ -599,9 +599,8 @@ After successful deployment:
 
 1. **Test the application** - Create users, occasions, and gift ideas
 2. **Configure email notifications** - Verify SMTP settings work
-3. **Set up backups** - See [Maintenance Guide](maintenance.md) _(coming soon)_
-4. **Monitor logs** - Check for errors or issues
-5. **Plan for updates** - Review the [Admin Guide](admin-guide.md) for upgrade procedures
+3. **Monitor logs** - Check for errors or issues
+4. **Plan for updates** - Review the [Admin Guide](admin-guide.md) for upgrade procedures
 
 ---
 

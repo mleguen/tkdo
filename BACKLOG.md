@@ -61,42 +61,7 @@
 
 ### Deployment Documentation
 
-**Task 1:** Create backup and maintenance guide
-
-- **File:** `docs/en/maintenance.md`
-- **Content:**
-  - Database backup procedures:
-    - Using mysqldump
-    - Backup frequency recommendations
-    - Backup storage and retention
-  - Database restore procedures
-  - Application updates and upgrades:
-    - Update vs upgrade distinction
-    - Backing up before updates
-    - **Cross-reference to deployment-apache.md (Task 2)** for building new package
-    - **Cross-reference to deployment-apache.md (Task 2)** for deployment steps
-    - Running new migrations (quick reference with link to database.md)
-    - Testing after deployment
-  - Log file management:
-    - Where logs are stored
-    - Log rotation recommendations
-    - What to look for in logs
-  - Performance monitoring:
-    - Database query optimization
-    - Cache considerations
-  - Security updates:
-    - Keeping PHP updated
-    - Keeping dependencies updated
-    - Monitoring for vulnerabilities
-  - Disaster recovery procedures
-- **Estimated size:** ~300-400 lines
-- **Note:** After completion, check consistency with other documentation (remove "coming soon" links & duplicates, update cross-references)
-- **Anti-duplication notes:**
-  - Do NOT duplicate build/packaging procedures (reference deployment-apache.md)
-  - Do NOT duplicate deployment steps (reference deployment-apache.md)
-  - Keep focus on ongoing maintenance, not initial deployment
-
-**Task 2:** Create troubleshooting guide
+**Task 1:** Create troubleshooting guide
 
 - **File:** `docs/en/troubleshooting.md`
 - **Content:**
@@ -145,7 +110,7 @@
 
 ### Documentation Infrastructure
 
-**Task 3:** Create documentation index and navigation
+**Task 2:** Create documentation index and navigation
 
 - **File:** `docs/en/INDEX.md`
 - **Content:**
@@ -162,7 +127,7 @@
 - **Estimated size:** ~100-150 lines
 - **Note:** After completion, check consistency with other documentation (remove "coming soon" links & duplicates, update cross-references)
 
-**Task 4:** Update main README.md with English content
+**Task 3:** Update main README.md with English content
 
 - **File:** `README.md`
 - **Action:** Keep only English versions
@@ -174,7 +139,7 @@
 - **Estimated size:** Additions of ~100-150 lines
 - **Note:** After completion, check consistency with other documentation (remove "coming soon" links & duplicates, update cross-references)
 
-**Task 5:** Create documentation writing guide
+**Task 4:** Create documentation writing guide
 
 - **File:** `docs/DOCUMENTATION-GUIDE.md`
 - **Content:**
@@ -188,4 +153,7 @@
   - Reviewing documentation changes
   - Localization process (English as source, how to add other languages)
 - **Estimated size:** ~200-250 lines
-- **Note:** After completion, check consistency with other documentation (remove "coming soon" links & duplicates, update cross-references)
+- **Note:** After completion:
+  - Remove documentation guidelines from other docs (including in .claude folder) and replace with cross-references
+  - Check consistency with other documentation (remove "coming soon" links & duplicates, update cross-references)
+  - Check other documentation stricly follow the guidelines defined in this new documentation guide
