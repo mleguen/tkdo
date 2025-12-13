@@ -36,12 +36,14 @@ php -m | grep -E '(dom|mbstring|pdo_mysql|zip)'
 ```
 
 **Required extensions:**
+
 - `dom` - For XML/HTML processing
 - `mbstring` - For multibyte string handling
 - `pdo_mysql` - For MySQL database connection
 - `zip` - For handling compressed files
 
 **Installation example (Debian/Ubuntu):**
+
 ```bash
 sudo apt-get install php8.4 php8.4-dom php8.4-mbstring php8.4-mysql php8.4-zip
 ```
@@ -59,6 +61,7 @@ sudo systemctl restart apache2
 The installation directory must allow `.htaccess` files to override Apache configuration.
 
 **Apache configuration:**
+
 ```apache
 <Directory /var/www/tkdo>
     AllowOverride All
@@ -80,6 +83,7 @@ If you need to test without HTTPS (not recommended for production), comment out 
 #### Installation Directory Requirements
 
 The default configuration assumes:
+
 - The installation directory is the **document root** of the Apache virtual host
 - Example: `/var/www/tkdo` is the DocumentRoot
 
@@ -104,48 +108,32 @@ Tkdo is configured using environment variables. You have two options for setting
 
 ### Creating api/.env.prod
 
-Create a file at `api/.env.prod` with your production settings:
+Create a file at `api/.env.prod` with your production settings. At minimum:
 
 ```bash
-# MySQL database connection
-MYSQL_HOST=localhost
-MYSQL_PORT=3306
-MYSQL_DATABASE=tkdo
-MYSQL_USER=tkdo_user
-MYSQL_PASSWORD=secure_password_here
-
-# Application base URL (used in emails and links)
+# api/.env.prod
+MYSQL_PASSWORD=your_secure_password_here
 TKDO_BASE_URI=https://tkdo.example.com
-
-# API base path (usually /api or empty)
-TKDO_API_BASE_PATH=/api
-
-# Development mode (0 for production)
 TKDO_DEV_MODE=0
-
-# Email sender address (optional)
-# If not set, defaults to noreply@your-domain.com
-TKDO_MAILER_FROM=Tkdo <noreply@example.com>
 ```
+
+**For complete configuration examples with all available variables**, see [Environment Variables Reference - Method 1: .env File](environment-variables.md#method-1-env-file-recommended).
 
 **Security note:** The `api/.env.prod` file will be automatically included in the installation package when you run `./apache-pack`.
 
 ### Setting Environment Variables in Apache
 
-Alternatively, set variables in your Apache configuration:
+Alternatively, set variables in your Apache virtual host configuration using `SetEnv` directives:
 
 ```apache
 <VirtualHost *:443>
     ServerName tkdo.example.com
     DocumentRoot /var/www/tkdo
 
-    SetEnv MYSQL_HOST "localhost"
-    SetEnv MYSQL_DATABASE "tkdo"
-    SetEnv MYSQL_USER "tkdo_user"
     SetEnv MYSQL_PASSWORD "secure_password_here"
     SetEnv TKDO_BASE_URI "https://tkdo.example.com"
-    SetEnv TKDO_API_BASE_PATH "/api"
     SetEnv TKDO_DEV_MODE "0"
+    # ... other variables as needed
 
     # SSL configuration
     SSLEngine on
@@ -154,14 +142,7 @@ Alternatively, set variables in your Apache configuration:
 </VirtualHost>
 ```
 
-### Environment Variables Reference
-
-For complete documentation of all available environment variables, their default values, and security considerations, see the [Environment Variables Reference](environment-variables.md) *(coming soon)*.
-
-Key variables you should configure:
-- **MYSQL_*** - Database connection settings
-- **TKDO_BASE_URI** - Your application's public URL
-- **TKDO_MAILER_FROM** - Email sender address
+**For complete Apache configuration examples and all available variables**, see [Environment Variables Reference - Method 2: Apache Environment Variables](environment-variables.md#method-2-apache-environment-variables).
 
 ## Building the Installation Package
 
@@ -185,11 +166,13 @@ This script performs the following steps:
 The installation package contains:
 
 **Frontend assets:**
+
 - Compiled Angular application
 - Static assets (images, fonts, etc.)
 - Optimized JavaScript bundles
 
 **Backend files:**
+
 - PHP source code (`api/src/`)
 - Public entry point (`api/public/`)
 - CLI tools (`api/bin/`)
@@ -197,11 +180,13 @@ The installation package contains:
 - Database migrations (`api/migrations/`)
 
 **Configuration:**
+
 - `.htaccess` file for Apache routing
 - `api/.env.prod` (if you created it)
 - Authentication keys (`api/var/auth/`)
 
 **Not included:**
+
 - Development dependencies
 - Source maps
 - Test files
@@ -279,6 +264,7 @@ cd /var/www/tkdo/api
 ```
 
 **Expected output:**
+
 ```
 Processing entity "App\Appli\ModelAdaptor\UtilisateurAdaptor"
 Processing entity "App\Appli\ModelAdaptor\OccasionAdaptor"
@@ -299,6 +285,7 @@ cd /var/www/tkdo/api
 ```
 
 **Expected output:**
+
 ```
 WARNING! You are about to execute a migration that could result in schema changes and data loss.
 Are you sure you wish to continue? (yes/no) [yes]:
@@ -337,10 +324,12 @@ cd /var/www/tkdo/api
 ```
 
 **Arguments:**
+
 - `--admin-email` - (Optional) Administrator's email address
   - If omitted, uses `admin@your-domain.com` (derived from `TKDO_BASE_URI`)
 
 **Expected output:**
+
 ```
 Initialisation ou réinitialisation de la base de données (production)...
 Utilisateurs créés.
@@ -354,6 +343,7 @@ OK
 **Note:** In production mode, only the admin account is actually created. The other fixture messages appear but no sample data is created (no sample occasions, ideas, or other users). Sample data is only created in development mode.
 
 **Default credentials:**
+
 - **Username:** `admin`
 - **Password:** `admin`
 
@@ -384,6 +374,7 @@ Add to your crontab:
 For complete documentation on notification types, preferences, and cron configuration, see [Email Notifications Reference - For Administrators](notifications.md#for-administrators).
 
 **Key points:**
+
 - Daily digest is sent to users who selected "Daily" notification preference
 - Only includes changes from the last 24 hours
 - Only for upcoming occasions
@@ -406,6 +397,7 @@ cd /var/www/tkdo/api
 ### Choosing the Right Time
 
 Recommended times for daily digest:
+
 - **6:00 AM** - Early morning before users check email
 - **8:00 AM** - During morning email check
 - **9:00 PM** - Evening summary
@@ -414,7 +406,7 @@ Choose based on your users' timezone and email habits.
 
 ## Troubleshooting Deployment Issues
 
-This section covers deployment-specific problems. For general troubleshooting, see the [Troubleshooting Guide](troubleshooting.md) *(coming soon)*.
+This section covers deployment-specific problems. For general troubleshooting, see the [Troubleshooting Guide](troubleshooting.md) _(coming soon)_.
 
 ### SSH Access Issues
 
@@ -433,6 +425,7 @@ This section covers deployment-specific problems. For general troubleshooting, s
 **Problem:** The `php` command runs PHP CGI or old PHP version (PHP 5.x).
 
 **Symptoms:**
+
 ```bash
 $ php -v
 PHP 5.6.40 (cgi-fcgi) (built: Jan 8 2019)
@@ -449,11 +442,13 @@ Use `phpinfo()` to find the PHP CLI binary:
 ```
 
 Look for:
+
 - **Server API:** Should be "CLI" not "CGI/FastCGI"
 - **PHP Version:** Should be 8.4.x
 - **Loaded Configuration File:** Note the path
 
 Common locations for PHP 8.4 CLI:
+
 - `/usr/bin/php8.4`
 - `/usr/local/bin/php84`
 - `/usr/local/php8.4/bin/php`
@@ -488,6 +483,7 @@ Once you've found the correct PHP binary, use it instead of the Composer scripts
 ```
 
 **What `-n` does:**
+
 - Doesn't load php.ini configuration
 - Uses PHP's compiled-in defaults
 - Allows seeing exceptions even if display_errors is off
@@ -497,6 +493,7 @@ Once you've found the correct PHP binary, use it instead of the Composer scripts
 **Problem:** Required PHP extensions are not installed.
 
 **Check installed extensions:**
+
 ```bash
 php -m
 ```
@@ -506,6 +503,7 @@ php -m
 See the [Prerequisites](#php-84-with-required-extensions) section above for installation instructions.
 
 **Quick reference:**
+
 - Shared hosting: Contact your provider or use control panel (cPanel, Plesk)
 - VPS/Dedicated: Install extensions using your package manager (apt, yum, etc.)
 
@@ -514,17 +512,20 @@ See the [Prerequisites](#php-84-with-required-extensions) section above for inst
 **Problem:** Cannot connect to MySQL database.
 
 **Check:**
+
 1. MySQL service is running
 2. Database and user exist
 3. User has correct permissions
 4. Host/port are correct in environment variables
 
 **Test connection:**
+
 ```bash
 mysql -h localhost -u tkdo_user -p tkdo
 ```
 
 **Grant permissions:**
+
 ```sql
 GRANT ALL PRIVILEGES ON tkdo.* TO 'tkdo_user'@'localhost' IDENTIFIED BY 'password';
 FLUSH PRIVILEGES;
@@ -535,6 +536,7 @@ FLUSH PRIVILEGES;
 **Problem:** Apache cannot read files or write to cache.
 
 **Solution:**
+
 ```bash
 # Set correct ownership
 sudo chown -R www-data:www-data /var/www/tkdo
@@ -553,11 +555,13 @@ chmod -R 775 /var/www/tkdo/api/var/doctrine
 **Problem:** Routes don't work, getting 404 errors.
 
 **Check:**
+
 1. `mod_rewrite` is enabled
 2. `AllowOverride All` is set for the directory
 3. `.htaccess` file exists in installation root
 
 **Verify .htaccess is loaded:**
+
 ```bash
 # Temporarily add invalid directive to .htaccess
 echo "InvalidDirective" >> .htaccess
@@ -595,13 +599,14 @@ After successful deployment:
 
 1. **Test the application** - Create users, occasions, and gift ideas
 2. **Configure email notifications** - Verify SMTP settings work
-3. **Set up backups** - See [Maintenance Guide](maintenance.md) *(coming soon)*
+3. **Set up backups** - See [Maintenance Guide](maintenance.md) _(coming soon)_
 4. **Monitor logs** - Check for errors or issues
 5. **Plan for updates** - Review the [Admin Guide](admin-guide.md) for upgrade procedures
 
 ---
 
 **Need more help?**
-- [Troubleshooting Guide](troubleshooting.md) *(coming soon)* - Comprehensive problem-solving guide
+
+- [Troubleshooting Guide](troubleshooting.md) _(coming soon)_ - Comprehensive problem-solving guide
 - [Admin Guide](admin-guide.md) - Administration and user management
-- [Environment Variables Reference](environment-variables.md) *(coming soon)* - Complete variable documentation
+- [Environment Variables Reference](environment-variables.md) - Complete variable documentation

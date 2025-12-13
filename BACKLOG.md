@@ -3,11 +3,13 @@
 ## Features & Enhancements
 
 ### UI/UX Improvements
+
 - Sort participants alphabetically
 - Properly truncate participant names that are too long
 - Separate PageOccasionComponent/OccasionComponent/ParticipantComponent following the model of PageIdeesComponent/ListeIdeesComponent/IdeeComponent
 
 ### Ideas & Comments Features
+
 - Add to a participant's card the count of ideas proposed for them (only count readable ideas)
 - Add the ability to comment on an idea by clicking on its card (only show own comments for own ideas)
 - Display on an idea card the number of comments made (only count readable comments)
@@ -15,24 +17,29 @@
 - Add the ability to edit the title of an idea or a comment (for its author only)
 
 ### User Management
+
 - Add the ability to disable a user account (still present in DB for history, but no longer usable)
 
 ### Admin Routes
+
 - Add an admin route to cancel a draw
 - Add an admin route to remove a user from an occasion
 - Add an admin route to remove an exclusion
 - Add an admin route to delete an occasion (if no draw or draw removed)
 
 ### Email Customization
+
 - Make email signatures customizable to make them less "machine-like"
 
 ## Technical Improvements
 
 ### API enhancement
+
 - switch to JSON+HAL, to decouple front and API: front would no longer have to build routes, or decide which actions are possible,
   as possible actions with their routes will already be provided with the state
 
 ### Dependencies & Security
+
 - Upgrade Angular version (>= 20) to fix moderate vulnerabilities
 - Make a PR in rpkamp/mailhog-client to fix deprecation "str_getcsv(): the $escape parameter must be provided as its default value will change"
 - add a unique random slug to each entity, and use them in routes instead of ids to make it more difficult to forge routes
@@ -41,33 +48,21 @@
 - Implement a backup strategy
 
 ### Infrastructure & Deployment
+
 - AWS serverless support with Ansible, and 2 dev/prod stacks
 - Replace apache-pack with a proper build tool or remove it completely
 
 ### Code Quality & Database
+
 - Rename fixtures to install, and provide a default admin email (the admin can then modify it themselves)
 - Remove "doctrine" from auto-generated column names in database
 
 ## Documentation
 
 ### Deployment Documentation
-**Task 1:** Create environment variables reference
-- **File:** `docs/en/environment-variables.md`
-- **Content:**
-  - Reading current `api/.env` file
-  - Documenting each variable:
-    - TKDO_BASE_URI: Application base URL, usage, examples
-    - Database connection variables: host, port, name, user, password
-    - TKDO_MAILER_*: Mailer configuration (SMTP settings, from address)
-    - Any other variables found in .env
-  - Which variables are required vs optional
-  - Default values
-  - Development vs production differences
-  - Security considerations (never commit .env files with secrets)
-- **Estimated size:** ~200-300 lines
-- **Note:** After completion, check consistency with other documentation (remove "coming soon" links, update cross-references)
 
-**Task 2:** Create backup and maintenance guide
+**Task 1:** Create backup and maintenance guide
+
 - **File:** `docs/en/maintenance.md`
 - **Content:**
   - Database backup procedures:
@@ -95,13 +90,14 @@
     - Monitoring for vulnerabilities
   - Disaster recovery procedures
 - **Estimated size:** ~300-400 lines
-- **Note:** After completion, check consistency with other documentation (remove "coming soon" links, update cross-references)
+- **Note:** After completion, check consistency with other documentation (remove "coming soon" links & duplicates, update cross-references)
 - **Anti-duplication notes:**
   - Do NOT duplicate build/packaging procedures (reference deployment-apache.md)
   - Do NOT duplicate deployment steps (reference deployment-apache.md)
   - Keep focus on ongoing maintenance, not initial deployment
 
-**Task 3:** Create troubleshooting guide
+**Task 2:** Create troubleshooting guide
+
 - **File:** `docs/en/troubleshooting.md`
 - **Content:**
   - **Note:** This should become the SINGLE SOURCE for all troubleshooting
@@ -148,7 +144,9 @@
   - frontend-dev.md: Update troubleshooting reference
 
 ### Documentation Infrastructure
-**Task 4:** Create documentation index and navigation
+
+**Task 3:** Create documentation index and navigation
+
 - **File:** `docs/en/INDEX.md`
 - **Content:**
   - Welcome message
@@ -162,9 +160,10 @@
   - How to contribute to documentation
   - Documentation versioning strategy
 - **Estimated size:** ~100-150 lines
-- **Note:** After completion, check consistency with other documentation (remove "coming soon" links, update cross-references)
+- **Note:** After completion, check consistency with other documentation (remove "coming soon" links & duplicates, update cross-references)
 
-**Task 5:** Update main README.md with English content
+**Task 4:** Update main README.md with English content
+
 - **File:** `README.md`
 - **Action:** Keep only English versions
 - **Content:**
@@ -173,9 +172,10 @@
   - Remove existing French content
   - Add table of contents
 - **Estimated size:** Additions of ~100-150 lines
-- **Note:** After completion, check consistency with other documentation (remove "coming soon" links, update cross-references)
+- **Note:** After completion, check consistency with other documentation (remove "coming soon" links & duplicates, update cross-references)
 
-**Task 6:** Create documentation writing guide
+**Task 5:** Create documentation writing guide
+
 - **File:** `docs/DOCUMENTATION-GUIDE.md`
 - **Content:**
   - Documentation philosophy and principles
@@ -188,4 +188,4 @@
   - Reviewing documentation changes
   - Localization process (English as source, how to add other languages)
 - **Estimated size:** ~200-250 lines
-- **Note:** After completion, check consistency with other documentation (remove "coming soon" links, update cross-references)
+- **Note:** After completion, check consistency with other documentation (remove "coming soon" links & duplicates, update cross-references)

@@ -31,22 +31,26 @@ The application ensures fairness with exclusion rules (e.g., prevent spouses fro
 ### For Regular Users
 
 - **User Account Management**
+
   - Personal profile with name, email, and password
   - Customizable notification preferences (instant, daily digest, or none)
   - Secure authentication with token-based sessions
 
 - **Occasion Participation**
+
   - View upcoming and past occasions you're part of
   - See other participants in each occasion
   - Automatic display of next upcoming occasion at login
 
 - **Gift Ideas Management**
+
   - Add gift ideas for other participants
   - Edit or delete your own ideas
   - View ideas others suggested (except ideas for you)
   - Soft delete (ideas marked deleted, not removed from database)
 
 - **Draw Results**
+
   - See who you should give a gift to (after draw is performed)
   - Cannot see who draws you (keeps the surprise)
 
@@ -60,22 +64,26 @@ The application ensures fairness with exclusion rules (e.g., prevent spouses fro
 ### For Administrators
 
 - **User Management**
+
   - Create user accounts
   - View and modify user profiles
   - Reset user passwords
   - (Planned: Disable user accounts)
 
 - **Occasion Management**
+
   - Create occasions with dates
   - Add participants to occasions
   - Modify occasion details
   - View all occasions in the system
 
 - **Exclusion Management**
+
   - Define who cannot draw whom (e.g., couples, siblings)
   - View and create exclusions for each occasion
 
 - **Draw Management**
+
   - Trigger automatic random draw generation
   - Draw algorithm respects exclusions
   - (Planned: Cancel draws, remove participants/occasions)
@@ -119,12 +127,14 @@ graph TB
 ### Architecture Principles
 
 **Frontend:**
+
 - **Single Page Application** - Fast, responsive user experience
 - **Component-based** - Reusable, testable UI components
 - **Interceptors** - Handle authentication tokens and development mocking
 - **Routing** - Client-side navigation without full page reloads
 
 **Backend:**
+
 - **Hexagonal Architecture** - Clear separation of concerns:
   - **Domain** (`Dom`) - Business logic and entities
   - **Application** (`Appli`) - Controllers, services, use cases
@@ -134,6 +144,7 @@ graph TB
 - **Dependency Injection** - PHP-DI for loose coupling
 
 **Database:**
+
 - **Relational Model** - Normalized schema with foreign keys
 - **Migrations** - Version-controlled schema changes with Doctrine
 - **Soft Deletes** - Gift ideas marked as deleted but preserved
@@ -143,45 +154,45 @@ graph TB
 
 ### Frontend
 
-| Technology | Version | Purpose |
-|------------|---------|---------|
-| **Angular** | 17.3 | Web framework |
-| **TypeScript** | 5.4 | Programming language |
-| **Bootstrap** | 5.3 | UI framework and styling |
-| **RxJS** | 7.8 | Reactive programming |
-| **Cypress** | latest | E2E and component testing |
-| **Jasmine/Karma** | 5.1/6.4 | Unit testing |
+| Technology        | Version | Purpose                   |
+| ----------------- | ------- | ------------------------- |
+| **Angular**       | 17.3    | Web framework             |
+| **TypeScript**    | 5.4     | Programming language      |
+| **Bootstrap**     | 5.3     | UI framework and styling  |
+| **RxJS**          | 7.8     | Reactive programming      |
+| **Cypress**       | latest  | E2E and component testing |
+| **Jasmine/Karma** | 5.1/6.4 | Unit testing              |
 
 ### Backend
 
-| Technology | Version | Purpose |
-|------------|---------|---------|
-| **PHP** | 8.4 | Programming language |
-| **Slim Framework** | 4.10 | Micro web framework |
-| **Doctrine ORM** | 2.17 | Object-relational mapping |
-| **Doctrine Migrations** | 3.4 | Database schema versioning |
-| **Firebase JWT** | 6.4 | Token-based authentication |
-| **Monolog** | 2.9 | Logging |
-| **PHP-DI** | 7.0 | Dependency injection |
-| **PHPUnit** | 11.5 | Testing framework |
-| **PHPStan** | 2.1 | Static analysis |
+| Technology              | Version | Purpose                    |
+| ----------------------- | ------- | -------------------------- |
+| **PHP**                 | 8.4     | Programming language       |
+| **Slim Framework**      | 4.10    | Micro web framework        |
+| **Doctrine ORM**        | 2.17    | Object-relational mapping  |
+| **Doctrine Migrations** | 3.4     | Database schema versioning |
+| **Firebase JWT**        | 6.4     | Token-based authentication |
+| **Monolog**             | 2.9     | Logging                    |
+| **PHP-DI**              | 7.0     | Dependency injection       |
+| **PHPUnit**             | 11.5    | Testing framework          |
+| **PHPStan**             | 2.1     | Static analysis            |
 
 ### Database
 
-| Technology | Version | Purpose |
-|------------|---------|---------|
-| **MySQL** | 5.7+ | Relational database |
+| Technology | Version | Purpose             |
+| ---------- | ------- | ------------------- |
+| **MySQL**  | 5.7+    | Relational database |
 
 ### Development & Deployment
 
-| Technology | Version | Purpose |
-|------------|---------|---------|
-| **Docker** | latest | Development environment |
-| **Docker Compose** | latest | Multi-container orchestration |
-| **Apache** | 2.4+ | Production web server |
-| **Node.js** | latest LTS | Frontend build tools |
-| **Composer** | latest | PHP dependency management |
-| **npm** | latest | JavaScript package manager |
+| Technology         | Version    | Purpose                       |
+| ------------------ | ---------- | ----------------------------- |
+| **Docker**         | latest     | Development environment       |
+| **Docker Compose** | latest     | Multi-container orchestration |
+| **Apache**         | 2.4+       | Production web server         |
+| **Node.js**        | latest LTS | Frontend build tools          |
+| **Composer**       | latest     | PHP dependency management     |
+| **npm**            | latest     | JavaScript package manager    |
 
 ## Getting Started
 
@@ -205,6 +216,7 @@ graph TB
 4. Access the application at http://localhost:8080
 
 For detailed setup instructions, see:
+
 - [Development Setup Guide](dev-setup.md)
 - [Apache Deployment Guide](deployment-apache.md)
 
@@ -221,11 +233,13 @@ Default credentials: `admin` / `admin` (change password immediately!)
 ## Documentation
 
 ### User Documentation
+
 - [User Guide](user-guide.md) - For regular users
 - [Administrator Guide](admin-guide.md) - For administrators
 - [Email Notifications Reference](notifications.md)
 
 ### Developer Documentation
+
 - [Development Environment Setup](dev-setup.md)
 - [Frontend Development Guide](frontend-dev.md)
 - [Backend/API Development Guide](backend-dev.md)
@@ -236,12 +250,14 @@ Default credentials: `admin` / `admin` (change password immediately!)
 - [Contributing Guidelines](CONTRIBUTING.md)
 
 ### Deployment Documentation
+
 - [Apache Deployment Guide](deployment-apache.md)
-- [Environment Variables Reference](environment-variables.md) _(coming soon)_
+- [Environment Variables Reference](environment-variables.md)
 - [Backup & Maintenance Guide](maintenance.md) _(coming soon)_
 - [Troubleshooting Guide](troubleshooting.md) _(coming soon)_
 
 ### French Documentation
+
 - [README (Français)](../../README.md)
 - [Guide du développeur (Français)](../../CONTRIBUTING.md)
 - [Historique des changements (Français)](../../CHANGELOG.md)
@@ -251,12 +267,15 @@ Default credentials: `admin` / `admin` (change password immediately!)
 **Current Version:** 1.4.3 (April 2025)
 
 ### Recent Changes
+
 - PHP 8.4 and Slim 4.10 upgrade
 - Security fixes for frontend dependencies
 - Bug fixes for notification system
 
 ### Upcoming Features
+
 See [BACKLOG.md](../../BACKLOG.md) for planned features and improvements, including:
+
 - Angular 20+ upgrade
 - MySQL 8 migration
 - Enhanced participant management
@@ -266,6 +285,7 @@ See [BACKLOG.md](../../BACKLOG.md) for planned features and improvements, includ
 ### Contributing
 
 Contributions are welcome! This project follows:
+
 - Conventional Commits for commit messages
 - PSR standards for PHP code
 - Angular style guide for TypeScript
