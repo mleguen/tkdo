@@ -4,6 +4,7 @@
 
 ### Contributors
 - **Documentation:**
+  - Create documentation index and navigation (docs/en/INDEX.md) organizing all documentation by category with quick reference paths by user role
   - Create comprehensive troubleshooting guide (docs/en/troubleshooting.md) consolidating all troubleshooting content into single source covering user issues, administrator issues, email notifications, development environment, production deployment, frontend, and backend problems
   - Create backend/API development guide (docs/en/backend-dev.md) with hexagonal architecture documentation
   - Create database documentation (docs/en/database.md) with schema diagrams, entity descriptions, and migration workflows

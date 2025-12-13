@@ -61,24 +61,7 @@
 
 ### Documentation Infrastructure
 
-**Task 1:** Create documentation index and navigation
-
-- **File:** `docs/en/INDEX.md`
-- **Content:**
-  - Welcome message
-  - Documentation structure overview
-  - Links to all documentation files organized by category:
-    - Getting Started
-    - User Documentation
-    - Developer Documentation
-    - Deployment Documentation
-  - How to navigate the documentation
-  - How to contribute to documentation
-  - Documentation versioning strategy
-- **Estimated size:** ~100-150 lines
-- **Note:** After completion, check consistency with other documentation (remove "coming soon" links & duplicates, update cross-references)
-
-**Task 2:** Update main README.md with English content
+**Task 1:** Update main README.md with English content
 
 - **File:** `README.md`
 - **Action:** Keep only English versions
@@ -90,7 +73,7 @@
 - **Estimated size:** Additions of ~100-150 lines
 - **Note:** After completion, check consistency with other documentation (remove "coming soon" links & duplicates, update cross-references)
 
-**Task 3:** Create documentation writing guide
+**Task 2:** Create documentation writing guide
 
 - **File:** `docs/DOCUMENTATION-GUIDE.md`
 - **Content:**
