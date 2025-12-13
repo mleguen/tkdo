@@ -255,12 +255,6 @@ Default credentials: `admin` / `admin` (change password immediately!)
 - [Environment Variables Reference](environment-variables.md)
 - [Troubleshooting Guide](troubleshooting.md)
 
-### French Documentation
-
-- [README (Français)](../../README.md)
-- [Guide du développeur (Français)](../../CONTRIBUTING.md)
-- [Historique des changements (Français)](../../CHANGELOG.md)
-
 ## Project Status
 
 **Current Version:** 1.4.3 (April 2025)

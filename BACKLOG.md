@@ -61,19 +61,7 @@
 
 ### Documentation Infrastructure
 
-**Task 1:** Update main README.md with English content
-
-- **File:** `README.md`
-- **Action:** Keep only English versions
-- **Content:**
-  - Brief project description in English
-  - Link to English documentation (`docs/en/INDEX.md`)
-  - Remove existing French content
-  - Add table of contents
-- **Estimated size:** Additions of ~100-150 lines
-- **Note:** After completion, check consistency with other documentation (remove "coming soon" links & duplicates, update cross-references)
-
-**Task 2:** Create documentation writing guide
+**Task 1:** Create documentation writing guide
 
 - **File:** `docs/DOCUMENTATION-GUIDE.md`
 - **Content:**
