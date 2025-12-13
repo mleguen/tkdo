@@ -206,7 +206,7 @@ graph TB
 
 For detailed setup instructions, see:
 - [Development Setup Guide](dev-setup.md)
-- [Apache Deployment Guide](deployment-apache.md) _(coming soon)_
+- [Apache Deployment Guide](deployment-apache.md)
 
 ### First Admin Account
 
@@ -236,7 +236,7 @@ Default credentials: `admin` / `admin` (change password immediately!)
 - [Contributing Guidelines](CONTRIBUTING.md)
 
 ### Deployment Documentation
-- [Apache Deployment Guide](deployment-apache.md) _(coming soon)_
+- [Apache Deployment Guide](deployment-apache.md)
 - [Environment Variables Reference](environment-variables.md) _(coming soon)_
 - [Backup & Maintenance Guide](maintenance.md) _(coming soon)_
 - [Troubleshooting Guide](troubleshooting.md) _(coming soon)_
