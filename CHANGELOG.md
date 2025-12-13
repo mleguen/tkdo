@@ -4,17 +4,13 @@
 
 ### Contributors
 - **Documentation:**
-  - Add documentation consolidation task to backlog to address redundancies and inconsistencies before creating more documentation
   - Create backend/API development guide (docs/en/backend-dev.md) with hexagonal architecture documentation
   - Create database documentation (docs/en/database.md) with schema diagrams, entity descriptions, and migration workflows
   - Create testing guide (docs/en/testing.md) covering frontend, backend, and E2E testing strategies
   - Create API reference (docs/en/api-reference.md) with complete endpoint documentation and curl examples
   - Create architecture and design decisions documentation (docs/en/architecture.md) covering system architecture, frontend/backend design rationale, database design decisions, authentication strategy, email notification system, and deployment architecture
   - Create contributing guidelines (docs/en/CONTRIBUTING.md) with development workflow, coding standards, testing requirements, commit conventions, pull request process, and release procedures
-  - Consolidate and streamline all English documentation (docs/en/) to remove redundancies and establish clear single sources of truth for each topic
-  - Fix terminology inconsistency in notifications.md: change `notifPref` to `prefNotifIdees` to match actual API parameter name
-  - Update BACKLOG documentation tasks to prevent duplication (added cross-references and anti-duplication notes)
-  - Fix inaccurate "coming soon" reference to CONTRIBUTING.md in README.md (document already exists)
+  - Consolidate and streamline all English documentation (docs/en/) to remove inconsistency & redundancies and establish clear single sources of truth for each topic
 - **Project Configuration:**
   - Add Mermaid diagram quality standards (high contrast colors, readability, proper layouts)
 
@@ -36,7 +32,6 @@
   - Create frontend development guide (docs/en/frontend-dev.md)
   - Translate changelog from French to English with audience/scope grouping structure
   - Fix PHP version mention in documentation (PHP 8.4, not PHP 7)
-  - Add consistency check note to all remaining documentation tasks in backlog
 - **Project Configuration:**
   - Add commit conventions for Claude Code (Conventional Commits format, English, attribution)
   - Add preference requiring Mermaid diagrams for all technical diagrams

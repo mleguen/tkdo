@@ -754,6 +754,20 @@ Add database migration for user notification preferences."
 - Use past tense ("Added feature", not "Add feature")
 - Be concise but descriptive
 
+**What NOT to mention in CHANGELOG:**
+
+Do not mention routine BACKLOG/CHANGELOG maintenance that is standard documentation procedure:
+- Removing completed tasks from BACKLOG.md
+- Renumbering remaining tasks after removal
+- Updating cross-references or "coming soon" links
+- Adding anti-duplication notes to tasks
+
+**DO mention** significant changes to BACKLOG/CHANGELOG themselves:
+- Translating BACKLOG or CHANGELOG to another language
+- Creating whole new sections with many tasks
+- Restructuring organization or format
+- Establishing new guidelines or processes
+
 ### BACKLOG.md Management
 
 **When to update:**
