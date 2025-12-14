@@ -15,8 +15,22 @@
   - Create architecture and design decisions documentation (docs/en/architecture.md) covering system architecture, frontend/backend design rationale, database design decisions, authentication strategy, email notification system, and deployment architecture
   - Create contributing guidelines (docs/en/CONTRIBUTING.md) with development workflow, coding standards, testing requirements, commit conventions, pull request process, and release procedures
   - Consolidate and streamline all English documentation (docs/en/) to remove inconsistency & redundancies and establish clear single sources of truth for each topic
+  - Update frontend development guide (docs/en/frontend-dev.md) with Angular v21 technology stack versions and common issues during major Angular upgrades
+  - Document Dart Sass 3.0.0 deprecation warnings in BACKLOG.md with specific actionable items for liste-idees component styles and monitoring tasks for Bootstrap compatibility
 - **Project Configuration:**
   - Add Mermaid diagram quality standards (high contrast colors, readability, proper layouts)
+- **Technical Tasks:**
+  - Upgrade Angular from v17.3 to v21.0 to address critical security vulnerabilities
+  - Upgrade esbuild from 0.17.x to 0.26.0 (included in @angular/devkit/build-angular v21.0.3) to fix critical arbitrary file read vulnerability (CVE affecting <=0.24.2)
+  - Upgrade TypeScript from 5.4 to 5.9
+  - Upgrade @ng-bootstrap/ng-bootstrap from v16.0 to v20.0
+  - Upgrade @angular-eslint packages from v17.3 to v21.1 to fix moderate severity vulnerabilities via nx dependency and tmp symbolic link attack (GHSA-52f5-9888-hmc6)
+  - Apply Angular automatic migrations including inject() function pattern and block control flow syntax
+  - Update all component test files to use provideHttpClientTesting() instead of deprecated HttpClientTestingModule
+  - Update app.config.ts to use provideHttpClient(withInterceptorsFromDi()) instead of deprecated HttpClientModule
+  - Fix deprecated HttpErrorResponse.statusText usage for HTTP/2 compatibility
+  - Fix integration test whitespace assertion to handle Angular v21 block control flow whitespace preservation
+  - Fix integration test console.log spy timing issue to ensure console is available before spying on it
 
 ## V1.4.4 (December 8, 2025)
 

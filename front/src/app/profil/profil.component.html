@@ -4,9 +4,11 @@
   <div class="form-group">
     <label for="nom">Nom :</label>
     <input id="nom" type="text" formControlName="nom" class="form-control" />
-    <div *ngIf="nom.errors?.['minlength']" class="alert alert-danger">
-      Le nom doit avoir une longueur d'au moins 3 caractères.
-    </div>
+    @if (nom.errors?.["minlength"]) {
+      <div class="alert alert-danger">
+        Le nom doit avoir une longueur d'au moins 3 caractères.
+      </div>
+    }
   </div>
 
   <div class="form-group">
@@ -17,9 +19,9 @@
       formControlName="email"
       class="form-control"
     />
-    <div *ngIf="email.errors?.['email']" class="alert alert-danger">
-      E-mail invalide.
-    </div>
+    @if (email.errors?.["email"]) {
+      <div class="alert alert-danger">E-mail invalide.</div>
+    }
   </div>
 
   <div class="form-group">
@@ -66,9 +68,12 @@
         autocomplete="off"
         class="form-control"
       />
-      <div *ngIf="mdp.errors?.['minlength']" class="alert alert-danger">
-        Le nouveau mot de passe doit avoir une longueur d'au moins 8 caractères.
-      </div>
+      @if (mdp.errors?.["minlength"]) {
+        <div class="alert alert-danger">
+          Le nouveau mot de passe doit avoir une longueur d'au moins 8
+          caractères.
+        </div>
+      }
     </div>
     <div class="form-group col-md-6">
       <label for="confirmeMdp">Confirmer le nouveau mot de passe :</label>
@@ -79,12 +84,11 @@
         autocomplete="off"
         class="form-control"
       />
-      <div
-        *ngIf="formProfil.errors?.['sameValueIfDefined']"
-        class="alert alert-danger"
-      >
-        Les 2 mots de passe doivent être identiques.
-      </div>
+      @if (formProfil.errors?.["sameValueIfDefined"]) {
+        <div class="alert alert-danger">
+          Les 2 mots de passe doivent être identiques.
+        </div>
+      }
     </div>
   </div>
 
@@ -99,9 +103,11 @@
   </div>
 </form>
 
-<div *ngIf="enregistre" class="alert alert-success feedback">
-  Votre profil a été enregistré.
-</div>
-<div *ngIf="erreurModification" class="alert alert-danger feedback">
-  {{ erreurModification }}
-</div>
+@if (enregistre) {
+  <div class="alert alert-success feedback">Votre profil a été enregistré.</div>
+}
+@if (erreurModification) {
+  <div class="alert alert-danger feedback">
+    {{ erreurModification }}
+  </div>
+}

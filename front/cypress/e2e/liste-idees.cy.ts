@@ -13,9 +13,15 @@ import { etantDonneQue } from 'cypress/preconditions/preconditions';
 
 describe("liste d'idées", () => {
   beforeEach(() => {
-    cy.window()
-      .its('console')
-      .then((console) => cy.spy(console, 'log').as('log'));
+    // Wait for console.log to be available before spying on it
+    cy.window().then((win) => {
+      // Ensure we have a console with a log method
+      cy.wrap(null).should(() => {
+        expect(win.console).to.exist;
+        expect(win.console.log).to.be.a('function');
+      });
+      cy.spy(win.console, 'log').as('log');
+    });
   });
 
   it('proposer des idées pour soi et en supprimer', () => {
@@ -29,7 +35,9 @@ describe("liste d'idées", () => {
       occasionPage.maCarte().click();
 
       const listeIdeesPage = new ListeIdeesPage();
-      listeIdeesPage.titre().should('have.text', "Ma liste d'idées");
+      listeIdeesPage.titre().should(($el) => {
+        expect($el.text().trim()).to.equal("Ma liste d'idées");
+      });
 
       cy.fixture('idees').then((idees) => {
         listeIdeesPage.idees(idees.soi.aCreer).should('not.exist');

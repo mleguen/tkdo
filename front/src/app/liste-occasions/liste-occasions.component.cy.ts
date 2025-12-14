@@ -1,12 +1,13 @@
 import { cy, describe, it } from 'local-cypress';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { provideHttpClient } from '@angular/common/http';
 
 import { ListeOccasionsComponent } from './liste-occasions.component';
 
 describe('ListeOccasionsComponent', () => {
   it('should mount', () => {
     cy.mount(ListeOccasionsComponent, {
-      imports: [HttpClientTestingModule],
+      providers: [provideHttpClient(), provideHttpClientTesting()],
     });
   });
 });

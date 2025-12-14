@@ -1,6 +1,5 @@
-import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
@@ -8,12 +7,16 @@ import { BackendService } from '../backend.service';
 
 @Component({
   selector: 'app-connexion',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [ReactiveFormsModule],
   templateUrl: './connexion.component.html',
   styleUrl: './connexion.component.scss',
 })
 export class ConnexionComponent implements OnInit {
+  private readonly fb = inject(FormBuilder);
+  private readonly backend = inject(BackendService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+
   erreurConnexion?: string;
   formConnexion = this.fb.group({
     identifiant: ['', Validators.required],
@@ -21,13 +24,6 @@ export class ConnexionComponent implements OnInit {
   });
 
   private retour = '';
-
-  constructor(
-    private readonly fb: FormBuilder,
-    private readonly backend: BackendService,
-    private readonly route: ActivatedRoute,
-    private readonly router: Router,
-  ) {}
 
   ngOnInit(): void {
     this.route.queryParamMap.subscribe((queryParams) => {

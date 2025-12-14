@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { NavigationStart, Router, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs/operators';
 
@@ -9,20 +9,17 @@ import { BackendService } from './backend.service';
 
 @Component({
   selector: 'app-root',
-  standalone: true,
   imports: [RouterOutlet, CommonModule, HeaderComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })
 export class AppComponent implements OnInit {
+  private readonly backend = inject(BackendService);
+  private readonly router = inject(Router);
+
   erreurBackend$ = this.backend.erreur$;
   menuOuvert = false;
   version = environment.version;
-
-  constructor(
-    private readonly backend: BackendService,
-    private readonly router: Router,
-  ) {}
 
   ngOnInit() {
     this.router.events

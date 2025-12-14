@@ -1,5 +1,4 @@
-import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import {
   Validators,
   FormBuilder,
@@ -17,12 +16,15 @@ import {
 
 @Component({
   selector: 'app-profil',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [ReactiveFormsModule],
   templateUrl: './profil.component.html',
   styleUrl: './profil.component.scss',
 })
 export class ProfilComponent implements OnInit {
+  private readonly formBuilder = inject(FormBuilder);
+  private readonly backend = inject(BackendService);
+  private readonly changeDetector = inject(ChangeDetectorRef);
+
   Genre = Genre;
   PrefNotifIdees = PrefNotifIdees;
 
@@ -46,12 +48,6 @@ export class ProfilComponent implements OnInit {
   erreurModification?: string;
   enregistre = false;
   utilisateur?: Utilisateur;
-
-  constructor(
-    private readonly formBuilder: FormBuilder,
-    private readonly backend: BackendService,
-    private readonly changeDetector: ChangeDetectorRef,
-  ) {}
 
   ngOnInit(): void {
     this.backend.utilisateurConnecte$.subscribe({

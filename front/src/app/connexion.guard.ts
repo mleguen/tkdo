@@ -10,10 +10,8 @@ import { BackendService } from './backend.service';
 
 @Injectable()
 export class ConnexionGuard {
-  constructor(
-    private readonly backend: BackendService,
-    private readonly router: Router,
-  ) {}
+  private readonly backend = inject(BackendService);
+  private readonly router = inject(Router);
 
   async canActivate(state: RouterStateSnapshot): Promise<boolean | UrlTree> {
     if (!(await this.backend.estConnecte()))

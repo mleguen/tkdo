@@ -1,7 +1,5 @@
-<ng-container
-  *ngIf="utilisateurConnecte$ | async as uc; else veuillezPatienter"
->
-  <ng-container *ngIf="ideesPour$ | async as ip; else veuillezPatienter">
+@if (utilisateurConnecte$ | async; as uc) {
+  @if (ideesPour$ | async; as ip) {
     <app-liste-idees
       [ideesPour]="ip"
       [utilisateurConnecte]="uc"
@@ -9,13 +7,15 @@
       (ajoute)="ajoute($event)"
       (supprime)="supprime($event)"
     />
-  </ng-container>
-</ng-container>
-
-<ng-template #veuillezPatienter>
+  } @else {
+    <h1>Veuillez patienter...</h1>
+  }
+} @else {
   <h1>Veuillez patienter...</h1>
-</ng-template>
+}
 
-<div *ngIf="erreurAjoutSuppression" class="alert alert-danger">
-  {{ erreurAjoutSuppression }}
-</div>
+@if (erreurAjoutSuppression) {
+  <div class="alert alert-danger">
+    {{ erreurAjoutSuppression }}
+  </div>
+}

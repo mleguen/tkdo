@@ -1,72 +1,85 @@
-<ng-container *ngIf="occasion$ | async as o; else veuillezPatienter">
+@if (occasion$ | async; as o) {
   <h1 id="occasion">{{ o.titre }}</h1>
-
-  <ng-container [ngSwitch]="o.estPassee">
-    <div *ngSwitchCase="true" class="alert alert-warning col-12" role="alert">
-      Cette occasion est passée.
+  @switch (o.estPassee) {
+    @case (true) {
+      <div class="alert alert-warning col-12" role="alert">
+        Cette occasion est passée.
+      </div>
+    }
+    @case (false) {
+      <div
+        id="dateRemiseCadeaux"
+        class="alert alert-primary col-12"
+        role="alert"
+      >
+        Date de remise des cadeaux : {{ o.date }}
+      </div>
+    }
+  }
+  @if (!o.tirageFait) {
+    <div class="alert alert-warning col-12" role="alert">
+      Le tirage au sort n'a pas
+      @if (!o.estPassee) {
+        encore
+      }
+      eu lieu.
     </div>
-    <div
-      id="dateRemiseCadeaux"
-      *ngSwitchCase="false"
-      class="alert alert-primary col-12"
-      role="alert"
-    >
-      Date de remise des cadeaux : {{ o.date }}
-    </div>
-  </ng-container>
-
-  <div *ngIf="!o.tirageFait" class="alert alert-warning col-12" role="alert">
-    Le tirage au sort n'a pas
-    <ng-container *ngIf="!o.estPassee">encore</ng-container>
-    eu lieu.
-  </div>
-
+  }
   <!-- <h2>Participants</h2> -->
   <div>
     Cliquer sur le nom d'un des participants pour accéder à sa liste d'idées.
   </div>
   <div class="container">
     <div class="row justify-content-center">
-      <div
-        *ngFor="let p of o.participants"
-        class="col-sm-6 col-md-4 col-lg-3 col-xl-2"
-      >
-        <div
-          class="card"
-          [ngClass]="{
-            'bg-primary': p.estQuiRecoitDeMoi,
-            'bg-muted': p.estMoi,
-            'bg-secondary': !p.estMoi && !p.estQuiRecoitDeMoi,
-            'text-white': !p.estMoi,
-            estMoi: p.estMoi,
-            estQuiRecoitDeMoi: p.estQuiRecoitDeMoi
-          }"
-          [routerLink]="['/idee']"
-          [queryParams]="{ idUtilisateur: p.id }"
-        >
-          <div class="card-body">
-            <h3 class="card-title">{{ p.nom }}</h3>
-            <div class="card-text" *ngIf="p.estMoi">C'est vous !</div>
-            <div class="card-text" *ngIf="p.estQuiRecoitDeMoi">
-              C'est à
-              <ng-container [ngSwitch]="p.genre">
-                <ng-container *ngSwitchCase="Genre.Feminin">elle</ng-container>
-                <ng-container *ngSwitchCase="Genre.Masculin">lui</ng-container>
-              </ng-container>
-              que vous
-              <ng-container [ngSwitch]="o.estPassee">
-                <ng-container *ngSwitchCase="true">avez fait</ng-container>
-                <ng-container *ngSwitchCase="false">ferez</ng-container>
-              </ng-container>
-              un cadeau.
+      @for (p of o.participants; track p) {
+        <div class="col-sm-6 col-md-4 col-lg-3 col-xl-2">
+          <div
+            class="card"
+            [ngClass]="{
+              'bg-primary': p.estQuiRecoitDeMoi,
+              'bg-muted': p.estMoi,
+              'bg-secondary': !p.estMoi && !p.estQuiRecoitDeMoi,
+              'text-white': !p.estMoi,
+              estMoi: p.estMoi,
+              estQuiRecoitDeMoi: p.estQuiRecoitDeMoi,
+            }"
+            [routerLink]="['/idee']"
+            [queryParams]="{ idUtilisateur: p.id }"
+          >
+            <div class="card-body">
+              <h3 class="card-title">{{ p.nom }}</h3>
+              @if (p.estMoi) {
+                <div class="card-text">C'est vous !</div>
+              }
+              @if (p.estQuiRecoitDeMoi) {
+                <div class="card-text">
+                  C'est à
+                  @switch (p.genre) {
+                    @case (Genre.Feminin) {
+                      elle
+                    }
+                    @case (Genre.Masculin) {
+                      lui
+                    }
+                  }
+                  que vous
+                  @switch (o.estPassee) {
+                    @case (true) {
+                      avez fait
+                    }
+                    @case (false) {
+                      ferez
+                    }
+                  }
+                  un cadeau.
+                </div>
+              }
             </div>
           </div>
         </div>
-      </div>
+      }
     </div>
   </div>
-</ng-container>
-
-<ng-template #veuillezPatienter>
+} @else {
   <h1 id="occasion">Veuillez patienter...</h1>
-</ng-template>
+}

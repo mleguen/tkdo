@@ -1,5 +1,4 @@
-import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -12,8 +11,7 @@ import { IdeesPour, Idee, Genre, Utilisateur } from '../backend.service';
 
 @Component({
   selector: 'app-liste-idees',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, IdeeComponent],
+  imports: [ReactiveFormsModule, IdeeComponent],
   templateUrl: './liste-idees.component.html',
   styleUrl: './liste-idees.component.scss',
 })
@@ -30,7 +28,9 @@ export class ListeIdeesComponent {
   propresIdees: Idee[] = [];
   utilisateur?: Utilisateur;
 
-  constructor(fb: FormBuilder) {
+  constructor() {
+    const fb = inject(FormBuilder);
+
     this.formAjout = fb.group({
       description: ['', Validators.required],
     });

@@ -29,6 +29,8 @@
   </button>
 </form>
 
-<div *ngIf="erreurConnexion" class="alert alert-danger">
-  {{ erreurConnexion }}
-</div>
+@if (erreurConnexion) {
+  <div class="alert alert-danger">
+    {{ erreurConnexion }}
+  </div>
+}

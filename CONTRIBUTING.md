@@ -1,5 +1,16 @@
 # Guide du développeur
 
+> **⚠️ DEPRECATED**: This French documentation is deprecated and will be removed in a future release.
+>
+> Please use the comprehensive English documentation in [docs/en/](./docs/en/):
+> - **[Contributing Guidelines](./docs/en/CONTRIBUTING.md)** - Development workflow, coding standards, testing
+> - **[Development Setup](./docs/en/dev-setup.md)** - Environment setup and prerequisites
+> - **[Frontend Development](./docs/en/frontend-dev.md)** - Angular development guide
+> - **[Backend Development](./docs/en/backend-dev.md)** - PHP/Slim API development
+> - **[Testing Guide](./docs/en/testing.md)** - Complete testing documentation
+>
+> See [docs/en/INDEX.md](./docs/en/INDEX.md) for the complete documentation index.
+
 ## Prérequis
 
 - docker et son plugin compose installés

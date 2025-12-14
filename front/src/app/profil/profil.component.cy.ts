@@ -1,12 +1,13 @@
 import { cy, describe, it } from 'local-cypress';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { provideHttpClient } from '@angular/common/http';
 
 import { ProfilComponent } from './profil.component';
 
 describe('ProfilComponent', () => {
   it('should mount', () => {
     cy.mount(ProfilComponent, {
-      imports: [HttpClientTestingModule],
+      providers: [provideHttpClient(), provideHttpClientTesting()],
     });
   });
 });

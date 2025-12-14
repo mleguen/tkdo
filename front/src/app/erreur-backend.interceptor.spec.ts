@@ -1,14 +1,23 @@
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 
 import { ErreurBackendInterceptor } from './erreur-backend.interceptor';
+import {
+  provideHttpClient,
+  withInterceptorsFromDi,
+} from '@angular/common/http';
 
 describe('ErreurBackendInterceptor', () => {
   beforeEach(() =>
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [provideRouter([]), ErreurBackendInterceptor],
+      imports: [],
+      providers: [
+        provideRouter([]),
+        ErreurBackendInterceptor,
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
+      ],
     }),
   );
 

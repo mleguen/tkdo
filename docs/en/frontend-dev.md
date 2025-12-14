@@ -24,10 +24,10 @@ The Tkdo frontend is built with modern Angular practices and architectural decis
 
 | Technology            | Version  | Purpose                                |
 |-----------------------|----------|----------------------------------------|
-| **Angular**           | 17.3     | Frontend framework                     |
-| **TypeScript**        | 5.4      | Programming language                   |
+| **Angular**           | 21.0     | Frontend framework                     |
+| **TypeScript**        | 5.9      | Programming language                   |
 | **Bootstrap**         | 5.3      | UI framework                           |
-| **ng-bootstrap**      | 16.0     | Angular Bootstrap components           |
+| **ng-bootstrap**      | 20.0     | Angular Bootstrap components           |
 | **RxJS**              | 7.8      | Reactive programming                   |
 | **Moment.js**         | 2.30     | Date manipulation                      |
 | **Cypress**           | latest   | E2E and component testing              |
@@ -35,7 +35,7 @@ The Tkdo frontend is built with modern Angular practices and architectural decis
 
 ### Architecture Decisions
 
-**Standalone Components (Angular 17+):**
+**Standalone Components (Angular 17-21):**
 - All components use the standalone API
 - No `NgModule` declarations needed
 - Simplified dependency management
@@ -730,6 +730,9 @@ The project maintains Angular and dependencies at the latest stable versions usi
    - Adapt code to new Angular APIs
    - Fix breaking changes
    - Update deprecated patterns
+   - Run available Angular migrations: `./ng generate @angular/core:inject`, etc.
+   - Update files if APIs changed (e.g., `HttpClientTestingModule` → `provideHttpClientTesting()`)
+   - Fix TypeScript/ESLint errors after running migrations
    - Run tests: `./npm test`
 
 10. **Verify everything works**:
@@ -739,6 +742,16 @@ The project maintains Angular and dependencies at the latest stable versions usi
     ./npm run int
     ./npm run build
     ```
+
+**Common Issues During Major Upgrades:**
+
+- **Peer dependency conflicts**: Use `--legacy-peer-deps` flag when installing packages that haven't been updated for the new Angular version yet
+- **Multi-version upgrades**: Angular requires upgrading one major version at a time (e.g., v17 → v18 → v19 → v20 → v21)
+- **Automatic migrations**: Angular CLI provides automatic migrations (`ng update`) that modify code - review all changes
+- **Breaking changes in testing**: Test utilities often change between major versions - check component/unit test files
+- **Third-party package compatibility**: Bootstrap wrappers (`@ng-bootstrap`) and linting tools (`@angular-eslint`) may need separate upgrades
+- **Deprecated APIs**: Address deprecation warnings immediately as they may be removed in next major version
+- **TypeScript version**: Angular upgrades often require TypeScript upgrades - ensure `typescript` package version is compatible
 
 ### Dependency Upgrade
 

@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable, Subscription, tap } from 'rxjs';
 
@@ -11,13 +11,13 @@ import { BackendService, Occasion } from '../backend.service';
   styleUrl: './liste-occasions.component.scss',
 })
 export class ListeOccasionsComponent implements OnInit, OnDestroy {
+  private readonly backend = inject(BackendService);
+  private readonly router = inject(Router);
+
   protected occasions$: Observable<Occasion[] | null>;
   protected lastSubscription: Subscription | null = null;
 
-  constructor(
-    private readonly backend: BackendService,
-    private readonly router: Router,
-  ) {
+  constructor() {
     this.occasions$ = this.backend.occasions$.pipe(
       tap(async (occasions) => {
         if (occasions !== null) {

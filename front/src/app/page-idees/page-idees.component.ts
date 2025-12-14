@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { switchMap, catchError, combineLatestWith } from 'rxjs/operators';
@@ -9,12 +9,14 @@ import { BackendService, IdeesPour, Genre } from '../backend.service';
 
 @Component({
   selector: 'app-page-idees',
-  standalone: true,
   imports: [CommonModule, ListeIdeesComponent],
   templateUrl: './page-idees.component.html',
   styleUrl: './page-idees.component.scss',
 })
 export class PageIdeesComponent {
+  private readonly backend = inject(BackendService);
+  private readonly route = inject(ActivatedRoute);
+
   Genre = Genre;
 
   erreurAjoutSuppression?: string;
@@ -24,10 +26,7 @@ export class PageIdeesComponent {
   protected actualise$ = new BehaviorSubject(true);
   protected idUtilisateur?: number;
 
-  constructor(
-    private readonly backend: BackendService,
-    private readonly route: ActivatedRoute,
-  ) {
+  constructor() {
     // subscribe/unsubscribe automatiques par le template html
     this.ideesPour$ = this.route.queryParamMap.pipe(
       combineLatestWith(this.backend.utilisateurConnecte$, this.actualise$),

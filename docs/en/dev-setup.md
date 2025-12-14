@@ -148,7 +148,7 @@ First, create the database schema:
 Then populate with initial data:
 
 ```bash
-./console fixtures --admin-email admin@localhost
+./console fixtures
 ```
 
 **What these commands do:**

@@ -41,24 +41,63 @@
 ### Security Vulnerabilities (Frontend)
 
 **Critical Priority:**
-- Upgrade @angular/devkit/build-angular to v21.0.3+ to fix critical esbuild arbitrary file read vulnerability (CVE affecting <=0.24.2) and include esbuild >=0.24.3
-- Upgrade @angular/compiler to >=19.2.15 to fix high severity XSS vulnerability (GHSA-v4hv-rgfq-gp49) affecting SVG animation, SVG URL, and MathML attributes sanitization
-- Upgrade @angular/common to >=19.2.16 to fix high severity XSRF token leakage vulnerability (GHSA-58c5-g7wp-6w37) affecting protocol-relative URLs in Angular HTTP client
-
-**High Priority:**
-- Upgrade @angular/cli to v21.0.3+ to resolve dependency chain issues and fix low severity inquirer vulnerability
-- Upgrade @angular-eslint/builder and @angular-eslint/schematics to v21.1.0+ to fix moderate severity vulnerabilities via nx dependency and tmp symbolic link attack (GHSA-52f5-9888-hmc6)
-- Run full frontend test suite (unit, integration, E2E) after Angular v21 upgrade and fix any breaking changes in component tests, service mocks, dependency injection, or routing configurations
+- Upgrade form-data to >=4.0.4 to fix critical unsafe random function vulnerability (GHSA-fjxv-7rqg-78g4) - currently at v4.0.3 via cypress@14.4.1 -> @cypress/request@3.0.8
 
 **Medium Priority:**
-- Verify webpack-dev-server upgraded to >=5.3.0 (via @angular/devkit/build-angular v21) to fix moderate severity source code theft vulnerabilities (GHSA-9jgg-88mc-972h, GHSA-4v9v-hfq4-rm2v)
-- Verify vite upgraded to >=6.1.7 to fix moderate severity path traversal vulnerabilities (GHSA-93m4-6634-74q7, GHSA-jqfw-vq24-v9c3, GHSA-g4jq-h2w9-997c) affecting server.fs.deny bypass and public directory handling
-- Verify cookie package upgraded to >=0.8.0 to fix low severity session fixation vulnerability (GHSA-cqmj-92xf-r6r9)
-- Verify path-to-regexp upgraded to >=8.2.1 to fix low severity denial of service vulnerability (GHSA-9wv6-86v2-598j)
+- Upgrade webpack-dev-server to >=5.3.0 to fix moderate severity source code theft vulnerabilities (GHSA-9jgg-88mc-972h, GHSA-4v9v-hfq4-rm2v) - currently at v5.2.2
+- Upgrade cookie package to >=0.8.0 to fix low severity session fixation vulnerability (GHSA-cqmj-92xf-r6r9) - currently at v0.7.2
+- Upgrade old path-to-regexp instance to >=8.2.1 to fix low severity denial of service vulnerability (GHSA-9wv6-86v2-598j) - currently at v0.1.12 (one instance at v8.3.0 is OK)
 
-**Documentation:**
-- Update frontend development guide (docs/en/frontend-dev.md) with Angular v21 migration notes including breaking changes, new features, deprecated APIs, and updated testing patterns
-- Update development setup guide (docs/en/dev-setup.md) with updated Angular CLI version requirements and any new prerequisites
+**Low Priority:**
+- Upgrade tmp to >=0.2.4 to fix low severity symbolic link vulnerability (GHSA-52f5-9888-hmc6) - currently at v0.2.3 via cypress@14.4.1 and karma@6.4.4
+- Upgrade brace-expansion to >=2.0.2 to fix low severity ReDoS vulnerability (GHSA-v6h2-p8h4-qcjw) - currently at v1.1.11 via eslint@8.57.1, karma@6.4.4, karma-coverage@2.2.1 (newer version 2.0.1 also vulnerable)
+
+### Deprecation Warnings (Dart Sass 3.0.0)
+
+**Context:** Following the Angular 21 upgrade, multiple Sass deprecation warnings are reported by `./npm run ct`, `./npm run int`, and `./npm run e2e`. These relate to Dart Sass 3.0.0 breaking changes that will remove deprecated features.
+
+**Actionable Items (Our Code):**
+
+1. **Replace deprecated `@import` with `@use` in liste-idees component styles**
+   - **File:** `front/src/app/liste-idees/liste-idees.component.scss` (lines 1-3)
+   - **Current code:**
+     ```scss
+     @import "../../../node_modules/bootstrap/scss/functions";
+     @import "../../../node_modules/bootstrap/scss/variables";
+     @import "../../../node_modules/bootstrap/scss/mixins";
+     ```
+   - **Action:** Replace with modern `@use` syntax and namespaces
+   - **Reported by:** `./npm run ct`, `./npm run int`, `./npm run e2e`
+   - **Warning:** "Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0"
+   - **Reference:** https://sass-lang.com/d/import
+   - **Priority:** Medium
+
+2. **Replace deprecated `@import` in global styles**
+   - **File:** `front/src/styles.scss` (line 4)
+   - **Current code:**
+     ```scss
+     @import "bootstrap/scss/bootstrap";
+     ```
+   - **Action:** Replace with `@use "bootstrap/scss/bootstrap";` if compatible, or await Bootstrap update
+   - **Note:** May need to wait for Bootstrap to fully support `@use` syntax
+   - **Priority:** Low (global import may require Bootstrap update)
+
+**Third-Party Dependencies (Bootstrap):**
+
+3. **Monitor Bootstrap for Dart Sass 3.0.0 compatibility update**
+   - **Affected package:** `bootstrap` v5.3.2 (Sass source files)
+   - **Affected files:** `node_modules/bootstrap/scss/_functions.scss`, `_variables.scss`, `_mixins.scss`
+   - **Deprecations (69+ warnings):**
+     - Global `unit()` function → use `math.unit()`
+     - Color functions `red()`, `green()`, `blue()` → use `color.channel()`
+     - Global `mix()` function → use `color.mix()`
+     - Multiple `@import` statements → use `@use`/`@forward`
+   - **Action:** Monitor Bootstrap releases for Dart Sass 3.0.0 compatibility; upgrade when available
+   - **Tracking:** Check https://github.com/twbs/bootstrap/releases
+   - **Alternative:** Consider switching to compiled Bootstrap CSS instead of Sass imports if updates lag
+   - **Priority:** Low (third-party issue, will be resolved in Bootstrap v6 or earlier patch)
+
+**Note:** See [CONTRIBUTING.md - Tracking Deprecation Warnings](docs/en/CONTRIBUTING.md#tracking-deprecation-warnings) for the process of tracking new deprecations.
 
 ### Dependencies & General Security
 
@@ -77,3 +116,4 @@
 
 - Rename fixtures to install, and provide a default admin email (the admin can then modify it themselves)
 - Remove "doctrine" from auto-generated column names in database
+- Remove legacy documentations in French (e.g. CONTRIBUTING.md) after verifying all content is in docs/en/ documentation

@@ -1,5 +1,8 @@
-import { HttpClientModule } from '@angular/common/http';
-import { ApplicationConfig, importProvidersFrom } from '@angular/core';
+import {
+  provideHttpClient,
+  withInterceptorsFromDi,
+} from '@angular/common/http';
+import { ApplicationConfig } from '@angular/core';
 import { provideRouter, withRouterConfig } from '@angular/router';
 
 import { AdminGuard } from './admin.guard';
@@ -15,7 +18,7 @@ export const appConfig: ApplicationConfig = {
         onSameUrlNavigation: 'reload',
       }),
     ),
-    importProvidersFrom(HttpClientModule),
+    provideHttpClient(withInterceptorsFromDi()),
     // Les guards sont des fonctions reposant sur des classes qu'elles doivent donc pouvoir injecter
     AdminGuard,
     ConnexionGuard,

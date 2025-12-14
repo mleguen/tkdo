@@ -1,12 +1,13 @@
 import { cy, describe, it } from 'local-cypress';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { provideHttpClient } from '@angular/common/http';
 
 import { AdminComponent } from './admin.component';
 
 describe('AdminComponent', () => {
   it('should mount', () => {
     cy.mount(AdminComponent, {
-      imports: [HttpClientTestingModule],
+      providers: [provideHttpClient(), provideHttpClientTesting()],
     });
   });
 });

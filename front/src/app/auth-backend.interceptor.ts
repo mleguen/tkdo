@@ -4,14 +4,14 @@ import {
   HttpEvent,
   HttpInterceptor,
 } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { BackendService } from './backend.service';
 
 @Injectable()
 export class AuthBackendInterceptor implements HttpInterceptor {
-  constructor(private readonly backend: BackendService) {}
+  private readonly backend = inject(BackendService);
 
   intercept(
     request: HttpRequest<unknown>,

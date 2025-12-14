@@ -5,7 +5,7 @@ import {
   HttpInterceptor,
   HttpErrorResponse,
 } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
@@ -14,10 +14,8 @@ import { BackendService } from './backend.service';
 
 @Injectable()
 export class ErreurBackendInterceptor implements HttpInterceptor {
-  constructor(
-    private readonly backend: BackendService,
-    private readonly router: Router,
-  ) {}
+  private readonly backend = inject(BackendService);
+  private readonly router = inject(Router);
 
   intercept(
     request: HttpRequest<unknown>,

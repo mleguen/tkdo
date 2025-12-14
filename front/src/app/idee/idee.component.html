@@ -1,18 +1,18 @@
-<ng-container *ngIf="idee && utilisateurConnecte">
+@if (idee && utilisateurConnecte) {
   <div class="card-header">
-    <span *ngIf="afficheAuteur" class="auteur">{{
-      idee.auteur.id === utilisateurConnecte.id ? "Vous" : idee.auteur.nom
-    }}</span>
+    @if (afficheAuteur) {
+      <span class="auteur">{{
+        idee.auteur.id === utilisateurConnecte.id ? "Vous" : idee.auteur.nom
+      }}</span>
+    }
     le {{ datePropositionFormatee }}
   </div>
   <div class="card-body">
     <h3 class="card-title">{{ idee.description }}</h3>
-    <button
-      *ngIf="idee.auteur.id === utilisateurConnecte.id"
-      (click)="supprime.emit()"
-      class="btn btn-danger btnSupprimer"
-    >
-      Supprimer
-    </button>
+    @if (idee.auteur.id === utilisateurConnecte.id) {
+      <button (click)="supprime.emit()" class="btn btn-danger btnSupprimer">
+        Supprimer
+      </button>
+    }
   </div>
-</ng-container>
+}

@@ -1,82 +1,92 @@
-<div class="container" *ngIf="utilisateurConnecte && utilisateur">
-  <div class="row justify-content-around align-items-center">
-    <h1 [ngSwitch]="utilisateur.id" class="col-10">
-      <ng-container *ngSwitchCase="utilisateurConnecte.id"
-        >Ma liste d'idées</ng-container
-      >
-      <ng-container *ngSwitchDefault
-        >Idées pour {{ utilisateur.nom }}</ng-container
-      >
-    </h1>
-    <div class="col-auto">
-      <button (click)="actualise.emit()" class="btn btn-secondary">
-        Actualiser
-      </button>
-    </div>
-  </div>
-
-  <div class="row" *ngIf="propresIdees.length > 0">
-    <div class="col-12">
-      <h2 *ngIf="utilisateur.id !== utilisateurConnecte.id">
-        Proposées par {{ utilisateur.nom }}
-        <ng-container [ngSwitch]="utilisateur.genre">
-          <ng-container *ngSwitchCase="Genre.Feminin">elle-même</ng-container>
-          <ng-container *ngSwitchCase="Genre.Masculin">lui-même</ng-container>
-        </ng-container>
-      </h2>
-      <div class="card-columns">
-        <app-idee
-          *ngFor="let i of propresIdees"
-          [idee]="i"
-          [utilisateurConnecte]="utilisateurConnecte"
-          (supprime)="supprime.emit(i.id)"
-        />
-      </div>
-    </div>
-  </div>
-
-  <div
-    class="row"
-    *ngIf="utilisateur.id !== utilisateurConnecte.id && autresIdees.length > 0"
-  >
-    <div class="col-12">
-      <h2>Proposées par d'autres que {{ utilisateur.nom }}</h2>
-      <div class="alert alert-warning col-12" role="alert">
-        {{ utilisateur.nom }} ne peut pas voir ces idées
-      </div>
-      <div class="card-columns">
-        <app-idee
-          *ngFor="let i of autresIdees"
-          [idee]="i"
-          [utilisateurConnecte]="utilisateurConnecte"
-          [afficheAuteur]="true"
-          (supprime)="supprime.emit(i.id)"
-        />
-      </div>
-    </div>
-  </div>
-
-  <div class="row">
-    <div class="col-12">
-      <form [formGroup]="formAjout" (ngSubmit)="ajouteEtReset()">
-        <div class="form-group">
-          <label for="description">Nouvelle idée :</label>
-          <input
-            id="description"
-            type="text"
-            formControlName="description"
-            class="form-control"
-          />
-        </div>
-        <button
-          id="btnAjouter"
-          type="submit"
-          class="btn btn-primary"
-          [disabled]="!formAjout.valid"
-        >
-          Ajouter
+@if (utilisateurConnecte && utilisateur) {
+  <div class="container">
+    <div class="row justify-content-around align-items-center">
+      <h1 class="col-10">
+        @switch (utilisateur.id) {
+          @case (utilisateurConnecte.id) {
+            Ma liste d'idées
+          }
+          @default {
+            Idées pour {{ utilisateur.nom }}
+          }
+        }
+      </h1>
+      <div class="col-auto">
+        <button (click)="actualise.emit()" class="btn btn-secondary">
+          Actualiser
         </button>
-      </form>
+      </div>
+    </div>
+    @if (propresIdees.length > 0) {
+      <div class="row">
+        <div class="col-12">
+          @if (utilisateur.id !== utilisateurConnecte.id) {
+            <h2>
+              Proposées par {{ utilisateur.nom }}
+              @switch (utilisateur.genre) {
+                @case (Genre.Feminin) {
+                  elle-même
+                }
+                @case (Genre.Masculin) {
+                  lui-même
+                }
+              }
+            </h2>
+          }
+          <div class="card-columns">
+            @for (i of propresIdees; track i) {
+              <app-idee
+                [idee]="i"
+                [utilisateurConnecte]="utilisateurConnecte"
+                (supprime)="supprime.emit(i.id)"
+              />
+            }
+          </div>
+        </div>
+      </div>
+    }
+    @if (utilisateur.id !== utilisateurConnecte.id && autresIdees.length > 0) {
+      <div class="row">
+        <div class="col-12">
+          <h2>Proposées par d'autres que {{ utilisateur.nom }}</h2>
+          <div class="alert alert-warning col-12" role="alert">
+            {{ utilisateur.nom }} ne peut pas voir ces idées
+          </div>
+          <div class="card-columns">
+            @for (i of autresIdees; track i) {
+              <app-idee
+                [idee]="i"
+                [utilisateurConnecte]="utilisateurConnecte"
+                [afficheAuteur]="true"
+                (supprime)="supprime.emit(i.id)"
+              />
+            }
+          </div>
+        </div>
+      </div>
+    }
+    <div class="row">
+      <div class="col-12">
+        <form [formGroup]="formAjout" (ngSubmit)="ajouteEtReset()">
+          <div class="form-group">
+            <label for="description">Nouvelle idée :</label>
+            <input
+              id="description"
+              type="text"
+              formControlName="description"
+              class="form-control"
+            />
+          </div>
+          <button
+            id="btnAjouter"
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="!formAjout.valid"
+          >
+            Ajouter
+          </button>
+        </form>
+      </div>
     </div>
   </div>
-</div>
+}

@@ -327,11 +327,34 @@ flowchart LR
 ### General Principles
 
 **All code examples must:**
-- Actually work (test before documenting)
+- Actually work (test before documenting - **run full test suite**)
 - Be complete (include all necessary imports/setup)
 - Be relevant (show only what's needed)
 - Include comments for complex logic
 - Follow project coding standards
+
+### Testing Code Examples
+
+**Before documenting any code changes**, verify with the **complete test suite**:
+
+```bash
+# Frontend - ALL LEVELS REQUIRED before commits
+./npm test      # Unit tests + format + lint
+./npm run ct    # Component tests
+./npm run int   # Integration tests
+
+# Before PRs/releases - ALSO REQUIRED
+./npm run e2e   # End-to-end tests (needs docker compose up -d front)
+
+# Backend - REQUIRED before commits
+./composer test
+```
+
+**Why this matters:**
+- Documentation with broken examples erodes user trust
+- Untested examples may work now but break with future changes
+- All test levels catch different types of issues
+- See [CONTRIBUTING.md](./en/CONTRIBUTING.md#testing-requirements) for detailed testing requirements
 
 ### Command-Line Examples
 

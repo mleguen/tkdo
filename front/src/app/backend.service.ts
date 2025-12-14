@@ -1,6 +1,5 @@
-import { DOCUMENT } from '@angular/common';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Inject, Injectable } from '@angular/core';
+import { Injectable, DOCUMENT, inject } from '@angular/core';
 import { BehaviorSubject, Observable, firstValueFrom, of } from 'rxjs';
 import { first, map, shareReplay, switchMap } from 'rxjs/operators';
 
@@ -78,6 +77,9 @@ interface PostConnexionDTO {
   providedIn: 'root',
 })
 export class BackendService {
+  private readonly http = inject(HttpClient);
+  private document = inject<Document>(DOCUMENT);
+
   erreur$ = new BehaviorSubject<string | undefined>(undefined);
   occasions$: Observable<Occasion[] | null>;
   token = localStorage.getItem(CLE_TOKEN);
@@ -85,10 +87,7 @@ export class BackendService {
 
   protected idUtilisateurConnecte$: BehaviorSubject<number | null>;
 
-  constructor(
-    private readonly http: HttpClient,
-    @Inject(DOCUMENT) private document: Document,
-  ) {
+  constructor() {
     this.idUtilisateurConnecte$ = new BehaviorSubject(
       JSON.parse(localStorage.getItem(CLE_ID_UTILISATEUR) || 'null'),
     );
@@ -201,7 +200,7 @@ export class BackendService {
     // Les erreurs applicatives sont censées être prises en compte
     if (error.status === 400) return;
 
-    this.erreur$.next(error.message || `${error.status} ${error.statusText}`);
+    this.erreur$.next(error.message || `HTTP Error ${error.status}`);
   }
 
   notifieSuccesHTTP() {

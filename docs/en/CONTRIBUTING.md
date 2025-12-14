@@ -385,6 +385,36 @@ Run before committing:
 
 ## Testing Requirements
 
+### Full Test Suite
+
+**Before every commit** (minimum required):
+
+```bash
+# Frontend Tests - ALL THREE LEVELS REQUIRED
+./npm test      # 1. Unit tests + format + lint (REQUIRED)
+./npm run ct    # 2. Component tests (REQUIRED)
+./npm run int   # 3. Integration tests (REQUIRED)
+
+# Backend Tests
+./composer test  # All backend tests (REQUIRED)
+```
+
+**Before PRs and releases** (additional requirement):
+
+```bash
+# End-to-End Tests - REQUIRED for PRs/releases, strongly recommended otherwise
+docker compose up -d front        # Start full stack
+./composer run install-fixtures   # Reset test data
+./npm run e2e                     # E2E tests with real backend
+```
+
+**Why all test levels matter:**
+- **Unit tests**: Catch logic errors in services/guards/interceptors
+- **Component tests**: Verify component rendering and interactions
+- **Integration tests**: Validate complete user workflows with mocked backend
+- **E2E tests**: Ensure full stack integration works correctly
+- **Skipping any level** may allow bugs to reach production
+
 ### When to Write Tests
 
 - **Always**: When fixing bugs (write failing test first, then fix)
@@ -739,6 +769,86 @@ Do not mention routine BACKLOG/CHANGELOG maintenance that is standard documentat
 - Don't mark tasks as "completed" or "done"
 - Renumber remaining tasks after removal
 - Keep tasks organized by category
+
+### Tracking Deprecation Warnings
+
+**When deprecation warnings are reported by package managers or build tools**, they should be tracked in BACKLOG.md to ensure they're addressed before they become breaking changes.
+
+#### When to Add to Backlog
+
+Add deprecation warnings to the backlog when they're reported by:
+
+- **npm commands**: `./npm install`, `./npm test`, `./npm run ct`, `./npm run int`, `./npm run e2e`, `./npm run build`
+- **Angular CLI**: `./ng update`, `./ng build`, `./ng serve`
+- **Composer**: `./composer install`, `./composer update`, `./composer test`
+
+#### Process
+
+**1. Document the deprecation:**
+
+When you encounter deprecation warnings during development or testing:
+
+```bash
+# Example: Running component tests shows deprecations
+./npm run ct
+
+# Output shows warnings like:
+# DeprecationWarning: The `punycode` module is deprecated
+# (node:12345) [DEP0040] DeprecationWarning: The `sys` module is deprecated
+```
+
+**2. Add to BACKLOG.md:**
+
+Add the deprecation to the appropriate section in BACKLOG.md:
+
+- **Security-related deprecations** (from dependency upgrades like Angular): Add to "Security Vulnerabilities" or "Deprecation Warnings" section
+- **Tool deprecations** (build tools, package managers): Add to "Dependencies & General Security" section
+- **API/Framework deprecations**: Add to relevant technical section
+
+**Example format:**
+```markdown
+### Deprecation Warnings
+
+**Angular 21 Upgrade Side Effects:**
+
+- Fix `punycode` module deprecation in component tests
+  - Reported by: `./npm run ct`
+  - Action: Update to use WHATWG URL API instead
+  - Severity: Low (deprecated in Node.js 21, removed in future versions)
+```
+
+**3. Categorize by priority:**
+
+Use these severity levels based on the deprecation notice:
+
+- **Critical**: Will break in next major version (< 6 months)
+- **High**: Deprecated with removal timeline announced
+- **Medium**: Deprecated without specific timeline
+- **Low**: Soft deprecation or alternative recommended
+
+**4. Link to tracking guidelines:**
+
+When adding deprecation sections, include a cross-reference to this guideline:
+
+```markdown
+**Note:** See [CONTRIBUTING.md - Tracking Deprecation Warnings](docs/en/CONTRIBUTING.md#tracking-deprecation-warnings)
+for the process of tracking new deprecations.
+```
+
+#### What NOT to Track
+
+**Don't add to backlog:**
+- Third-party package deprecations that don't affect the project
+- Deprecations already fixed in latest versions
+- Warnings that are false positives or can be safely ignored
+
+#### Removing Deprecations from Backlog
+
+When a deprecation is fixed:
+
+1. Verify the warning no longer appears when running the relevant commands
+2. Remove the item from BACKLOG.md completely
+3. Update CHANGELOG.md under "Technical Tasks" if it was a significant fix
 
 ## Pull Request Process
 

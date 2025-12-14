@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import {
   Component,
   EventEmitter,
@@ -15,8 +14,7 @@ import { Idee, Utilisateur } from '../backend.service';
 
 @Component({
   selector: 'app-idee',
-  standalone: true,
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './idee.component.html',
   styleUrl: './idee.component.scss',
 })

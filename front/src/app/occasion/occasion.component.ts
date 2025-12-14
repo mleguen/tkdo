@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { Observable, of } from 'rxjs';
 import { catchError, combineLatestWith, switchMap } from 'rxjs/operators';
@@ -13,20 +13,19 @@ import {
 
 @Component({
   selector: 'app-occasion',
-  standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './occasion.component.html',
   styleUrl: './occasion.component.scss',
 })
 export class OccasionComponent {
+  private readonly backend = inject(BackendService);
+  private readonly route = inject(ActivatedRoute);
+
   Genre = Genre;
 
   occasion$: Observable<OccasionAffichee | null>;
 
-  constructor(
-    private readonly backend: BackendService,
-    private readonly route: ActivatedRoute,
-  ) {
+  constructor() {
     // subscribe/unsubscribe automatiques par le template html
     this.occasion$ = this.route.paramMap.pipe(
       combineLatestWith(this.backend.utilisateurConnecte$),
