@@ -41,12 +41,10 @@
 ### Security Vulnerabilities (Frontend)
 
 **Medium Priority:**
-- Upgrade webpack-dev-server to >=5.3.0 to fix moderate severity source code theft vulnerabilities (GHSA-9jgg-88mc-972h, GHSA-4v9v-hfq4-rm2v) - currently at v5.2.2
 - Upgrade cookie package to >=0.8.0 to fix low severity session fixation vulnerability (GHSA-cqmj-92xf-r6r9) - currently at v0.7.2
 - Upgrade old path-to-regexp instance to >=8.2.1 to fix low severity denial of service vulnerability (GHSA-9wv6-86v2-598j) - currently at v0.1.12 (one instance at v8.3.0 is OK)
 
 **Low Priority:**
-- Upgrade tmp to >=0.2.4 to fix low severity symbolic link vulnerability (GHSA-52f5-9888-hmc6) - currently at v0.2.3 via cypress@14.4.1 and karma@6.4.4
 - Upgrade brace-expansion to >=2.0.2 to fix low severity ReDoS vulnerability (GHSA-v6h2-p8h4-qcjw) - currently at v1.1.11 via eslint@8.57.1, karma@6.4.4, karma-coverage@2.2.1 (newer version 2.0.1 also vulnerable)
 
 ### Deprecation Warnings (Dart Sass 3.0.0)
