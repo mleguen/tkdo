@@ -21,119 +21,51 @@ Claude Code will automatically reference these conventions when creating commits
 
 ### Documentation Standards
 
-**Diagrams:**
-- **Always use Mermaid** for diagrams when possible (architecture, flows, sequences, ERDs, etc.)
-- Mermaid diagrams are version-controllable, renderable in GitHub/IDEs, and easier to maintain
-- Use appropriate Mermaid diagram types: `graph`, `flowchart`, `sequenceDiagram`, `classDiagram`, `erDiagram`, etc.
-- Avoid ASCII art diagrams or external image files for technical diagrams
+**Complete documentation guidelines** are available in [docs/DOCUMENTATION-GUIDE.md](../docs/DOCUMENTATION-GUIDE.md).
 
-**Mermaid Diagram Quality Standards:**
-- **High Contrast Colors**: Use light backgrounds with dark text and borders for readability
-  - Example: `fill:#b3d9ff,stroke:#003d73,stroke-width:2px,color:#000`
-  - Always set `color:#000` (black text) explicitly for maximum contrast
-  - Use stroke-width of 2px for clear element separation
-- **Readability & Layout**:
-  - Use `flowchart LR` for left-to-right flows (more natural for reading)
-  - Use `flowchart TB` for top-to-bottom hierarchies
-  - For hexagonal architecture: nest subgraphs (Infrastructure → Application → Domain)
-  - Include descriptive labels and clear relationship arrows
-  - Add visual grouping with subgraphs for related components
+**Quick reference - Key requirements:**
 
-**Example:**
+- **Diagrams**: Always use Mermaid for technical diagrams (architecture, flows, ERDs)
+  - High contrast colors: `fill:#b3d9ff,stroke:#003d73,stroke-width:2px,color:#000`
+  - See [Documentation Guide - Diagrams](../docs/DOCUMENTATION-GUIDE.md#diagrams-and-visual-content)
+
+- **Documentation Updates**: Always update documentation in the same commit as code changes
+  - Update README, API docs, guides when related code changes
+  - See [Documentation Guide - Keeping Documentation Current](../docs/DOCUMENTATION-GUIDE.md#keeping-documentation-current)
+
+- **Consistency Checks**: After creating/updating docs, check for cross-references
+  - Remove "coming soon" labels: `grep -r "coming soon" docs/`
+  - Update navigation pages (INDEX.md, README.md)
+  - See [Documentation Guide - Avoiding Duplication](../docs/DOCUMENTATION-GUIDE.md#avoiding-documentation-duplication)
+
+- **BACKLOG.md**: Remove completed tasks entirely (don't mark as done), renumber remaining
+
+- **CHANGELOG.md**: Always add to "Next Release" section (never to past releases)
+  - Group by audience (Users, Administrators, Contributors) and scope
+  - See format below
+
+**CHANGELOG.md Format:**
 ```markdown
-```mermaid
-flowchart LR
-    A[Frontend] --> B[Backend API]
-    B --> C[Database]
+## Next Release
 
-    classDef default fill:#b3d9ff,stroke:#003d73,stroke-width:2px,color:#000
+### [Audience]
+- **[Scope]:**
+  - [Change description]
+
+## V1.x.x (Month Day, Year)
+
+### Users
+- **Features:**
+  - [User-facing feature]
 ```
-```
-
-**Documentation Updates:**
-- **Always update documentation in the same commit** as related code changes
-- This includes:
-  - README files when features change
-  - API documentation when endpoints change
-  - Architecture docs when design changes
-  - BACKLOG.md when tasks are completed or requirements change
-  - User guides when UI/functionality changes
-  - Developer guides when development processes change
-- Benefits:
-  - Documentation stays in sync with code
-  - Git history shows complete context of changes
-  - No orphaned or outdated documentation
-  - Easier code reviews with full context
-
-**Documentation Consistency Checks:**
-- **CRITICAL: After creating or updating documentation, ALWAYS check for cross-references that need updating**
-- Common consistency checks required:
-  - Remove "coming soon" labels from newly created documentation files
-  - Update index/navigation pages (like `docs/en/README.md`) to link to new docs
-  - Update related documentation that references the new content
-  - Ensure all cross-references use correct file paths
-  - Check that all examples and code snippets are up-to-date
-- **How to check**: Use grep to search for references to the file you created/updated:
-  ```bash
-  grep -r "filename.md" docs/
-  grep -r "coming soon" docs/
-  ```
-- This prevents broken links and outdated "coming soon" markers in the documentation
-
-**BACKLOG.md Management:**
-- **Remove completed tasks entirely** from BACKLOG.md (don't mark as completed, delete them)
-- Renumber remaining tasks sequentially after removal
-- This keeps the backlog focused on future work, not past accomplishments
-- Completed work is tracked in git history and documentation itself
-
-**CHANGELOG.md Maintenance:**
-- **Always update CHANGELOG.md** in the same commit as related changes
-- **CRITICAL: ALL new changes MUST go in the "Next Release" section**
-  - **NEVER add entries to past release sections** (V1.x.x with dates) - those are final/immutable
-  - Only add to "Next Release" at the top of the changelog
-  - If "Next Release" section doesn't exist yet, create it
-  - Past releases document what was already released, not work in progress
-- **Release ordering:** "Next Release" first, then newest to oldest releases (V1.x.x)
-- **Changes within a release:** Group by audience and scope, NOT by commit time
-  - Audiences: Users, Administrators, Contributors
-  - Scopes: Features, Bug Fixes, Technical Tasks, Documentation, Project Configuration, etc.
-- **Format:**
-  ```markdown
-  ## Next Release
-
-  ### [Audience]
-  - **[Scope]:**
-    - [Change description]
-    - [Another change]
-
-  ## V1.x.x (Month Day, Year)
-
-  ### Users
-  - **Features:**
-    - [User-facing feature]
-  - **Bug Fixes:**
-    - [User-facing fix]
-
-  ### Administrators
-  - **Features:**
-    - [Admin feature]
-
-  ### Contributors
-  - **Technical Tasks:**
-    - [Technical change]
-  - **Documentation:**
-    - [Doc change]
-  ```
 
 **Markdown Tables:**
-- **Always add proper indentation/spacing** to markdown tables for readability in raw markdown
-- Align columns with spaces so tables are readable without rendering
+- Align columns with spaces for raw readability
 - Example:
   ```markdown
   | Column 1     | Column 2                | Column 3        |
   |--------------|-------------------------|-----------------|
   | Short        | Longer content here     | Medium          |
-  | Value        | Another value           | Third value     |
   ```
 
 **Example commit:**

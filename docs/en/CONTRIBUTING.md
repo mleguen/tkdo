@@ -563,6 +563,8 @@ class IdeeRepositoryAdaptorIntTest extends IntTestCase
 
 ## Documentation Requirements
 
+**Complete documentation guidelines** are available in [DOCUMENTATION-GUIDE.md](../DOCUMENTATION-GUIDE.md).
+
 ### When to Update Documentation
 
 **You must update documentation in the same commit as code changes when:**
@@ -574,88 +576,35 @@ class IdeeRepositoryAdaptorIntTest extends IntTestCase
 - Changing deployment procedures
 - Adding or removing dependencies
 
+See [Documentation Guide - Keeping Documentation Current](../DOCUMENTATION-GUIDE.md#keeping-documentation-current) for details.
+
 ### Documentation Structure
 
-All English documentation is in `docs/en/`:
+All English documentation is in `docs/en/` - see [Documentation Index](INDEX.md) for complete list.
 
-- `README.md` - Project overview and quick start
-- `dev-setup.md` - Development environment setup
-- `frontend-dev.md` - Frontend development guide
-- `backend-dev.md` - Backend/API development guide
-- `database.md` - Database schema and migrations
-- `testing.md` - Testing strategies and tools
-- `api-reference.md` - Complete API endpoint documentation
-- `architecture.md` - Architecture and design decisions
-- `user-guide.md` - End-user documentation
-- `admin-guide.md` - Administrator guide
-- `notifications.md` - Email notification reference
+**Key documents:**
+- `INDEX.md` - Documentation navigation and index
+- `README.md` - Project overview
 - `CONTRIBUTING.md` - This file
+- `dev-setup.md` - Development environment setup
+- Plus 11 other specialized guides
 
 ### Documentation Standards
 
-#### Use Mermaid Diagrams
+See [DOCUMENTATION-GUIDE.md](../DOCUMENTATION-GUIDE.md) for complete standards including:
 
-For all technical diagrams (architecture, flows, sequences, ERDs), use Mermaid instead of ASCII art or external images:
+- **Writing style** - Clear, concise, audience-appropriate
+- **Mermaid diagrams** - Use for all technical diagrams with high-contrast colors
+- **Code examples** - Working examples with proper syntax highlighting
+- **Markdown conventions** - Tables, lists, formatting
+- **Link management** - Relative paths, cross-references
+- **Avoiding duplication** - Single source of truth principle
 
-```markdown
-\`\`\`mermaid
-graph LR
-    User[User] --> Frontend[Angular Frontend]
-    Frontend --> API[Slim API]
-    API --> Database[(MySQL)]
-\`\`\`
-```
-
-**Diagram quality requirements:**
-- Use high-contrast colors for readability
-- Include clear labels
-- Follow project color scheme:
-  - Domain layer: Blue (#b3d9ff background, #003d73 border)
-  - Application layer: Orange (#ffe6cc background, #b34700 border)
-  - Infrastructure layer: Green (#d9f2d9 background, #1a661a border)
-  - External systems: Gray (#f0f0f0 background, #333 border)
-
-#### Markdown Table Formatting
-
-Format tables with proper indentation and spacing for raw readability:
-
-```markdown
-| Column 1 | Column 2 | Column 3 |
-|----------|----------|----------|
-| Value 1  | Value 2  | Value 3  |
-| Value 4  | Value 5  | Value 6  |
-```
-
-#### Code Examples
-
-Include working code examples with proper syntax highlighting:
-
-```markdown
-\`\`\`typescript
-// TypeScript example
-interface User {
-  id: number;
-  name: string;
-}
-\`\`\`
-
-\`\`\`php
-// PHP example
-class UserService {
-    public function findById(int $id): User { }
-}
-\`\`\`
-```
-
-#### Cross-References
-
-Link to related documentation:
-
-```markdown
-See [Frontend Development Guide](frontend-dev.md) for details.
-
-For API endpoint documentation, refer to the [API Reference](api-reference.md).
-```
+**Quick reference:**
+- Use Mermaid for diagrams (not ASCII art or images)
+- Format tables with proper spacing for raw readability
+- Include working code examples with syntax highlighting
+- Link to related documentation with relative paths
 
 ## Database Migrations
 
