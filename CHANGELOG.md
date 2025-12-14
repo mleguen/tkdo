@@ -22,6 +22,7 @@
 - **Technical Tasks:**
   - Upgrade Angular from v17.3 to v21.0 to address critical security vulnerabilities
   - Upgrade esbuild from 0.17.x to 0.26.0 (included in @angular/devkit/build-angular v21.0.3) to fix critical arbitrary file read vulnerability (CVE affecting <=0.24.2)
+  - Upgrade Cypress from v14.4.1 to v15.7.1 to fix critical unsafe random function vulnerability in form-data dependency (GHSA-fjxv-7rqg-78g4, upgraded from v4.0.3 to v4.0.5 via @cypress/request@3.0.9)
   - Upgrade TypeScript from 5.4 to 5.9
   - Upgrade @ng-bootstrap/ng-bootstrap from v16.0 to v20.0
   - Upgrade @angular-eslint packages from v17.3 to v21.1 to fix moderate severity vulnerabilities via nx dependency and tmp symbolic link attack (GHSA-52f5-9888-hmc6)

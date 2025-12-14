@@ -54,7 +54,7 @@
     "@types/jasmine": "~5.1.0",
     "@typescript-eslint/eslint-plugin": "^8.49.0",
     "@typescript-eslint/parser": "^8.49.0",
-    "cypress": "latest",
+    "cypress": "^15.7.1",
     "eslint": "^8.57.0",
     "eslint-plugin-deprecation": "^2.0.0",
     "jasmine-core": "~5.1.0",

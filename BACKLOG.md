@@ -40,9 +40,6 @@
 
 ### Security Vulnerabilities (Frontend)
 
-**Critical Priority:**
-- Upgrade form-data to >=4.0.4 to fix critical unsafe random function vulnerability (GHSA-fjxv-7rqg-78g4) - currently at v4.0.3 via cypress@14.4.1 -> @cypress/request@3.0.8
-
 **Medium Priority:**
 - Upgrade webpack-dev-server to >=5.3.0 to fix moderate severity source code theft vulnerabilities (GHSA-9jgg-88mc-972h, GHSA-4v9v-hfq4-rm2v) - currently at v5.2.2
 - Upgrade cookie package to >=0.8.0 to fix low severity session fixation vulnerability (GHSA-cqmj-92xf-r6r9) - currently at v0.7.2
