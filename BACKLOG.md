@@ -42,24 +42,11 @@
 
 **Low Priority:**
 
-**Context:** brace-expansion package versions 1.1.11 and 2.0.1 are vulnerable to ReDoS (GHSA-v6h2-p8h4-qcjw/CVE-2025-5889, CVSS 1.3). These versions are pulled in as transitive dependencies via minimatch@3.1.2 from eslint@8.57.1, karma@6.4.4, and karma-coverage@2.2.1. Fixed versions: >=1.1.12 or >=2.0.2.
+**Context:** brace-expansion package versions 1.1.11 and 2.0.1 are vulnerable to ReDoS (GHSA-v6h2-p8h4-qcjw/CVE-2025-5889, CVSS 1.3). These versions are pulled in as transitive dependencies via minimatch@3.1.2 from karma@6.4.4 and karma-coverage@2.2.1. Fixed versions: >=1.1.12 or >=2.0.2.
 
-**Strategy:** Upgrade parent packages (eslint, karma, karma-coverage) to newer versions that depend on patched minimatch/brace-expansion versions.
+**Strategy:** Upgrade parent packages (karma, karma-coverage) to newer versions that depend on patched minimatch/brace-expansion versions.
 
-1. **Upgrade ESLint from v8.57.1 to v9.x**
-   - **Current:** eslint@8.57.1 (depends on minimatch@3.1.2 → brace-expansion@1.1.11)
-   - **Target:** eslint@9.39.2 or latest v9.x
-   - **Action:**
-     - Update `front/package.json` devDependencies: `"eslint": "^9.39.2"`
-     - Run `./npm install`
-     - Review and update ESLint configuration for v9 breaking changes (flat config migration)
-     - Update `.eslintrc.json` or migrate to `eslint.config.js` if required
-     - Fix any new linting errors that appear
-   - **Testing:** Run `./npm test` (includes linting) to verify
-   - **Note:** ESLint v9 is a major version upgrade with breaking changes; review migration guide
-   - **Reference:** https://eslint.org/docs/latest/use/migrate-to-9.0.0
-
-2. **Upgrade Karma from v6.4.4 to v7.x (if available)**
+1. **Upgrade Karma from v6.4.4 to v7.x (if available)**
    - **Current:** karma@6.4.4 (depends on minimatch@3.1.2 → brace-expansion@1.1.11)
    - **Target:** Latest stable version
    - **Action:**
@@ -71,7 +58,7 @@
    - **Testing:** Run `./npm test` to verify unit tests still work
    - **Note:** Check for breaking changes in karma release notes
 
-3. **Upgrade karma-coverage from v2.2.1 to latest**
+2. **Upgrade karma-coverage from v2.2.1 to latest**
    - **Current:** karma-coverage@2.2.1 (depends on minimatch@3.1.2 → brace-expansion@1.1.11)
    - **Target:** Latest stable version compatible with upgraded karma
    - **Action:**
@@ -82,7 +69,7 @@
    - **Testing:** Run `./npm test` and verify coverage reports generate correctly
    - **Note:** Ensure compatibility with upgraded karma version
 
-4. **Verify brace-expansion vulnerability is fixed**
+3. **Verify brace-expansion vulnerability is fixed**
    - **Action:**
      - Run `./npm list brace-expansion` to check all instances
      - Run `./npm audit` to verify GHSA-v6h2-p8h4-qcjw is no longer reported

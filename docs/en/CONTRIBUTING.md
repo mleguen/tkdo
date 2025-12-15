@@ -399,14 +399,19 @@ Run before committing:
 ./composer test  # All backend tests (REQUIRED)
 ```
 
-**Before PRs and releases** (additional requirement):
+**Before PRs, releases, and dependency upgrades** (additional requirement):
 
 ```bash
-# End-to-End Tests - REQUIRED for PRs/releases, strongly recommended otherwise
+# End-to-End Tests - REQUIRED for PRs/releases/dependency upgrades, strongly recommended otherwise
 docker compose up -d front        # Start full stack
 ./composer run install-fixtures   # Reset test data
 ./npm run e2e                     # E2E tests with real backend
 ```
+
+**IMPORTANT:** E2E tests are **MANDATORY** when:
+- Creating pull requests
+- Preparing releases
+- **Upgrading dependencies** (npm packages, PHP packages, Angular, etc.)
 
 **Why all test levels matter:**
 - **Unit tests**: Catch logic errors in services/guards/interceptors

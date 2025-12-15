@@ -26,6 +26,7 @@
   - Upgrade TypeScript from 5.4 to 5.9
   - Upgrade @ng-bootstrap/ng-bootstrap from v16.0 to v20.0
   - Upgrade @angular-eslint packages from v17.3 to v21.1 to fix moderate severity vulnerabilities via nx dependency and tmp symbolic link attack (GHSA-52f5-9888-hmc6)
+  - Upgrade ESLint from v8.57.1 to v9.39.2 and migrate from archived eslint-plugin-deprecation to @typescript-eslint/no-deprecated rule, fixing brace-expansion ReDoS vulnerability (GHSA-v6h2-p8h4-qcjw/CVE-2025-5889) in ESLint dependencies
   - Apply Angular automatic migrations including inject() function pattern and block control flow syntax
   - Update all component test files to use provideHttpClientTesting() instead of deprecated HttpClientTestingModule
   - Update app.config.ts to use provideHttpClient(withInterceptorsFromDi()) instead of deprecated HttpClientModule
