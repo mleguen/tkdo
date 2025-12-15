@@ -40,10 +40,6 @@
 
 ### Security Vulnerabilities (Frontend)
 
-**Medium Priority:**
-- Upgrade cookie package to >=0.8.0 to fix low severity session fixation vulnerability (GHSA-cqmj-92xf-r6r9) - currently at v0.7.2
-- Upgrade old path-to-regexp instance to >=8.2.1 to fix low severity denial of service vulnerability (GHSA-9wv6-86v2-598j) - currently at v0.1.12 (one instance at v8.3.0 is OK)
-
 **Low Priority:**
 - Upgrade brace-expansion to >=2.0.2 to fix low severity ReDoS vulnerability (GHSA-v6h2-p8h4-qcjw) - currently at v1.1.11 via eslint@8.57.1, karma@6.4.4, karma-coverage@2.2.1 (newer version 2.0.1 also vulnerable)
 

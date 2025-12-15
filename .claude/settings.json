@@ -3,7 +3,10 @@
     "allow": [
       "Bash(chmod:*)"
     ],
-    "deny": [],
+    "deny": [
+      "Read:(./api/.env.prod)",
+      "Read:(.claude-WIP.md)"
+    ],
     "ask": []
   }
 }
