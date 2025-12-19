@@ -1,5 +1,586 @@
 # Future Work
 
+## Testing
+
+This section tracks tasks to achieve comprehensive test coverage with automated CI/CD integration, following the testing philosophy outlined in [docs/en/testing.md](docs/en/testing.md).
+
+**Testing Targets:**
+- All major features and use cases covered by tests
+- In-browser tests covering mobile and desktop viewports
+- Balanced test pyramid with no redundancy
+- Proper test preconditions (no external state dependencies)
+- Automated GitHub CI with PR merge blocking
+- Test-driven development practices
+- Fast test execution via parallelization
+- Compliance with general and framework-specific best practices
+
+### GitHub CI/CD Integration
+
+**Task 1:** Investigate and document CI testing approach
+- **Files to create:**
+  - `docs/en/ci-testing-strategy.md`
+- **Content:**
+  - Research GitHub Actions service containers vs Docker Compose
+  - Verify GitHub runner support for PHP 8.4 (via shivammathur/setup-php)
+  - Verify Node.js/npm setup (via actions/setup-node)
+  - Test MySQL 5.7 service container configuration
+  - Test Mailhog service container for notification tests, and consider whether switching to another mail testing service instead (e.g. maildev) wouldn't help with standardisation (rephrase other tasks below in that case)
+  - Measure performance: service containers vs Docker Compose
+  - Document decision matrix: when to use each approach
+  - Define CI test execution strategy (native vs containerized)
+  - Investigate if E2E tests can run with service containers
+  - Research similar Angular+PHP projects' CI patterns
+  - Investigate repository visibility options and GitHub Actions free tier strategy (knowing this is a public repository)
+  - Document wrapper script pattern: local Docker commands vs native CI commands
+  - Research Makefile or unified test interface for environment detection
+  - Investigate test execution optimization: fail-fast strategies, conditional test runs, tiered approach (unit → component → integration → E2E)
+  - Research caching strategy for node_modules and vendor dependencies
+  - Document artifact management and retention policies (screenshots, videos, coverage reports, 500 MB limit considerations)
+  - Investigate database fixture optimization for CI: snapshots vs migrations, transaction rollback, parallel test databases
+  - Research path-based test triggering to skip tests for documentation-only changes
+- **Estimated size:** ~200-300 lines documentation
+- **Dependencies:** None
+- **Priority:** Critical - must complete before Tasks 2-5
+- **Note:** This investigation will determine the implementation approach for all subsequent CI tasks
+
+**Task 2:** Set up GitHub Actions workflow for unit and component tests
+- **Files to create:**
+  - `.github/workflows/test.yml`
+- **Content:**
+  - Configure workflow triggers (push, pull_request on all branches)
+  - Frontend unit tests job (native runner with actions/setup-node)
+  - Frontend component tests job (native runner with Cypress)
+  - Backend unit tests job (native runner with shivammathur/setup-php)
+  - Backend integration tests job with MySQL service container
+  - Run PHPStan static analysis
+  - Configure test result reporting and artifacts
+  - Set up caching for node_modules and Composer dependencies
+  - Configure branch protection rules requiring tests to pass
+- **Estimated size:** ~150-200 lines
+- **Dependencies:** Task 1 completed with documented strategy
+- **Priority:** High - enables automated quality gates
+- **Note:** Implementation details depend on Task 1 investigation results
+
+**Task 3:** Add GitHub Actions workflow for integration tests
+- **Files to create:**
+  - `.github/workflows/integration.yml`
+- **Content:**
+  - Frontend integration tests with mocked backend (native runner)
+  - Backend API integration tests with MySQL service container
+  - Mailhog service container for email testing
+  - Database fixture loading before tests
+  - Configure proper service health checks
+  - Test result and coverage artifact uploads
+  - Optimize service container startup time
+- **Estimated size:** ~120-150 lines
+- **Dependencies:** Task 2 completed
+- **Priority:** High - validates integration points
+- **Note:** May use Docker Compose only if service containers prove insufficient (per Task 1)
+
+**Task 4:** Add GitHub Actions workflow for E2E tests
+- **Files to create:**
+  - `.github/workflows/e2e.yml`
+- **Content:**
+  - Decide on approach based on Task 1 investigation
+  - Option A (preferred): Use service containers for MySQL, build frontend, start Slim via PHP built-in server
+  - Option B (fallback): Use Docker Compose for full stack if Option A not feasible
+  - Database fixture loading
+  - Cypress E2E execution against real backend
+  - Screenshot and video artifact uploads on failure
+  - Run only on PR approval or manual trigger (slower tests)
+  - Document chosen approach and rationale
+- **Estimated size:** ~100-150 lines
+- **Dependencies:** Tasks 1-3 completed
+- **Priority:** High - critical path validation
+- **Note:** Approach TBD by Task 1; prefer native GitHub Actions patterns
+
+**Task 5:** Configure test parallelization and cross-browser testing
+- **Files to modify:**
+  - `.github/workflows/test.yml`
+  - `.github/workflows/integration.yml`
+  - `.github/workflows/e2e.yml`
+  - `front/cypress.config.ts`
+  - `api/phpunit.xml`
+- **Content:**
+  - Split Cypress tests across multiple runners using matrix strategy
+  - Configure PHPUnit parallel execution
+  - Add Firefox browser to Cypress tests
+  - Add Webkit/Safari browser to Cypress tests (if feasible in GitHub Actions)
+  - Set up matrix strategy for browser testing
+  - Optimize job dependencies for faster feedback
+  - Configure proper test sharding and load balancing
+  - Document browser support policy in testing.md
+- **Estimated size:** ~80-120 lines across files
+- **Dependencies:** Tasks 2-4 completed
+- **Priority:** Medium - improves speed and coverage
+
+### Frontend Testing - Unit Tests
+
+**Task 6:** Expand BackendService unit tests
+- **File:** `front/src/app/backend.service.spec.ts`
+- **Content:**
+  - Test all HTTP methods (GET, POST, PUT, DELETE)
+  - Test authentication state management
+  - Test error handling and error$ observable
+  - Test token storage and retrieval
+  - Mock HttpClient responses
+  - Test observable streams (utilisateurConnecte$, occasions$)
+  - Test edge cases (network failures, invalid responses)
+- **Current state:** Minimal (instantiation only)
+- **Estimated additions:** ~150-200 lines
+- **Priority:** High - core service used throughout app
+
+**Task 7:** Add comprehensive guard unit tests
+- **Files:**
+  - `front/src/app/connexion.guard.spec.ts`
+  - `front/src/app/admin.guard.spec.ts`
+- **Content:**
+  - Test authentication checks
+  - Test navigation blocking for unauthenticated users
+  - Test admin authorization logic
+  - Test redirect behavior
+  - Mock BackendService and Router
+  - Test CanActivate interface implementation
+- **Current state:** Minimal (instantiation only)
+- **Estimated additions:** ~100-150 lines total
+- **Priority:** High - guards protect critical routes
+
+**Task 8:** Add HTTP interceptor unit tests
+- **Files:**
+  - `front/src/app/auth-backend.interceptor.spec.ts`
+  - `front/src/app/erreur-backend.interceptor.spec.ts`
+  - `front/src/app/dev-backend.interceptor.spec.ts`
+- **Content:**
+  - Test token injection in requests
+  - Test error handling and transformation
+  - Test dev mode API mocking
+  - Test interceptor chaining
+  - Mock HTTP requests and responses
+  - Test error observable emissions
+- **Current state:** No tests exist
+- **Estimated additions:** ~200-250 lines total
+- **Priority:** Medium - important but well-isolated code
+
+### Frontend Testing - Component Tests
+
+**Task 9:** Expand ConnexionComponent component tests
+- **File:** `front/cypress/component/connexion.component.cy.ts`
+- **Content:**
+  - Test form rendering and validation
+  - Test successful login flow
+  - Test failed login with error message display
+  - Test form submission with invalid data
+  - Test password visibility toggle
+  - Mock BackendService responses
+  - Test navigation after successful login
+- **Current state:** Minimal (mounting only)
+- **Estimated additions:** ~80-120 lines
+- **Priority:** High - critical user journey
+
+**Task 10:** Add comprehensive OccasionComponent component tests
+- **File:** `front/cypress/component/occasion.component.cy.ts`
+- **Content:**
+  - Test occasion details rendering
+  - Test participant list display
+  - Test exclusion list display
+  - Test add participant form
+  - Test add exclusion form
+  - Test draw generation button
+  - Test different user permissions (participant vs admin)
+  - Mock backend data and responses
+- **Current state:** Minimal (mounting only)
+- **Estimated additions:** ~150-200 lines
+- **Priority:** High - complex component with multiple features
+
+**Task 11:** Add ListeIdeesComponent component tests
+- **File:** `front/cypress/component/liste-idees.component.cy.ts`
+- **Content:**
+  - Test idea list rendering for different participants
+  - Test filtering by participant
+  - Test add new idea form
+  - Test idea card interactions
+  - Test permission-based visibility (own vs others' ideas)
+  - Test empty state display
+  - Mock ideas fixture data
+- **Current state:** Minimal (mounting only)
+- **Estimated additions:** ~120-150 lines
+- **Priority:** High - core feature
+
+**Task 12:** Add ProfilComponent component tests
+- **File:** `front/cypress/component/profil.component.cy.ts`
+- **Content:**
+  - Test profile display
+  - Test profile edit form
+  - Test password change functionality
+  - Test notification preferences
+  - Test form validation
+  - Test successful save with confirmation
+  - Mock user data and API responses
+- **Current state:** Minimal (mounting only)
+- **Estimated additions:** ~100-130 lines
+- **Priority:** Medium - important user feature
+
+**Task 13:** Add AdminComponent component tests
+- **File:** `front/cypress/component/admin.component.cy.ts`
+- **Content:**
+  - Test user list rendering
+  - Test create user form
+  - Test user deletion
+  - Test admin-only access
+  - Test form validation
+  - Mock user list and API responses
+- **Current state:** Minimal (mounting only)
+- **Estimated additions:** ~100-130 lines
+- **Priority:** Medium - admin functionality
+
+**Task 14:** Add HeaderComponent component tests
+- **File:** `front/cypress/component/header.component.cy.ts`
+- **Content:**
+  - Test navigation menu rendering
+  - Test authenticated vs unauthenticated states
+  - Test admin menu visibility
+  - Test mobile hamburger menu
+  - Test logout functionality
+  - Mock authentication state
+- **Current state:** Minimal (mounting only)
+- **Estimated additions:** ~80-100 lines
+- **Priority:** Medium - navigation component
+
+### Frontend Testing - Integration Tests Enhancement
+
+**Task 15:** Add mobile viewport testing to all integration tests
+- **Files:**
+  - `front/cypress/e2e/*.cy.ts` (all test files)
+  - `front/cypress/support/e2e.ts`
+- **Content:**
+  - Add viewport configuration helper
+  - Test all flows on mobile (375x667) and desktop (1280x720)
+  - Test responsive UI elements (hamburger menu, cards)
+  - Add viewport switcher to test suite
+  - Document mobile testing patterns
+- **Estimated additions:** ~150-200 lines across files
+- **Priority:** High - mobile support is critical
+
+**Task 16:** Refactor integration tests to remove component-level concerns
+- **Files:**
+  - `front/cypress/e2e/connexion.cy.ts`
+  - `front/cypress/e2e/liste-idees.cy.ts`
+- **Content:**
+  - Move component-specific tests to component test files
+  - Keep only multi-component integration flows
+  - Update to focus on user journeys, not implementation
+  - Reduce redundancy with component tests
+  - Improve test performance
+- **Estimated changes:** ~50-100 lines removed, reorganized
+- **Dependencies:** Tasks 9-14 completed
+- **Priority:** Medium - maintains test pyramid balance
+
+**Task 17:** Add comprehensive error handling integration tests
+- **File:** `front/cypress/e2e/error-handling.cy.ts` (new)
+- **Content:**
+  - Test network failure scenarios
+  - Test API error responses (4xx, 5xx)
+  - Test error message display
+  - Test error recovery flows
+  - Test offline behavior
+  - Mock various error conditions
+- **Estimated size:** ~120-150 lines
+- **Priority:** Medium - important for resilience
+
+**Task 18:** Add notification preferences integration tests
+- **File:** `front/cypress/e2e/notifications.cy.ts` (new)
+- **Content:**
+  - Test notification preference changes
+  - Test daily digest enabling/disabling
+  - Test immediate notification preferences
+  - Test email preference persistence
+  - Mock notification settings API
+- **Estimated size:** ~80-100 lines
+- **Priority:** Medium - user-facing feature
+
+### Frontend Testing - Test Infrastructure
+
+**Task 19:** Implement test data builders for fixtures
+- **Files to create:**
+  - `front/cypress/support/builders/utilisateur.builder.ts`
+  - `front/cypress/support/builders/occasion.builder.ts`
+  - `front/cypress/support/builders/idee.builder.ts`
+- **Content:**
+  - Create fluent builder pattern for test data
+  - Support default values with overrides
+  - Type-safe builder methods
+  - Integration with existing fixtures
+- **Estimated size:** ~150-200 lines total
+- **Priority:** Medium - improves test maintainability
+
+**Task 20:** Add reusable test assertions library
+- **File:** `front/cypress/support/assertions.ts` (new)
+- **Content:**
+  - Custom Cypress commands for common assertions
+  - Domain-specific assertions (isLoggedIn, hasOccasion, etc.)
+  - Reusable error checking
+  - Accessibility assertion helpers
+- **Estimated size:** ~100-150 lines
+- **Priority:** Low - nice to have
+
+### Backend Testing - Unit Tests
+
+**Task 21:** Add comprehensive IdeePort unit tests
+- **File:** `api/test/Unit/Dom/Port/IdeePortTest.php`
+- **Content:**
+  - Test idea creation with authorization
+  - Test idea update with permission checks
+  - Test idea deletion
+  - Test visibility rules (own ideas vs others)
+  - Mock dependencies (repositories, auth)
+  - Test exception cases
+- **Current state:** No tests exist
+- **Estimated size:** ~200-250 lines
+- **Priority:** High - core business logic
+
+**Task 22:** Add comprehensive UtilisateurPort unit tests
+- **File:** `api/test/Unit/Dom/Port/UtilisateurPortTest.php`
+- **Content:**
+  - Test user creation (admin only)
+  - Test user update
+  - Test password change
+  - Test notification preference updates
+  - Test admin authorization checks
+  - Mock all dependencies
+  - Test validation logic
+- **Current state:** Exists but needs expansion
+- **Estimated additions:** ~150-200 lines
+- **Priority:** High - user management logic
+
+**Task 23:** Add comprehensive NotifPort unit tests
+- **File:** `api/test/Unit/Dom/Port/NotifPortTest.php`
+- **Content:**
+  - Test notification creation logic
+  - Test daily digest aggregation
+  - Test notification filtering by preferences
+  - Test email sending logic
+  - Mock MailPlugin
+  - Test edge cases (no preferences, empty digests)
+- **Current state:** Exists but minimal
+- **Estimated additions:** ~200-250 lines
+- **Priority:** High - complex notification logic
+
+**Task 24:** Add ExclusionPort unit tests
+- **File:** `api/test/Unit/Dom/Port/ExclusionPortTest.php`
+- **Content:**
+  - Test exclusion creation
+  - Test exclusion validation (bidirectional)
+  - Test exclusion removal
+  - Test authorization checks
+  - Mock repositories
+- **Current state:** No tests exist
+- **Estimated size:** ~120-150 lines
+- **Priority:** Medium - important business rule
+
+**Task 25:** Expand OccasionPort unit tests
+- **File:** `api/test/Unit/Dom/Port/OccasionPortTest.php`
+- **Content:**
+  - Test draw generation algorithm
+  - Test participant validation
+  - Test exclusion enforcement in draws
+  - Test occasion creation/update/delete
+  - Test authorization for various operations
+  - Mock all dependencies thoroughly
+- **Current state:** Exists but needs expansion
+- **Estimated additions:** ~150-200 lines
+- **Priority:** High - core feature with complex logic
+
+### Backend Testing - Integration Tests
+
+**Task 26:** Add comprehensive idea API integration tests
+- **File:** `api/test/Int/IdeeIntTest.php`
+- **Content:**
+  - Test all CRUD operations via API
+  - Test authorization for different user types
+  - Test visibility rules
+  - Test commenting functionality (when implemented)
+  - Test concurrent modification
+  - Verify database state after operations
+  - Test email notifications
+- **Current state:** Exists but needs expansion
+- **Estimated additions:** ~200-300 lines
+- **Priority:** High - core API
+
+**Task 27:** Add notification integration tests
+- **File:** `api/test/Int/NotifIntTest.php` (new)
+- **Content:**
+  - Test notification creation via various triggers
+  - Test daily digest generation
+  - Test email sending
+  - Test notification preferences
+  - Verify Mailhog receives emails
+  - Test notification filtering
+- **Estimated size:** ~250-300 lines
+- **Priority:** High - email is critical functionality
+
+**Task 28:** Add comprehensive occasion draw integration tests
+- **File:** `api/test/Int/OccasionIntTest.php`
+- **Content:**
+  - Test draw generation with various scenarios
+  - Test exclusion enforcement
+  - Test impossible draw scenarios
+  - Test draw regeneration
+  - Test result visibility by participant
+  - Verify database constraints
+- **Current state:** Exists but needs expansion
+- **Estimated additions:** ~150-200 lines
+- **Priority:** High - core feature
+
+**Task 29:** Add API error response integration tests
+- **File:** `api/test/Int/ErrorHandlingIntTest.php` (new)
+- **Content:**
+  - Test 400 Bad Request scenarios
+  - Test 401 Unauthorized responses
+  - Test 403 Forbidden responses
+  - Test 404 Not Found responses
+  - Test 500 Internal Server Error handling
+  - Verify error response format consistency
+  - Test validation error messages
+- **Estimated size:** ~200-250 lines
+- **Priority:** Medium - API consistency
+
+**Task 30:** Add database constraint integration tests
+- **File:** `api/test/Int/DatabaseConstraintIntTest.php` (new)
+- **Content:**
+  - Test unique constraints
+  - Test foreign key constraints
+  - Test cascade deletions
+  - Test null constraints
+  - Verify constraint error handling
+- **Estimated size:** ~120-150 lines
+- **Priority:** Low - database integrity
+
+### Backend Testing - Test Infrastructure
+
+**Task 31:** Add database transaction rollback for faster tests
+- **File:** `api/test/Int/IntTestCase.php`
+- **Content:**
+  - Wrap each test in database transaction
+  - Rollback after each test
+  - Eliminate need for manual cleanup
+  - Document transaction isolation levels
+  - Measure performance improvement
+- **Estimated changes:** ~40-60 lines
+- **Priority:** High - significantly speeds up tests
+
+**Task 32:** Create test data builders for backend
+- **Files to create:**
+  - `api/test/Builder/UtilisateurBuilder.php`
+  - `api/test/Builder/OccasionBuilder.php`
+  - `api/test/Builder/IdeeBuilder.php`
+- **Content:**
+  - Fluent builder pattern for entities
+  - Default valid values
+  - Method chaining for customization
+  - Integration with IntTestCase
+- **Estimated size:** ~200-250 lines total
+- **Priority:** Medium - improves test readability
+
+### Test Coverage and Quality
+
+**Task 33:** Set up test coverage reporting
+- **Files to modify:**
+  - `api/phpunit.xml`
+  - `front/karma.conf.js` (if exists) or create
+  - `.github/workflows/test.yml`
+- **Content:**
+  - Enable Xdebug coverage for PHPUnit
+  - Configure Istanbul/NYC for frontend
+  - Set coverage thresholds (80% for business logic)
+  - Generate coverage reports in CI
+  - Upload coverage to artifact storage
+  - Add coverage badges to README
+- **Estimated size:** ~80-100 lines across files
+- **Priority:** Medium - tracks progress
+
+**Task 34:** Add mutation testing for backend
+- **Files to create/modify:**
+  - `api/infection.json.dist`
+  - `api/composer.json` (add infection/infection)
+  - `.github/workflows/test.yml`
+- **Content:**
+  - Configure Infection mutation testing
+  - Set mutation score indicator (MSI) thresholds
+  - Run on CI for critical business logic
+  - Document mutation testing in testing.md
+- **Estimated size:** ~60-80 lines
+- **Priority:** Low - advanced quality metric
+
+### Performance Testing
+
+**Task 35:** Add performance benchmarks for critical paths
+- **Files to create:**
+  - `front/cypress/e2e/performance.cy.ts`
+  - `api/test/Performance/DrawPerformanceTest.php`
+- **Content:**
+  - Measure page load times
+  - Measure API response times
+  - Test with large datasets (100+ participants)
+  - Set performance budgets
+  - Track metrics over time
+  - Alert on regressions
+- **Estimated size:** ~200-250 lines total
+- **Priority:** Low - optimization metric
+
+### Accessibility Testing
+
+**Task 36:** Add accessibility testing to E2E tests
+- **Files to create:**
+  - `front/cypress/e2e/accessibility.cy.ts`
+  - `front/package.json` (add cypress-axe)
+- **Content:**
+  - Install and configure cypress-axe
+  - Test WCAG 2.1 AA compliance
+  - Test keyboard navigation
+  - Test screen reader compatibility
+  - Test color contrast
+  - Document accessibility standards
+- **Estimated size:** ~150-200 lines
+- **Priority:** Medium - improves inclusivity
+
+### Documentation and Process
+
+**Task 37:** Create testing contribution guide
+- **File:** `docs/en/testing.md`
+- **Content:**
+  - Add "Writing Tests" section with TDD workflow
+  - Document test-first development process
+  - Provide test templates for each type
+  - Add troubleshooting for common test issues
+  - Document running tests in different environments
+  - Add examples of good vs bad tests
+- **Estimated additions:** ~200-250 lines
+- **Priority:** Medium - enables contributor TDD
+
+**Task 38:** Create PR checklist template
+- **File:** `.github/pull_request_template.md` (new)
+- **Content:**
+  - Require test evidence for all PRs
+  - Checklist for all test levels executed
+  - Coverage impact section
+  - Manual testing steps
+  - Link to testing.md guidelines
+- **Estimated size:** ~40-60 lines
+- **Priority:** Medium - enforces testing standards
+
+**Task 39:** Add test execution time tracking and optimization
+- **Files to modify:**
+  - `.github/workflows/test.yml`
+  - `docs/en/testing.md`
+- **Content:**
+  - Track test suite execution times
+  - Set target times (unit: <30s, component: <2m, integration: <5m, e2e: <10m)
+  - Document optimization strategies
+  - Identify and split slow tests
+  - Configure proper timeouts
+- **Estimated changes:** ~60-80 lines
+- **Priority:** Low - developer experience
+
 ## Features & Enhancements
 
 ### UI/UX Improvements
