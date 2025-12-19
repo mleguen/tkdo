@@ -62,6 +62,7 @@ Documentation for developers contributing to or extending Tkdo.
 | [Development Setup](dev-setup.md)         | Docker environment, running services, helper scripts                  |
 | [Contributing Guidelines](CONTRIBUTING.md)| Workflow, coding standards, testing, commit conventions, PR process   |
 | [Testing Guide](testing.md)               | Frontend, backend, and E2E testing strategies                         |
+| [CI Testing Strategy](ci-testing-strategy.md) | GitHub Actions CI/CD investigation and implementation guide      |
 
 ### Architecture and Design
 
