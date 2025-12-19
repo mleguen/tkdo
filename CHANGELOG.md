@@ -2,6 +2,10 @@
 
 ## Next Release
 
+### Users
+- **Bug Fixes:**
+  - Fixed desktop navigation menu not visible on initial connection - menu now appears by default on desktop viewports (≥768px) while remaining collapsed on mobile (<768px), using Angular CDK's BreakpointObserver for responsive behavior
+
 ### Contributors
 - **Documentation:**
   - Create documentation writing guide (docs/DOCUMENTATION-GUIDE.md) consolidating all documentation standards, writing style, markdown conventions, diagram guidelines, code examples, link management, consistency practices, and localization process
@@ -35,6 +39,8 @@
   - Fix deprecated HttpErrorResponse.statusText usage for HTTP/2 compatibility
   - Fix integration test whitespace assertion to handle Angular v21 block control flow whitespace preservation
   - Fix integration test console.log spy timing issue to ensure console is available before spying on it
+  - Add @angular/cdk package to use BreakpointObserver for responsive design
+  - Add comprehensive component tests for HeaderComponent covering desktop and mobile viewport behavior including menu visibility, hamburger toggle functionality, and responsive design validation using real viewport detection (cy.viewport) with BreakpointObserver
 
 ## V1.4.4 (December 8, 2025)
 
