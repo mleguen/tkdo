@@ -38,46 +38,6 @@
 - switch to JSON+HAL, to decouple front and API: front would no longer have to build routes, or decide which actions are possible,
   as possible actions with their routes will already be provided with the state
 
-### Security Vulnerabilities (Frontend)
-
-**Low Priority:**
-
-**Context:** brace-expansion package versions 1.1.11 and 2.0.1 are vulnerable to ReDoS (GHSA-v6h2-p8h4-qcjw/CVE-2025-5889, CVSS 1.3). These versions are pulled in as transitive dependencies via minimatch@3.1.2 from karma@6.4.4 and karma-coverage@2.2.1. Fixed versions: >=1.1.12 or >=2.0.2.
-
-**Strategy:** Upgrade parent packages (karma, karma-coverage) to newer versions that depend on patched minimatch/brace-expansion versions.
-
-1. **Upgrade Karma from v6.4.4 to v7.x (if available)**
-   - **Current:** karma@6.4.4 (depends on minimatch@3.1.2 → brace-expansion@1.1.11)
-   - **Target:** Latest stable version
-   - **Action:**
-     - Check npm for latest karma version: `./npm view karma versions`
-     - Update `front/package.json` devDependencies: `"karma": "~X.Y.Z"`
-     - Run `./npm install`
-     - Review karma configuration (`karma.conf.js`) for breaking changes
-     - Test with `./npm test` (includes karma unit tests)
-   - **Testing:** Run `./npm test` to verify unit tests still work
-   - **Note:** Check for breaking changes in karma release notes
-
-2. **Upgrade karma-coverage from v2.2.1 to latest**
-   - **Current:** karma-coverage@2.2.1 (depends on minimatch@3.1.2 → brace-expansion@1.1.11)
-   - **Target:** Latest stable version compatible with upgraded karma
-   - **Action:**
-     - Check npm for latest version: `./npm view karma-coverage versions`
-     - Update `front/package.json` devDependencies: `"karma-coverage": "~X.Y.Z"`
-     - Run `./npm install`
-     - Test coverage reporting still works
-   - **Testing:** Run `./npm test` and verify coverage reports generate correctly
-   - **Note:** Ensure compatibility with upgraded karma version
-
-3. **Verify brace-expansion vulnerability is fixed**
-   - **Action:**
-     - Run `./npm list brace-expansion` to check all instances
-     - Run `./npm audit` to verify GHSA-v6h2-p8h4-qcjw is no longer reported
-     - Confirm all brace-expansion versions are >=1.1.12 or >=2.0.2
-   - **Expected:** No vulnerable brace-expansion versions in dependency tree
-   - **Update BACKLOG:** Remove this entire security vulnerability section once verified fixed
-   - **Update CHANGELOG:** Add upgrade details under "Technical Tasks" in same commit
-
 ### Deprecation Warnings (Dart Sass 3.0.0)
 
 **Context:** Following the Angular 21 upgrade, multiple Sass deprecation warnings are reported by `./npm run ct`, `./npm run int`, and `./npm run e2e`. These relate to Dart Sass 3.0.0 breaking changes that will remove deprecated features.
@@ -119,7 +79,7 @@
      - Global `mix()` function → use `color.mix()`
      - Multiple `@import` statements → use `@use`/`@forward`
    - **Action:** Monitor Bootstrap releases for Dart Sass 3.0.0 compatibility; upgrade when available
-   - **Tracking:** Check https://github.com/twbs/bootstrap/releases
+   - **Tracking:** Check https://github.com/twbs/bootstrap/releases and [the matching Bootstrap issue](https://github.com/twbs/bootstrap/issues/40962)
    - **Alternative:** Consider switching to compiled Bootstrap CSS instead of Sass imports if updates lag
    - **Priority:** Low (third-party issue, will be resolved in Bootstrap v6 or earlier patch)
 

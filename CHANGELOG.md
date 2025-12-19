@@ -27,6 +27,7 @@
   - Upgrade @ng-bootstrap/ng-bootstrap from v16.0 to v20.0
   - Upgrade @angular-eslint packages from v17.3 to v21.1 to fix moderate severity vulnerabilities via nx dependency and tmp symbolic link attack (GHSA-52f5-9888-hmc6)
   - Upgrade ESLint from v8.57.1 to v9.39.2 and migrate from archived eslint-plugin-deprecation to @typescript-eslint/no-deprecated rule, fixing brace-expansion ReDoS vulnerability (GHSA-v6h2-p8h4-qcjw/CVE-2025-5889) in ESLint dependencies
+  - Fix brace-expansion ReDoS vulnerability (GHSA-v6h2-p8h4-qcjw/CVE-2025-5889, CVSS 1.3) by upgrading transitive dependencies from karma and karma-coverage (1.1.11→1.1.12, 2.0.1→2.0.2) via npm audit fix, also upgrading Cypress from 15.7.1 to 15.8.1 to fix systeminformation command injection vulnerability (GHSA-wphj-fx3q-84ch) on Windows
   - Apply Angular automatic migrations including inject() function pattern and block control flow syntax
   - Update all component test files to use provideHttpClientTesting() instead of deprecated HttpClientTestingModule
   - Update app.config.ts to use provideHttpClient(withInterceptorsFromDi()) instead of deprecated HttpClientModule
