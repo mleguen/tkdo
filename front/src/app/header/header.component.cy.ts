@@ -5,7 +5,30 @@ import { provideRouter } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
 
 import { HeaderComponent } from './header.component';
-import { BackendService, Genre, PrefNotifIdees } from '../backend.service';
+import {
+  BackendService,
+  Genre,
+  PrefNotifIdees,
+  Occasion,
+} from '../backend.service';
+
+// Helper function to create mock backend service
+function createMockBackend(
+  options: { admin?: boolean; occasions?: Occasion[] } = {},
+) {
+  return {
+    occasions$: new BehaviorSubject(options.occasions || []),
+    utilisateurConnecte$: new BehaviorSubject({
+      id: 1,
+      nom: 'Alice',
+      genre: Genre.Feminin,
+      email: 'alice@example.com',
+      admin: options.admin || false,
+      identifiant: 'alice',
+      prefNotifIdees: PrefNotifIdees.Quotidienne,
+    }),
+  };
+}
 
 describe('HeaderComponent', () => {
   it('should mount', () => {
@@ -28,27 +51,13 @@ describe('HeaderComponent', () => {
           provideHttpClientTesting(),
         ],
       }).then(({ component }) => {
-        // Wait for BreakpointObserver to detect viewport and update component
-        cy.wait(100);
         // Verify isMenuCollapsed is false on desktop
         cy.wrap(component).its('isMenuCollapsed').should('be.false');
       });
     });
 
     it('should not display hamburger menu toggle when logged in', () => {
-      // Create mock backend service with logged-in user
-      const mockBackend = {
-        occasions$: new BehaviorSubject([]),
-        utilisateurConnecte$: new BehaviorSubject({
-          id: 1,
-          nom: 'Alice',
-          genre: Genre.Feminin,
-          email: 'alice@example.com',
-          admin: false,
-          identifiant: 'alice',
-          prefNotifIdees: PrefNotifIdees.Quotidienne,
-        }),
-      };
+      const mockBackend = createMockBackend();
 
       cy.mount(HeaderComponent, {
         providers: [
@@ -66,9 +75,9 @@ describe('HeaderComponent', () => {
     });
 
     it('should display menu items immediately when logged in', () => {
-      // Create mock backend service with logged-in user and occasions
-      const mockBackend = {
-        occasions$: new BehaviorSubject([
+      const mockBackend = createMockBackend({
+        admin: true,
+        occasions: [
           {
             id: 1,
             titre: 'Noël 2024',
@@ -76,17 +85,8 @@ describe('HeaderComponent', () => {
             participants: [],
             resultats: [],
           },
-        ]),
-        utilisateurConnecte$: new BehaviorSubject({
-          id: 1,
-          nom: 'Alice',
-          genre: Genre.Feminin,
-          email: 'alice@example.com',
-          admin: true,
-          identifiant: 'alice',
-          prefNotifIdees: PrefNotifIdees.Quotidienne,
-        }),
-      };
+        ],
+      });
 
       cy.mount(HeaderComponent, {
         providers: [
@@ -122,27 +122,13 @@ describe('HeaderComponent', () => {
           provideHttpClientTesting(),
         ],
       }).then(({ component }) => {
-        // Wait for BreakpointObserver to detect viewport
-        cy.wait(100);
         // Verify isMenuCollapsed is true on mobile
         cy.wrap(component).its('isMenuCollapsed').should('be.true');
       });
     });
 
     it('should display hamburger menu toggle when logged in', () => {
-      // Create mock backend service with logged-in user
-      const mockBackend = {
-        occasions$: new BehaviorSubject([]),
-        utilisateurConnecte$: new BehaviorSubject({
-          id: 1,
-          nom: 'Alice',
-          genre: Genre.Feminin,
-          email: 'alice@example.com',
-          admin: false,
-          identifiant: 'alice',
-          prefNotifIdees: PrefNotifIdees.Quotidienne,
-        }),
-      };
+      const mockBackend = createMockBackend();
 
       cy.mount(HeaderComponent, {
         providers: [
@@ -158,19 +144,7 @@ describe('HeaderComponent', () => {
     });
 
     it('should expand menu when clicking hamburger toggle', () => {
-      // Create mock backend service with logged-in user
-      const mockBackend = {
-        occasions$: new BehaviorSubject([]),
-        utilisateurConnecte$: new BehaviorSubject({
-          id: 1,
-          nom: 'Alice',
-          genre: Genre.Feminin,
-          email: 'alice@example.com',
-          admin: false,
-          identifiant: 'alice',
-          prefNotifIdees: PrefNotifIdees.Quotidienne,
-        }),
-      };
+      const mockBackend = createMockBackend();
 
       cy.mount(HeaderComponent, {
         providers: [
@@ -180,8 +154,6 @@ describe('HeaderComponent', () => {
           { provide: BackendService, useValue: mockBackend },
         ],
       }).then(({ component }) => {
-        // Wait for BreakpointObserver to detect viewport
-        cy.wait(100);
         // Initially collapsed
         cy.wrap(component).its('isMenuCollapsed').should('be.true');
 
@@ -194,19 +166,7 @@ describe('HeaderComponent', () => {
     });
 
     it('should collapse menu when clicking hamburger toggle twice', () => {
-      // Create mock backend service with logged-in user
-      const mockBackend = {
-        occasions$: new BehaviorSubject([]),
-        utilisateurConnecte$: new BehaviorSubject({
-          id: 1,
-          nom: 'Alice',
-          genre: Genre.Feminin,
-          email: 'alice@example.com',
-          admin: false,
-          identifiant: 'alice',
-          prefNotifIdees: PrefNotifIdees.Quotidienne,
-        }),
-      };
+      const mockBackend = createMockBackend();
 
       cy.mount(HeaderComponent, {
         providers: [
@@ -216,8 +176,6 @@ describe('HeaderComponent', () => {
           { provide: BackendService, useValue: mockBackend },
         ],
       }).then(({ component }) => {
-        // Wait for BreakpointObserver to detect viewport
-        cy.wait(100);
         // Initially collapsed
         cy.wrap(component).its('isMenuCollapsed').should('be.true');
 
@@ -232,9 +190,8 @@ describe('HeaderComponent', () => {
     });
 
     it('should collapse menu when clicking on a menu item', () => {
-      // Create mock backend service with logged-in user and occasions
-      const mockBackend = {
-        occasions$: new BehaviorSubject([
+      const mockBackend = createMockBackend({
+        occasions: [
           {
             id: 1,
             titre: 'Noël 2024',
@@ -242,17 +199,8 @@ describe('HeaderComponent', () => {
             participants: [],
             resultats: [],
           },
-        ]),
-        utilisateurConnecte$: new BehaviorSubject({
-          id: 1,
-          nom: 'Alice',
-          genre: Genre.Feminin,
-          email: 'alice@example.com',
-          admin: false,
-          identifiant: 'alice',
-          prefNotifIdees: PrefNotifIdees.Quotidienne,
-        }),
-      };
+        ],
+      });
 
       cy.mount(HeaderComponent, {
         providers: [
@@ -262,8 +210,6 @@ describe('HeaderComponent', () => {
           { provide: BackendService, useValue: mockBackend },
         ],
       }).then(({ component }) => {
-        // Wait for BreakpointObserver to detect viewport
-        cy.wait(100);
         // Expand menu first
         cy.get('.navbar-toggler').click();
         cy.wrap(component).its('isMenuCollapsed').should('be.false');
