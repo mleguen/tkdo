@@ -1,11 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, OnDestroy, inject } from '@angular/core';
 import { Router, Event, NavigationEnd, RouterModule } from '@angular/router';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import {
   NgbCollapseModule,
   NgbDropdownModule,
 } from '@ng-bootstrap/ng-bootstrap';
+import { Subscription } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
 
 import { BackendService } from '../backend.service';
@@ -16,7 +17,7 @@ import { BackendService } from '../backend.service';
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss',
 })
-export class HeaderComponent {
+export class HeaderComponent implements OnDestroy {
   private readonly backend = inject(BackendService);
   private readonly router = inject(Router);
   private readonly breakpointObserver = inject(BreakpointObserver);
@@ -31,15 +32,18 @@ export class HeaderComponent {
   // Bootstrap's navbar-expand-md uses 768px, which corresponds to Breakpoints.Medium and above
   isMenuCollapsed = true;
 
+  private breakpointSubscription: Subscription | null = null;
+  private routerSubscription: Subscription | null = null;
+
   constructor() {
     // Observe medium and larger breakpoints (≥768px) to determine if menu should be expanded
-    this.breakpointObserver
+    this.breakpointSubscription = this.breakpointObserver
       .observe([Breakpoints.Medium, Breakpoints.Large, Breakpoints.XLarge])
       .subscribe((result) => {
         this.isMenuCollapsed = !result.matches;
       });
 
-    this.router.events
+    this.routerSubscription = this.router.events
       .pipe(
         filter((e: Event): e is NavigationEnd => e instanceof NavigationEnd),
       )
@@ -53,5 +57,16 @@ export class HeaderComponent {
           this.menuActif = e.urlAfterRedirects;
         }
       });
+  }
+
+  ngOnDestroy(): void {
+    if (this.breakpointSubscription) {
+      this.breakpointSubscription.unsubscribe();
+      this.breakpointSubscription = null;
+    }
+    if (this.routerSubscription) {
+      this.routerSubscription.unsubscribe();
+      this.routerSubscription = null;
+    }
   }
 }
