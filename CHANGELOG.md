@@ -17,6 +17,7 @@
   - Consolidate and streamline all English documentation (docs/en/) to remove inconsistency & redundancies and establish clear single sources of truth for each topic
   - Update frontend development guide (docs/en/frontend-dev.md) with Angular v21 technology stack versions and common issues during major Angular upgrades
   - Document Dart Sass 3.0.0 deprecation warnings in BACKLOG.md with specific actionable items for liste-idees component styles and monitoring tasks for Bootstrap compatibility
+  - Investigate and document that Sass @import deprecation warnings cannot be fixed until Bootstrap v6 release - Bootstrap 5.3 does not support @use syntax and attempting conversion causes compilation errors
 - **Project Configuration:**
   - Add Mermaid diagram quality standards (high contrast colors, readability, proper layouts)
 - **Technical Tasks:**

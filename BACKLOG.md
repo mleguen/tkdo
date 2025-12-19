@@ -42,46 +42,43 @@
 
 **Context:** Following the Angular 21 upgrade, multiple Sass deprecation warnings are reported by `./npm run ct`, `./npm run int`, and `./npm run e2e`. These relate to Dart Sass 3.0.0 breaking changes that will remove deprecated features.
 
-**Actionable Items (Our Code):**
+**Status:** All Sass `@import` deprecation warnings in our code originate from Bootstrap 5.3, which does not yet support Sass modules (`@use`/@`forward`). Bootstrap will migrate to Sass modules in version 6. Until then, these warnings cannot be eliminated without switching to compiled Bootstrap CSS.
 
-1. **Replace deprecated `@import` with `@use` in liste-idees component styles**
-   - **File:** `front/src/app/liste-idees/liste-idees.component.scss` (lines 1-3)
-   - **Current code:**
+**Blocked Tasks (Waiting for Bootstrap v6):**
+
+1. **Replace deprecated `@import` in our component styles**
+   - **Files affected:**
+     - `front/src/app/liste-idees/liste-idees.component.scss` (lines 1-3)
+     - `front/src/styles.scss` (line 4)
+   - **Blocker:** Bootstrap 5.3 does not support `@use` syntax - attempting to use `@use` with Bootstrap modules causes compilation errors ("Undefined mixin" errors due to missing internal dependencies)
+   - **Current code uses:**
      ```scss
      @import "../../../node_modules/bootstrap/scss/functions";
      @import "../../../node_modules/bootstrap/scss/variables";
      @import "../../../node_modules/bootstrap/scss/mixins";
      ```
-   - **Action:** Replace with modern `@use` syntax and namespaces
-   - **Reported by:** `./npm run ct`, `./npm run int`, `./npm run e2e`
-   - **Warning:** "Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0"
+   - **Cannot replace with:** `@use` syntax until Bootstrap 6 is released
+   - **Warnings reported by:** `./npm run ct`, `./npm run int`, `./npm run e2e` (3 warnings per build)
    - **Reference:** https://sass-lang.com/d/import
-   - **Priority:** Medium
-
-2. **Replace deprecated `@import` in global styles**
-   - **File:** `front/src/styles.scss` (line 4)
-   - **Current code:**
-     ```scss
-     @import "bootstrap/scss/bootstrap";
-     ```
-   - **Action:** Replace with `@use "bootstrap/scss/bootstrap";` if compatible, or await Bootstrap update
-   - **Note:** May need to wait for Bootstrap to fully support `@use` syntax
-   - **Priority:** Low (global import may require Bootstrap update)
+   - **Verified:** December 2025 - Bootstrap 5.3 still uses `@import` internally and is incompatible with `@use`
 
 **Third-Party Dependencies (Bootstrap):**
 
-3. **Monitor Bootstrap for Dart Sass 3.0.0 compatibility update**
-   - **Affected package:** `bootstrap` v5.3.2 (Sass source files)
-   - **Affected files:** `node_modules/bootstrap/scss/_functions.scss`, `_variables.scss`, `_mixins.scss`
-   - **Deprecations (69+ warnings):**
-     - Global `unit()` function → use `math.unit()`
-     - Color functions `red()`, `green()`, `blue()` → use `color.channel()`
-     - Global `mix()` function → use `color.mix()`
-     - Multiple `@import` statements → use `@use`/`@forward`
-   - **Action:** Monitor Bootstrap releases for Dart Sass 3.0.0 compatibility; upgrade when available
-   - **Tracking:** Check https://github.com/twbs/bootstrap/releases and [the matching Bootstrap issue](https://github.com/twbs/bootstrap/issues/40962)
-   - **Alternative:** Consider switching to compiled Bootstrap CSS instead of Sass imports if updates lag
-   - **Priority:** Low (third-party issue, will be resolved in Bootstrap v6 or earlier patch)
+2. **Monitor Bootstrap for Dart Sass 3.0.0 compatibility and upgrade when available**
+   - **Current version:** `bootstrap` v5.3.2
+   - **Target version:** Bootstrap v6 (will include Sass modules support)
+   - **Affected files:** All Bootstrap Sass source files (`node_modules/bootstrap/scss/*.scss`)
+   - **Total deprecations:** 69+ warnings from Bootstrap's internal code
+     - Global `unit()` function → will use `math.unit()`
+     - Color functions `red()`, `green()`, `blue()` → will use `color.channel()`
+     - Global `mix()` function → will use `color.mix()`
+     - Multiple `@import` statements → will use `@use`/`@forward`
+   - **Action:** Monitor Bootstrap releases; upgrade to v6 when stable
+   - **Tracking:**
+     - Releases: https://github.com/twbs/bootstrap/releases
+     - Sass modules migration: https://github.com/twbs/bootstrap/issues/40962
+   - **Alternative:** Switch to compiled Bootstrap CSS instead of Sass imports (eliminates all Sass warnings but loses customization ability)
+   - **Priority:** Low (third-party dependency, blocked by Bootstrap development timeline)
 
 **Note:** See [CONTRIBUTING.md - Tracking Deprecation Warnings](docs/en/CONTRIBUTING.md#tracking-deprecation-warnings) for the process of tracking new deprecations.
 
