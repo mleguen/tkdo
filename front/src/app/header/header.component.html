@@ -34,7 +34,7 @@
                 class="dropdown-menu-dark"
                 aria-labelledby="menuMesOccasions"
               >
-                @for (o of occasions; track o) {
+                @for (o of occasions; track o.id) {
                   <a
                     ngbDropdownItem
                     class="menuMesOccasionsItem"

@@ -34,7 +34,7 @@
             </h2>
           }
           <div class="card-columns">
-            @for (i of propresIdees; track i) {
+            @for (i of propresIdees; track i.id) {
               <app-idee
                 [idee]="i"
                 [utilisateurConnecte]="utilisateurConnecte"
@@ -53,7 +53,7 @@
             {{ utilisateur.nom }} ne peut pas voir ces idées
           </div>
           <div class="card-columns">
-            @for (i of autresIdees; track i) {
+            @for (i of autresIdees; track i.id) {
               <app-idee
                 [idee]="i"
                 [utilisateurConnecte]="utilisateurConnecte"
