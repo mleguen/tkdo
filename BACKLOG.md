@@ -234,6 +234,434 @@ Following the viewport testing audit, components with responsive behavior need v
   - Review all testing-related documentation to ensure it follows documentation guidelines (e.g. single source of truth)
 - **Priority:** Medium - important for building upon this afterwards
 
+## Localization & Internationalization
+
+**Context**: The application is currently hardcoded in French throughout frontend code, backend code, database schema, and documentation. The goal is to:
+1. Restructure documentation to English-only (move `docs/en/` to `docs/`)
+2. Implement proper frontend localization infrastructure with English as the reference language and French as a translation
+3. Translate all French code to English (comments, class/method/variable names in frontend and backend)
+4. Document database schema in English (tables and columns remain French for backward compatibility)
+5. Regenerate screenshots in English
+
+**Important**: Backend API responses and error messages will remain in English only (no localization infrastructure). Backend code will be translated to English but will continue to output English-only messages.
+
+**Reference Documentation**:
+- [Documentation Guide - Localization](docs/DOCUMENTATION-GUIDE.md#localization)
+- [Contributing Guide - Coding Standards](docs/en/CONTRIBUTING.md#coding-standards)
+- [Angular i18n Documentation](https://angular.dev/guide/i18n)
+
+---
+
+### Documentation Restructuring (Priority)
+
+**Task I18N01:** Move documentation from `docs/en/` to `docs/`
+- **Files:**
+  - All files in `docs/en/` (14 files: INDEX.md, README.md, CONTRIBUTING.md, admin-guide.md, api-reference.md, architecture.md, backend-dev.md, ci-testing-strategy.md, database.md, deployment-apache.md, dev-setup.md, environment-variables.md, frontend-dev.md, notifications.md, testing.md, troubleshooting.md, user-guide.md)
+- **Content:**
+  - Move all files from `docs/en/` to `docs/`
+  - Update all internal links within documentation files to reflect new paths (remove `/en` from paths)
+  - Remove empty `docs/en/` directory
+- **Priority:** High - prerequisite for other documentation tasks
+
+**Task I18N02:** Replace deprecated French CONTRIBUTING.md at root
+- **Files:**
+  - `CONTRIBUTING.md` (root - currently French, deprecated)
+  - `docs/CONTRIBUTING.md` (after Task I18N01 moves it from `docs/en/`)
+- **Content:**
+  - Move `docs/CONTRIBUTING.md` to project root, replacing the deprecated French version
+  - Update any links pointing to `docs/CONTRIBUTING.md` or `docs/en/CONTRIBUTING.md` to point to root `CONTRIBUTING.md`
+- **Dependencies:** Task I18N01
+- **Priority:** High - standard practice for open source projects
+
+**Task I18N03:** Update documentation references across the project
+- **Files:**
+  - `README.md` (root)
+  - `BACKLOG.md`
+  - `CHANGELOG.md`
+  - `.claude/README.md`
+  - All files in `docs/` (after Task I18N01)
+- **Content:**
+  - Update all references from `docs/en/` to `docs/`
+  - Update references to `docs/CONTRIBUTING.md` to root `CONTRIBUTING.md`
+  - Remove any "coming soon" labels for completed documentation
+- **Dependencies:** Tasks I18N01, I18N02
+- **Priority:** High - ensures documentation links work
+
+**Task I18N04:** Update Documentation Guide for English-only policy
+- **File:** `docs/DOCUMENTATION-GUIDE.md`
+- **Content:**
+  - Update example paths to use `docs/` instead of `docs/en/`
+  - Update the Localization section to clarify documentation is English-only (no translations maintained)
+  - Remove references to translation workflow for documentation
+- **Dependencies:** Task I18N01
+- **Priority:** Medium - clarifies documentation policy
+
+---
+
+### Frontend Localization Infrastructure
+
+**Task I18N05:** Set up Angular i18n configuration
+- **Files:**
+  - `front/angular.json`
+  - `front/package.json`
+  - `front/src/locale/messages.fr.xlf` (new)
+- **Content:**
+  - Configure `angular.json` for i18n with English (en) as source locale and French (fr) as translation
+  - Add `extract-i18n` and locale-specific build commands to `package.json` scripts
+  - Create initial `messages.fr.xlf` file structure
+  - Test build process generates locale-specific bundles correctly
+- **Priority:** High - prerequisite for all frontend localization tasks
+
+**Task I18N06:** Add language selection mechanism
+- **Files:**
+  - `front/src/app/language.service.ts` (new)
+  - `front/src/app/header/header.component.html`
+  - `front/src/app/header/header.component.ts`
+- **Content:**
+  - Create language service to manage locale selection (en/fr)
+  - Store user language preference in localStorage
+  - Implement language detection (browser preference fallback)
+  - Add language switcher UI to header component
+- **Dependencies:** Task I18N05
+- **Priority:** Medium - enables user locale selection
+
+---
+
+### Frontend Component Localization (Templates)
+
+**Task I18N07:** Localize authentication components
+- **Files:**
+  - `front/src/app/connexion/connexion.component.html`
+  - `front/src/app/deconnexion/deconnexion.component.html`
+- **Content:**
+  - Add i18n markers to login form labels, buttons, error messages
+  - Add i18n markers to logout confirmation and messages
+  - Test both English and French versions render correctly
+- **Dependencies:** Task I18N05
+- **Priority:** High - authentication is core functionality
+
+**Task I18N08:** Localize navigation and layout components
+- **Files:**
+  - `front/src/app/header/header.component.html`
+  - `front/src/index.html`
+  - `front/src/app/app.component.html`
+- **Content:**
+  - Add i18n markers to menu items ("Mes occasions" → "My occasions", etc.)
+  - Update page title "Tirage cadeaux" → "Gift Exchange"
+  - Add i18n markers to error reporting link text
+- **Dependencies:** Task I18N05
+- **Priority:** High - affects all pages
+
+**Task I18N09:** Localize profile management component
+- **Files:**
+  - `front/src/app/profil/profil.component.html`
+  - `front/src/app/profil/profil.component.ts`
+- **Content:**
+  - Add i18n markers to form labels, gender options, notification preference labels
+  - Localize validation error messages (minimum length, email format, password match)
+  - Localize success messages ("Votre profil a été enregistré" → "Your profile has been saved")
+- **Dependencies:** Task I18N05
+- **Priority:** Medium - user-facing feature
+
+**Task I18N10:** Localize ideas management components
+- **Files:**
+  - `front/src/app/liste-idees/liste-idees.component.html`
+  - `front/src/app/idee/idee.component.html`
+- **Content:**
+  - Add i18n markers to page titles, section headings, button labels
+  - Localize "Nouvelle idée", "Ajouter", "Supprimer" buttons
+  - Handle gender-specific text ("elle-même"/"lui-même" → "herself"/"himself")
+- **Dependencies:** Task I18N05
+- **Priority:** Medium - core feature
+
+**Task I18N11:** Localize occasion components
+- **Files:**
+  - `front/src/app/occasion/occasion.component.html`
+  - `front/src/app/page-idees/page-idees.component.html`
+- **Content:**
+  - Add i18n markers to status alerts, date labels, participant instructions
+  - Localize occasion details and participant cards
+  - Handle gender-specific pronouns in gift assignment text
+- **Dependencies:** Task I18N05
+- **Priority:** Medium - core feature
+
+**Task I18N12:** Localize admin component
+- **Files:**
+  - `front/src/app/admin/admin.component.html`
+- **Content:**
+  - Add i18n markers to SQL documentation, command examples, section headings
+  - Decide whether admin interface should be English-only or bilingual
+- **Dependencies:** Task I18N05
+- **Priority:** Low - admin-only feature
+
+**Task I18N13:** Extract i18n strings and generate French translations
+- **Files:**
+  - `front/src/locale/messages.xlf` (generated)
+  - `front/src/locale/messages.fr.xlf`
+- **Content:**
+  - Run `ng extract-i18n` to generate `messages.xlf`
+  - Translate all extracted strings to French in `messages.fr.xlf`
+  - Verify translation file is valid and complete
+  - Build and test both locale bundles
+- **Dependencies:** Tasks I18N07-I18N12
+- **Priority:** High - completes template localization
+
+---
+
+### Frontend Component Localization (TypeScript)
+
+**Task I18N14:** Localize component error messages
+- **Files:**
+  - `front/src/app/connexion/connexion.component.ts`
+  - `front/src/app/page-idees/page-idees.component.ts`
+  - `front/src/app/profil/profil.component.ts`
+- **Content:**
+  - Update "connexion impossible", "ajout impossible", "suppression impossible", "enregistrement impossible"
+  - Use `$localize` for runtime error messages
+- **Dependencies:** Task I18N05
+- **Priority:** Medium - affects error UX
+
+**Task I18N15:** Localize enums and constants
+- **Files:**
+  - `front/src/app/model/*.ts`
+- **Content:**
+  - Localize gender values ("Féminin"/"Masculin" → "Female"/"Male")
+  - Localize notification preference options
+  - Create proper translation keys for all enum values displayed to users
+- **Dependencies:** Task I18N05
+- **Priority:** Medium - affects form displays
+
+---
+
+### Frontend Code Translation (French → English)
+
+**Task I18N16:** Translate frontend service and model class names
+- **Files:**
+  - All TypeScript classes in `front/src/app/`
+- **Content:**
+  - Create mapping for French → English class names
+  - Update class names, interfaces, types to English
+  - Update all references throughout the codebase
+  - Update imports and module references
+- **Priority:** Medium - improves code readability
+
+**Task I18N17:** Translate frontend method and property names
+- **Files:**
+  - `front/src/app/**/*.ts`
+- **Content:**
+  - Translate service method names (e.g., in `AuthentificationService`, `ApiService`)
+  - Update property names (e.g., `utilisateur` → `user`)
+  - Update local variable names
+  - Keep template bindings consistent
+- **Dependencies:** Task I18N16
+- **Priority:** Medium - improves code readability
+
+**Task I18N18:** Translate frontend French comments
+- **Files:**
+  - `front/src/app/**/*.ts`
+- **Content:**
+  - Translate inline comments to English
+  - Update JSDoc/TSDoc blocks to English
+- **Dependencies:** Tasks I18N16, I18N17
+- **Priority:** Low - documentation improvement
+
+---
+
+### Backend Code Translation (French → English)
+
+**Important**: Backend will output English-only messages (no localization infrastructure). Exception messages will be changed directly in the code to English.
+
+**Task I18N19:** Translate backend exception messages
+- **Files:**
+  - `api/src/Dom/Exception/*.php` (~19 exception files)
+- **Content:**
+  - Translate all French exception messages to English:
+    - "identifiant déjà utilisé" → "username already in use"
+    - "utilisateur inconnu" → "unknown user"
+    - "l'idée a déjà été marquée comme supprimée" → "idea already marked as deleted"
+    - "occasion inconnue" → "unknown occasion"
+    - etc.
+  - Update test assertions to expect English messages
+- **Priority:** High - affects API responses
+
+**Task I18N20:** Translate backend entity property names and methods
+- **Files:**
+  - `api/src/Dom/Model/*.php`
+  - `api/src/Appli/ModelAdaptor/*.php`
+- **Content:**
+  - Translate property names (e.g., `mdp` → `password`, `nom` → `name`)
+  - Update getters/setters (e.g., `getMdp()` → `getPassword()`)
+  - **Important**: Add `@Column(name="mdp")` annotations to maintain database compatibility
+  - Update all callers
+- **Priority:** Medium - improves code readability
+
+**Task I18N21:** Translate backend Port class methods
+- **Files:**
+  - `api/src/Dom/Port/*.php`
+- **Content:**
+  - Translate method names (e.g., `creeIdee()` → `createIdea()`)
+  - Update all callers
+  - Ensure business logic remains unchanged
+- **Dependencies:** Task I18N20
+- **Priority:** Medium - improves code readability
+
+**Task I18N22:** Translate backend Repository interfaces and implementations
+- **Files:**
+  - `api/src/Dom/Repository/*.php`
+  - `api/src/Appli/RepositoryAdaptor/*.php`
+- **Content:**
+  - Update method names in repository interfaces
+  - Update implementations in RepositoryAdaptor classes
+  - Update all repository consumers
+- **Dependencies:** Task I18N20
+- **Priority:** Medium - improves code readability
+
+**Task I18N23:** Translate backend Service, Plugin, and Controller classes
+- **Files:**
+  - `api/src/Dom/Plugin/*.php`
+  - `api/src/Appli/PluginAdaptor/*.php`
+  - `api/src/Appli/Service/*.php`
+  - `api/src/Appli/Controller/*.php`
+- **Content:**
+  - Translate method names and variable names
+  - Ensure API routes remain unchanged for backward compatibility
+- **Dependencies:** Tasks I18N20-I18N22
+- **Priority:** Medium - improves code readability
+
+**Task I18N24:** Translate backend French comments
+- **Files:**
+  - `api/src/**/*.php`
+- **Content:**
+  - Translate inline comments to English
+  - Update PHPDoc blocks to English
+- **Dependencies:** Tasks I18N19-I18N23
+- **Priority:** Low - documentation improvement
+
+---
+
+### Database Schema Documentation & Fixture Data
+
+**Important**: Database table and column names remain in French for backward compatibility. Only documentation and code references will be in English.
+
+**Task I18N25:** Create code-to-database mapping documentation
+- **File:** `docs/database.md` (after Task I18N01)
+- **Content:**
+  - Add section documenting all entity property mappings (English code → French database)
+  - Create reference table: `password` (code) → `mdp` (database), `name` → `nom`, etc.
+  - Add notes clarifying backward compatibility approach
+- **Dependencies:** Tasks I18N01, I18N20
+- **Priority:** Medium - helps developers understand mappings
+
+**Task I18N26:** Update fixture data to English
+- **File:** `api/src/Appli/Fixture/ChargeFixtures.php`
+- **Content:**
+  - Update French person names to English (e.g., "Alice", "Bob", "Charlie")
+  - Update occasion titles to English
+  - Update any French text in fixture data
+- **Priority:** Low - affects test data only
+
+---
+
+### Configuration & Metadata Translation
+
+**Task I18N27:** Update package.json and HTML metadata
+- **Files:**
+  - `front/package.json`
+  - `front/src/index.html`
+- **Content:**
+  - Translate `package.json` description: "Tirage au sort de cadeaux..." → English
+  - Update `<meta name="description">` to English
+  - Ensure proper `lang` attribute on `<html>` element matches locale
+- **Priority:** Medium - affects SEO and package metadata
+
+**Task I18N28:** Translate email templates
+- **Files:**
+  - Email-related files in `api/src/`
+- **Content:**
+  - Translate email template text to English
+  - Backend will send English-only emails (no localization)
+- **Priority:** Medium - affects user communication
+
+---
+
+### Screenshot Regeneration
+
+**Task I18N29:** Regenerate screenshots in English
+- **Files:**
+  - `doc/connexion.png`
+  - `doc/menus.png`
+  - `doc/occasion.png`
+  - `doc/idee-1.png`
+  - `doc/idee-2.png`
+- **Content:**
+  - Regenerate all 5 screenshots with English UI (after frontend localization complete)
+  - Use mobile viewport (main target platform)
+  - Consider adding additional screenshots where helpful
+- **Dependencies:** Tasks I18N07-I18N15 (frontend localization complete)
+- **Priority:** Low - cosmetic improvement
+
+**Task I18N30:** Document screenshot regeneration process
+- **File:** `docs/DOCUMENTATION-GUIDE.md` or `CONTRIBUTING.md`
+- **Content:**
+  - Document which screens to capture
+  - Specify mobile viewport size to use
+  - Document how to ensure consistency (browser, viewport size, zoom level)
+  - Consider linking to e2e tests for automated capture
+- **Dependencies:** Task I18N29
+- **Priority:** Low - process documentation
+
+---
+
+### Testing & Quality Assurance
+
+**Task I18N31:** Update frontend tests for localization
+- **Files:**
+  - `front/src/app/**/*.spec.ts`
+  - `front/src/app/**/*.cy.ts`
+  - `front/cypress/e2e/*.cy.ts`
+- **Content:**
+  - Update test fixtures and mocks to use English where appropriate
+  - Add tests for language switching functionality
+  - Verify all tests pass in both English and French locales
+- **Dependencies:** Tasks I18N05-I18N15
+- **Priority:** High - ensures localization works
+
+**Task I18N32:** Update backend tests for English messages
+- **Files:**
+  - `api/test/**/*.php`
+- **Content:**
+  - Update test assertions for English exception messages
+  - Verify API responses contain English messages
+- **Dependencies:** Task I18N19
+- **Priority:** High - ensures backend translation works
+
+---
+
+### Cleanup & Maintenance Guide
+
+**Task I18N33:** Create localization maintenance guide
+- **File:** `CONTRIBUTING.md` (at root after Task I18N02)
+- **Content:**
+  - Document how to add new translatable strings in the frontend
+  - Explain Angular i18n workflow for future development
+  - Include examples of properly localized code
+  - Document that backend remains English-only
+- **Dependencies:** Tasks I18N02, I18N05-I18N15
+- **Priority:** Medium - enables future maintenance
+
+---
+
+### Important Reminders
+
+- **Always run tests** after each task: Frontend (`./npm test && ./npm run ct && ./npm run int`) and Backend (`./composer test`)
+- **Update documentation** in the same commit as code changes
+- **Follow commit conventions** as specified in `.claude/commit-conventions.md`
+- **Maintain database compatibility** when renaming code elements - use Doctrine annotations to map English property names to French database columns
+- **Test both languages** thoroughly before marking tasks complete (frontend only - backend is English-only)
+- **English is the reference/source language** for frontend UI, French is a translation
+- **Backend remains English-only** - no localization infrastructure, exception messages in English only
+- **Documentation is English-only** - no translations will be maintained
+
 ## Features & Enhancements
 
 ### UI/UX Improvements
@@ -334,4 +762,3 @@ Following the viewport testing audit, components with responsive behavior need v
 
 - Rename fixtures to install, and provide a default admin email (the admin can then modify it themselves)
 - Remove "doctrine" from auto-generated column names in database
-- Remove legacy documentations in French (e.g. CONTRIBUTING.md) after verifying all content is in docs/en/ documentation
