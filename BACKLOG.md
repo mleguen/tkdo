@@ -571,6 +571,14 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 - Sort participants alphabetically
 - Properly truncate participant names that are too long
 - Separate PageOccasionComponent/OccasionComponent/ParticipantComponent following the model of PageIdeesComponent/ListeIdeesComponent/IdeeComponent
+- **Fix desktop menu visibility on initial connection:**
+  - **Issue:** When first connecting to Tkdo on desktop, the navigation menu is not visible. Users must click on "Tirage cadeaux" (navbar brand) to make the menu appear.
+  - **Root cause:** The `isMenuCollapsed = true` initial state in `HeaderComponent` (line 28) appears to override Bootstrap's responsive behavior (`navbar-expand-md` should show menu on desktop)
+  - **Files affected:**
+    - `front/src/app/header/header.component.ts` - Component logic
+    - `front/src/app/header/header.component.html` - Template with navbar structure
+  - **Expected behavior:** Menu should be visible by default on desktop viewports (≥768px), collapsed on mobile
+  - **Note:** This fix should be accompanied by tests (see Testing Coverage section below)
 
 ### Ideas & Comments Features
 
@@ -596,6 +604,43 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 - Make email signatures customizable to make them less "machine-like"
 
 ## Technical Improvements
+
+### Testing Coverage & Quality
+
+**Desktop & Mobile Viewport Testing:**
+
+The current test suites (unit, component, integration, and E2E) do not systematically verify behavior across different viewport sizes. All tests should cover both desktop and mobile viewports to catch responsive design issues.
+
+- **Add desktop/mobile viewport testing to header component:**
+  - **Create tests:** Add component tests for `HeaderComponent` to verify menu visibility
+  - **Test file:** `front/src/app/header/header.component.cy.ts` (currently missing)
+  - **Desktop tests (≥768px viewport):**
+    - Menu should be visible by default after login
+    - Menu items ("Mes occasions", "Mes idées", "Mon profil", etc.) should be immediately accessible
+    - No hamburger menu toggle should be visible
+  - **Mobile tests (<768px viewport):**
+    - Menu should be collapsed by default
+    - Hamburger menu toggle should be visible
+    - Clicking toggle should expand/collapse menu
+    - Menu should collapse when navigating to a new page
+  - **Implementation:** Use `cy.viewport()` to test both desktop (e.g., 1280x720) and mobile (e.g., 375x667) sizes
+  - **Note:** This addresses the desktop menu visibility bug reported above
+
+- **Establish viewport testing guidelines for all test levels:**
+  - **Update testing documentation:**
+    - Add section to `docs/en/testing.md` on responsive testing practices
+    - Document standard viewport sizes to test (desktop, tablet, mobile)
+    - Provide code examples for viewport testing in Cypress component and E2E tests
+  - **Component tests:** Key UI components (header, navigation, modals) should include desktop/mobile variants
+  - **Integration tests:** User workflows should be tested on both desktop and mobile viewports
+  - **E2E tests:** Critical paths should include viewport variations where UI differs significantly
+  - **Documentation reference:** Update `docs/en/CONTRIBUTING.md#testing-requirements` with viewport testing expectations
+
+- **Audit existing tests for viewport coverage:**
+  - Review all component tests (`.component.cy.ts` files) to identify components that change behavior based on viewport
+  - Review integration tests (`front/cypress/integration/`) for missing mobile/desktop coverage
+  - Add viewport tests to components with responsive behavior (forms, tables, cards, navigation)
+  - Estimated scope: ~10-15 component files may need viewport test variants
 
 ### API enhancement
 
