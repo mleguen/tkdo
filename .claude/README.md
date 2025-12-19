@@ -98,7 +98,32 @@ Example from `api/.claude/settings.json`:
 }
 ```
 
+### Pull Request Review Responses
+
+When responding to PR review comments using the GitHub CLI (`gh`):
+
+**List all review comments:**
+```bash
+gh api /repos/OWNER/REPO/pulls/PR_NUMBER/comments --jq 'map({id, body: .body[0:50], line, path, html_url})'
+```
+
+**Reply to a specific review comment thread:**
+```bash
+gh api --method POST \
+  /repos/OWNER/REPO/pulls/PR_NUMBER/comments \
+  -f body="@Reviewer Your response message here" \
+  -F in_reply_to=COMMENT_ID
+```
+
+**Key points:**
+- Use `-F in_reply_to=COMMENT_ID` to reply within an existing thread
+- Without `in_reply_to`, the comment appears as a new standalone comment
+- The `COMMENT_ID` is obtained from listing comments (the `id` field)
+- Ping the reviewer with `@username` for visibility except when the reviewer is `@copilot` as it would open a PR to implement instead of reviewing your answer (DON'T ping `@copilot`!)
+- Each review comment should be answered individually in its own thread
+
 ## References
 
 - [Claude Code Documentation](https://code.claude.com/docs)
 - [Conventional Commits](https://www.conventionalcommits.org/)
+- [GitHub REST API - Pull Request Review Comments](https://docs.github.com/rest/pulls/comments)
