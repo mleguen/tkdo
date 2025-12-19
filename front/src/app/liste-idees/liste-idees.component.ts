@@ -16,6 +16,8 @@ import { IdeesPour, Idee, Genre, Utilisateur } from '../backend.service';
   styleUrl: './liste-idees.component.scss',
 })
 export class ListeIdeesComponent {
+  private readonly fb = inject(FormBuilder);
+
   @Input() utilisateurConnecte?: Utilisateur;
 
   @Output() actualise = new EventEmitter();
@@ -29,9 +31,7 @@ export class ListeIdeesComponent {
   utilisateur?: Utilisateur;
 
   constructor() {
-    const fb = inject(FormBuilder);
-
-    this.formAjout = fb.group({
+    this.formAjout = this.fb.group({
       description: ['', Validators.required],
     });
   }

@@ -54,7 +54,7 @@
     "@types/jasmine": "~5.1.0",
     "@typescript-eslint/eslint-plugin": "^8.49.0",
     "@typescript-eslint/parser": "^8.49.0",
-    "cypress": "^15.7.1",
+    "cypress": "^15.8.1",
     "eslint": "^9.39.2",
     "jasmine-core": "~5.1.0",
     "karma": "~6.4.0",

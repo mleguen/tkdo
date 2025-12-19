@@ -17,6 +17,7 @@ import { BackendService } from '../backend.service';
 })
 export class HeaderComponent {
   private readonly backend = inject(BackendService);
+  private readonly router = inject(Router);
 
   occasions$ = this.backend.occasions$.pipe(
     map((occasions) => occasions?.slice(0).reverse()),
@@ -27,9 +28,7 @@ export class HeaderComponent {
   isMenuCollapsed = true;
 
   constructor() {
-    const router = inject(Router);
-
-    router.events
+    this.router.events
       .pipe(
         filter((e: Event): e is NavigationEnd => e instanceof NavigationEnd),
       )
