@@ -59,3 +59,4 @@ Before creating a commit, verify:
 - [ ] Scope is appropriate (if used)
 - [ ] Body explains what and why (if complex change)
 - [ ] Footer includes issue references (if applicable)
+- [ ] **DO NOT mention routine BACKLOG.md maintenance** (removing completed tasks, renumbering remaining tasks, updating cross-references)

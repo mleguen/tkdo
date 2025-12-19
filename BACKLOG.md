@@ -40,28 +40,10 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
   - Research path-based test triggering to skip tests for documentation-only changes
 - **Estimated size:** ~200-300 lines documentation
 - **Dependencies:** None
-- **Priority:** Critical - must complete before Tasks 2-5
+- **Priority:** Critical - must complete before Tasks 2-4
 - **Note:** This investigation will determine the implementation approach for all subsequent CI tasks
 
-**Task 2:** Set up GitHub Actions workflow for unit and component tests
-- **Files to create:**
-  - `.github/workflows/test.yml`
-- **Content:**
-  - Configure workflow triggers (push, pull_request on all branches)
-  - Frontend unit tests job (native runner with actions/setup-node)
-  - Frontend component tests job (native runner with Cypress)
-  - Backend unit tests job (native runner with shivammathur/setup-php)
-  - Backend integration tests job with MySQL service container
-  - Run PHPStan static analysis
-  - Configure test result reporting and artifacts
-  - Set up caching for node_modules and Composer dependencies
-  - Configure branch protection rules requiring tests to pass
-- **Estimated size:** ~150-200 lines
-- **Dependencies:** Task 1 completed with documented strategy
-- **Priority:** High - enables automated quality gates
-- **Note:** Implementation details depend on Task 1 investigation results
-
-**Task 3:** Add GitHub Actions workflow for integration tests
+**Task 2:** Add GitHub Actions workflow for integration tests
 - **Files to create:**
   - `.github/workflows/integration.yml`
 - **Content:**
@@ -73,11 +55,11 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
   - Test result and coverage artifact uploads
   - Optimize service container startup time
 - **Estimated size:** ~120-150 lines
-- **Dependencies:** Task 2 completed
+- **Dependencies:** Task 1 completed with documented strategy
 - **Priority:** High - validates integration points
 - **Note:** May use Docker Compose only if service containers prove insufficient (per Task 1)
 
-**Task 4:** Add GitHub Actions workflow for E2E tests
+**Task 3:** Add GitHub Actions workflow for E2E tests
 - **Files to create:**
   - `.github/workflows/e2e.yml`
 - **Content:**
@@ -90,11 +72,11 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
   - Run only on PR approval or manual trigger (slower tests)
   - Document chosen approach and rationale
 - **Estimated size:** ~100-150 lines
-- **Dependencies:** Tasks 1-3 completed
+- **Dependencies:** Tasks 1-2 completed
 - **Priority:** High - critical path validation
 - **Note:** Approach TBD by Task 1; prefer native GitHub Actions patterns
 
-**Task 5:** Configure test parallelization and cross-browser testing
+**Task 4:** Configure test parallelization and cross-browser testing
 - **Files to modify:**
   - `.github/workflows/test.yml`
   - `.github/workflows/integration.yml`
@@ -111,8 +93,25 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
   - Configure proper test sharding and load balancing
   - Document browser support policy in testing.md
 - **Estimated size:** ~80-120 lines across files
-- **Dependencies:** Tasks 2-4 completed
+- **Dependencies:** Tasks 1-3 completed
 - **Priority:** Medium - improves speed and coverage
+
+**Task 5:** Address PHPStan level 8 type issues in backend
+- **Files to modify:**
+  - Multiple controller files in `api/src/Appli/Controller/`
+  - Multiple adaptor files in `api/src/Appli/ModelAdaptor/`
+  - Fixture and exception files
+- **Content:**
+  - Add type declarations to all properties (currently ~100+ missing)
+  - Add type declarations to method parameters, especially `$args` in controllers
+  - Fix generic type specifications for Doctrine collections
+  - Resolve undefined variable issues
+  - Add return type declarations where missing
+  - Fix nullable type checks
+- **Estimated size:** Changes across ~30-40 files
+- **Dependencies:** Task 1 completed (PHPStan configured)
+- **Priority:** Medium - improves code quality and IDE support
+- **Note:** Currently PHPStan job is set to continue-on-error to allow CI to pass. Remove this flag once types are fixed.
 
 ### Frontend Testing - Unit Tests
 
