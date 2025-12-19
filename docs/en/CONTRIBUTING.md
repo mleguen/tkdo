@@ -102,14 +102,20 @@ This project follows the **[Conventional Commits](https://www.conventionalcommit
 #### Format
 
 ```
-<type>(<scope>): <description>
+<type>(<scope (optional)>): <description>
 
 <body (optional)>
 
 <footer (optional)>
 ```
 
-#### Types
+#### Language
+
+- **All commit messages MUST be in English**
+
+#### Type
+
+Must be one of:
 
 - **feat**: New feature for users
 - **fix**: Bug fix for users
@@ -120,12 +126,32 @@ This project follows the **[Conventional Commits](https://www.conventionalcommit
 - **chore**: Build process, dependency updates, etc.
 - **perf**: Performance improvements
 
-#### Scopes
+#### Scope
+
+Indicates the area of the codebase:
 
 - **front**: Frontend (Angular) changes
 - **api**: Backend (Slim/PHP) changes
+- **db**: Database schema or migration changes
+- **deps**: Dependency updates
 - **config**: Configuration changes
-- **en**: English documentation
+- **ci**: CI/CD pipeline changes
+- Custom scopes are allowed if they make sense
+
+### Body
+
+Provides additional context:
+
+- Separate from subject with a blank line
+- Explain what and why, not how
+- Can be multiple paragraphs
+- Wrap at 72 characters
+
+#### Footer
+
+Used for:
+- Breaking changes: Start with "BREAKING CHANGE:"
+- Issue references: "Closes #123", "Fixes #456", "Relates to #789"
 
 #### Examples
 
@@ -147,7 +173,7 @@ git commit -m "chore(api): upgrade PHP to 8.4"
 
 1. **Use present tense** - "add feature" not "added feature"
 2. **Use imperative mood** - "move cursor to..." not "moves cursor to..."
-3. **Capitalize first letter** - "Add feature" not "add feature"
+3. **Don't capitalize first letter** - "add feature" not "Add feature"
 4. **No period at the end** - Description should not end with a period
 5. **Keep description under 72 characters** - Use body for longer explanations
 6. **Update documentation in same commit** - When code changes affect documentation, update both in one commit
