@@ -1,13 +1,279 @@
-import { cy, describe, it } from 'local-cypress';
+import { cy, describe, it, beforeEach } from 'local-cypress';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideHttpClient } from '@angular/common/http';
+import { provideRouter } from '@angular/router';
+import { BehaviorSubject } from 'rxjs';
 
 import { HeaderComponent } from './header.component';
+import { BackendService, Genre, PrefNotifIdees } from '../backend.service';
 
 describe('HeaderComponent', () => {
   it('should mount', () => {
     cy.mount(HeaderComponent, {
       providers: [provideHttpClient(), provideHttpClientTesting()],
+    });
+  });
+
+  describe('Desktop viewport (≥768px)', () => {
+    beforeEach(() => {
+      // Set desktop viewport size before mounting
+      cy.viewport(1280, 720);
+    });
+
+    it('should have menu expanded by default', () => {
+      cy.mount(HeaderComponent, {
+        providers: [
+          provideRouter([]),
+          provideHttpClient(),
+          provideHttpClientTesting(),
+        ],
+      }).then(({ component }) => {
+        // Wait for BreakpointObserver to detect viewport and update component
+        cy.wait(100);
+        // Verify isMenuCollapsed is false on desktop
+        cy.wrap(component).its('isMenuCollapsed').should('be.false');
+      });
+    });
+
+    it('should not display hamburger menu toggle when logged in', () => {
+      // Create mock backend service with logged-in user
+      const mockBackend = {
+        occasions$: new BehaviorSubject([]),
+        utilisateurConnecte$: new BehaviorSubject({
+          id: 1,
+          nom: 'Alice',
+          genre: Genre.Feminin,
+          email: 'alice@example.com',
+          admin: false,
+          identifiant: 'alice',
+          prefNotifIdees: PrefNotifIdees.Quotidienne,
+        }),
+      };
+
+      cy.mount(HeaderComponent, {
+        providers: [
+          provideRouter([]),
+          provideHttpClient(),
+          provideHttpClientTesting(),
+          { provide: BackendService, useValue: mockBackend },
+        ],
+      });
+
+      // Hamburger toggle button should exist but be hidden by Bootstrap CSS on desktop
+      cy.get('.navbar-toggler').should('exist');
+      // Check that it's not visible (Bootstrap hides it with CSS on ≥md screens)
+      cy.get('.navbar-toggler').should('not.be.visible');
+    });
+
+    it('should display menu items immediately when logged in', () => {
+      // Create mock backend service with logged-in user and occasions
+      const mockBackend = {
+        occasions$: new BehaviorSubject([
+          {
+            id: 1,
+            titre: 'Noël 2024',
+            date: '2024-12-25',
+            participants: [],
+            resultats: [],
+          },
+        ]),
+        utilisateurConnecte$: new BehaviorSubject({
+          id: 1,
+          nom: 'Alice',
+          genre: Genre.Feminin,
+          email: 'alice@example.com',
+          admin: true,
+          identifiant: 'alice',
+          prefNotifIdees: PrefNotifIdees.Quotidienne,
+        }),
+      };
+
+      cy.mount(HeaderComponent, {
+        providers: [
+          provideRouter([]),
+          provideHttpClient(),
+          provideHttpClientTesting(),
+          { provide: BackendService, useValue: mockBackend },
+        ],
+      });
+
+      // Wait for component to render with user data
+      cy.get('#nomUtilisateur').should('contain', 'Alice');
+
+      // Menu items should be visible without needing to click anything
+      cy.contains('Mes occasions').should('be.visible');
+      cy.contains('Mes idées').should('be.visible');
+      cy.contains('Mon profil').should('be.visible');
+      cy.contains('Administration').should('be.visible');
+    });
+  });
+
+  describe('Mobile viewport (<768px)', () => {
+    beforeEach(() => {
+      // Set mobile viewport size before mounting
+      cy.viewport(375, 667);
+    });
+
+    it('should have menu collapsed by default', () => {
+      cy.mount(HeaderComponent, {
+        providers: [
+          provideRouter([]),
+          provideHttpClient(),
+          provideHttpClientTesting(),
+        ],
+      }).then(({ component }) => {
+        // Wait for BreakpointObserver to detect viewport
+        cy.wait(100);
+        // Verify isMenuCollapsed is true on mobile
+        cy.wrap(component).its('isMenuCollapsed').should('be.true');
+      });
+    });
+
+    it('should display hamburger menu toggle when logged in', () => {
+      // Create mock backend service with logged-in user
+      const mockBackend = {
+        occasions$: new BehaviorSubject([]),
+        utilisateurConnecte$: new BehaviorSubject({
+          id: 1,
+          nom: 'Alice',
+          genre: Genre.Feminin,
+          email: 'alice@example.com',
+          admin: false,
+          identifiant: 'alice',
+          prefNotifIdees: PrefNotifIdees.Quotidienne,
+        }),
+      };
+
+      cy.mount(HeaderComponent, {
+        providers: [
+          provideRouter([]),
+          provideHttpClient(),
+          provideHttpClientTesting(),
+          { provide: BackendService, useValue: mockBackend },
+        ],
+      });
+
+      // Hamburger toggle button should be visible on mobile
+      cy.get('.navbar-toggler').should('be.visible');
+    });
+
+    it('should expand menu when clicking hamburger toggle', () => {
+      // Create mock backend service with logged-in user
+      const mockBackend = {
+        occasions$: new BehaviorSubject([]),
+        utilisateurConnecte$: new BehaviorSubject({
+          id: 1,
+          nom: 'Alice',
+          genre: Genre.Feminin,
+          email: 'alice@example.com',
+          admin: false,
+          identifiant: 'alice',
+          prefNotifIdees: PrefNotifIdees.Quotidienne,
+        }),
+      };
+
+      cy.mount(HeaderComponent, {
+        providers: [
+          provideRouter([]),
+          provideHttpClient(),
+          provideHttpClientTesting(),
+          { provide: BackendService, useValue: mockBackend },
+        ],
+      }).then(({ component }) => {
+        // Wait for BreakpointObserver to detect viewport
+        cy.wait(100);
+        // Initially collapsed
+        cy.wrap(component).its('isMenuCollapsed').should('be.true');
+
+        // Click hamburger toggle
+        cy.get('.navbar-toggler').click();
+
+        // Should now be expanded
+        cy.wrap(component).its('isMenuCollapsed').should('be.false');
+      });
+    });
+
+    it('should collapse menu when clicking hamburger toggle twice', () => {
+      // Create mock backend service with logged-in user
+      const mockBackend = {
+        occasions$: new BehaviorSubject([]),
+        utilisateurConnecte$: new BehaviorSubject({
+          id: 1,
+          nom: 'Alice',
+          genre: Genre.Feminin,
+          email: 'alice@example.com',
+          admin: false,
+          identifiant: 'alice',
+          prefNotifIdees: PrefNotifIdees.Quotidienne,
+        }),
+      };
+
+      cy.mount(HeaderComponent, {
+        providers: [
+          provideRouter([]),
+          provideHttpClient(),
+          provideHttpClientTesting(),
+          { provide: BackendService, useValue: mockBackend },
+        ],
+      }).then(({ component }) => {
+        // Wait for BreakpointObserver to detect viewport
+        cy.wait(100);
+        // Initially collapsed
+        cy.wrap(component).its('isMenuCollapsed').should('be.true');
+
+        // Click hamburger toggle to expand
+        cy.get('.navbar-toggler').click();
+        cy.wrap(component).its('isMenuCollapsed').should('be.false');
+
+        // Click hamburger toggle again to collapse
+        cy.get('.navbar-toggler').click();
+        cy.wrap(component).its('isMenuCollapsed').should('be.true');
+      });
+    });
+
+    it('should collapse menu when clicking on a menu item', () => {
+      // Create mock backend service with logged-in user and occasions
+      const mockBackend = {
+        occasions$: new BehaviorSubject([
+          {
+            id: 1,
+            titre: 'Noël 2024',
+            date: '2024-12-25',
+            participants: [],
+            resultats: [],
+          },
+        ]),
+        utilisateurConnecte$: new BehaviorSubject({
+          id: 1,
+          nom: 'Alice',
+          genre: Genre.Feminin,
+          email: 'alice@example.com',
+          admin: false,
+          identifiant: 'alice',
+          prefNotifIdees: PrefNotifIdees.Quotidienne,
+        }),
+      };
+
+      cy.mount(HeaderComponent, {
+        providers: [
+          provideRouter([]),
+          provideHttpClient(),
+          provideHttpClientTesting(),
+          { provide: BackendService, useValue: mockBackend },
+        ],
+      }).then(({ component }) => {
+        // Wait for BreakpointObserver to detect viewport
+        cy.wait(100);
+        // Expand menu first
+        cy.get('.navbar-toggler').click();
+        cy.wrap(component).its('isMenuCollapsed').should('be.false');
+
+        // Click on "Mes idées" menu item
+        cy.contains('Mes idées').click();
+
+        // Menu should collapse after clicking menu item
+        cy.wrap(component).its('isMenuCollapsed').should('be.true');
+      });
     });
   });
 });
