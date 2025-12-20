@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { Router, Event, NavigationEnd, RouterModule } from '@angular/router';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import {
@@ -17,7 +17,7 @@ import { BackendService } from '../backend.service';
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss',
 })
-export class HeaderComponent implements OnDestroy {
+export class HeaderComponent implements OnInit, OnDestroy {
   private readonly backend = inject(BackendService);
   private readonly router = inject(Router);
   private readonly breakpointObserver = inject(BreakpointObserver);
@@ -32,10 +32,10 @@ export class HeaderComponent implements OnDestroy {
   // Using custom media query to match Bootstrap's navbar-expand-md breakpoint at 768px
   isMenuCollapsed = true;
 
-  private breakpointSubscription: Subscription | null = null;
-  private routerSubscription: Subscription | null = null;
+  private breakpointSubscription!: Subscription;
+  private routerSubscription!: Subscription;
 
-  constructor() {
+  ngOnInit(): void {
     // Observe 768px breakpoint to match Bootstrap's navbar-expand-md
     // NOTE: We use a custom media query instead of Breakpoints.Medium because
     // Angular CDK's Breakpoints.Medium starts at 960px, not 768px. Using it
@@ -64,13 +64,7 @@ export class HeaderComponent implements OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this.breakpointSubscription) {
-      this.breakpointSubscription.unsubscribe();
-      this.breakpointSubscription = null;
-    }
-    if (this.routerSubscription) {
-      this.routerSubscription.unsubscribe();
-      this.routerSubscription = null;
-    }
+    this.breakpointSubscription.unsubscribe();
+    this.routerSubscription.unsubscribe();
   }
 }

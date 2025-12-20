@@ -50,10 +50,9 @@ describe('HeaderComponent', () => {
           provideHttpClient(),
           provideHttpClientTesting(),
         ],
-      }).then(({ component }) => {
-        // Verify isMenuCollapsed is false on desktop
-        cy.wrap(component).its('isMenuCollapsed').should('be.false');
-      });
+      })
+        .its('component.isMenuCollapsed')
+        .should('be.false');
     });
 
     it('should not display hamburger menu toggle when logged in', () => {
@@ -68,9 +67,8 @@ describe('HeaderComponent', () => {
         ],
       });
 
-      // Hamburger toggle button should exist but be hidden by Bootstrap CSS on desktop
+      // Hamburger toggle button should exist but be hidden (not visible) by Bootstrap CSS on desktop
       cy.get('.navbar-toggler').should('exist');
-      // Check that it's not visible (Bootstrap hides it with CSS on ≥md screens)
       cy.get('.navbar-toggler').should('not.be.visible');
     });
 
@@ -118,10 +116,9 @@ describe('HeaderComponent', () => {
           provideHttpClient(),
           provideHttpClientTesting(),
         ],
-      }).then(({ component }) => {
-        // At 768px, menu should be expanded (min-width: 768px matches)
-        cy.wrap(component).its('isMenuCollapsed').should('be.false');
-      });
+      })
+        .its('component.isMenuCollapsed')
+        .should('be.false');
     });
 
     it('should have menu collapsed at 767px (just below Bootstrap md breakpoint)', () => {
@@ -133,10 +130,9 @@ describe('HeaderComponent', () => {
           provideHttpClient(),
           provideHttpClientTesting(),
         ],
-      }).then(({ component }) => {
-        // At 767px, menu should be collapsed (min-width: 768px does not match)
-        cy.wrap(component).its('isMenuCollapsed').should('be.true');
-      });
+      })
+        .its('component.isMenuCollapsed')
+        .should('be.true');
     });
   });
 
@@ -153,10 +149,9 @@ describe('HeaderComponent', () => {
           provideHttpClient(),
           provideHttpClientTesting(),
         ],
-      }).then(({ component }) => {
-        // Verify isMenuCollapsed is true on mobile
-        cy.wrap(component).its('isMenuCollapsed').should('be.true');
-      });
+      })
+        .its('component.isMenuCollapsed')
+        .should('be.true');
     });
 
     it('should display hamburger menu toggle when logged in', () => {
