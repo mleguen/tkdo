@@ -108,6 +108,38 @@ describe('HeaderComponent', () => {
     });
   });
 
+  describe('Breakpoint edge cases', () => {
+    it('should have menu expanded at exactly 768px (Bootstrap md breakpoint)', () => {
+      cy.viewport(768, 1024);
+
+      cy.mount(HeaderComponent, {
+        providers: [
+          provideRouter([]),
+          provideHttpClient(),
+          provideHttpClientTesting(),
+        ],
+      }).then(({ component }) => {
+        // At 768px, menu should be expanded (min-width: 768px matches)
+        cy.wrap(component).its('isMenuCollapsed').should('be.false');
+      });
+    });
+
+    it('should have menu collapsed at 767px (just below Bootstrap md breakpoint)', () => {
+      cy.viewport(767, 1024);
+
+      cy.mount(HeaderComponent, {
+        providers: [
+          provideRouter([]),
+          provideHttpClient(),
+          provideHttpClientTesting(),
+        ],
+      }).then(({ component }) => {
+        // At 767px, menu should be collapsed (min-width: 768px does not match)
+        cy.wrap(component).its('isMenuCollapsed').should('be.true');
+      });
+    });
+  });
+
   describe('Mobile viewport (<768px)', () => {
     beforeEach(() => {
       // Set mobile viewport size before mounting

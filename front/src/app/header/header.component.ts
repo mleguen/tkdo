@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, inject } from '@angular/core';
 import { Router, Event, NavigationEnd, RouterModule } from '@angular/router';
-import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { BreakpointObserver } from '@angular/cdk/layout';
 import {
   NgbCollapseModule,
   NgbDropdownModule,
@@ -29,16 +29,20 @@ export class HeaderComponent implements OnDestroy {
   menuActif = '';
   idOccasionActive = 0;
   // Initialize based on viewport: collapsed on mobile (<768px), expanded on desktop (≥768px)
-  // Bootstrap's navbar-expand-md uses 768px, which corresponds to Breakpoints.Medium and above
+  // Using custom media query to match Bootstrap's navbar-expand-md breakpoint at 768px
   isMenuCollapsed = true;
 
   private breakpointSubscription: Subscription | null = null;
   private routerSubscription: Subscription | null = null;
 
   constructor() {
-    // Observe medium and larger breakpoints (≥768px) to determine if menu should be expanded
+    // Observe 768px breakpoint to match Bootstrap's navbar-expand-md
+    // NOTE: We use a custom media query instead of Breakpoints.Medium because
+    // Angular CDK's Breakpoints.Medium starts at 960px, not 768px. Using it
+    // would cause the menu to remain collapsed for viewports 768-959px, which
+    // contradicts Bootstrap's navbar-expand-md behavior.
     this.breakpointSubscription = this.breakpointObserver
-      .observe([Breakpoints.Medium, Breakpoints.Large, Breakpoints.XLarge])
+      .observe('(min-width: 768px)')
       .subscribe((result) => {
         this.isMenuCollapsed = !result.matches;
       });
