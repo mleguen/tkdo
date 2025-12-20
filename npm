@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-docker compose run --publish=4200:4200 --rm npm "$@"
+docker compose run --publish=${NPM_DEV_PORT:-4200}:4200 --rm npm "$@"

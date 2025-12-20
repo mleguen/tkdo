@@ -8,3 +8,4 @@ node_modules
 /tkdo-*.tar
 /tkdo-*.tar.gz
 /claude-WIP.md
+.env
