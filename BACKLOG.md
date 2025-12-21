@@ -96,26 +96,10 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 - **Dependencies:** Tasks 1-3 completed
 - **Priority:** Medium - improves speed and coverage
 
-**Task 5:** Address PHPStan level 8 type issues in backend
-- **Files to modify:**
-  - Multiple controller files in `api/src/Appli/Controller/`
-  - Multiple adaptor files in `api/src/Appli/ModelAdaptor/`
-  - Fixture and exception files
-- **Content:**
-  - Add type declarations to all properties (currently ~100+ missing)
-  - Add type declarations to method parameters, especially `$args` in controllers
-  - Fix generic type specifications for Doctrine collections
-  - Resolve undefined variable issues
-  - Add return type declarations where missing
-  - Fix nullable type checks
-- **Estimated size:** Changes across ~30-40 files
-- **Dependencies:** Task 1 completed (PHPStan configured)
-- **Priority:** Medium - improves code quality and IDE support
-- **Note:** Currently PHPStan job is set to continue-on-error to allow CI to pass. Remove this flag once types are fixed.
 
 ### Frontend Testing - Unit Tests
 
-**Task 6:** Expand BackendService unit tests
+**Task 5:** Expand BackendService unit tests
 - **File:** `front/src/app/backend.service.spec.ts`
 - **Content:**
   - Test all HTTP methods (GET, POST, PUT, DELETE)
@@ -129,7 +113,7 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 - **Estimated additions:** ~150-200 lines
 - **Priority:** High - core service used throughout app
 
-**Task 7:** Add comprehensive guard unit tests
+**Task 6:** Add comprehensive guard unit tests
 - **Files:**
   - `front/src/app/connexion.guard.spec.ts`
   - `front/src/app/admin.guard.spec.ts`
@@ -144,7 +128,7 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 - **Estimated additions:** ~100-150 lines total
 - **Priority:** High - guards protect critical routes
 
-**Task 8:** Add HTTP interceptor unit tests
+**Task 7:** Add HTTP interceptor unit tests
 - **Files:**
   - `front/src/app/auth-backend.interceptor.spec.ts`
   - `front/src/app/erreur-backend.interceptor.spec.ts`
@@ -162,7 +146,7 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 
 ### Frontend Testing - Component Tests
 
-**Task 9:** Expand ConnexionComponent component tests
+**Task 8:** Expand ConnexionComponent component tests
 - **File:** `front/cypress/component/connexion.component.cy.ts`
 - **Content:**
   - Test form rendering and validation
@@ -176,7 +160,7 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 - **Estimated additions:** ~80-120 lines
 - **Priority:** High - critical user journey
 
-**Task 10:** Add comprehensive OccasionComponent component tests
+**Task 9:** Add comprehensive OccasionComponent component tests
 - **File:** `front/cypress/component/occasion.component.cy.ts`
 - **Content:**
   - Test occasion details rendering
@@ -191,7 +175,7 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 - **Estimated additions:** ~150-200 lines
 - **Priority:** High - complex component with multiple features
 
-**Task 11:** Add ListeIdeesComponent component tests
+**Task 10:** Add ListeIdeesComponent component tests
 - **File:** `front/cypress/component/liste-idees.component.cy.ts`
 - **Content:**
   - Test idea list rendering for different participants
@@ -205,7 +189,7 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 - **Estimated additions:** ~120-150 lines
 - **Priority:** High - core feature
 
-**Task 12:** Add ProfilComponent component tests
+**Task 11:** Add ProfilComponent component tests
 - **File:** `front/cypress/component/profil.component.cy.ts`
 - **Content:**
   - Test profile display
@@ -219,7 +203,7 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 - **Estimated additions:** ~100-130 lines
 - **Priority:** Medium - important user feature
 
-**Task 13:** Add AdminComponent component tests
+**Task 12:** Add AdminComponent component tests
 - **File:** `front/cypress/component/admin.component.cy.ts`
 - **Content:**
   - Test user list rendering
@@ -232,7 +216,7 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 - **Estimated additions:** ~100-130 lines
 - **Priority:** Medium - admin functionality
 
-**Task 14:** Add HeaderComponent component tests
+**Task 13:** Add HeaderComponent component tests
 - **File:** `front/cypress/component/header.component.cy.ts`
 - **Content:**
   - Test navigation menu rendering
@@ -247,7 +231,7 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 
 ### Frontend Testing - Integration Tests Enhancement
 
-**Task 15:** Add mobile viewport testing to all integration tests
+**Task 14:** Add mobile viewport testing to all integration tests
 - **Files:**
   - `front/cypress/e2e/*.cy.ts` (all test files)
   - `front/cypress/support/e2e.ts`
@@ -260,7 +244,7 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 - **Estimated additions:** ~150-200 lines across files
 - **Priority:** High - mobile support is critical
 
-**Task 16:** Refactor integration tests to remove component-level concerns
+**Task 15:** Refactor integration tests to remove component-level concerns
 - **Files:**
   - `front/cypress/e2e/connexion.cy.ts`
   - `front/cypress/e2e/liste-idees.cy.ts`
@@ -274,7 +258,7 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 - **Dependencies:** Tasks 9-14 completed
 - **Priority:** Medium - maintains test pyramid balance
 
-**Task 17:** Add comprehensive error handling integration tests
+**Task 16:** Add comprehensive error handling integration tests
 - **File:** `front/cypress/e2e/error-handling.cy.ts` (new)
 - **Content:**
   - Test network failure scenarios
@@ -286,7 +270,7 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 - **Estimated size:** ~120-150 lines
 - **Priority:** Medium - important for resilience
 
-**Task 18:** Add notification preferences integration tests
+**Task 17:** Add notification preferences integration tests
 - **File:** `front/cypress/e2e/notifications.cy.ts` (new)
 - **Content:**
   - Test notification preference changes
@@ -299,7 +283,7 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 
 ### Frontend Testing - Test Infrastructure
 
-**Task 19:** Implement test data builders for fixtures
+**Task 18:** Implement test data builders for fixtures
 - **Files to create:**
   - `front/cypress/support/builders/utilisateur.builder.ts`
   - `front/cypress/support/builders/occasion.builder.ts`
@@ -312,7 +296,7 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 - **Estimated size:** ~150-200 lines total
 - **Priority:** Medium - improves test maintainability
 
-**Task 20:** Add reusable test assertions library
+**Task 19:** Add reusable test assertions library
 - **File:** `front/cypress/support/assertions.ts` (new)
 - **Content:**
   - Custom Cypress commands for common assertions
@@ -324,7 +308,7 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 
 ### Backend Testing - Unit Tests
 
-**Task 21:** Add comprehensive IdeePort unit tests
+**Task 20:** Add comprehensive IdeePort unit tests
 - **File:** `api/test/Unit/Dom/Port/IdeePortTest.php`
 - **Content:**
   - Test idea creation with authorization
@@ -337,7 +321,7 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 - **Estimated size:** ~200-250 lines
 - **Priority:** High - core business logic
 
-**Task 22:** Add comprehensive UtilisateurPort unit tests
+**Task 21:** Add comprehensive UtilisateurPort unit tests
 - **File:** `api/test/Unit/Dom/Port/UtilisateurPortTest.php`
 - **Content:**
   - Test user creation (admin only)
@@ -351,7 +335,7 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 - **Estimated additions:** ~150-200 lines
 - **Priority:** High - user management logic
 
-**Task 23:** Add comprehensive NotifPort unit tests
+**Task 22:** Add comprehensive NotifPort unit tests
 - **File:** `api/test/Unit/Dom/Port/NotifPortTest.php`
 - **Content:**
   - Test notification creation logic
@@ -364,7 +348,7 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 - **Estimated additions:** ~200-250 lines
 - **Priority:** High - complex notification logic
 
-**Task 24:** Add ExclusionPort unit tests
+**Task 23:** Add ExclusionPort unit tests
 - **File:** `api/test/Unit/Dom/Port/ExclusionPortTest.php`
 - **Content:**
   - Test exclusion creation
@@ -376,7 +360,7 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 - **Estimated size:** ~120-150 lines
 - **Priority:** Medium - important business rule
 
-**Task 25:** Expand OccasionPort unit tests
+**Task 24:** Expand OccasionPort unit tests
 - **File:** `api/test/Unit/Dom/Port/OccasionPortTest.php`
 - **Content:**
   - Test draw generation algorithm
@@ -391,7 +375,7 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 
 ### Backend Testing - Integration Tests
 
-**Task 26:** Add comprehensive idea API integration tests
+**Task 25:** Add comprehensive idea API integration tests
 - **File:** `api/test/Int/IdeeIntTest.php`
 - **Content:**
   - Test all CRUD operations via API
@@ -405,7 +389,7 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 - **Estimated additions:** ~200-300 lines
 - **Priority:** High - core API
 
-**Task 27:** Add notification integration tests
+**Task 26:** Add notification integration tests
 - **File:** `api/test/Int/NotifIntTest.php` (new)
 - **Content:**
   - Test notification creation via various triggers
@@ -417,7 +401,7 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 - **Estimated size:** ~250-300 lines
 - **Priority:** High - email is critical functionality
 
-**Task 28:** Add comprehensive occasion draw integration tests
+**Task 27:** Add comprehensive occasion draw integration tests
 - **File:** `api/test/Int/OccasionIntTest.php`
 - **Content:**
   - Test draw generation with various scenarios
@@ -430,7 +414,7 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 - **Estimated additions:** ~150-200 lines
 - **Priority:** High - core feature
 
-**Task 29:** Add API error response integration tests
+**Task 28:** Add API error response integration tests
 - **File:** `api/test/Int/ErrorHandlingIntTest.php` (new)
 - **Content:**
   - Test 400 Bad Request scenarios
@@ -443,7 +427,7 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 - **Estimated size:** ~200-250 lines
 - **Priority:** Medium - API consistency
 
-**Task 30:** Add database constraint integration tests
+**Task 29:** Add database constraint integration tests
 - **File:** `api/test/Int/DatabaseConstraintIntTest.php` (new)
 - **Content:**
   - Test unique constraints
@@ -456,7 +440,7 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 
 ### Backend Testing - Test Infrastructure
 
-**Task 31:** Add database transaction rollback for faster tests
+**Task 30:** Add database transaction rollback for faster tests
 - **File:** `api/test/Int/IntTestCase.php`
 - **Content:**
   - Wrap each test in database transaction
@@ -467,7 +451,7 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 - **Estimated changes:** ~40-60 lines
 - **Priority:** High - significantly speeds up tests
 
-**Task 32:** Create test data builders for backend
+**Task 31:** Create test data builders for backend
 - **Files to create:**
   - `api/test/Builder/UtilisateurBuilder.php`
   - `api/test/Builder/OccasionBuilder.php`
@@ -482,7 +466,7 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 
 ### Test Coverage and Quality
 
-**Task 33:** Set up test coverage reporting
+**Task 32:** Set up test coverage reporting
 - **Files to modify:**
   - `api/phpunit.xml`
   - `front/karma.conf.js` (if exists) or create
@@ -497,7 +481,7 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 - **Estimated size:** ~80-100 lines across files
 - **Priority:** Medium - tracks progress
 
-**Task 34:** Add mutation testing for backend
+**Task 33:** Add mutation testing for backend
 - **Files to create/modify:**
   - `api/infection.json.dist`
   - `api/composer.json` (add infection/infection)
@@ -512,7 +496,7 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 
 ### Performance Testing
 
-**Task 35:** Add performance benchmarks for critical paths
+**Task 34:** Add performance benchmarks for critical paths
 - **Files to create:**
   - `front/cypress/e2e/performance.cy.ts`
   - `api/test/Performance/DrawPerformanceTest.php`
@@ -528,7 +512,7 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 
 ### Accessibility Testing
 
-**Task 36:** Add accessibility testing to E2E tests
+**Task 35:** Add accessibility testing to E2E tests
 - **Files to create:**
   - `front/cypress/e2e/accessibility.cy.ts`
   - `front/package.json` (add cypress-axe)
@@ -544,7 +528,7 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 
 ### Documentation and Process
 
-**Task 37:** Create testing contribution guide
+**Task 36:** Create testing contribution guide
 - **File:** `docs/en/testing.md`
 - **Content:**
   - Add "Writing Tests" section with TDD workflow
@@ -556,7 +540,7 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 - **Estimated additions:** ~200-250 lines
 - **Priority:** Medium - enables contributor TDD
 
-**Task 38:** Create PR checklist template
+**Task 37:** Create PR checklist template
 - **File:** `.github/pull_request_template.md` (new)
 - **Content:**
   - Require test evidence for all PRs
@@ -567,7 +551,7 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 - **Estimated size:** ~40-60 lines
 - **Priority:** Medium - enforces testing standards
 
-**Task 39:** Add test execution time tracking and optimization
+**Task 38:** Add test execution time tracking and optimization
 - **Files to modify:**
   - `.github/workflows/test.yml`
   - `docs/en/testing.md`

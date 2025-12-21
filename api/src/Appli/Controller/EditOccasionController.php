@@ -18,27 +18,21 @@ use Slim\Exception\HttpNotFoundException;
 
 class EditOccasionController extends AuthController
 {
-    protected $dateService;
-    protected $occasionPort;
-    protected $occasionRepository;
-    protected $jsonService;
-
     public function __construct(
-        DateService $dateService,
-        JsonService $jsonService,
-        OccasionPort $occasionPort,
-        OccasionRepository $occasionRepository,
+        private readonly DateService $dateService,
+        private readonly JsonService $jsonService,
+        private readonly OccasionPort $occasionPort,
+        private readonly OccasionRepository $occasionRepository,
         RouteService $routeService
     ) {
         parent::__construct($routeService);
-        $this->dateService = $dateService;
-        $this->jsonService = $jsonService;
-        $this->occasionPort = $occasionPort;
-        $this->occasionRepository = $occasionRepository;
     }
 
+    /**
+     * @param array<string, mixed> $args
+     */
     #[\Override]
-    public function __invoke(ServerRequestInterface $request, ResponseInterface $response, $args): ResponseInterface
+    public function __invoke(ServerRequestInterface $request, ResponseInterface $response, array $args): ResponseInterface
     {
         $response = parent::__invoke($request, $response, $args);
         $idOccasion = $this->routeService->getIntArg($request, $args, 'idOccasion');
@@ -49,7 +43,7 @@ class EditOccasionController extends AuthController
 
         try {
             $occasion = $this->occasionPort->modifieOccasion(
-                $this->auth,
+                $this->getAuth(),
                 $this->occasionRepository->read($idOccasion),
                 $modifications
             );

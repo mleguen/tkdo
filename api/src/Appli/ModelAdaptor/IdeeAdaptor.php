@@ -22,44 +22,38 @@ use Doctrine\ORM\Mapping\Table;
 class IdeeAdaptor implements Idee
 {
     /**
-     * @var int
      * @Id
      * @Column(type="integer")
      * @GeneratedValue
      */
-    protected $id;
+    protected int $id;
 
     /**
-     * @var Utilisateur
      * @ManyToOne(targetEntity="App\Appli\ModelAdaptor\UtilisateurAdaptor")
      * @JoinColumn(nullable=false)
      */
-    private $utilisateur;
+    private Utilisateur $utilisateur;
 
     /**
-     * @var string
      * @Column()
      */
-    private $description;
+    private string $description;
 
     /**
-     * @var Utilisateur
      * @ManyToOne(targetEntity="App\Appli\ModelAdaptor\UtilisateurAdaptor")
      * @JoinColumn(nullable=false)
      */
-    private $auteur;
+    private Utilisateur $auteur;
 
     /**
-     * @var DateTime
      * @Column(type="datetime")
      */
-    private $dateProposition;
+    private DateTime $dateProposition;
 
     /**
-     * @var DateTime
      * @Column(type="datetime", nullable=true)
      */
-    private $dateSuppression;
+    private ?DateTime $dateSuppression = null;
 
     public function __construct(?int $id = NULL)
     {
@@ -109,7 +103,7 @@ class IdeeAdaptor implements Idee
     /**
      * {@inheritdoc}
      */
-    public function getDateSuppression(): DateTime
+    public function getDateSuppression(): ?DateTime
     {
         return $this->dateSuppression;
     }
@@ -172,7 +166,7 @@ class IdeeAdaptor implements Idee
     /**
      * {@inheritdoc}
      */
-    public function setDateSuppression(DateTime $dateSuppression): Idee
+    public function setDateSuppression(?DateTime $dateSuppression): Idee
     {
         $this->dateSuppression = $dateSuppression;
         return $this;

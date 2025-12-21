@@ -2,7 +2,9 @@
 
 namespace App\Appli\Fixture;
 
+use App\Appli\ModelAdaptor\OccasionAdaptor;
 use App\Appli\ModelAdaptor\ResultatAdaptor;
+use App\Appli\ModelAdaptor\UtilisateurAdaptor;
 use Doctrine\Persistence\ObjectManager;
 
 class ResultatFixture extends AppAbstractFixture
@@ -27,8 +29,10 @@ class ResultatFixture extends AppAbstractFixture
             ] as $nomOccasion => $tirage) {
                 foreach ($tirage as $nomQuiDonne => $nomQuiRecoit) {
                     $em->persist(
-                        new ResultatAdaptor($this->getReference($nomOccasion), $this->getReference($nomQuiDonne))
-                            ->setQuiRecoit($this->getReference($nomQuiRecoit))
+                        new ResultatAdaptor(
+                            $this->getReference($nomOccasion, OccasionAdaptor::class),
+                            $this->getReference($nomQuiDonne, UtilisateurAdaptor::class)
+                        )->setQuiRecoit($this->getReference($nomQuiRecoit, UtilisateurAdaptor::class))
                     );
                 }
             }

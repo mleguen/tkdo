@@ -82,6 +82,7 @@
       "@reset-doctrine",
       "@console -- fixtures"
     ],
+    "phpstan": "vendor/bin/phpstan analyze",
     "rector": "rector",
     "test": "phpunit"
   }

@@ -19,6 +19,9 @@ class JsonService
     {
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     private function getPayloadConnexion(Utilisateur $utilisateur): array
     {
         return [
@@ -32,6 +35,9 @@ class JsonService
         ];
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     private function getPayloadException(Exception $e): array
     {
         return [
@@ -39,6 +45,9 @@ class JsonService
         ];
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getPayloadExclusion(Exclusion $exclusion): array
     {
         return [
@@ -46,6 +55,9 @@ class JsonService
         ];
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     private function getPayloadIdee(Idee $idee): array
     {
         $json = [
@@ -56,7 +68,9 @@ class JsonService
         ];
 
         if ($idee->hasDateSuppression()) {
-            $json['dateSuppression'] = $this->dateService->encodeDate($idee->getDateSuppression());
+            $dateSuppression = $idee->getDateSuppression();
+            assert($dateSuppression !== null);
+            $json['dateSuppression'] = $this->dateService->encodeDate($dateSuppression);
         }
 
         return $json;
@@ -64,6 +78,7 @@ class JsonService
 
     /**
      * @param Idee[] $idees
+     * @return array<string, mixed>
      */
     private function getPayloadListeIdees(Utilisateur $utilisateur, array $idees): array
     {
@@ -77,6 +92,9 @@ class JsonService
         ];
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getPayloadOccasion(Occasion $occasion): array
     {
         return [
@@ -88,6 +106,7 @@ class JsonService
 
     /**
      * @param Resultat[] $resultats
+     * @return array<string, mixed>
      */
     public function getPayloadOccasionDetaillee(Occasion $occasion, array $resultats): array
     {
@@ -103,6 +122,9 @@ class JsonService
         ]);
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getPayloadResultat(Resultat $resultat): array
     {
         return [
@@ -111,6 +133,9 @@ class JsonService
         ];
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     private function getPayloadUtilisateur(Utilisateur $utilisateur): array
     {
         return [
@@ -120,6 +145,9 @@ class JsonService
         ];
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     private function getPayloadUtilisateurComplet(Utilisateur $utilisateur): array
     {
         $data = array_merge($this->getPayloadUtilisateur($utilisateur), [
@@ -132,6 +160,9 @@ class JsonService
         return $data;
     }
 
+    /**
+     * @param array<string, mixed> $payload
+     */
     public function encode(array $payload): string
     {
         return json_encode($payload, JSON_PRETTY_PRINT) . "\n";
@@ -157,6 +188,9 @@ class JsonService
         return $this->encode($this->getPayloadIdee($idee));
     }
 
+    /**
+     * @param Idee[] $idees
+     */
     public function encodeListeIdees(Utilisateur $utilisateur, array $idees): string
     {
         return $this->encode($this->getPayloadListeIdees($utilisateur, $idees));

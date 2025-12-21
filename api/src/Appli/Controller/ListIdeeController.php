@@ -17,24 +17,20 @@ use Slim\Exception\HttpNotFoundException;
 
 class ListIdeeController extends AuthController
 {
-    protected $ideePort;
-    protected $jsonService;
-    protected $utilisateurRepository;
-
     public function __construct(
-        IdeePort $ideePort,
-        JsonService $jsonService,
+        private readonly IdeePort $ideePort,
+        private readonly JsonService $jsonService,
         RouteService $routeService,
-        UtilisateurRepository $utilisateurRepository
+        private readonly UtilisateurRepository $utilisateurRepository
     ) {
         parent::__construct($routeService);
-        $this->ideePort = $ideePort;
-        $this->jsonService = $jsonService;
-        $this->utilisateurRepository = $utilisateurRepository;
     }
 
+    /**
+     * @param array<string, mixed> $args
+     */
     #[\Override]
-    public function __invoke(ServerRequestInterface $request, ResponseInterface $response, $args): ResponseInterface
+    public function __invoke(ServerRequestInterface $request, ResponseInterface $response, array $args): ResponseInterface
     {
         $response = parent::__invoke($request, $response, $args);
 
@@ -44,7 +40,7 @@ class ListIdeeController extends AuthController
         try {
             $utilisateur = $this->utilisateurRepository->read((int) $queryParams['idUtilisateur']);
             $idees = $this->ideePort->listeIdees(
-                $this->auth,
+                $this->getAuth(),
                 $utilisateur,
                 isset($queryParams['supprimees']) ? boolval($queryParams['supprimees']) : null
             );

@@ -5,5 +5,8 @@ namespace App\Dom\Exception;
 
 class OccasionPasseeException extends DomException
 {
-    public $message = "l'occasion est passée";
+    public function __construct(string $message = "l'occasion est passée", int $code = 0, ?\Throwable $previous = null)
+    {
+        parent::__construct($message, $code, $previous);
+    }
 }

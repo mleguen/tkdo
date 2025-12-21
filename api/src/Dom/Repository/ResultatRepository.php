@@ -11,7 +11,7 @@ interface ResultatRepository
 {
     public function create(Occasion $occasion, Utilisateur $quiOffre, Utilisateur $quiRecoit): Resultat;
 
-    public function deleteByOccasion(Occasion $occasion);
+    public function deleteByOccasion(Occasion $occasion): void;
     
     /**
      * Indique s'il y a des résultats pour l'occasion donnée

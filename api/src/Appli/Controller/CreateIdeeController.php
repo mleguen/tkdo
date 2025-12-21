@@ -17,31 +17,27 @@ use Slim\Exception\HttpForbiddenException;
 
 class CreateIdeeController extends AuthController
 {
-    protected $ideePort;
-    protected $jsonService;
-    protected $utilisateurRepository;
-
     public function __construct(
-        IdeePort $ideePort,
-        JsonService $jsonService,
+        private readonly IdeePort $ideePort,
+        private readonly JsonService $jsonService,
         RouteService $routeService,
-        UtilisateurRepository $utilisateurRepository
+        private readonly UtilisateurRepository $utilisateurRepository
     ) {
         parent::__construct($routeService);
-        $this->ideePort = $ideePort;
-        $this->jsonService = $jsonService;
-        $this->utilisateurRepository = $utilisateurRepository;
     }
 
+    /**
+     * @param array<string, mixed> $args
+     */
     #[\Override]
-    public function __invoke(ServerRequestInterface $request, ResponseInterface $response, $args): ResponseInterface
+    public function __invoke(ServerRequestInterface $request, ResponseInterface $response, array $args): ResponseInterface
     {
         $response = parent::__invoke($request, $response, $args);
         $body = $this->routeService->getParsedRequestBody($request, ['idUtilisateur', 'description', 'idAuteur']);
 
         try {
             $idee = $this->ideePort->creeIdee(
-                $this->auth,
+                $this->getAuth(),
                 $this->utilisateurRepository->read(intval($body['idUtilisateur'])),
                 $body['description'],
                 $this->utilisateurRepository->read(intval($body['idAuteur']), true)

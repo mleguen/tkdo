@@ -13,10 +13,7 @@ use Doctrine\ORM\EntityManager;
 
 class ResultatRepositoryAdaptor implements ResultatRepository
 {
-    /**
-     * @var EntityManager
-     */
-    protected $em;
+    protected EntityManager $em;
 
     public function __construct(EntityManager $em)
     {
@@ -34,16 +31,16 @@ class ResultatRepositoryAdaptor implements ResultatRepository
         return $resultat;
     }
 
-    public function deleteByOccasion(Occasion $occasion)
+    public function deleteByOccasion(Occasion $occasion): void
     {
         $class = ResultatAdaptor::class;
         $dql = <<<EOS
             DELETE FROM $class r
             WHERE r.occasion = :occasion
 EOS;
-        return $this->em->createQuery($dql)
+        $this->em->createQuery($dql)
             ->setParameter('occasion', $occasion)
-            ->getResult();
+            ->execute();
     }
 
     public function hasForOccasion(Occasion $occasion): bool

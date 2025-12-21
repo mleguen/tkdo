@@ -9,7 +9,7 @@ use Doctrine\Migrations\Configuration\Migration\ConfigurationArray;
 
 class MigrationSettings
 {
-    public $configuration;
+    public ConfigurationArray $configuration;
 
     public function __construct(
         Bootstrap $bootstrap

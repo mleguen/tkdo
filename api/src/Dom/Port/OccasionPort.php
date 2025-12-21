@@ -110,7 +110,8 @@ class OccasionPort
     }
 
     /**
-     * @param Resultat[] $resultats
+     * @param Resultat[]|null $resultats
+     * @param-out Resultat[] $resultats
      * @throws PasParticipantNiAdminException
      */
     public function getOccasion(
@@ -158,14 +159,18 @@ class OccasionPort
         $exclusions = $this->exclusionRepository->readByParticipantsOccasion($occasion);
         foreach ($exclusions as $exclusion) {
             $idxQuiOffre = array_search($exclusion->getQuiOffre(), $participants);
+            assert(is_int($idxQuiOffre));
             $idxQuiNeDoitPasRecevoir = array_search($exclusion->getQuiNeDoitPasRecevoir(), $participants);
+            assert(is_int($idxQuiNeDoitPasRecevoir));
             $tabExclusions[$idxQuiOffre][] = $idxQuiNeDoitPasRecevoir;
         }
 
         $resultatsPasses = $this->resultatRepository->readByParticipantsOccasion($occasion);
         foreach ($resultatsPasses as $resultatPasse) {
             $idxQuiOffre = array_search($resultatPasse->getQuiOffre(), $participants);
+            assert(is_int($idxQuiOffre));
             $idxQuiNeDoitPasRecevoir = array_search($resultatPasse->getQuiRecoit(), $participants);
+            assert(is_int($idxQuiNeDoitPasRecevoir));
             $tabExclusions[$idxQuiOffre][] = $idxQuiNeDoitPasRecevoir;
         }
 
@@ -243,6 +248,7 @@ class OccasionPort
     }
 
     /**
+     * @param array<string, mixed> $modifications
      * @throws PasAdminException
      */
     public function modifieOccasion(

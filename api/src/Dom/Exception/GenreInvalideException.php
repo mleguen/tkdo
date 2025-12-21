@@ -5,5 +5,8 @@ namespace App\Dom\Exception;
 
 class GenreInvalideException extends DomException
 {
-    public $message = 'genre invalide';
+    public function __construct(string $message = 'genre invalide', int $code = 0, ?\Throwable $previous = null)
+    {
+        parent::__construct($message, $code, $previous);
+    }
 }

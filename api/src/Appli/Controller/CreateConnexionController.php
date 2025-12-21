@@ -15,25 +15,18 @@ use Slim\Exception\HttpBadRequestException;
 
 class CreateConnexionController
 {
-    protected $jsonService;
-    protected $logger;
-    protected $routeService;
-    protected $utilisateurRepository;
-
     public function __construct(
-        JsonService $jsonService,
-        LoggerInterface $logger,
-        RouteService $routeService,
-        UtilisateurRepository $utilisateurRepository
-    )
-    {
-        $this->jsonService = $jsonService;
-        $this->logger = $logger;
-        $this->routeService = $routeService;
-        $this->utilisateurRepository = $utilisateurRepository;
+        private readonly JsonService $jsonService,
+        private readonly LoggerInterface $logger,
+        private readonly RouteService $routeService,
+        private readonly UtilisateurRepository $utilisateurRepository
+    ) {
     }
 
-    public function __invoke(ServerRequestInterface $request, ResponseInterface $response, $args): ResponseInterface
+    /**
+     * @param array<string, mixed> $args
+     */
+    public function __invoke(ServerRequestInterface $request, ResponseInterface $response, array $args): ResponseInterface
     {
         $body = $this->routeService->getParsedRequestBody($request, ['identifiant', 'mdp']);
 

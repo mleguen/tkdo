@@ -6,6 +6,7 @@ namespace App\Dom\Port;
 
 use App\Dom\Exception\EmailInvalideException;
 use App\Dom\Exception\GenreInvalideException;
+use App\Dom\Exception\IdentifiantDejaUtiliseException;
 use App\Dom\Exception\ModificationMdpInterditeException;
 use App\Dom\Exception\PasAdminException;
 use App\Dom\Exception\PasUtilisateurNiAdminException;
@@ -85,6 +86,7 @@ class UtilisateurPort
     }
 
     /**
+     * @param array<string, mixed> $modifications
      * @throws PasUtilisateurNiAdminException
      * @throws ModificationMdpInterditeException
      * @throws PasAdminException
@@ -158,7 +160,7 @@ class UtilisateurPort
     /**
      * @throws EmailInvalideException
      */
-    private static function assertEstEmail($email)
+    private static function assertEstEmail(string $email): void
     {
         // Le .fr est un hack pour autoriser des noms de domaine sans point volontairement refusés par PHP
         // (cf. https://www.php.net/manual/fr/filter.filters.validate.php)

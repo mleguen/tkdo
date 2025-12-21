@@ -19,31 +19,27 @@ use Slim\Exception\HttpNotFoundException;
 
 class CreateIdeeSuppressionController extends AuthController
 {
-    protected $ideePort;
-    protected $ideeRepository;
-    protected $jsonService;
-
     public function __construct(
-        IdeePort $ideePort,
-        IdeeRepository $ideeRepository,
-        JsonService $jsonService,
+        private readonly IdeePort $ideePort,
+        private readonly IdeeRepository $ideeRepository,
+        private readonly JsonService $jsonService,
         RouteService $routeService
     ) {
         parent::__construct($routeService);
-        $this->ideePort = $ideePort;
-        $this->ideeRepository = $ideeRepository;
-        $this->jsonService = $jsonService;
     }
 
+    /**
+     * @param array<string, mixed> $args
+     */
     #[\Override]
-    public function __invoke(ServerRequestInterface $request, ResponseInterface $response, $args): ResponseInterface
+    public function __invoke(ServerRequestInterface $request, ResponseInterface $response, array $args): ResponseInterface
     {
         $response = parent::__invoke($request, $response, $args);
         $idIdee = $this->routeService->getIntArg($request, $args, 'idIdee');
 
         try {
             $idee = $this->ideePort->marqueIdeeCommeSupprimee(
-                $this->auth,
+                $this->getAuth(),
                 $this->ideeRepository->read($idIdee)
             );
         }

@@ -8,6 +8,7 @@ use App\Dom\Model\Occasion;
 use App\Dom\Model\Utilisateur;
 use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\GeneratedValue;
@@ -23,35 +24,33 @@ use Doctrine\ORM\Mapping\Table;
 class OccasionAdaptor implements Occasion
 {
     /**
-     * @var int
      * @Id
      * @Column(type="integer")
      * @GeneratedValue
      */
-    protected $id;
+    protected int $id;
 
     /**
-     * @var DateTime
      * @Column(type="datetime")
      */
-    private $date;
+    private DateTime $date;
 
     /**
-     * @var string
      * @Column()
      */
-    private $titre;
+    private string $titre;
 
     /**
-     * @var ArrayCollection
+     * @var Collection<int, UtilisateurAdaptor>
      * @ManyToMany(targetEntity="App\Appli\ModelAdaptor\UtilisateurAdaptor", inversedBy="occasions")
      * @JoinTable(name="tkdo_participation")
      */
-    private $participants;
+    private Collection $participants;
 
     public function __construct(?int $id = NULL)
     {
         if (isset($id)) $this->id = $id;
+        $this->participants = new ArrayCollection();
     }
 
     /**
@@ -59,6 +58,7 @@ class OccasionAdaptor implements Occasion
      */
     public function addParticipant(Utilisateur $participant): Occasion
     {
+        assert($participant instanceof UtilisateurAdaptor);
         $this->participants->add($participant);
         return $this;
     }
@@ -125,11 +125,13 @@ class OccasionAdaptor implements Occasion
     }
 
     /**
-     * {@inheritdoc}
+     * @param Utilisateur[] $participants
      */
     public function setParticipants (array $participants): Occasion
     {
-        $this->participants = new ArrayCollection($participants);
+        assert(count($participants) === 0 || $participants[array_key_first($participants)] instanceof UtilisateurAdaptor);
+        /** @var UtilisateurAdaptor[] $participants */
+        $this->participants = new ArrayCollection(array_values($participants));
         return $this;
     }
 }

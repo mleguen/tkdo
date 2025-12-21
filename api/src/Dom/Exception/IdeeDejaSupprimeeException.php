@@ -5,5 +5,8 @@ namespace App\Dom\Exception;
 
 class IdeeDejaSupprimeeException extends DomException
 {
-    public $message = "l'idée a déjà été marquée comme supprimée";
+    public function __construct(string $message = "l'idée a déjà été marquée comme supprimée", int $code = 0, ?\Throwable $previous = null)
+    {
+        parent::__construct($message, $code, $previous);
+    }
 }

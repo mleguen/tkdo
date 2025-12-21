@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace App\Appli\ModelAdaptor;
 
+use App\Dom\Model\Occasion;
 use App\Dom\Model\PrefNotifIdees;
 use App\Dom\Model\Utilisateur;
 use DateTime;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\GeneratedValue;
@@ -21,75 +24,64 @@ use Doctrine\ORM\Mapping\Table;
 class UtilisateurAdaptor implements Utilisateur
 {
     /**
-     * @var DateTime
      * @Column(type="datetime")
      */
-    private $dateDerniereNotifPeriodique;
+    private DateTime $dateDerniereNotifPeriodique;
 
     /**
-     * @var string
      * @Column()
      */
-    private $email;
+    private string $email;
 
     /**
-     * @var bool
      * @Column(type="boolean")
      */
-    private $admin = false;
+    private bool $admin = false;
 
     /**
-     * @var string
      * @Column()
      */
-    private $genre;
+    private string $genre;
 
     /**
-     * @var int
      * @Id
      * @Column(type="integer")
      * @GeneratedValue
      */
-    protected $id;
+    protected int $id;
 
     /**
-     * @var string
      * @Column(unique=true)
      */
-    private $identifiant;
+    private string $identifiant;
 
     /**
-     * @var string
      * @Column()
      */
-    private $mdp;
-    
-    /**
-     * @var string
-     */
-    private $mdpClair;
+    private string $mdp;
+
+    private string $mdpClair;
 
     /**
-     * @var string
      * @Column()
      */
-    private $nom;
+    private string $nom;
 
     /**
-     * @var ArrayCollection
+     * @var Collection<int, OccasionAdaptor>
      * @ManyToMany(targetEntity="App\Appli\ModelAdaptor\OccasionAdaptor", mappedBy="participants")
      */
-    private $occasions;
+    private Collection $occasions;
 
     /**
-     * @var string
      * @Column()
      */
-    private $prefNotifIdees = PrefNotifIdees::Aucune;
+    private string $prefNotifIdees = PrefNotifIdees::Aucune;
 
     public function __construct(?int $id = NULL)
     {
         if (isset($id)) $this->id = $id;
+        $this->occasions = new ArrayCollection();
     }
 
     /**

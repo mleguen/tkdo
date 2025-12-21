@@ -3,6 +3,7 @@
 namespace App\Appli\Fixture;
 
 use App\Appli\ModelAdaptor\ExclusionAdaptor;
+use App\Appli\ModelAdaptor\UtilisateurAdaptor;
 use Doctrine\Persistence\ObjectManager;
 
 class ExclusionFixture extends AppAbstractFixture
@@ -11,8 +12,8 @@ class ExclusionFixture extends AppAbstractFixture
     {
         if ($this->devMode) {
             $em->persist(new ExclusionAdaptor(
-                $this->getReference('alice'),
-                $this->getReference('bob'),
+                $this->getReference('alice', UtilisateurAdaptor::class),
+                $this->getReference('bob', UtilisateurAdaptor::class),
             ));
             $em->flush();
         }

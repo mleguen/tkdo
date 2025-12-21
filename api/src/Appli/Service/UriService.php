@@ -18,12 +18,12 @@ class UriService
     $this->baseUri = new UriFactory()->createUri($this->settings->baseUri);
   }
   
-  public function getHost()
+  public function getHost(): string
   {
     return $this->baseUri->getHost();
   }
-  
-  public function getUri(string $path = '', string $query = '')
+
+  public function getUri(string $path = '', string $query = ''): UriInterface
   {
     return $this->baseUri->withPath($this->baseUri->getPath() . $path)->withQuery($query);
   }

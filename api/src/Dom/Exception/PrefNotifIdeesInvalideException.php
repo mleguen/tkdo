@@ -5,5 +5,8 @@ namespace App\Dom\Exception;
 
 class PrefNotifIdeesInvalideException extends DomException
 {
-    public $message = 'format de préférence de notification incorrect';
+    public function __construct(string $message = 'format de préférence de notification incorrect', int $code = 0, ?\Throwable $previous = null)
+    {
+        parent::__construct($message, $code, $previous);
+    }
 }

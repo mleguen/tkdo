@@ -15,31 +15,27 @@ use Slim\Exception\HttpForbiddenException;
 
 class CreateOccasionController extends AuthController
 {
-    protected $dateService;
-    protected $occasionPort;
-    protected $jsonService;
-
     public function __construct(
-        DateService $dateService,
-        JsonService $jsonService,
-        OccasionPort $occasionPort,
+        private readonly DateService $dateService,
+        private readonly JsonService $jsonService,
+        private readonly OccasionPort $occasionPort,
         RouteService $routeService
     ) {
         parent::__construct($routeService);
-        $this->dateService = $dateService;
-        $this->jsonService = $jsonService;
-        $this->occasionPort = $occasionPort;
     }
 
+    /**
+     * @param array<string, mixed> $args
+     */
     #[\Override]
-    public function __invoke(ServerRequestInterface $request, ResponseInterface $response, $args): ResponseInterface
+    public function __invoke(ServerRequestInterface $request, ResponseInterface $response, array $args): ResponseInterface
     {
         $response = parent::__invoke($request, $response, $args);
         $body = $this->routeService->getParsedRequestBody($request, ['date', 'titre']);
 
         try {
             $occasion = $this->occasionPort->creeOccasion(
-                $this->auth,
+                $this->getAuth(),
                 $this->dateService->decodeDate($body['date']),
                 $body['titre']
             );

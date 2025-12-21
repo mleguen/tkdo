@@ -18,18 +18,16 @@ use Doctrine\ORM\Mapping\Table;
 class ExclusionAdaptor implements Exclusion
 {
     /**
-     * @var Utilisateur
      * @Id
      * @ManyToOne(targetEntity="App\Appli\ModelAdaptor\UtilisateurAdaptor")
      */
-    private $quiOffre;
+    private Utilisateur $quiOffre;
 
     /**
-     * @var Utilisateur
      * @Id
      * @ManyToOne(targetEntity="App\Appli\ModelAdaptor\UtilisateurAdaptor")
      */
-    private $quiNeDoitPasRecevoir;
+    private Utilisateur $quiNeDoitPasRecevoir;
 
     public function __construct(?Utilisateur $quiOffre = NULL, ?Utilisateur $quiNeDoitPasRecevoir = NULL)
     {

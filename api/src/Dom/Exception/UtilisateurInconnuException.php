@@ -5,5 +5,8 @@ namespace App\Dom\Exception;
 
 class UtilisateurInconnuException extends DomException
 {
-    public $message = 'utilisateur inconnu';
+    public function __construct(string $message = 'utilisateur inconnu', int $code = 0, ?\Throwable $previous = null)
+    {
+        parent::__construct($message, $code, $previous);
+    }
 }

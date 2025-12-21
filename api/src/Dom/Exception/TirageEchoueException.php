@@ -5,5 +5,8 @@ namespace App\Dom\Exception;
 
 class TirageEchoueException extends DomException
 {
-    public $message = "le tirage a échoué";
+    public function __construct(string $message = "le tirage a échoué", int $code = 0, ?\Throwable $previous = null)
+    {
+        parent::__construct($message, $code, $previous);
+    }
 }

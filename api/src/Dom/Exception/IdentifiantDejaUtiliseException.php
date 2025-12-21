@@ -5,5 +5,8 @@ namespace App\Dom\Exception;
 
 class IdentifiantDejaUtiliseException extends DomException
 {
-    public $message = 'identifiant déjà utilisé';
+    public function __construct(string $message = 'identifiant déjà utilisé', int $code = 0, ?\Throwable $previous = null)
+    {
+        parent::__construct($message, $code, $previous);
+    }
 }

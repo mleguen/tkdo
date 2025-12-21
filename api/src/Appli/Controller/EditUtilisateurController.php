@@ -35,8 +35,11 @@ class EditUtilisateurController extends AuthController
         parent::__construct($routeService);
     }
 
+    /**
+     * @param array<string, mixed> $args
+     */
     #[\Override]
-    public function __invoke(ServerRequestInterface $request, ResponseInterface $response, $args): ResponseInterface
+    public function __invoke(ServerRequestInterface $request, ResponseInterface $response, array $args): ResponseInterface
     {
         $response = parent::__invoke($request, $response, $args);
         $idUtilisateur = $this->routeService->getIntArg($request, $args, 'idUtilisateur');
@@ -54,7 +57,7 @@ class EditUtilisateurController extends AuthController
 
         try {
             $utilisateur = $this->utilisateurPort->modifieUtilisateur(
-                $this->auth,
+                $this->getAuth(),
                 $this->utilisateurRepository->read($idUtilisateur),
                 $modifications
             );

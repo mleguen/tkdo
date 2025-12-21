@@ -5,5 +5,8 @@ namespace App\Dom\Exception;
 
 class IdeeInconnueException extends DomException
 {
-    public $message = 'idée inconnue';
+    public function __construct(string $message = 'idée inconnue', int $code = 0, ?\Throwable $previous = null)
+    {
+        parent::__construct($message, $code, $previous);
+    }
 }

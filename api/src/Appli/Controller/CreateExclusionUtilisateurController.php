@@ -19,24 +19,20 @@ use Slim\Exception\HttpNotFoundException;
 
 class CreateExclusionUtilisateurController extends AuthController
 {
-    protected $jsonService;
-    protected $exclusionPort;
-    protected $utilisateurRepository;
-
     public function __construct(
-        JsonService $jsonService,
+        private readonly JsonService $jsonService,
         RouteService $routeService,
-        ExclusionPort $exclusionPort,
-        UtilisateurRepository $utilisateurRepository
+        private readonly ExclusionPort $exclusionPort,
+        private readonly UtilisateurRepository $utilisateurRepository
     ) {
         parent::__construct($routeService);
-        $this->jsonService = $jsonService;
-        $this->exclusionPort = $exclusionPort;
-        $this->utilisateurRepository = $utilisateurRepository;
     }
 
+    /**
+     * @param array<string, mixed> $args
+     */
     #[\Override]
-    public function __invoke(ServerRequestInterface $request, ResponseInterface $response, $args): ResponseInterface
+    public function __invoke(ServerRequestInterface $request, ResponseInterface $response, array $args): ResponseInterface
     {
         $response = parent::__invoke($request, $response, $args);
 
@@ -51,7 +47,7 @@ class CreateExclusionUtilisateurController extends AuthController
         try {
             $quiNeDoitPasRecevoir = $this->utilisateurRepository->read(intval($body['idQuiNeDoitPasRecevoir']));
             $exclusion = $this->exclusionPort->creeExclusion(
-                $this->auth,
+                $this->getAuth(),
                 $quiOffre,
                 $quiNeDoitPasRecevoir
             );

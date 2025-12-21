@@ -19,7 +19,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class FixturesCommand extends Command
 {
-    private $devMode;
+    private bool $devMode;
 
     public function __construct(
         Bootstrap $bootstrap,

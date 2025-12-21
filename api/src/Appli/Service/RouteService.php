@@ -12,7 +12,10 @@ use Slim\Exception\HttpUnauthorizedException;
 
 class RouteService
 {
-    public function getArg(ServerRequestInterface $request, array $args, string $name)
+    /**
+     * @param array<string, mixed> $args
+     */
+    public function getArg(ServerRequestInterface $request, array $args, string $name): mixed
     {
         if (!isset($args[$name])) {
             throw new HttpBadRequestException($request, "Argument `{$name}` manquant.");
@@ -27,16 +30,20 @@ class RouteService
         return $request->getAttribute('auth');
     }
 
+    /**
+     * @param array<string, mixed> $args
+     */
     public function getIntArg(ServerRequestInterface $request, array $args, string $name): int
     {
         return intval($this->getArg($request, $args, $name));
     }
 
     /**
-     * @return array|object
+     * @param array<string> $champsObligatoires
+     * @return array<string, mixed>
      * @throws HttpBadRequestException
      */
-    public function getParsedRequestBody(ServerRequestInterface $request, $champsObligatoires = [])
+    public function getParsedRequestBody(ServerRequestInterface $request, array $champsObligatoires = []): array
     {
         $contentTypes = $request->getHeader('Content-type');
         switch (end($contentTypes)) {
@@ -57,6 +64,7 @@ class RouteService
         }
 
         if (is_null($input)) $input = [];
+        if (is_object($input)) $input = (array) $input;
 
         foreach($champsObligatoires as $champObligatoire) {
             if (!isset($input[$champObligatoire])) throw new HttpBadRequestException($request, "champ '$champObligatoire' manquant");

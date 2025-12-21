@@ -18,25 +18,20 @@ use Slim\Exception\HttpNotFoundException;
 
 class ListOccasionController extends AuthController
 {
-    protected $jsonService;
-    protected $occasionPort;
-    protected $utilisateurRepository;
-
     public function __construct(
-        JsonService $jsonService,
-        OccasionPort $occasionPort,
-        UtilisateurRepository $utilisateurRepository,
+        private readonly JsonService $jsonService,
+        private readonly OccasionPort $occasionPort,
+        private readonly UtilisateurRepository $utilisateurRepository,
         RouteService $routeService
     ) {
         parent::__construct($routeService);
-        $this->jsonService = $jsonService;
-        $this->occasionPort = $occasionPort;
-        $this->utilisateurRepository = $utilisateurRepository;
     }
 
-
+    /**
+     * @param array<string, mixed> $args
+     */
     #[\Override]
-    public function __invoke(ServerRequestInterface $request, ResponseInterface $response, $args): ResponseInterface
+    public function __invoke(ServerRequestInterface $request, ResponseInterface $response, array $args): ResponseInterface
     {
         $response = parent::__invoke($request, $response, $args);
         $queryParams = $request->getQueryParams();
@@ -45,7 +40,7 @@ class ListOccasionController extends AuthController
             try {
                 $participant = $this->utilisateurRepository->read((int) $queryParams['idParticipant']);
                 $occasions = $this->occasionPort->listeOccasionsParticipant(
-                    $this->auth,
+                    $this->getAuth(),
                     $participant
                 );
             }
@@ -57,7 +52,7 @@ class ListOccasionController extends AuthController
             }
         } else {
             try {
-                $occasions = $this->occasionPort->listeOccasions($this->auth);
+                $occasions = $this->occasionPort->listeOccasions($this->getAuth());
             }
             catch (PasAdminException $err) {
                 throw new HttpForbiddenException($request, $err->getMessage());

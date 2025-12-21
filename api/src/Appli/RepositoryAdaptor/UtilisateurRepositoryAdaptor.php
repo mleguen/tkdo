@@ -64,7 +64,11 @@ class UtilisateurRepositoryAdaptor implements UtilisateurRepository
      */
     public function read(int $id, bool $reference = false): Utilisateur
     {
-        if ($reference) return $this->em->getReference(UtilisateurAdaptor::class, $id);
+        if ($reference) {
+            /** @var Utilisateur */
+            return $this->em->getReference(UtilisateurAdaptor::class, $id);
+        }
+        /** @var Utilisateur|null */
         $utilisateur = $this->em->getRepository(UtilisateurAdaptor::class)->find($id);
         if (is_null($utilisateur)) throw new UtilisateurInconnuException();
         return $utilisateur;
@@ -121,10 +125,8 @@ EOS;
      * {@inheritdoc}
      */
     public function readOneByIdentifiant(string $identifiant): Utilisateur
-    {        
-        /**
-         * @var UtilisateurAdaptor
-         */
+    {
+        /** @var Utilisateur|null */
         $utilisateur = $this->em->getRepository(UtilisateurAdaptor::class)->findOneBy([
             'identifiant' => $identifiant
         ]);

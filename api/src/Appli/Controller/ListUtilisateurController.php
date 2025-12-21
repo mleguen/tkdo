@@ -21,13 +21,16 @@ class ListUtilisateurController extends AuthController
         parent::__construct($routeService);
     }
 
+    /**
+     * @param array<string, mixed> $args
+     */
     #[\Override]
-    public function __invoke(ServerRequestInterface $request, ResponseInterface $response, $args): ResponseInterface
+    public function __invoke(ServerRequestInterface $request, ResponseInterface $response, array $args): ResponseInterface
     {
         $response = parent::__invoke($request, $response, $args);
 
         try {
-            $utilisateurs = $this->utilisateurPort->listeUtilisateurs($this->auth);
+            $utilisateurs = $this->utilisateurPort->listeUtilisateurs($this->getAuth());
         }
         catch (PasAdminException $err) {
             throw new HttpForbiddenException($request, $err->getMessage());

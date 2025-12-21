@@ -8,9 +8,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 abstract class AppAbstractFixture extends AbstractFixture
 {
-    /** @var OutputInterface */
-    protected $output;
-    protected $devMode;
+    protected OutputInterface $output;
+    protected bool $devMode;
 
     public function __construct(
         Bootstrap $bootstrap

@@ -13,7 +13,7 @@ use Slim\ResponseEmitter;
  */
 class ShutdownHandler
 {
-    private $errorHandler;
+    private ErrorHandler $errorHandler;
 
     public function __construct(
         private readonly ServerRequestInterface $request,
@@ -23,7 +23,7 @@ class ShutdownHandler
         $this->errorHandler = $errorHandler;
     }
 
-    public function __invoke()
+    public function __invoke(): void
     {
         $error = error_get_last();
         if ($error) {

@@ -22,7 +22,8 @@ class NotifPort
     private function _getDebutPeriode(
         DateTime $dateNotif,
         string $periode
-    ) {
+    ): DateTime
+    {
         $debutPeriode = clone $dateNotif;
         match ($periode) {
             PrefNotifIdees::Quotidienne => $debutPeriode->setTime(0, 0, 0),

@@ -1476,14 +1476,15 @@ Composer scripts provide shortcuts for common tasks.
 
 ### Script Reference
 
-| Script              | Usage                                      | Description                                |
-|---------------------|--------------------------------------------|--------------------------------------------|
-| `console`           | `./console`                                | Run console commands (helper script)       |
-| `doctrine`          | `./doctrine`                               | Run Doctrine CLI (helper script)           |
-| `reset-doctrine`    | `./composer run reset-doctrine`            | Full database reset                        |
-| `install-fixtures`  | `./composer run install-fixtures`          | Reset DB and load fixtures                 |
-| `test`              | `./composer test`                          | Run all tests                              |
-| `rector`            | `./composer run rector`                    | Run Rector for automated refactoring       |
+| Script             | Usage                             | Description                                 |
+| ------------------ | --------------------------------- | ------------------------------------------- |
+| `console`          | `./console`                       | Run console commands (helper script)        |
+| `doctrine`         | `./doctrine`                      | Run Doctrine CLI (helper script)            |
+| `phpstan`          | `./phpstan analyze`               | Run PHPStan static analysis (helper script) |
+| `reset-doctrine`   | `./composer run reset-doctrine`   | Full database reset                         |
+| `install-fixtures` | `./composer run install-fixtures` | Reset DB and load fixtures                  |
+| `test`             | `./composer test`                 | Run all tests                               |
+| `rector`           | `./composer run rector`           | Run Rector for automated refactoring        |
 
 ### Common Commands
 
@@ -1552,11 +1553,13 @@ Composer scripts provide shortcuts for common tasks.
 #### Code Quality
 
 ```bash
+# Run PHPStan for static analysis
+./phpstan analyze
+# Or using composer script (equivalent to ./phpstan analyze)
+./composer run phpstan
+
 # Run Rector for automated refactoring
 ./composer run rector
-
-# Run PHPStan for static analysis
-docker compose exec api vendor/bin/phpstan analyse
 
 # Run PHP_CodeSniffer for code style
 docker compose exec api vendor/bin/phpcs src/

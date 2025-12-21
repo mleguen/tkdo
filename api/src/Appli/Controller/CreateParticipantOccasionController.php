@@ -21,27 +21,21 @@ use Slim\Exception\HttpNotFoundException;
 
 class CreateParticipantOccasionController extends AuthController
 {
-    protected $jsonService;
-    protected $occasionPort;
-    protected $occasionRepository;
-    protected $utilisateurRepository;
-
     public function __construct(
-        JsonService $jsonService,
-        OccasionPort $occasionPort,
-        OccasionRepository $occasionRepository,
-        UtilisateurRepository $utilisateurRepository,
+        private readonly JsonService $jsonService,
+        private readonly OccasionPort $occasionPort,
+        private readonly OccasionRepository $occasionRepository,
+        private readonly UtilisateurRepository $utilisateurRepository,
         RouteService $routeService
     ) {
         parent::__construct($routeService);
-        $this->jsonService = $jsonService;
-        $this->occasionPort = $occasionPort;
-        $this->occasionRepository = $occasionRepository;
-        $this->utilisateurRepository = $utilisateurRepository;
     }
 
+    /**
+     * @param array<string, mixed> $args
+     */
     #[\Override]
-    public function __invoke(ServerRequestInterface $request, ResponseInterface $response, $args): ResponseInterface
+    public function __invoke(ServerRequestInterface $request, ResponseInterface $response, array $args): ResponseInterface
     {
         $response = parent::__invoke($request, $response, $args);
         $idOccasion = $this->routeService->getIntArg($request, $args, 'idOccasion');
@@ -51,7 +45,7 @@ class CreateParticipantOccasionController extends AuthController
             $occasion = $this->occasionRepository->read($idOccasion);
             $participant = $this->utilisateurRepository->read(intval($body['idParticipant']));
             $occasion = $this->occasionPort->ajouteParticipantOccasion(
-                $this->auth,
+                $this->getAuth(),
                 $occasion,
                 $participant
             );

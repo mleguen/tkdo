@@ -14,10 +14,7 @@ class DateService
     return $date->format(DateTimeInterface::W3C);
   }
 
-  /**
-   * @return DateTime|false
-   */
-  function decodeDate(string $date)
+  function decodeDate(string $date): DateTime
   {
     return new DateTime($date);
   }

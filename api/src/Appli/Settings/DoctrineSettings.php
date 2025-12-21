@@ -10,8 +10,9 @@ use Symfony\Component\Cache\Adapter\PhpFilesAdapter;
 
 class DoctrineSettings
 {
-    public $config;
-    public $connection;
+    public \Doctrine\ORM\Configuration $config;
+    /** @var array<string, mixed> */
+    public array $connection;
 
     public function __construct(
         Bootstrap $bootstrap

@@ -28,8 +28,11 @@ class CreateUtilisateurController extends AuthController
         parent::__construct($routeService);
     }
 
+    /**
+     * @param array<string, mixed> $args
+     */
     #[\Override]
-    public function __invoke(ServerRequestInterface $request, ResponseInterface $response, $args): ResponseInterface
+    public function __invoke(ServerRequestInterface $request, ResponseInterface $response, array $args): ResponseInterface
     {
         $response = parent::__invoke($request, $response, $args);
         $body = $this->routeService->getParsedRequestBody($request, [
@@ -41,7 +44,7 @@ class CreateUtilisateurController extends AuthController
 
         try {
             $utilisateur = $this->utilisateurPort->creeUtilisateur(
-                $this->auth,
+                $this->getAuth(),
                 $body['identifiant'],
                 $body['email'],
                 $body['nom'],

@@ -9,9 +9,10 @@ use Monolog\Logger;
 
 class LogSettings
 {
-    public $level = Logger::DEBUG;
-    public $name = 'api';
-    public $stream;
+    /** @var 100|200|250|300|400|500|550|600 */
+    public int $level = Logger::DEBUG;
+    public string $name = 'api';
+    public string $stream;
 
     public function __construct(
         Bootstrap $bootstrap

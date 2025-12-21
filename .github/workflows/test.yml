@@ -185,7 +185,6 @@ jobs:
   backend-phpstan:
     name: Backend - PHPStan Static Analysis
     runs-on: ubuntu-latest
-    continue-on-error: true  # Allow to fail while codebase is being typed
 
     steps:
       - name: Checkout code

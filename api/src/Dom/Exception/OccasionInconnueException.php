@@ -5,5 +5,8 @@ namespace App\Dom\Exception;
 
 class OccasionInconnueException extends DomException
 {
-    public $message = 'occasion inconnue';
+    public function __construct(string $message = 'occasion inconnue', int $code = 0, ?\Throwable $previous = null)
+    {
+        parent::__construct($message, $code, $previous);
+    }
 }

@@ -6,7 +6,7 @@ namespace App\Appli\Settings;
 
 class UriSettings
 {
-    public $baseUri;
+    public string $baseUri;
 
     public function __construct()
     {

@@ -15,8 +15,7 @@ interface Utilisateur
     public function getGenre(): string;
     public function getId(): int;
     public function getIdentifiant(): string;
-    /** @return string|null */
-    public function getMdpClair(): string;
+    public function getMdpClair(): ?string;
     public function getNom(): string;
     /** @return Occasion[] */
     public function getOccasions(): array;

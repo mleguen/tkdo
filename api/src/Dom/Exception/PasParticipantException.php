@@ -5,5 +5,8 @@ namespace App\Dom\Exception;
 
 class PasParticipantException extends DomException
 {
-    public $message = "l'utilisateur ne participe pas à l'occasion";
+    public function __construct(string $message = "l'utilisateur ne participe pas à l'occasion", int $code = 0, ?\Throwable $previous = null)
+    {
+        parent::__construct($message, $code, $previous);
+    }
 }

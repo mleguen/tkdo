@@ -17,31 +17,27 @@ use Slim\Exception\HttpNotFoundException;
 
 class ListExclusionUtilisateurController extends AuthController
 {
-    protected $jsonService;
-    protected $exclusionPort;
-    protected $utilisateurRepository;
-
     public function __construct(
-        JsonService $jsonService,
+        private readonly JsonService $jsonService,
         RouteService $routeService,
-        ExclusionPort $exclusionPort,
-        UtilisateurRepository $utilisateurRepository
+        private readonly ExclusionPort $exclusionPort,
+        private readonly UtilisateurRepository $utilisateurRepository
     ) {
         parent::__construct($routeService);
-        $this->jsonService = $jsonService;
-        $this->exclusionPort = $exclusionPort;
-        $this->utilisateurRepository = $utilisateurRepository;
     }
 
+    /**
+     * @param array<string, mixed> $args
+     */
     #[\Override]
-    public function __invoke(ServerRequestInterface $request, ResponseInterface $response, $args): ResponseInterface
+    public function __invoke(ServerRequestInterface $request, ResponseInterface $response, array $args): ResponseInterface
     {
         $response = parent::__invoke($request, $response, $args);
 
         try {
             $quiOffre = $this->utilisateurRepository->read($this->routeService->getIntArg($request, $args, 'idUtilisateur'));
             $exclusions = $this->exclusionPort->listeExclusions(
-                $this->auth,
+                $this->getAuth(),
                 $quiOffre
             );
         }

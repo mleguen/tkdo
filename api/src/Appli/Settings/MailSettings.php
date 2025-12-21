@@ -8,8 +8,8 @@ use App\Appli\Service\UriService;
 
 class MailSettings
 {
-    public $from;
-    public $signature = <<<EOS
+    public string $from;
+    public string $signature = <<<EOS
 Cordialement,
 Votre administrateur Tkdo.
 EOS;

@@ -5,5 +5,8 @@ namespace App\Appli\Exception;
 
 class AuthTokenInvalideException extends AppliException
 {
-    public $message = "token d'authentification invalide";
+    public function __construct(string $message = "token d'authentification invalide", int $code = 0, ?\Throwable $previous = null)
+    {
+        parent::__construct($message, $code, $previous);
+    }
 }

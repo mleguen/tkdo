@@ -5,5 +5,8 @@ namespace App\Dom\Exception;
 
 class IdeePasAuteurException extends DomException
 {
-    public $message = "l'utilisateur authentifié n'est ni l'auteur de l'idée, ni un administrateur";
+    public function __construct(string $message = "l'utilisateur authentifié n'est ni l'auteur de l'idée, ni un administrateur", int $code = 0, ?\Throwable $previous = null)
+    {
+        parent::__construct($message, $code, $previous);
+    }
 }

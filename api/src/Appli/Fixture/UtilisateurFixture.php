@@ -12,8 +12,8 @@ use Doctrine\Persistence\ObjectManager;
 
 class UtilisateurFixture extends AppAbstractFixture
 {
-    private $adminEmail;
-    private $host;
+    private ?string $adminEmail = null;
+    private string $host;
 
     public function __construct(
         Bootstrap $bootstrap,

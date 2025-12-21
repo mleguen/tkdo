@@ -13,17 +13,22 @@ use Firebase\JWT\Key;
 
 class AuthService
 {
-    private $clePrivee;
-    private $clePublique;
+    private string $clePrivee;
+    private string $clePublique;
 
     public function __construct(private readonly AuthSettings $settings)
     {
-        if (!($this->clePrivee = file_get_contents($this->settings->fichierClePrivee))) {
+        $clePrivee = file_get_contents($this->settings->fichierClePrivee);
+        if ($clePrivee === false) {
             throw new Exception("Impossible de lire la clé privée dans {$this->settings->fichierClePrivee}");
         }
-        if (!($this->clePublique = file_get_contents($this->settings->fichierClePublique))) {
+        $this->clePrivee = $clePrivee;
+
+        $clePublique = file_get_contents($this->settings->fichierClePublique);
+        if ($clePublique === false) {
             throw new Exception("Impossible de lire la clé publique dans {$this->settings->fichierClePublique}");
         }
+        $this->clePublique = $clePublique;
     }
 
     /**

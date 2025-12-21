@@ -8,10 +8,10 @@ use App\Bootstrap;
 
 class AuthSettings
 {
-    public $algo = 'RS256';
-    public $fichierClePrivee;
-    public $fichierClePublique;
-    public $validite = 3600;
+    public string $algo = 'RS256';
+    public string $fichierClePrivee;
+    public string $fichierClePublique;
+    public int $validite = 3600;
 
     public function __construct(
         Bootstrap $bootstrap

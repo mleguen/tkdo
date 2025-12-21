@@ -49,7 +49,11 @@ class IdeeRepositoryAdaptor implements IdeeRepository
      */
     public function read(int $id, bool $reference = false): Idee
     {
-        if ($reference) return $this->em->getReference(IdeeAdaptor::class, $id);
+        if ($reference) {
+            /** @var Idee */
+            return $this->em->getReference(IdeeAdaptor::class, $id);
+        }
+        /** @var Idee|null */
         $idee = $this->em->getRepository(IdeeAdaptor::class)->find($id);
         if (is_null($idee)) throw new IdeeInconnueException();
         return $idee;

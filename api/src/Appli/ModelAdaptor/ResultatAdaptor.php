@@ -26,25 +26,22 @@ use Doctrine\ORM\Mapping\UniqueConstraint;
 class ResultatAdaptor implements Resultat
 {
     /**
-     * @var Occasion
      * @Id
      * @ManyToOne(targetEntity="App\Appli\ModelAdaptor\OccasionAdaptor")
      */
-    private $occasion;
+    private Occasion $occasion;
 
     /**
-     * @var Utilisateur
      * @Id
      * @ManyToOne(targetEntity="App\Appli\ModelAdaptor\UtilisateurAdaptor")
      */
-    private $quiOffre;
+    private Utilisateur $quiOffre;
 
     /**
-     * @var Utilisateur
      * @ManyToOne(targetEntity="App\Appli\ModelAdaptor\UtilisateurAdaptor")
      * @JoinColumn(nullable=false)
      */
-    private $quiRecoit;
+    private Utilisateur $quiRecoit;
 
     public function __construct(?Occasion $occasion= NULL, ?Utilisateur $quiOffre = NULL)
     {

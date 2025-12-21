@@ -14,7 +14,7 @@ use Doctrine\ORM\EntityManager;
 
 class OccasionRepositoryAdaptor implements OccasionRepository
 {
-    protected $em;
+    protected EntityManager $em;
 
     public function __construct(EntityManager $em)
     {
@@ -39,8 +39,9 @@ class OccasionRepositoryAdaptor implements OccasionRepository
      */
     public function read(int $id): Occasion
     {
-        /** @var \Doctrine\ORM\EntityRepository */
+        /** @var \Doctrine\ORM\EntityRepository<OccasionAdaptor> */
         $repository = $this->em->getRepository(OccasionAdaptor::class);
+        /** @var Occasion|null */
         $occasion = $repository->find($id);
         if (is_null($occasion)) throw new OccasionInconnueException();
         return $occasion;
@@ -51,7 +52,7 @@ class OccasionRepositoryAdaptor implements OccasionRepository
      */
     public function readAll(): array
     {
-        /** @var \Doctrine\ORM\EntityRepository */
+        /** @var \Doctrine\ORM\EntityRepository<OccasionAdaptor> */
         $repository = $this->em->getRepository(OccasionAdaptor::class);
         return $repository->findAll();
     }

@@ -60,15 +60,14 @@ class Bootstrap
 {
     /** @var Container */
     private $container;
-    /** @var App */
+    /** @var App<Container> */
     private $slimApp;
 
-    public $apiRoot = __DIR__ . '/..';
-    /** @var bool */
-    public $devMode = true;
-    public $docker = false;
+    public string $apiRoot = __DIR__ . '/..';
+    public bool $devMode = true;
+    public bool $docker = false;
 
-    public function initEnv()
+    public function initEnv(): void
     {
         // Load .env
         $dotenv = Dotenv::createUnsafeImmutable($this->apiRoot);
@@ -117,11 +116,16 @@ class Bootstrap
         return DependencyFactory::fromEntityManager($config, new ExistingEntityManager($entityManager));
     }
 
+    /**
+     * @return App<Container>
+     */
     public function initSlimApp(): App
     {
         // Instantiate the app
         AppFactory::setContainer($this->container);
-        $this->slimApp = AppFactory::create();
+        /** @var App<Container> */
+        $app = AppFactory::create();
+        $this->slimApp = $app;
         $basePath = getenv('TKDO_API_BASE_PATH');
         if ($basePath) $this->slimApp->setBasePath($basePath);
 
