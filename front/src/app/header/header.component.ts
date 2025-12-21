@@ -30,10 +30,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
   idOccasionActive = 0;
   // Initialize based on viewport: collapsed on mobile (<768px), expanded on desktop (≥768px)
   // Using custom media query to match Bootstrap's navbar-expand-md breakpoint at 768px
-  isMenuCollapsed = true;
+  isMenuCollapsed = !this.breakpointObserver.isMatched('(min-width: 768px)');
 
-  private breakpointSubscription!: Subscription;
-  private routerSubscription!: Subscription;
+  private breakpointSubscription = Subscription.EMPTY;
+  private routerSubscription = Subscription.EMPTY;
 
   ngOnInit(): void {
     // Observe 768px breakpoint to match Bootstrap's navbar-expand-md
