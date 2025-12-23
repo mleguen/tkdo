@@ -43,6 +43,7 @@
   - Add comprehensive component tests for HeaderComponent covering desktop and mobile viewport behavior including menu visibility, hamburger toggle functionality, and responsive design validation using real viewport detection (cy.viewport) with BreakpointObserver
   - Update backlog management guidelines in CONTRIBUTING.md to no longer require renumbering tasks when completed tasks are removed - gaps in task numbers are acceptable
   - Fix E2E test console.log spy timing issues by waiting for the window to be loaded first
+  - Add frontend integration tests (with mocked backend) to GitHub Actions CI workflow for automated testing on pull requests and pushes to master
 
 ## V1.4.4 (December 8, 2025)
 
