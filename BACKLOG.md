@@ -16,23 +16,7 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 
 ### GitHub CI/CD Integration
 
-**Task 2:** Add GitHub Actions workflow for integration tests
-- **Files to create:**
-  - `.github/workflows/integration.yml`
-- **Content:**
-  - Frontend integration tests with mocked backend (native runner)
-  - Backend API integration tests with MySQL service container
-  - Mailhog service container for email testing
-  - Database fixture loading before tests
-  - Configure proper service health checks
-  - Test result and coverage artifact uploads
-  - Optimize service container startup time
-- **Estimated size:** ~120-150 lines
-- **Dependencies:** Task 1 completed with documented strategy
-- **Priority:** High - validates integration points
-- **Note:** May use Docker Compose only if service containers prove insufficient (per Task 1)
-
-**Task 3:** Add GitHub Actions workflow for E2E tests
+**Task 2:** Add GitHub Actions workflow for E2E tests
 - **Files to create:**
   - `.github/workflows/e2e.yml`
 - **Content:**
