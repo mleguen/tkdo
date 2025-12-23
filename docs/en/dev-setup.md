@@ -70,6 +70,12 @@ DEV_GID=YOUR_GROUP_ID
 
 **Why this matters:** Docker containers need to run with your user/group IDs to ensure file permissions are correct. Without this, files created by containers might not be accessible to you, or vice versa.
 
+### Port Configuration
+
+By default, the Docker Compose environment uses ports 8080 (frontend), 8081 (API), 8025 (MailHog), and 4200 (Angular dev server). These ports can be customized via environment variables to run multiple instances simultaneously.
+
+**For running multiple instances** (e.g., in different git worktrees), see [Environment Variables Reference - Docker Development Variables](environment-variables.md#docker-development-variables).
+
 ### API Environment Variables
 
 The API uses environment variables defined in `api/.env`. The defaults are suitable for development, but you can override them if needed.
@@ -191,6 +197,8 @@ Once the environment is running:
 - View all emails sent by the application
 - Useful for testing notifications
 
+**Note:** If you configured custom ports via environment variables, use those ports instead. See [Docker Development Variables](environment-variables.md#docker-development-variables).
+
 **Test user credentials:**
 
 Created when you run the `fixtures` command (see [Initial Setup](#initial-setup)):
@@ -250,8 +258,10 @@ graph TB
 | **slim-fpm** | PHP-FPM running the Slim Framework API       | -             |
 | **mysql**    | MySQL 5.6 database                           | -             |
 | **mailhog**  | Email testing server                         | 8025          |
-| **npm**      | Node.js tools (npm, ng, cypress, npx)        | -             |
+| **npm**      | Node.js tools (npm, ng, cypress, npx)        | 4200          |
 | **php-cli**  | PHP CLI tools (composer, doctrine, console)  | -             |
+
+**Note:** Exposed ports are configurable via environment variables. See [Docker Development Variables](environment-variables.md#docker-development-variables).
 
 ### Tool Containers
 

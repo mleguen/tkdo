@@ -6,6 +6,7 @@ This guide documents all environment variables used to configure Tkdo for both d
 
 - [Overview](#overview)
 - [Configuration Methods](#configuration-methods)
+- [Docker Development Variables](#docker-development-variables)
 - [Database Variables](#database-variables)
 - [Application Variables](#application-variables)
 - [Email Variables](#email-variables)
@@ -68,6 +69,138 @@ Set in Apache virtual host configuration:
 - Higher security (credentials not in files)
 - Multiple virtual hosts sharing same codebase
 - Environment-specific configuration
+
+## Docker Development Variables
+
+These variables configure port mappings for the Docker Compose development environment. They are particularly useful when running multiple instances of the application simultaneously (e.g., in different git worktrees).
+
+**Note:** These variables are only used in development with Docker Compose. They have no effect in production deployments.
+
+### FRONT_DEV_PORT
+
+**Description:** Host port mapped to the frontend web server (full application)
+
+**Type:** Integer
+
+**Required:** No
+
+**Default:** `8080`
+
+**Examples:**
+
+```bash
+FRONT_DEV_PORT=8080    # Default port
+FRONT_DEV_PORT=9080    # Alternative port for second instance
+FRONT_DEV_PORT=3000    # Custom port
+```
+
+**Usage:**
+
+- Set in `.env` file at project root (not `api/.env`)
+- Access the application at `http://localhost:${FRONT_DEV_PORT}`
+- Change when running multiple instances to avoid port conflicts
+- Each worktree should use a different port
+
+### MAILHOG_DEV_PORT
+
+**Description:** Host port mapped to the MailHog email testing UI
+
+**Type:** Integer
+
+**Required:** No
+
+**Default:** `8025`
+
+**Examples:**
+
+```bash
+MAILHOG_DEV_PORT=8025    # Default port
+MAILHOG_DEV_PORT=9025    # Alternative port for second instance
+MAILHOG_DEV_PORT=8125    # Custom port
+```
+
+**Usage:**
+
+- Set in `.env` file at project root (not `api/.env`)
+- Access MailHog UI at `http://localhost:${MAILHOG_DEV_PORT}`
+- Change when running multiple instances to avoid port conflicts
+- Used only in development to view test emails
+
+### API_DEV_PORT
+
+**Description:** Host port mapped to the backend API server (direct API access)
+
+**Type:** Integer
+
+**Required:** No
+
+**Default:** `8081`
+
+**Examples:**
+
+```bash
+API_DEV_PORT=8081    # Default port
+API_DEV_PORT=9081    # Alternative port for second instance
+API_DEV_PORT=3001    # Custom port
+```
+
+**Usage:**
+
+- Set in `.env` file at project root (not `api/.env`)
+- Access API directly at `http://localhost:${API_DEV_PORT}`
+- Change when running multiple instances to avoid port conflicts
+- Useful for API testing and debugging
+
+### NPM_DEV_PORT
+
+**Description:** Host port mapped to the Angular development server when running `./npm` script
+
+**Type:** Integer
+
+**Required:** No
+
+**Default:** `4200`
+
+**Examples:**
+
+```bash
+NPM_DEV_PORT=4200    # Default Angular dev server port
+NPM_DEV_PORT=4201    # Alternative port for second instance
+NPM_DEV_PORT=5000    # Custom port
+```
+
+**Usage:**
+
+- Set in `.env` file at project root (not `api/.env`)
+- Used when running `./npm` script for live development server
+- Access Angular dev server at `http://localhost:${NPM_DEV_PORT}`
+- Change when running multiple instances to avoid port conflicts
+
+### Running Multiple Instances
+
+When working with multiple git worktrees or wanting to run multiple instances simultaneously, create a `.env` file at the project root with unique ports:
+
+**First instance** (default ports - no .env needed):
+```bash
+# Uses defaults: 8080, 8081, 8025, 4200
+docker compose up -d front
+```
+
+**Second instance** (custom ports in `.env`):
+```bash
+# .env at project root
+FRONT_DEV_PORT=9080
+API_DEV_PORT=9081
+MAILHOG_DEV_PORT=9025
+NPM_DEV_PORT=4201
+```
+
+Then start normally:
+```bash
+docker compose up -d front
+```
+
+**Note:** The `.env` file should be at the project root, not in the `api/` directory. Docker Compose reads environment variables from the project root `.env` file.
 
 ## Database Variables
 
@@ -567,6 +700,10 @@ TKDO_DEV_MODE=0
 
 | Variable             | Required | Default                 | Type      | Category    |
 | -------------------- | -------- | ----------------------- | --------- | ----------- |
+| `FRONT_DEV_PORT`     | No       | `8080`                  | Integer   | Docker Dev  |
+| `MAILHOG_DEV_PORT`   | No       | `8025`                  | Integer   | Docker Dev  |
+| `API_DEV_PORT`       | No       | `8081`                  | Integer   | Docker Dev  |
+| `NPM_DEV_PORT`       | No       | `4200`                  | Integer   | Docker Dev  |
 | `MYSQL_HOST`         | No       | `mysql` or `127.0.0.1`  | String    | Database    |
 | `MYSQL_PORT`         | No       | `3306`                  | Integer   | Database    |
 | `MYSQL_DATABASE`     | No       | `tkdo`                  | String    | Database    |

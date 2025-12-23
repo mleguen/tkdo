@@ -487,14 +487,15 @@ The Angular development server provides hot reload and API mocking for rapid fro
 "serve": {
   "options": {
     "host": "0.0.0.0",
-    "proxyConfig": "src/proxy.conf.json"
+    "proxyConfig": "src/proxy.conf.js"
   }
 }
 ```
 
-**Proxy Configuration** (`src/proxy.conf.json`):
+**Proxy Configuration** (`src/proxy.conf.js`):
 - Used when dev server needs to proxy to real API
 - Currently, dev server uses interceptor mocking instead
+- Uses environment variable `FRONT_DEV_PORT` (default: 8080) for target port
 
 ## Dev Backend Interceptor
 

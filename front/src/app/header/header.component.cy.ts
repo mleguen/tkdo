@@ -33,7 +33,11 @@ function createMockBackend(
 describe('HeaderComponent', () => {
   it('should mount', () => {
     cy.mount(HeaderComponent, {
-      providers: [provideRouter([]), provideHttpClient(), provideHttpClientTesting()],
+      providers: [
+        provideRouter([]),
+        provideHttpClient(),
+        provideHttpClientTesting(),
+      ],
     });
   });
 
