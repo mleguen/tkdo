@@ -1,0 +1,281 @@
+name: E2E Tests
+
+on:
+  workflow_dispatch:  # Manual trigger
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches:
+      - '**'
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - 'CHANGELOG.md'
+      - 'BACKLOG.md'
+      - 'LICENSE'
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - 'CHANGELOG.md'
+      - 'BACKLOG.md'
+      - 'LICENSE'
+
+jobs:
+  e2e-tests:
+    name: End-to-End Tests
+    runs-on: ubuntu-latest
+    # Skip E2E tests for draft PRs - only run when PR is ready for review
+    if: github.event_name != 'pull_request' || !github.event.pull_request.draft
+
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_DATABASE: tkdo
+          MYSQL_USER: tkdo
+          MYSQL_PASSWORD: mdptkdo
+          MYSQL_ROOT_PASSWORD: mdproot
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost -P 3306 -u tkdo --password=mdptkdo"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+        ports:
+          - 3306:3306
+
+      mailhog:
+        image: mailhog/mailhog
+        ports:
+          - 1025:1025
+          - 8025:8025
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Set up Node.js for frontend build
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: 'front/package-lock.json'
+
+      - name: Install frontend dependencies
+        run: npm ci --ignore-scripts
+        working-directory: ./front
+
+      - name: Generate version file
+        run: node version.js
+        working-directory: ./front
+
+      - name: Build frontend (production)
+        run: npm run build
+        working-directory: ./front
+
+      # Set up PHP for backend
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: pdo_mysql, json, mbstring
+          coverage: none
+
+      - name: Get Composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+        working-directory: ./api
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('api/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
+      - name: Install backend dependencies
+        run: composer install --prefer-dist --no-progress --no-interaction
+        working-directory: ./api
+
+      - name: Wait for MySQL to be ready
+        run: |
+          until mysqladmin ping -h 127.0.0.1 -P 3306 -u tkdo --password=mdptkdo --silent; do
+            echo "Waiting for MySQL..."
+            sleep 2
+          done
+          echo "MySQL is ready!"
+
+      - name: Set up database
+        env:
+          MYSQL_HOST: 127.0.0.1
+          MYSQL_PORT: 3306
+          MYSQL_DATABASE: tkdo
+          MYSQL_USER: tkdo
+          MYSQL_PASSWORD: mdptkdo
+          MAILHOG_BASE_URI: http://127.0.0.1:8025/
+          TKDO_BASE_URI: http://localhost:8080
+          TKDO_MAILER_FROM: noreply@ci
+        run: |
+          php bin/doctrine.php orm:generate-proxies
+          php bin/doctrine.php migrations:migrate --no-interaction
+          php bin/console.php fixtures
+        working-directory: ./api
+
+      - name: Install Cypress binary
+        run: npx cypress install
+        working-directory: ./front
+
+      # Start backend PHP server in background
+      - name: Start PHP backend server
+        env:
+          MYSQL_HOST: 127.0.0.1
+          MYSQL_PORT: 3306
+          MYSQL_DATABASE: tkdo
+          MYSQL_USER: tkdo
+          MYSQL_PASSWORD: mdptkdo
+          MAILHOG_BASE_URI: http://127.0.0.1:8025/
+          TKDO_BASE_URI: http://localhost:8080
+          TKDO_MAILER_FROM: noreply@ci
+        run: |
+          cd api/public
+          php -S localhost:8000 index.php &
+          echo $! > /tmp/php-server.pid
+          sleep 2
+          echo "PHP server started on port 8000"
+
+      # Start frontend static server in background with SPA routing support
+      - name: Start frontend static server
+        run: |
+          cd front/dist/tkdo-front/browser
+          # Create a simple Python server that serves index.html for all routes (SPA support)
+          cat > spa_server.py << 'EOF'
+          import http.server
+          import socketserver
+          import os
+          from urllib.parse import unquote
+
+          class SPAHandler(http.server.SimpleHTTPRequestHandler):
+              def do_GET(self):
+                  # Decode the URL path
+                  path = unquote(self.path)
+                  # Remove query string if present
+                  if '?' in path:
+                      path = path.split('?')[0]
+
+                  # Check if the requested path is a file that exists
+                  if path != '/' and os.path.isfile('.' + path):
+                      # Serve the actual file
+                      return http.server.SimpleHTTPRequestHandler.do_GET(self)
+                  else:
+                      # For all other routes, serve index.html (SPA routing)
+                      self.path = '/index.html'
+                      return http.server.SimpleHTTPRequestHandler.do_GET(self)
+
+          PORT = 4200
+          with socketserver.TCPServer(("", PORT), SPAHandler) as httpd:
+              print(f"Serving SPA on port {PORT}")
+              httpd.serve_forever()
+          EOF
+          python3 spa_server.py &
+          echo $! > /tmp/python-server.pid
+          sleep 2
+          echo "Frontend SPA server started on port 4200"
+
+      # Configure reverse proxy using nginx to combine frontend + API
+      - name: Install nginx for proxying
+        run: sudo apt-get update && sudo apt-get install -y nginx
+
+      - name: Configure nginx reverse proxy
+        run: |
+          sudo tee /etc/nginx/sites-available/tkdo-e2e > /dev/null <<'EOF'
+          server {
+              listen 8080;
+              server_name localhost;
+
+              # API requests go to PHP backend
+              location /api/ {
+                  proxy_pass http://localhost:8000/;
+                  proxy_set_header Host $host;
+                  proxy_set_header X-Real-IP $remote_addr;
+              }
+
+              # Everything else goes to frontend
+              location / {
+                  proxy_pass http://localhost:4200/;
+                  proxy_set_header Host $host;
+                  proxy_set_header X-Real-IP $remote_addr;
+              }
+          }
+          EOF
+          sudo ln -sf /etc/nginx/sites-available/tkdo-e2e /etc/nginx/sites-enabled/
+          sudo rm -f /etc/nginx/sites-enabled/default
+          sudo nginx -t
+          sudo systemctl restart nginx
+          echo "Nginx proxy configured and started on port 8080"
+
+      - name: Wait for services to be ready
+        run: |
+          until curl -s http://localhost:8080 > /dev/null; do
+            echo "Waiting for application to be ready..."
+            sleep 2
+          done
+          echo "Application is ready!"
+
+      # Run E2E tests
+      - name: Run E2E tests
+        uses: cypress-io/github-action@v6
+        with:
+          working-directory: ./front
+          command: npx cypress run --config baseUrl=http://localhost:8080
+          browser: chrome
+          install: false
+
+      - name: Stop servers
+        if: always()
+        run: |
+          if [ -f /tmp/php-server.pid ]; then
+            kill $(cat /tmp/php-server.pid) || true
+          fi
+          if [ -f /tmp/python-server.pid ]; then
+            kill $(cat /tmp/python-server.pid) || true
+          fi
+          sudo systemctl stop nginx || true
+
+      - name: Upload screenshots on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-e2e-screenshots-${{ github.run_number }}
+          path: front/cypress/screenshots
+          retention-days: 7
+          if-no-files-found: ignore
+
+      - name: Compress and upload videos on failure
+        if: failure()
+        run: |
+          cd front
+          if [ -d cypress/videos ] && [ "$(ls -A cypress/videos)" ]; then
+            tar -czf cypress-e2e-videos.tar.gz cypress/videos
+            mv cypress-e2e-videos.tar.gz ..
+          fi
+
+      - name: Upload compressed videos
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-e2e-videos-${{ github.run_number }}
+          path: cypress-e2e-videos.tar.gz
+          retention-days: 3
+          if-no-files-found: ignore
+
+      - name: Upload backend logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-backend-logs-${{ github.run_number }}
+          path: api/var/log
+          retention-days: 7
+          if-no-files-found: ignore
