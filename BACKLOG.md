@@ -16,23 +16,6 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 
 ### GitHub CI/CD Integration
 
-**Task 2:** Add GitHub Actions workflow for E2E tests
-- **Files to create:**
-  - `.github/workflows/e2e.yml`
-- **Content:**
-  - Decide on approach based on Task 1 investigation
-  - Option A (preferred): Use service containers for MySQL, build frontend, start Slim via PHP built-in server
-  - Option B (fallback): Use Docker Compose for full stack if Option A not feasible
-  - Database fixture loading
-  - Cypress E2E execution against real backend
-  - Screenshot and video artifact uploads on failure
-  - Run only on PR approval or manual trigger (slower tests)
-  - Document chosen approach and rationale
-- **Estimated size:** ~100-150 lines
-- **Dependencies:** Tasks 1-2 completed
-- **Priority:** High - critical path validation
-- **Note:** Approach TBD by Task 1; prefer native GitHub Actions patterns
-
 **Task 4:** Configure test parallelization and cross-browser testing
 - **Files to modify:**
   - `.github/workflows/test.yml`
