@@ -16,20 +16,6 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 
 ### Frontend Testing - Unit Tests
 
-**Task 5:** Expand BackendService unit tests
-- **File:** `front/src/app/backend.service.spec.ts`
-- **Content:**
-  - Test all HTTP methods (GET, POST, PUT, DELETE)
-  - Test authentication state management
-  - Test error handling and error$ observable
-  - Test token storage and retrieval
-  - Mock HttpClient responses
-  - Test observable streams (utilisateurConnecte$, occasions$)
-  - Test edge cases (network failures, invalid responses)
-- **Current state:** Minimal (instantiation only)
-- **Estimated additions:** ~150-200 lines
-- **Priority:** High - core service used throughout app
-
 **Task 6:** Add comprehensive guard unit tests
 - **Files:**
   - `front/src/app/connexion.guard.spec.ts`
