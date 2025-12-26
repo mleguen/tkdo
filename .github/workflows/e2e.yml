@@ -194,9 +194,9 @@ jobs:
           sleep 2
           echo "Frontend SPA server started on port 4200"
 
-      # Configure reverse proxy using socat to combine frontend + API
-      - name: Install socat for proxying
-        run: sudo apt-get update && sudo apt-get install -y socat nginx
+      # Configure reverse proxy using nginx to combine frontend + API
+      - name: Install nginx for proxying
+        run: sudo apt-get update && sudo apt-get install -y nginx
 
       - name: Configure nginx reverse proxy
         run: |
