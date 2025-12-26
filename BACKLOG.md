@@ -14,24 +14,6 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 - Fast test execution via parallelization
 - Compliance with general and framework-specific best practices
 
-### Frontend Testing - Unit Tests
-
-**Task 7:** Add HTTP interceptor unit tests
-- **Files:**
-  - `front/src/app/auth-backend.interceptor.spec.ts`
-  - `front/src/app/erreur-backend.interceptor.spec.ts`
-  - `front/src/app/dev-backend.interceptor.spec.ts`
-- **Content:**
-  - Test token injection in requests
-  - Test error handling and transformation
-  - Test dev mode API mocking
-  - Test interceptor chaining
-  - Mock HTTP requests and responses
-  - Test error observable emissions
-- **Current state:** No tests exist
-- **Estimated additions:** ~200-250 lines total
-- **Priority:** Medium - important but well-isolated code
-
 ### Frontend Testing - Component Tests
 
 **Task 8:** Expand ConnexionComponent component tests

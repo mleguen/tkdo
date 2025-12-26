@@ -47,6 +47,10 @@
   - Configure CI test parallelization and cross-browser testing: split Cypress component tests across 2 shards per browser using cypress-split plugin, add Firefox to all Cypress tests (component, integration, E2E) alongside Chrome
   - Add comprehensive unit tests for connexionGuard covering authentication checks, navigation blocking, redirect behavior with return URLs, and CanActivate interface implementation (5 tests)
   - Add comprehensive unit tests for adminGuard covering admin authorization logic, navigation blocking for non-admin users, and CanActivate interface implementation (4 tests)
+  - Add comprehensive unit tests for HTTP interceptors (25 tests total):
+    - AuthBackendInterceptor: token injection in requests, URL filtering, header preservation (6 tests)
+    - ErreurBackendInterceptor: error handling, 401 redirect to login, success notifications (8 tests)
+    - DevBackendInterceptor: API mocking, authentication, request routing, network delay simulation (11 tests)
 
 ## V1.4.4 (December 8, 2025)
 
