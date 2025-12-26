@@ -13,13 +13,8 @@ import { etantDonneQue } from 'cypress/preconditions/preconditions';
 
 describe("liste d'idées", () => {
   beforeEach(() => {
-    // Wait for console.log to be available before spying on it
-    cy.window().then((win) => {
-      // Ensure we have a console with a log method
-      cy.wrap(null).should(() => {
-        expect(win.console).to.exist;
-        expect(win.console.log).to.be.a('function');
-      });
+    // Spy on console.log before each window load
+    cy.on('window:before:load', (win) => {
       cy.spy(win.console, 'log').as('log');
     });
   });

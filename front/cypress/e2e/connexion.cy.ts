@@ -14,9 +14,10 @@ describe('connexion/déconnexion/reconnexion', () => {
     // Assert that there are no errors emitted from the browser
     expectNoSevereLogs = true;
 
-    cy.window()
-      .its('console')
-      .then((console) => cy.spy(console, 'log').as('log'));
+    // Spy on console.log before each window load
+    cy.on('window:before:load', (win) => {
+      cy.spy(win.console, 'log').as('log');
+    });
   });
 
   it('se connecter', () => {
