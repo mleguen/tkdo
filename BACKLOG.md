@@ -16,33 +16,6 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 
 ### GitHub CI/CD Integration
 
-**Task 1:** Investigate and document CI testing approach
-- **Files to create:**
-  - `docs/en/ci-testing-strategy.md`
-- **Content:**
-  - Research GitHub Actions service containers vs Docker Compose
-  - Verify GitHub runner support for PHP 8.4 (via shivammathur/setup-php)
-  - Verify Node.js/npm setup (via actions/setup-node)
-  - Test MySQL 5.7 service container configuration
-  - Test Mailhog service container for notification tests, and consider whether switching to another mail testing service instead (e.g. maildev) wouldn't help with standardisation (rephrase other tasks below in that case)
-  - Measure performance: service containers vs Docker Compose
-  - Document decision matrix: when to use each approach
-  - Define CI test execution strategy (native vs containerized)
-  - Investigate if E2E tests can run with service containers
-  - Research similar Angular+PHP projects' CI patterns
-  - Investigate repository visibility options and GitHub Actions free tier strategy (knowing this is a public repository)
-  - Document wrapper script pattern: local Docker commands vs native CI commands
-  - Research Makefile or unified test interface for environment detection
-  - Investigate test execution optimization: fail-fast strategies, conditional test runs, tiered approach (unit → component → integration → E2E)
-  - Research caching strategy for node_modules and vendor dependencies
-  - Document artifact management and retention policies (screenshots, videos, coverage reports, 500 MB limit considerations)
-  - Investigate database fixture optimization for CI: snapshots vs migrations, transaction rollback, parallel test databases
-  - Research path-based test triggering to skip tests for documentation-only changes
-- **Estimated size:** ~200-300 lines documentation
-- **Dependencies:** None
-- **Priority:** Critical - must complete before Tasks 2-4
-- **Note:** This investigation will determine the implementation approach for all subsequent CI tasks
-
 **Task 2:** Add GitHub Actions workflow for integration tests
 - **Files to create:**
   - `.github/workflows/integration.yml`
