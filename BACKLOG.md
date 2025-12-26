@@ -14,29 +14,6 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 - Fast test execution via parallelization
 - Compliance with general and framework-specific best practices
 
-### GitHub CI/CD Integration
-
-**Task 4:** Configure test parallelization and cross-browser testing
-- **Files to modify:**
-  - `.github/workflows/test.yml`
-  - `.github/workflows/integration.yml`
-  - `.github/workflows/e2e.yml`
-  - `front/cypress.config.ts`
-  - `api/phpunit.xml`
-- **Content:**
-  - Split Cypress tests across multiple runners using matrix strategy
-  - Configure PHPUnit parallel execution
-  - Add Firefox browser to Cypress tests
-  - Add Webkit/Safari browser to Cypress tests (if feasible in GitHub Actions)
-  - Set up matrix strategy for browser testing
-  - Optimize job dependencies for faster feedback
-  - Configure proper test sharding and load balancing
-  - Document browser support policy in testing.md
-- **Estimated size:** ~80-120 lines across files
-- **Dependencies:** Tasks 1-3 completed
-- **Priority:** Medium - improves speed and coverage
-
-
 ### Frontend Testing - Unit Tests
 
 **Task 5:** Expand BackendService unit tests

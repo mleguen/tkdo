@@ -65,9 +65,79 @@ Tkdo uses multiple testing levels to ensure code quality:
 
 ### Test Distribution
 
-- **Frontend**: ~6 unit tests, ~5 component tests, ~2 integration test suites
-- **Backend**: ~5 unit test classes, ~5 integration test classes
+- **Frontend**: ~6 unit tests, ~11 component tests, ~2 integration test suites
+- **Backend**: ~5 unit test classes, ~6 integration test classes
 - **E2E**: Covered by frontend integration tests on full environment
+
+### Browser Support Policy
+
+All Cypress tests (component, integration, and E2E) are executed on **multiple browsers** to ensure cross-browser compatibility:
+
+**Supported Browsers:**
+- **Chrome** - Primary browser, tested on every commit
+- **Firefox** - Secondary browser, tested on every commit
+
+**CI Testing:**
+- Component tests run on both Chrome and Firefox in parallel
+- Integration tests run on both Chrome and Firefox in parallel
+- E2E tests run on both Chrome and Firefox in parallel
+
+**Not Currently Supported:**
+- **Safari/WebKit** - Not tested in CI (requires macOS runners)
+- **Edge** - Not tested (Chromium-based, similar to Chrome)
+
+**Local Testing:**
+You can test on any browser locally:
+```bash
+# Chrome (default)
+./npm run ct
+./npm run int
+./npm run e2e
+
+# Firefox
+./npm run ct -- --browser firefox
+./npm run int -- --browser firefox
+./npm run e2e -- --browser firefox
+
+# Edge (if installed)
+./npm run ct -- --browser edge
+```
+
+**Adding New Browsers:**
+To add a new browser to CI testing, update the matrix in:
+- `.github/workflows/test.yml` (component and integration tests)
+- `.github/workflows/e2e.yml` (E2E tests)
+
+### Test Parallelization
+
+To improve CI execution speed, tests are parallelized where beneficial:
+
+**Frontend Component Tests:**
+- Split across 2 shards using the [cypress-split](https://github.com/bahmutov/cypress-split) plugin
+- Each browser (Chrome, Firefox) runs 2 parallel shards
+- Total: 4 parallel jobs (chrome-shard1, chrome-shard2, firefox-shard1, firefox-shard2)
+- Sharding uses `SPLIT=2` and `SPLIT_INDEX1` environment variables (1-based indexing)
+
+**Frontend Integration Tests:**
+- Run on 2 browsers in parallel (Chrome, Firefox)
+- No sharding (only 2 test files)
+
+**Backend Unit Tests:**
+- Tests run sequentially in a single job
+- Future: Parallel execution could be enabled with paratest package
+
+**Backend Integration Tests:**
+- Tests run sequentially with MySQL service container
+- Database isolation handled by PHPUnit test isolation
+
+**E2E Tests:**
+- Run on 2 browsers in parallel (Chrome, Firefox)
+- No sharding (only 2 test files)
+
+**Benefits:**
+- Faster CI feedback (parallel execution reduces total time)
+- Better resource utilization on GitHub Actions runners
+- Cross-browser issues detected earlier
 
 ## Frontend Testing
 
