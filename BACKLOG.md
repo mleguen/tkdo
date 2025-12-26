@@ -16,21 +16,6 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 
 ### Frontend Testing - Unit Tests
 
-**Task 6:** Add comprehensive guard unit tests
-- **Files:**
-  - `front/src/app/connexion.guard.spec.ts`
-  - `front/src/app/admin.guard.spec.ts`
-- **Content:**
-  - Test authentication checks
-  - Test navigation blocking for unauthenticated users
-  - Test admin authorization logic
-  - Test redirect behavior
-  - Mock BackendService and Router
-  - Test CanActivate interface implementation
-- **Current state:** Minimal (instantiation only)
-- **Estimated additions:** ~100-150 lines total
-- **Priority:** High - guards protect critical routes
-
 **Task 7:** Add HTTP interceptor unit tests
 - **Files:**
   - `front/src/app/auth-backend.interceptor.spec.ts`
