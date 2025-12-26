@@ -24,10 +24,15 @@ on:
 
 jobs:
   e2e-tests:
-    name: End-to-End Tests
+    name: End-to-End Tests (${{ matrix.browser }})
     runs-on: ubuntu-latest
     # Skip E2E tests for draft PRs - only run when PR is ready for review
     if: github.event_name != 'pull_request' || !github.event.pull_request.draft
+
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chrome, firefox]
 
     services:
       mysql:
@@ -127,6 +132,11 @@ jobs:
       - name: Install Cypress binary
         run: npx cypress install
         working-directory: ./front
+
+      # Install Firefox for firefox browser tests
+      - name: Install Firefox
+        if: matrix.browser == 'firefox'
+        uses: browser-actions/setup-firefox@latest
 
       # Start backend PHP server in background
       - name: Start PHP backend server
@@ -230,7 +240,7 @@ jobs:
         with:
           working-directory: ./front
           command: npx cypress run --config baseUrl=http://localhost:8080
-          browser: chrome
+          browser: ${{ matrix.browser }}
           install: false
 
       - name: Stop servers
@@ -248,7 +258,7 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: cypress-e2e-screenshots-${{ github.run_number }}
+          name: cypress-e2e-screenshots-${{ matrix.browser }}-${{ github.run_number }}
           path: front/cypress/screenshots
           retention-days: 7
           if-no-files-found: ignore
@@ -266,7 +276,7 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: cypress-e2e-videos-${{ github.run_number }}
+          name: cypress-e2e-videos-${{ matrix.browser }}-${{ github.run_number }}
           path: cypress-e2e-videos.tar.gz
           retention-days: 3
           if-no-files-found: ignore
@@ -275,7 +285,7 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: e2e-backend-logs-${{ github.run_number }}
+          name: e2e-backend-logs-${{ matrix.browser }}-${{ github.run_number }}
           path: api/var/log
           retention-days: 7
           if-no-files-found: ignore

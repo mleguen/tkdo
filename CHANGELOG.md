@@ -44,6 +44,7 @@
   - Update backlog management guidelines in CONTRIBUTING.md to no longer require renumbering tasks when completed tasks are removed - gaps in task numbers are acceptable
   - Add frontend integration tests (with mocked backend) to GitHub Actions CI workflow for automated testing on pull requests and pushes to master
   - Add E2E tests to GitHub Actions CI workflow using service containers (MySQL 5.7, Mailhog), nginx reverse proxy, and Cypress running against full stack (real backend + production frontend build) with manual trigger support and artifact uploads on failure
+  - Configure test parallelization and cross-browser testing: split Cypress component tests across 2 shards per browser, add Firefox to all Cypress tests (component, integration, E2E) alongside Chrome
 
 ## V1.4.4 (December 8, 2025)
 
