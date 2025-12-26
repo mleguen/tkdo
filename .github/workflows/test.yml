@@ -81,7 +81,7 @@ jobs:
         working-directory: ./front
 
   frontend-component-tests:
-    name: Frontend - Component Tests (${{ matrix.browser }}, shard ${{ matrix.shard }}/2)
+    name: Frontend - Component Tests (${{ matrix.browser }}, shard ${{ matrix.shard }})
     runs-on: ubuntu-latest
     needs: frontend-unit-tests
 
@@ -89,7 +89,7 @@ jobs:
       fail-fast: false
       matrix:
         browser: [chrome, firefox]
-        shard: [1, 2]
+        shard: [0, 1]
 
     steps:
       - name: Checkout code
@@ -131,7 +131,7 @@ jobs:
           browser: ${{ matrix.browser }}
           install: false
         env:
-          SPLIT: ${{ strategy.job-total }}
+          SPLIT: 2
           SPLIT_INDEX: ${{ matrix.shard }}
 
       - name: Upload screenshots on failure
