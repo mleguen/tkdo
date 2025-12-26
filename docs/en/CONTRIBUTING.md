@@ -798,7 +798,7 @@ Do not mention routine BACKLOG/CHANGELOG maintenance that is standard documentat
 **Rules:**
 - Remove completed tasks completely
 - Don't mark tasks as "completed" or "done"
-- Renumber remaining tasks after removal
+- Do not renumber remaining tasks after removal - gaps in task numbers are acceptable
 - Keep tasks organized by category
 
 ### Tracking Deprecation Warnings
