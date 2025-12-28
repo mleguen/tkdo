@@ -103,4 +103,37 @@ class ExclusionPortTest extends UnitTestCase
             $this->quiNeDoitPasRecevoirProphecy->reveal(),
         );
     }
+
+    public function testListeExclusions()
+    {
+        $quiOffre = $this->quiOffreProphecy->reveal();
+
+        $this->authProphecy->estAdmin()->willReturn(true);
+
+        $exclusion1 = $this->prophesize(Exclusion::class)->reveal();
+        $exclusion2 = $this->prophesize(Exclusion::class)->reveal();
+        $exclusionsAttendues = [$exclusion1, $exclusion2];
+
+        $this->exclusionRepositoryProphecy->readByQuiOffre($quiOffre)
+            ->willReturn($exclusionsAttendues)
+            ->shouldBeCalledOnce();
+
+        $exclusions = $this->exclusionPort->listeExclusions(
+            $this->authProphecy->reveal(),
+            $quiOffre
+        );
+
+        $this->assertEquals($exclusionsAttendues, $exclusions);
+    }
+
+    public function testListeExclusionsPasAdmin()
+    {
+        $this->authProphecy->estAdmin()->willReturn(false);
+
+        $this->expectException(PasAdminException::class);
+        $this->exclusionPort->listeExclusions(
+            $this->authProphecy->reveal(),
+            $this->quiOffreProphecy->reveal()
+        );
+    }
 }

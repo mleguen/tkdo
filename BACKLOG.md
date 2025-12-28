@@ -178,19 +178,6 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 
 ### Backend Testing - Unit Tests
 
-**Task 23:** Complete ExclusionPort unit tests
-- **File:** `api/test/Unit/Dom/Port/ExclusionPortTest.php`
-- **Content:**
-  - ✅ Test exclusion creation (done)
-  - ✅ Test authorization checks for creation (done)
-  - ✅ Test duplicate exclusion exception (done)
-  - ❌ **Missing: Test `listeExclusions` method**
-    - Test successful listing when admin
-    - Test PasAdminException when not admin
-- **Current state:** Partial (106 lines, 3 tests) - missing `listeExclusions` tests
-- **Estimated additions:** ~40-60 lines (2-3 tests)
-- **Priority:** High - completes core exclusion business logic
-
 **Task 24:** Complete OccasionPort unit tests
 - **File:** `api/test/Unit/Dom/Port/OccasionPortTest.php`
 - **Content:**

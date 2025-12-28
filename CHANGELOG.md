@@ -51,6 +51,7 @@
     - AuthBackendInterceptor: token injection in requests, URL filtering, header preservation (6 tests)
     - ErreurBackendInterceptor: error handling, 401 redirect to login, success notifications (8 tests)
     - DevBackendInterceptor: API mocking, authentication, request routing, network delay simulation (11 tests)
+  - Add comprehensive unit tests for ExclusionPort covering listeExclusions method with admin authorization checks (2 tests) completing full test coverage for all exclusion business logic
 
 ## V1.4.4 (December 8, 2025)
 
