@@ -746,4 +746,408 @@ class OccasionIntTest extends IntTestCase
             'message' => 'occasion inconnue',
         ], $body);
     }
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
+    public function testLanceTirageSimple(bool $curl): void
+    {
+        $admin = $this->creeUtilisateurEnBase('admin', ['admin' => true]);
+        $participant1 = $this->creeUtilisateurEnBase('participant1');
+        $participant2 = $this->creeUtilisateurEnBase('participant2');
+        $participant3 = $this->creeUtilisateurEnBase('participant3');
+        $occasion = $this->creeOccasionEnBase(['participants' => [$participant1, $participant2, $participant3]]);
+
+        $this->postConnexion($curl, $admin);
+
+        // Lance le tirage
+        $this->requestApi(
+            $curl,
+            'POST',
+            "/occasion/{$occasion->getId()}/tirage",
+            $statusCode,
+            $body,
+            '',
+            []
+        );
+        $this->assertEquals(200, $statusCode);
+        $this->assertArrayHasKey('resultats', $body);
+        $this->assertCount(3, $body['resultats']);
+
+        // Vérifie que chaque participant offre à exactement une personne
+        $quiOffrent = array_column($body['resultats'], 'idQuiOffre');
+        $this->assertCount(3, array_unique($quiOffrent));
+
+        // Vérifie que chaque participant reçoit d'exactement une personne
+        $quiRecoivent = array_column($body['resultats'], 'idQuiRecoit');
+        $this->assertCount(3, array_unique($quiRecoivent));
+
+        // Vérifie qu'aucun participant ne s'offre à lui-même
+        foreach ($body['resultats'] as $resultat) {
+            $this->assertNotEquals($resultat['idQuiOffre'], $resultat['idQuiRecoit']);
+        }
+
+        // Vérifie que tous les participants ont reçu un email
+        $emailsRecus = $this->depileDerniersEmailsRecus();
+        $this->assertCount(3, $emailsRecus);
+    }
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
+    public function testLanceTirageAvecExclusions(bool $curl): void
+    {
+        $admin = $this->creeUtilisateurEnBase('admin', ['admin' => true]);
+        $participant1 = $this->creeUtilisateurEnBase('participant1');
+        $participant2 = $this->creeUtilisateurEnBase('participant2');
+        $participant3 = $this->creeUtilisateurEnBase('participant3');
+        $occasion = $this->creeOccasionEnBase(['participants' => [$participant1, $participant2, $participant3]]);
+
+        $this->postConnexion($curl, $admin);
+
+        // Crée une exclusion: participant1 ne doit pas offrir à participant2
+        $this->requestApi(
+            $curl,
+            'POST',
+            "/utilisateur/{$participant1->getId()}/exclusion",
+            $statusCode,
+            $body,
+            '',
+            ['idQuiNeDoitPasRecevoir' => $participant2->getId()]
+        );
+        $this->assertEquals(200, $statusCode);
+
+        // Lance le tirage
+        $this->requestApi(
+            $curl,
+            'POST',
+            "/occasion/{$occasion->getId()}/tirage",
+            $statusCode,
+            $body,
+            '',
+            []
+        );
+        $this->assertEquals(200, $statusCode);
+
+        // Vérifie que l'exclusion est respectée
+        foreach ($body['resultats'] as $resultat) {
+            if ($resultat['idQuiOffre'] === $participant1->getId()) {
+                $this->assertNotEquals($participant2->getId(), $resultat['idQuiRecoit']);
+            }
+        }
+    }
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
+    public function testLanceTirageImpossible(bool $curl): void
+    {
+        $admin = $this->creeUtilisateurEnBase('admin', ['admin' => true]);
+        $participant1 = $this->creeUtilisateurEnBase('participant1');
+        $participant2 = $this->creeUtilisateurEnBase('participant2');
+        $occasion = $this->creeOccasionEnBase(['participants' => [$participant1, $participant2]]);
+
+        $this->postConnexion($curl, $admin);
+
+        // Crée des exclusions qui rendent le tirage impossible
+        // participant1 ne peut pas offrir à participant2
+        $this->requestApi(
+            $curl,
+            'POST',
+            "/utilisateur/{$participant1->getId()}/exclusion",
+            $statusCode,
+            $body,
+            '',
+            ['idQuiNeDoitPasRecevoir' => $participant2->getId()]
+        );
+        $this->assertEquals(200, $statusCode);
+
+        // participant2 ne peut pas offrir à participant1
+        $this->requestApi(
+            $curl,
+            'POST',
+            "/utilisateur/{$participant2->getId()}/exclusion",
+            $statusCode,
+            $body,
+            '',
+            ['idQuiNeDoitPasRecevoir' => $participant1->getId()]
+        );
+        $this->assertEquals(200, $statusCode);
+
+        // Tente de lancer le tirage
+        $this->requestApi(
+            $curl,
+            'POST',
+            "/occasion/{$occasion->getId()}/tirage",
+            $statusCode,
+            $body,
+            '',
+            []
+        );
+        $this->assertEquals(500, $statusCode);
+        $this->assertEquals([
+            'message' => 'le tirage a échoué',
+        ], $body);
+    }
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
+    public function testLanceTirageDejaLance(bool $curl): void
+    {
+        $admin = $this->creeUtilisateurEnBase('admin', ['admin' => true]);
+        $participant1 = $this->creeUtilisateurEnBase('participant1');
+        $participant2 = $this->creeUtilisateurEnBase('participant2');
+        $occasion = $this->creeOccasionEnBase(['participants' => [$participant1, $participant2]]);
+
+        $this->postConnexion($curl, $admin);
+
+        // Lance le tirage une première fois
+        $this->requestApi(
+            $curl,
+            'POST',
+            "/occasion/{$occasion->getId()}/tirage",
+            $statusCode,
+            $body,
+            '',
+            []
+        );
+        $this->assertEquals(200, $statusCode);
+
+        // Vide les emails envoyés
+        $this->depileDerniersEmailsRecus();
+
+        // Tente de lancer le tirage une deuxième fois sans force
+        $this->requestApi(
+            $curl,
+            'POST',
+            "/occasion/{$occasion->getId()}/tirage",
+            $statusCode,
+            $body,
+            '',
+            []
+        );
+        $this->assertEquals(400, $statusCode);
+        $this->assertEquals([
+            'message' => 'des résultats existent déjà pour cette occasion',
+        ], $body);
+
+        // Vérifie qu'aucun email n'a été envoyé
+        $emailsRecus = $this->depileDerniersEmailsRecus();
+        $this->assertCount(0, $emailsRecus);
+    }
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
+    public function testLanceTirageRegeneration(bool $curl): void
+    {
+        $admin = $this->creeUtilisateurEnBase('admin', ['admin' => true]);
+        $participant1 = $this->creeUtilisateurEnBase('participant1');
+        $participant2 = $this->creeUtilisateurEnBase('participant2');
+        $participant3 = $this->creeUtilisateurEnBase('participant3');
+        $occasion = $this->creeOccasionEnBase(['participants' => [$participant1, $participant2, $participant3]]);
+
+        $this->postConnexion($curl, $admin);
+
+        // Lance le tirage une première fois
+        $this->requestApi(
+            $curl,
+            'POST',
+            "/occasion/{$occasion->getId()}/tirage",
+            $statusCode,
+            $bodyFirst,
+            '',
+            []
+        );
+        $this->assertEquals(200, $statusCode);
+        $this->assertArrayHasKey('resultats', $bodyFirst);
+        $this->assertCount(3, $bodyFirst['resultats']);
+
+        // Vide les emails envoyés
+        $this->depileDerniersEmailsRecus();
+
+        // Force la régénération du tirage
+        $this->requestApi(
+            $curl,
+            'POST',
+            "/occasion/{$occasion->getId()}/tirage",
+            $statusCode,
+            $bodySecond,
+            '',
+            ['force' => true]
+        );
+        $this->assertEquals(200, $statusCode);
+        $this->assertArrayHasKey('resultats', $bodySecond);
+        $this->assertCount(3, $bodySecond['resultats']);
+
+        // Vérifie que les nouveaux résultats sont valides
+        $quiOffrent = array_column($bodySecond['resultats'], 'idQuiOffre');
+        $this->assertCount(3, array_unique($quiOffrent));
+
+        $quiRecoivent = array_column($bodySecond['resultats'], 'idQuiRecoit');
+        $this->assertCount(3, array_unique($quiRecoivent));
+
+        // Vérifie que tous les participants ont reçu un email
+        $emailsRecus = $this->depileDerniersEmailsRecus();
+        $this->assertCount(3, $emailsRecus);
+    }
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
+    public function testLanceTirageOccasionPassee(bool $curl): void
+    {
+        $admin = $this->creeUtilisateurEnBase('admin', ['admin' => true]);
+        $participant1 = $this->creeUtilisateurEnBase('participant1');
+        $participant2 = $this->creeUtilisateurEnBase('participant2');
+        $occasion = $this->creeOccasionEnBase([
+            'date' => new DateTime('yesterday'),
+            'participants' => [$participant1, $participant2]
+        ]);
+
+        $this->postConnexion($curl, $admin);
+
+        // Tente de lancer le tirage pour une occasion passée
+        $this->requestApi(
+            $curl,
+            'POST',
+            "/occasion/{$occasion->getId()}/tirage",
+            $statusCode,
+            $body,
+            '',
+            []
+        );
+        $this->assertEquals(400, $statusCode);
+        $this->assertEquals([
+            'message' => 'l\'occasion est passée',
+        ], $body);
+    }
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
+    public function testLanceTirageResultatVisibilitéParParticipant(bool $curl): void
+    {
+        $admin = $this->creeUtilisateurEnBase('admin', ['admin' => true]);
+        $participant1 = $this->creeUtilisateurEnBase('participant1');
+        $participant2 = $this->creeUtilisateurEnBase('participant2');
+        $participant3 = $this->creeUtilisateurEnBase('participant3');
+        $occasion = $this->creeOccasionEnBase(['participants' => [$participant1, $participant2, $participant3]]);
+
+        $this->postConnexion($curl, $admin);
+
+        // Lance le tirage
+        $this->requestApi(
+            $curl,
+            'POST',
+            "/occasion/{$occasion->getId()}/tirage",
+            $statusCode,
+            $bodyAdmin,
+            '',
+            []
+        );
+        $this->assertEquals(200, $statusCode);
+
+        // Vide les emails
+        $this->depileDerniersEmailsRecus();
+
+        // Vérifie que participant1 ne voit que son propre résultat
+        $this->postConnexion($curl, $participant1);
+        $this->requestApi(
+            $curl,
+            'GET',
+            "/occasion/{$occasion->getId()}",
+            $statusCode,
+            $bodyParticipant1
+        );
+        $this->assertEquals(200, $statusCode);
+        $this->assertArrayHasKey('resultats', $bodyParticipant1);
+        $this->assertCount(1, $bodyParticipant1['resultats']);
+        $this->assertEquals($participant1->getId(), $bodyParticipant1['resultats'][0]['idQuiOffre']);
+
+        // Vérifie que participant2 ne voit que son propre résultat
+        $this->postConnexion($curl, $participant2);
+        $this->requestApi(
+            $curl,
+            'GET',
+            "/occasion/{$occasion->getId()}",
+            $statusCode,
+            $bodyParticipant2
+        );
+        $this->assertEquals(200, $statusCode);
+        $this->assertArrayHasKey('resultats', $bodyParticipant2);
+        $this->assertCount(1, $bodyParticipant2['resultats']);
+        $this->assertEquals($participant2->getId(), $bodyParticipant2['resultats'][0]['idQuiOffre']);
+
+        // Vérifie que participant3 ne voit que son propre résultat
+        $this->postConnexion($curl, $participant3);
+        $this->requestApi(
+            $curl,
+            'GET',
+            "/occasion/{$occasion->getId()}",
+            $statusCode,
+            $bodyParticipant3
+        );
+        $this->assertEquals(200, $statusCode);
+        $this->assertArrayHasKey('resultats', $bodyParticipant3);
+        $this->assertCount(1, $bodyParticipant3['resultats']);
+        $this->assertEquals($participant3->getId(), $bodyParticipant3['resultats'][0]['idQuiOffre']);
+    }
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
+    public function testLanceTirageNonAuthentifie(bool $curl): void
+    {
+        $participant1 = $this->creeUtilisateurEnBase('participant1');
+        $participant2 = $this->creeUtilisateurEnBase('participant2');
+        $occasion = $this->creeOccasionEnBase(['participants' => [$participant1, $participant2]]);
+
+        $this->requestApi(
+            $curl,
+            'POST',
+            "/occasion/{$occasion->getId()}/tirage",
+            $statusCode,
+            $body,
+            '',
+            []
+        );
+        $this->assertEquals(401, $statusCode);
+        $this->assertEquals([
+            'message' => "token d'authentification absent",
+        ], $body);
+    }
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
+    public function testLanceTiragePasAdmin(bool $curl): void
+    {
+        $participant1 = $this->creeUtilisateurEnBase('participant1');
+        $participant2 = $this->creeUtilisateurEnBase('participant2');
+        $occasion = $this->creeOccasionEnBase(['participants' => [$participant1, $participant2]]);
+
+        $this->postConnexion($curl, $participant1);
+
+        $this->requestApi(
+            $curl,
+            'POST',
+            "/occasion/{$occasion->getId()}/tirage",
+            $statusCode,
+            $body,
+            '',
+            []
+        );
+        $this->assertEquals(403, $statusCode);
+        $this->assertEquals([
+            'message' => "l'utilisateur authentifié n'est pas un administrateur",
+        ], $body);
+    }
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
+    public function testLanceTirageOccasionInconnue(bool $curl): void
+    {
+        $admin = $this->creeUtilisateurEnBase('admin', ['admin' => true]);
+        $occasion = $this->creeOccasionEnBase();
+        $idOccasionInconnue = $occasion->getId() + 1;
+
+        $this->postConnexion($curl, $admin);
+
+        $this->requestApi(
+            $curl,
+            'POST',
+            "/occasion/$idOccasionInconnue/tirage",
+            $statusCode,
+            $body,
+            '',
+            []
+        );
+        $this->assertEquals(404, $statusCode);
+        $this->assertEquals([
+            'message' => 'occasion inconnue',
+        ], $body);
+    }
 }

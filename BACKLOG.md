@@ -178,19 +178,6 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 
 ### Backend Testing - Integration Tests
 
-**Task 27:** Add comprehensive occasion draw integration tests
-- **File:** `api/test/Int/OccasionIntTest.php`
-- **Content:**
-  - Test draw generation with various scenarios
-  - Test exclusion enforcement
-  - Test impossible draw scenarios
-  - Test draw regeneration
-  - Test result visibility by participant
-  - Verify database constraints
-- **Current state:** Exists but needs expansion
-- **Estimated additions:** ~150-200 lines
-- **Priority:** High - core feature
-
 **Task 28:** Add API error response integration tests
 - **File:** `api/test/Int/ErrorHandlingIntTest.php` (new)
 - **Content:**
