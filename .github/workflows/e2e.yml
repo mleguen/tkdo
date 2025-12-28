@@ -142,10 +142,51 @@ jobs:
         run: npx cypress install
         working-directory: ./front
 
-      # Install Firefox for firefox browser tests
-      - name: Install Firefox
+      # Get current year-week for Firefox cache key (updates weekly)
+      - name: Get current week
         if: matrix.browser == 'firefox'
+        id: week
+        run: echo "week=$(date +%Y-W%V)" >> $GITHUB_OUTPUT
+
+      # Cache Firefox binary to speed up installation
+      # Cache key includes year-week to refresh weekly and get Firefox updates
+      - name: Cache Firefox binary
+        if: matrix.browser == 'firefox'
+        id: firefox-cache
+        uses: actions/cache@v4
+        with:
+          path: /opt/hostedtoolcache/firefox
+          key: ${{ runner.os }}-firefox-latest-v4-${{ steps.week.outputs.week }}
+          restore-keys: |
+            ${{ runner.os }}-firefox-latest-v4-
+
+      # Install Firefox for firefox browser tests
+      - name: Install Firefox from cache
+        if: matrix.browser == 'firefox' && steps.firefox-cache.outputs.cache-hit == 'true'
         uses: browser-actions/setup-firefox@latest
+        with:
+          # default would be 'latest' which is not compatible with tc.find() as not a semver
+          firefox-version: '*'
+
+      # Distinct from the previous step because firefox-version: '*' wouldn't download the latest version (!)
+      - name: Download & install latest Firefox
+        if: matrix.browser == 'firefox' && steps.firefox-cache.outputs.cache-hit != 'true'
+        id: setup-firefox
+        uses: browser-actions/setup-firefox@latest
+
+      # Rename cache directory and .complete marker from "latest" to actual version for tc.find() compatibility
+      - name: Fix Firefox cache for tool-cache API
+        if: matrix.browser == 'firefox' && steps.firefox-cache.outputs.cache-hit != 'true'
+        run: |
+          VERSION="${{ steps.setup-firefox.outputs.firefox-version }}"
+          if [ -d "/opt/hostedtoolcache/firefox/latest" ]; then
+            echo "Renaming /opt/hostedtoolcache/firefox/latest to /opt/hostedtoolcache/firefox/$VERSION"
+            mv /opt/hostedtoolcache/firefox/latest "/opt/hostedtoolcache/firefox/$VERSION"
+            if [ -f "/opt/hostedtoolcache/firefox/latest/x64.complete" ]; then
+              mv "/opt/hostedtoolcache/firefox/latest/x64.complete" "/opt/hostedtoolcache/firefox/$VERSION/x64.complete"
+            fi
+            echo "Firefox $VERSION cached for tool-cache API compatibility"
+          fi
 
       # Start backend PHP server in background
       - name: Start PHP backend server
