@@ -260,44 +260,12 @@ jobs:
         run: composer install --prefer-dist --no-progress --no-interaction
         working-directory: ./api
 
+      - name: Run PHPStan
+        run: composer phpstan
+        working-directory: ./api
+
       - name: Run unit tests
         run: composer test -- --testsuite=Unit
-        working-directory: ./api
-
-  backend-phpstan:
-    name: Backend - PHPStan Static Analysis
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.4'
-          extensions: pdo_mysql, json, mbstring
-          coverage: none
-
-      - name: Get Composer cache directory
-        id: composer-cache
-        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
-        working-directory: ./api
-
-      - name: Cache Composer dependencies
-        uses: actions/cache@v4
-        with:
-          path: ${{ steps.composer-cache.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ hashFiles('api/composer.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-composer-
-
-      - name: Install dependencies
-        run: composer install --prefer-dist --no-progress --no-interaction
-        working-directory: ./api
-
-      - name: Run PHPStan
-        run: vendor/bin/phpstan analyse --no-progress
         working-directory: ./api
 
   backend-integration-tests:
