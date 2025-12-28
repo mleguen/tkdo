@@ -178,70 +178,40 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 
 ### Backend Testing - Unit Tests
 
-**Task 20:** Add comprehensive IdeePort unit tests
-- **File:** `api/test/Unit/Dom/Port/IdeePortTest.php`
-- **Content:**
-  - Test idea creation with authorization
-  - Test idea update with permission checks
-  - Test idea deletion
-  - Test visibility rules (own ideas vs others)
-  - Mock dependencies (repositories, auth)
-  - Test exception cases
-- **Current state:** No tests exist
-- **Estimated size:** ~200-250 lines
-- **Priority:** High - core business logic
-
-**Task 21:** Add comprehensive UtilisateurPort unit tests
-- **File:** `api/test/Unit/Dom/Port/UtilisateurPortTest.php`
-- **Content:**
-  - Test user creation (admin only)
-  - Test user update
-  - Test password change
-  - Test notification preference updates
-  - Test admin authorization checks
-  - Mock all dependencies
-  - Test validation logic
-- **Current state:** Exists but needs expansion
-- **Estimated additions:** ~150-200 lines
-- **Priority:** High - user management logic
-
-**Task 22:** Add comprehensive NotifPort unit tests
-- **File:** `api/test/Unit/Dom/Port/NotifPortTest.php`
-- **Content:**
-  - Test notification creation logic
-  - Test daily digest aggregation
-  - Test notification filtering by preferences
-  - Test email sending logic
-  - Mock MailPlugin
-  - Test edge cases (no preferences, empty digests)
-- **Current state:** Exists but minimal
-- **Estimated additions:** ~200-250 lines
-- **Priority:** High - complex notification logic
-
-**Task 23:** Add ExclusionPort unit tests
+**Task 23:** Complete ExclusionPort unit tests
 - **File:** `api/test/Unit/Dom/Port/ExclusionPortTest.php`
 - **Content:**
-  - Test exclusion creation
-  - Test exclusion validation (bidirectional)
-  - Test exclusion removal
-  - Test authorization checks
-  - Mock repositories
-- **Current state:** No tests exist
-- **Estimated size:** ~120-150 lines
-- **Priority:** Medium - important business rule
+  - ✅ Test exclusion creation (done)
+  - ✅ Test authorization checks for creation (done)
+  - ✅ Test duplicate exclusion exception (done)
+  - ❌ **Missing: Test `listeExclusions` method**
+    - Test successful listing when admin
+    - Test PasAdminException when not admin
+- **Current state:** Partial (106 lines, 3 tests) - missing `listeExclusions` tests
+- **Estimated additions:** ~40-60 lines (2-3 tests)
+- **Priority:** High - completes core exclusion business logic
 
-**Task 24:** Expand OccasionPort unit tests
+**Task 24:** Complete OccasionPort unit tests
 - **File:** `api/test/Unit/Dom/Port/OccasionPortTest.php`
 - **Content:**
-  - Test draw generation algorithm
-  - Test participant validation
-  - Test exclusion enforcement in draws
-  - Test occasion creation/update/delete
-  - Test authorization for various operations
-  - Mock all dependencies thoroughly
-- **Current state:** Exists but needs expansion
-- **Estimated additions:** ~150-200 lines
-- **Priority:** High - core feature with complex logic
+  - ✅ Test occasion creation/update (done)
+  - ✅ Test participant addition (done)
+  - ✅ Test result addition (done)
+  - ✅ Test listing occasions (done)
+  - ✅ Test authorization for various operations (done)
+  - ❌ **Missing: Test `lanceTirage` method (draw generation algorithm)**
+    - Test successful draw generation
+    - Test draw with exclusions enforcement
+    - Test draw with past results (avoid repeats)
+    - Test TirageDejaLanceException when draw exists and force=false
+    - Test force redraw (deletes existing results)
+    - Test TirageEchoueException when impossible draw
+    - Test OccasionPasseeException for past occasions
+    - Test PasAdminException when not admin
+    - Test email notifications sent to all participants
+- **Current state:** Partial (422 lines, 23 tests) - missing `lanceTirage` tests
+- **Estimated additions:** ~200-300 lines (8-10 tests)
+- **Priority:** High - core feature with complex draw algorithm logic
 
 ### Backend Testing - Integration Tests
 
