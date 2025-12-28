@@ -215,6 +215,23 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 - **Estimated size:** ~120-150 lines
 - **Priority:** Low - database integrity
 
+**Task 29 bis:** Review and refactor backend integration tests to be workflow-oriented
+- **Files to review:** All integration test files in `api/test/Int/`
+- **Content:**
+  - Analyze current class-oriented integration tests for coverage duplication
+  - Identify which tests overlap with unit tests and should be simplified or removed
+  - Group tests by user workflows/sagas instead of by class (e.g., "Complete gift idea workflow", "Occasion draw workflow", "User notification saga")
+  - Document integration test philosophy: focus on cross-component interactions, database operations, API contracts, and end-to-end workflows rather than business logic already covered by unit tests
+  - Refactor tests to reduce duplication while maintaining coverage of critical integration points
+  - Update testing.md documentation with workflow-oriented integration testing guidelines
+- **Benefits:**
+  - Easier to understand test intent (complete user workflows vs isolated class methods)
+  - Reduced duplication between integration tests and unit tests
+  - Faster test suite execution by removing redundant coverage
+  - Better alignment with integration testing best practices
+- **Estimated changes:** Significant refactoring, ~200-400 lines moved/modified across test files
+- **Priority:** Medium - improves test maintainability and clarity
+
 ### Backend Testing - Test Infrastructure
 
 **Task 30:** Add database transaction rollback for faster tests
