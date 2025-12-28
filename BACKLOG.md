@@ -178,19 +178,6 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 
 ### Backend Testing - Integration Tests
 
-**Task 28:** Add API error response integration tests
-- **File:** `api/test/Int/ErrorHandlingIntTest.php` (new)
-- **Content:**
-  - Test 400 Bad Request scenarios
-  - Test 401 Unauthorized responses
-  - Test 403 Forbidden responses
-  - Test 404 Not Found responses
-  - Test 500 Internal Server Error handling
-  - Verify error response format consistency
-  - Test validation error messages
-- **Estimated size:** ~200-250 lines
-- **Priority:** Medium - API consistency
-
 **Task 29:** Add database constraint integration tests
 - **File:** `api/test/Int/DatabaseConstraintIntTest.php` (new)
 - **Content:**
