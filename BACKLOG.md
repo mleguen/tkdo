@@ -16,21 +16,6 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 
 ### Frontend Testing - Component Tests
 
-**Task 9:** Add comprehensive OccasionComponent component tests
-- **File:** `front/cypress/component/occasion.component.cy.ts`
-- **Content:**
-  - Test occasion details rendering
-  - Test participant list display
-  - Test exclusion list display
-  - Test add participant form
-  - Test add exclusion form
-  - Test draw generation button
-  - Test different user permissions (participant vs admin)
-  - Mock backend data and responses
-- **Current state:** Minimal (mounting only)
-- **Estimated additions:** ~150-200 lines
-- **Priority:** High - complex component with multiple features
-
 **Task 10:** Add ListeIdeesComponent component tests
 - **File:** `front/cypress/component/liste-idees.component.cy.ts`
 - **Content:**
