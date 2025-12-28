@@ -178,20 +178,6 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 
 ### Backend Testing - Integration Tests
 
-**Task 25:** Add comprehensive idea API integration tests
-- **File:** `api/test/Int/IdeeIntTest.php`
-- **Content:**
-  - Test all CRUD operations via API
-  - Test authorization for different user types
-  - Test visibility rules
-  - Test commenting functionality (when implemented)
-  - Test concurrent modification
-  - Verify database state after operations
-  - Test email notifications
-- **Current state:** Exists but needs expansion
-- **Estimated additions:** ~200-300 lines
-- **Priority:** High - core API
-
 **Task 26:** Add notification integration tests
 - **File:** `api/test/Int/NotifIntTest.php` (new)
 - **Content:**

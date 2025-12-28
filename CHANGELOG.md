@@ -54,6 +54,7 @@
   - Add comprehensive unit tests for ExclusionPort covering listeExclusions method with admin authorization checks (2 tests) completing full test coverage for all exclusion business logic
   - Add comprehensive unit tests for OccasionPort covering lanceTirage method (draw generation algorithm) with success cases (basic draw, with exclusions, with past results, force redraw) and error cases (not admin, past occasion, already launched, impossible draw) including email notifications (8 tests) completing full test coverage for all occasion business logic
   - Remove local-cypress which is no longer needed and whose post-install script conflicted with cypress install
+  - Add comprehensive integration tests for idea API (IdeeIntTest.php) covering deleted ideas retrieval (supprimees parameter), admin viewing all ideas regardless of authorship, admin creating ideas for any user, database state verification after creation and deletion, edge cases (empty description, missing author parameter, user with no ideas), multiple ideas per user with author attribution verification, admin/non-admin deletion authorization, third-party deletion prevention, and notification filtering by occasion participants (13 new tests, 23 total)
 
 ## V1.4.4 (December 8, 2025)
 
