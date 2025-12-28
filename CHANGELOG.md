@@ -63,6 +63,7 @@
   - Add fluent test data builders for backend integration tests to standardize creation of test entities with sensible defaults and customization options
   - Migrate backend integration tests to use the new builders and remove legacy helper methods from IntTestCase to maintain a single approach to test data creation
   - Document builder patterns and best practices in docs/en/backend-dev.md
+  - Add comprehensive ConnexionComponent tests (22 tests total): complete component test coverage for the login form using mocked BackendService
 
 ## V1.4.4 (December 8, 2025)
 

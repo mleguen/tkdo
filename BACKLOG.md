@@ -16,20 +16,6 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 
 ### Frontend Testing - Component Tests
 
-**Task 8:** Expand ConnexionComponent component tests
-- **File:** `front/cypress/component/connexion.component.cy.ts`
-- **Content:**
-  - Test form rendering and validation
-  - Test successful login flow
-  - Test failed login with error message display
-  - Test form submission with invalid data
-  - Test password visibility toggle
-  - Mock BackendService responses
-  - Test navigation after successful login
-- **Current state:** Minimal (mounting only)
-- **Estimated additions:** ~80-120 lines
-- **Priority:** High - critical user journey
-
 **Task 9:** Add comprehensive OccasionComponent component tests
 - **File:** `front/cypress/component/occasion.component.cy.ts`
 - **Content:**
