@@ -178,18 +178,6 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 
 ### Backend Testing - Integration Tests
 
-**Task 26:** Add notification integration tests
-- **File:** `api/test/Int/NotifIntTest.php` (new)
-- **Content:**
-  - Test notification creation via various triggers
-  - Test daily digest generation
-  - Test email sending
-  - Test notification preferences
-  - Verify Mailhog receives emails
-  - Test notification filtering
-- **Estimated size:** ~250-300 lines
-- **Priority:** High - email is critical functionality
-
 **Task 27:** Add comprehensive occasion draw integration tests
 - **File:** `api/test/Int/OccasionIntTest.php`
 - **Content:**
