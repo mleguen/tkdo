@@ -36,6 +36,15 @@ jobs:
         run: npm install --prefer-offline --no-audit --ignore-scripts
         working-directory: ./front
 
+      # Cache Cypress binary to speed up installation
+      - name: Cache Cypress binary
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/Cypress
+          key: ${{ runner.os }}-cypress-${{ hashFiles('front/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-cypress-
+
       # Explicitly install Cypress binary after dependencies are in place
       - name: Install Cypress binary
         run: npx cypress install
@@ -76,6 +85,15 @@ jobs:
       - name: Generate version file
         run: node version.js
         working-directory: ./front
+
+      # Cache Cypress binary to speed up installation
+      - name: Cache Cypress binary
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/Cypress
+          key: ${{ runner.os }}-cypress-${{ hashFiles('front/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-cypress-
 
       - name: Install Cypress binary
         run: npx cypress install
@@ -154,6 +172,15 @@ jobs:
       - name: Generate version file
         run: node version.js
         working-directory: ./front
+
+      # Cache Cypress binary to speed up installation
+      - name: Cache Cypress binary
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/Cypress
+          key: ${{ runner.os }}-cypress-${{ hashFiles('front/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-cypress-
 
       - name: Install Cypress binary
         run: npx cypress install

@@ -129,6 +129,15 @@ jobs:
           php bin/console.php fixtures
         working-directory: ./api
 
+      # Cache Cypress binary to speed up installation
+      - name: Cache Cypress binary
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/Cypress
+          key: ${{ runner.os }}-cypress-${{ hashFiles('front/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-cypress-
+
       - name: Install Cypress binary
         run: npx cypress install
         working-directory: ./front
