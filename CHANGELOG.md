@@ -40,12 +40,11 @@
   - Fix integration test whitespace assertion to handle Angular v21 block control flow whitespace preservation
   - Fix integration test console.log spy timing issue to ensure console is available before spying on it
   - Add @angular/cdk package to use BreakpointObserver for responsive design
+  - Add GitHub Actions CI workflow for unit and component tests, frontend integration tests and E2E tests, for automated testing on pull requests and pushes to master
   - Add comprehensive component tests for HeaderComponent covering desktop and mobile viewport behavior including menu visibility, hamburger toggle functionality, and responsive design validation using real viewport detection (cy.viewport) with BreakpointObserver
   - Update backlog management guidelines in CONTRIBUTING.md to no longer require renumbering tasks when completed tasks are removed - gaps in task numbers are acceptable
   - Fix E2E test console.log spy timing issues by waiting for the window to be loaded first
-  - Add frontend integration tests (with mocked backend) to GitHub Actions CI workflow for automated testing on pull requests and pushes to master
-  - Add E2E tests to GitHub Actions CI workflow using service containers (MySQL 5.7, Mailhog), nginx reverse proxy, and Cypress running against full stack (real backend + production frontend build) with manual trigger support and artifact uploads on failure
-  - Configure test parallelization and cross-browser testing: split Cypress component tests across 2 shards per browser using cypress-split plugin, add Firefox to all Cypress tests (component, integration, E2E) alongside Chrome
+  - Configure CI test parallelization and cross-browser testing: split Cypress component tests across 2 shards per browser using cypress-split plugin, add Firefox to all Cypress tests (component, integration, E2E) alongside Chrome
 
 ## V1.4.4 (December 8, 2025)
 
