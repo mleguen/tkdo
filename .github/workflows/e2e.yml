@@ -195,9 +195,6 @@ jobs:
           echo "Frontend SPA server started on port 4200"
 
       # Configure reverse proxy using nginx to combine frontend + API
-      - name: Install nginx for proxying
-        run: sudo apt-get update && sudo apt-get install -y nginx
-
       - name: Configure nginx reverse proxy
         run: |
           sudo tee /etc/nginx/sites-available/tkdo-e2e > /dev/null <<'EOF'
