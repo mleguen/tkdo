@@ -1,5 +1,3 @@
-import { cy } from 'local-cypress';
-
 import { ConnexionPage } from 'cypress/po/connexion.po';
 import { DeconnexionPage } from 'cypress/po/deconnexion.po';
 import { AppPage } from 'cypress/po/app.po';

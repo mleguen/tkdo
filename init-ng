@@ -19,11 +19,6 @@ rm front/package*.json
 ./ng add @angular-eslint/schematics --defaults --skip-confirmation
 ./ng add @cypress/schematic --defaults --skip-confirmation
 
-# Use local-cypress to ensure Cypress types are defined but not global,
-# to prevent them from breaking Jasmine unit tests
-# (see https://github.com/cypress-io/cypress/issues/7552#issuecomment-1842066053)
-./npm install --save-dev local-cypress
-
 # Have eslint prevent deprecated code
 ./npm install --save-dev eslint-plugin-deprecation
 
@@ -54,9 +49,6 @@ ANGULAR_JSON=$(jq <<<$ANGULAR_JSON '.projects."tkdo-front".architect.e2e.options
 # Cypress still complains when baseUrl is not set
 TSCONFIG_JSON=$(jq <<<$TSCONFIG_JSON '.compilerOptions.baseUrl = "./"')
 
-# Do not globally load Cypress types in e2e tests (cf. comment about installing local-cypress above)
-CYPRESS_TSCONFIG_JSON=$(jq <<<$CYPRESS_TSCONFIG_JSON 'del(.compilerOptions.types[]|select(. == "cypress"))')
-
 # Add npm run ct
 PACKAGE_JSON=$(jq <<<$PACKAGE_JSON '.scripts.ct = "ng run tkdo-front:ct"')
 
@@ -77,11 +69,6 @@ cat > front/.prettierrc <<EOF
 {}
 EOF
 
-# Ensure e2e tests use local Cypress types (cf. comment about installing local-cypress above)
-sed -E '1i import { cy, describe, it } from '\''local-cypress'\'\\n -i front/cypress/e2e/spec.cy.ts
-# Ensure cy.mount is built into local Cypress types for component tests (cf. comment about installing local-cypress above)
-sed -e '/import .* from '\''cypress\/angular'\''/a import { Cypress } from '\''local-cypress'\' -i front/cypress/support/component.ts
-
 # Ignore eslint error on Cypress namespace
 sed -e '/namespace Cypress/i \/\/ eslint-disable-next-line @typescript-eslint\/no-namespace -- A réactiver après implémentation' -i front/cypress/support/component.ts
 
@@ -91,8 +78,6 @@ for c in admin connexion deconnexion header idee liste-idees liste-occasions occ
     # Another bug in @cypress/schematic:component prevents the base Angular component from working without --standalone
     # (it doesn't know the app is standalone and therefore looks for a module ng new no longer creates - apps are now standalone by default)
     ./ng generate component $c --standalone
-    # Ensure component tests use local Cypress types (cf. comment about installing local-cypress above)
-    sed -E '1i import { cy, describe, it } from '\''local-cypress'\'\\n -i front/src/app/$c/$c.component.cy.ts
 done
 
 for i in erreur-backend auth-backend dev-backend; do

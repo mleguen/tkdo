@@ -1,5 +1,3 @@
-import { afterEach, beforeEach, cy, describe, expect, it } from 'local-cypress';
-
 import { AppPage } from 'cypress/po/app.po';
 import { ConnexionPage } from 'cypress/po/connexion.po';
 import { DeconnexionPage } from 'cypress/po/deconnexion.po';

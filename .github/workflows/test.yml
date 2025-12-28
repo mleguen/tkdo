@@ -3,16 +3,16 @@ name: Unit and Component Tests
 on:
   pull_request:
     branches:
-      - '**'
+      - "**"
   push:
     branches:
       - master
     paths-ignore:
-      - '**.md'
-      - 'docs/**'
-      - 'CHANGELOG.md'
-      - 'BACKLOG.md'
-      - 'LICENSE'
+      - "**.md"
+      - "docs/**"
+      - "CHANGELOG.md"
+      - "BACKLOG.md"
+      - "LICENSE"
 
 jobs:
   frontend-unit-tests:
@@ -26,15 +26,9 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: 'front/package-lock.json'
-
-      # Skip postinstall scripts to avoid local-cypress race condition
-      # local-cypress tries to patch Cypress types before Cypress is extracted
-      - name: Install dependencies
-        run: npm install --prefer-offline --no-audit --ignore-scripts
-        working-directory: ./front
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: "front/package-lock.json"
 
       # Cache Cypress binary to speed up installation
       - name: Cache Cypress binary
@@ -45,9 +39,8 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-cypress-
 
-      # Explicitly install Cypress binary after dependencies are in place
-      - name: Install Cypress binary
-        run: npx cypress install
+      - name: Install dependencies
+        run: npm install --prefer-offline --no-audit
         working-directory: ./front
 
       - name: Run unit tests
@@ -69,22 +62,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Set up Node.js and install dependencies with --ignore-scripts
-      # to avoid local-cypress timing issue
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: 'front/package-lock.json'
-
-      - name: Install dependencies
-        run: npm ci --ignore-scripts
-        working-directory: ./front
-
-      - name: Generate version file
-        run: node version.js
-        working-directory: ./front
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: "front/package-lock.json"
 
       # Cache Cypress binary to speed up installation
       - name: Cache Cypress binary
@@ -95,8 +78,8 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-cypress-
 
-      - name: Install Cypress binary
-        run: npx cypress install
+      - name: Install dependencies
+        run: npm ci
         working-directory: ./front
 
       # Get current year-week for Firefox cache key (updates weekly)
@@ -123,7 +106,7 @@ jobs:
         uses: browser-actions/setup-firefox@latest
         with:
           # default would be 'latest' which is not compatible with tc.find() as not a semver
-          firefox-version: '*'
+          firefox-version: "*"
 
       # Distinct from the previous step because firefox-version: '*' wouldn't download the latest version (!)
       - name: Download & install latest Firefox
@@ -202,9 +185,9 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: 'front/package-lock.json'
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: "front/package-lock.json"
 
       - name: Install dependencies
         run: npm ci --ignore-scripts
@@ -313,7 +296,7 @@ jobs:
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.4'
+          php-version: "8.4"
           extensions: pdo_mysql, json, mbstring
           coverage: none
 
@@ -376,7 +359,7 @@ jobs:
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.4'
+          php-version: "8.4"
           extensions: pdo_mysql, json, mbstring
           coverage: none
 

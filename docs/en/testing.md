@@ -247,7 +247,6 @@ Component tests verify individual Angular components in isolation with mocked de
 #### Test Structure
 
 ```typescript
-import { cy, describe, it } from 'local-cypress';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { provideRouter } from '@angular/router';
 import { ConnexionComponent } from './connexion.component';
@@ -318,7 +317,6 @@ Integration tests verify multiple components working together with a **mocked ba
 #### Test Structure
 
 ```typescript
-import { cy, describe, it, beforeEach } from 'local-cypress';
 import { ConnexionPage } from 'cypress/po/connexion.po';
 import { jeSuisConnecteEnTantQue } from 'cypress/preconditions/connexion.pre';
 import { etantDonneQue } from 'cypress/preconditions/preconditions';

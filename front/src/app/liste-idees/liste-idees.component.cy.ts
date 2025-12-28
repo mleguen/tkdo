@@ -1,5 +1,3 @@
-import { cy, describe, it } from 'local-cypress';
-
 import { ListeIdeesComponent } from './liste-idees.component';
 import { Genre } from '../backend.service';
 

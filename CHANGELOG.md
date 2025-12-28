@@ -53,6 +53,7 @@
     - DevBackendInterceptor: API mocking, authentication, request routing, network delay simulation (11 tests)
   - Add comprehensive unit tests for ExclusionPort covering listeExclusions method with admin authorization checks (2 tests) completing full test coverage for all exclusion business logic
   - Add comprehensive unit tests for OccasionPort covering lanceTirage method (draw generation algorithm) with success cases (basic draw, with exclusions, with past results, force redraw) and error cases (not admin, past occasion, already launched, impossible draw) including email notifications (8 tests) completing full test coverage for all occasion business logic
+  - Remove local-cypress which is no longer needed and whose post-install script conflicted with cypress install
 
 ## V1.4.4 (December 8, 2025)
 

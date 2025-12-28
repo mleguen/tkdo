@@ -1,4 +1,3 @@
-import { cy, describe, it, beforeEach } from 'local-cypress';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { provideRouter } from '@angular/router';

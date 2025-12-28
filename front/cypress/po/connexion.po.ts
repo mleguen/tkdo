@@ -1,5 +1,3 @@
-import { cy } from 'local-cypress';
-
 import { AppPage } from './app.po';
 
 export class ConnexionPage extends AppPage {

@@ -1,5 +1,3 @@
-import { afterEach, beforeEach, cy, describe, expect, it } from 'local-cypress';
-
 import { ListeIdeesPage } from 'cypress/po/liste-idees.po';
 import { OccasionPage } from 'cypress/po/occasion.po';
 import { jeSuisConnecteEnTantQue } from 'cypress/preconditions/connexion.pre';
