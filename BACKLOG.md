@@ -178,17 +178,6 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 
 ### Backend Testing - Integration Tests
 
-**Task 29:** Add database constraint integration tests
-- **File:** `api/test/Int/DatabaseConstraintIntTest.php` (new)
-- **Content:**
-  - Test unique constraints
-  - Test foreign key constraints
-  - Test cascade deletions
-  - Test null constraints
-  - Verify constraint error handling
-- **Estimated size:** ~120-150 lines
-- **Priority:** Low - database integrity
-
 **Task 29 bis:** Review and refactor backend integration tests to be workflow-oriented
 - **Files to review:** All integration test files in `api/test/Int/`
 - **Content:**

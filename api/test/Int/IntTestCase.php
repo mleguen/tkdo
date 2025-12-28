@@ -322,4 +322,14 @@ class IntTestCase extends TestCase
             yield [$curl];
         }
     }
+
+    /**
+     * Reset the EntityManager when it's been closed due to an exception
+     */
+    protected function resetEntityManager(): void
+    {
+        $bootstrap = new Bootstrap();
+        $container = $bootstrap->initContainer();
+        self::$em = $container->get(EntityManager::class);
+    }
 }
