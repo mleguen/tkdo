@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace Test\Unit\Dom\Port;
 
+use App\Dom\Exception\OccasionPasseeException;
 use App\Dom\Exception\PasAdminException;
 use App\Dom\Exception\PasParticipantException;
 use App\Dom\Exception\PasParticipantNiAdminException;
 use App\Dom\Exception\PasUtilisateurNiAdminException;
+use App\Dom\Exception\TirageDejaLanceException;
+use App\Dom\Exception\TirageEchoueException;
 use App\Dom\Model\Auth;
+use App\Dom\Model\Exclusion;
 use App\Dom\Model\Occasion;
 use App\Dom\Model\Resultat;
 use App\Dom\Model\Utilisateur;
@@ -375,6 +379,378 @@ class OccasionPortTest extends UnitTestCase
         $this->occasionPort->listeOccasionsParticipant(
             $this->authProphecy->reveal(),
             $participant
+        );
+    }
+
+    public function testLanceTirage()
+    {
+        $this->authProphecy->estAdmin()->willReturn(true);
+
+        $occasion = $this->occasionProphecy->reveal();
+        $this->occasionProphecy->getDate()->willReturn(new DateTime('tomorrow'));
+
+        // Create 3 participants
+        $participant1Prophecy = $this->prophesize(Utilisateur::class);
+        $participant1 = $participant1Prophecy->reveal();
+        $participant2Prophecy = $this->prophesize(Utilisateur::class);
+        $participant2 = $participant2Prophecy->reveal();
+        $participant3Prophecy = $this->prophesize(Utilisateur::class);
+        $participant3 = $participant3Prophecy->reveal();
+        $participants = [$participant1, $participant2, $participant3];
+        $this->occasionProphecy->getParticipants()->willReturn($participants);
+
+        // No existing results
+        $this->resultatRepositoryProphecy->hasForOccasion($occasion)->willReturn(false);
+
+        // No exclusions
+        $this->exclusionRepositoryProphecy->readByParticipantsOccasion($occasion)->willReturn([]);
+
+        // No past results
+        $this->resultatRepositoryProphecy->readByParticipantsOccasion($occasion)->willReturn([]);
+
+        // Track created results to verify draw validity
+        $createdResults = [];
+        $testCase = $this;
+        $this->resultatRepositoryProphecy->create($occasion, Argument::type(Utilisateur::class), Argument::type(Utilisateur::class))
+            ->will(function ($args) use ($testCase, &$createdResults) {
+                $createdResults[] = ['quiOffre' => $args[1], 'quiRecoit' => $args[2]];
+                $resultatProphecy = $testCase->prophesize(Resultat::class);
+                return $resultatProphecy->reveal();
+            })
+            ->shouldBeCalledTimes(3);
+
+        // Expect emails to be sent to all participants
+        $this->mailPluginProphecy->envoieMailTirageFait($participant1, $occasion)->willReturn(true)->shouldBeCalledOnce();
+        $this->mailPluginProphecy->envoieMailTirageFait($participant2, $occasion)->willReturn(true)->shouldBeCalledOnce();
+        $this->mailPluginProphecy->envoieMailTirageFait($participant3, $occasion)->willReturn(true)->shouldBeCalledOnce();
+
+        $resultats = $this->occasionPort->lanceTirage(
+            $this->authProphecy->reveal(),
+            $occasion,
+            false,
+            10
+        );
+
+        // Verify draw validity
+        $this->assertCount(3, $resultats);
+
+        // Verify everyone gives exactly once
+        $givingParticipants = array_column($createdResults, 'quiOffre');
+        $this->assertCount(3, array_unique($givingParticipants, SORT_REGULAR));
+        $this->assertEqualsCanonicalizing($participants, $givingParticipants);
+
+        // Verify everyone receives exactly once
+        $receivingParticipants = array_column($createdResults, 'quiRecoit');
+        $this->assertCount(3, array_unique($receivingParticipants, SORT_REGULAR));
+        $this->assertEqualsCanonicalizing($participants, $receivingParticipants);
+
+        // Verify no one gives to themselves
+        foreach ($createdResults as $result) {
+            $this->assertNotSame($result['quiOffre'], $result['quiRecoit']);
+        }
+    }
+
+    public function testLanceTirageAvecExclusions()
+    {
+        $this->authProphecy->estAdmin()->willReturn(true);
+
+        $occasion = $this->occasionProphecy->reveal();
+        $this->occasionProphecy->getDate()->willReturn(new DateTime('tomorrow'));
+
+        // Create 3 participants
+        $participant1Prophecy = $this->prophesize(Utilisateur::class);
+        $participant1 = $participant1Prophecy->reveal();
+        $participant2Prophecy = $this->prophesize(Utilisateur::class);
+        $participant2 = $participant2Prophecy->reveal();
+        $participant3Prophecy = $this->prophesize(Utilisateur::class);
+        $participant3 = $participant3Prophecy->reveal();
+        $participants = [$participant1, $participant2, $participant3];
+        $this->occasionProphecy->getParticipants()->willReturn($participants);
+
+        // No existing results
+        $this->resultatRepositoryProphecy->hasForOccasion($occasion)->willReturn(false);
+
+        // Add exclusion: participant1 cannot give to participant2
+        $exclusionProphecy = $this->prophesize(Exclusion::class);
+        $exclusionProphecy->getQuiOffre()->willReturn($participant1);
+        $exclusionProphecy->getQuiNeDoitPasRecevoir()->willReturn($participant2);
+        $this->exclusionRepositoryProphecy->readByParticipantsOccasion($occasion)->willReturn([$exclusionProphecy->reveal()]);
+
+        // No past results
+        $this->resultatRepositoryProphecy->readByParticipantsOccasion($occasion)->willReturn([]);
+
+        // Track created results to verify exclusion is respected
+        $createdResults = [];
+        $testCase = $this;
+        $this->resultatRepositoryProphecy->create($occasion, Argument::type(Utilisateur::class), Argument::type(Utilisateur::class))
+            ->will(function ($args) use ($testCase, &$createdResults) {
+                $createdResults[] = ['quiOffre' => $args[1], 'quiRecoit' => $args[2]];
+                $resultatProphecy = $testCase->prophesize(Resultat::class);
+                return $resultatProphecy->reveal();
+            })
+            ->shouldBeCalledTimes(3);
+
+        // Expect emails to be sent to all participants
+        $this->mailPluginProphecy->envoieMailTirageFait(Argument::type(Utilisateur::class), $occasion)->willReturn(true)->shouldBeCalledTimes(3);
+
+        $resultats = $this->occasionPort->lanceTirage(
+            $this->authProphecy->reveal(),
+            $occasion,
+            false,
+            100
+        );
+
+        // Verify draw validity
+        $this->assertCount(3, $resultats);
+
+        // Verify everyone gives exactly once
+        $givingParticipants = array_column($createdResults, 'quiOffre');
+        $this->assertCount(3, array_unique($givingParticipants, SORT_REGULAR));
+        $this->assertEqualsCanonicalizing($participants, $givingParticipants);
+
+        // Verify everyone receives exactly once
+        $receivingParticipants = array_column($createdResults, 'quiRecoit');
+        $this->assertCount(3, array_unique($receivingParticipants, SORT_REGULAR));
+        $this->assertEqualsCanonicalizing($participants, $receivingParticipants);
+
+        // Verify no one gives to themselves
+        foreach ($createdResults as $result) {
+            $this->assertNotSame($result['quiOffre'], $result['quiRecoit']);
+        }
+
+        // Verify exclusion is respected: participant1 does not give to participant2
+        foreach ($createdResults as $result) {
+            if ($result['quiOffre'] === $participant1) {
+                $this->assertNotSame($participant2, $result['quiRecoit'], 'Exclusion violated: participant1 should not give to participant2');
+            }
+        }
+    }
+
+    public function testLanceTirageAvecResultatsPasses()
+    {
+        $this->authProphecy->estAdmin()->willReturn(true);
+
+        $occasion = $this->occasionProphecy->reveal();
+        $this->occasionProphecy->getDate()->willReturn(new DateTime('tomorrow'));
+
+        // Create 3 participants
+        $participant1Prophecy = $this->prophesize(Utilisateur::class);
+        $participant1 = $participant1Prophecy->reveal();
+        $participant2Prophecy = $this->prophesize(Utilisateur::class);
+        $participant2 = $participant2Prophecy->reveal();
+        $participant3Prophecy = $this->prophesize(Utilisateur::class);
+        $participant3 = $participant3Prophecy->reveal();
+        $participants = [$participant1, $participant2, $participant3];
+        $this->occasionProphecy->getParticipants()->willReturn($participants);
+
+        // No existing results
+        $this->resultatRepositoryProphecy->hasForOccasion($occasion)->willReturn(false);
+
+        // No exclusions
+        $this->exclusionRepositoryProphecy->readByParticipantsOccasion($occasion)->willReturn([]);
+
+        // Past result: participant1 gave to participant2 in a past occasion
+        $resultatPasseProphecy = $this->prophesize(Resultat::class);
+        $resultatPasseProphecy->getQuiOffre()->willReturn($participant1);
+        $resultatPasseProphecy->getQuiRecoit()->willReturn($participant2);
+        $this->resultatRepositoryProphecy->readByParticipantsOccasion($occasion)->willReturn([$resultatPasseProphecy->reveal()]);
+
+        // Track created results to verify past results are avoided
+        $createdResults = [];
+        $testCase = $this;
+        $this->resultatRepositoryProphecy->create($occasion, Argument::type(Utilisateur::class), Argument::type(Utilisateur::class))
+            ->will(function ($args) use ($testCase, &$createdResults) {
+                $createdResults[] = ['quiOffre' => $args[1], 'quiRecoit' => $args[2]];
+                $resultatProphecy = $testCase->prophesize(Resultat::class);
+                return $resultatProphecy->reveal();
+            })
+            ->shouldBeCalledTimes(3);
+
+        // Expect emails to be sent to all participants
+        $this->mailPluginProphecy->envoieMailTirageFait(Argument::type(Utilisateur::class), $occasion)->willReturn(true)->shouldBeCalledTimes(3);
+
+        $resultats = $this->occasionPort->lanceTirage(
+            $this->authProphecy->reveal(),
+            $occasion,
+            false,
+            100
+        );
+
+        // Verify draw validity
+        $this->assertCount(3, $resultats);
+
+        // Verify everyone gives exactly once
+        $givingParticipants = array_column($createdResults, 'quiOffre');
+        $this->assertCount(3, array_unique($givingParticipants, SORT_REGULAR));
+        $this->assertEqualsCanonicalizing($participants, $givingParticipants);
+
+        // Verify everyone receives exactly once
+        $receivingParticipants = array_column($createdResults, 'quiRecoit');
+        $this->assertCount(3, array_unique($receivingParticipants, SORT_REGULAR));
+        $this->assertEqualsCanonicalizing($participants, $receivingParticipants);
+
+        // Verify no one gives to themselves
+        foreach ($createdResults as $result) {
+            $this->assertNotSame($result['quiOffre'], $result['quiRecoit']);
+        }
+
+        // Verify past result is avoided: participant1 does not give to participant2
+        foreach ($createdResults as $result) {
+            if ($result['quiOffre'] === $participant1) {
+                $this->assertNotSame($participant2, $result['quiRecoit'], 'Past result should be avoided: participant1 should not give to participant2 again');
+            }
+        }
+    }
+
+    public function testLanceTirageForce()
+    {
+        $this->authProphecy->estAdmin()->willReturn(true);
+
+        $occasion = $this->occasionProphecy->reveal();
+        $this->occasionProphecy->getDate()->willReturn(new DateTime('tomorrow'));
+
+        $participant1Prophecy = $this->prophesize(Utilisateur::class);
+        $participant1 = $participant1Prophecy->reveal();
+        $participant2Prophecy = $this->prophesize(Utilisateur::class);
+        $participant2 = $participant2Prophecy->reveal();
+        $participants = [$participant1, $participant2];
+        $this->occasionProphecy->getParticipants()->willReturn($participants);
+
+        // Existing results
+        $this->resultatRepositoryProphecy->hasForOccasion($occasion)->willReturn(true);
+
+        // Should delete existing results when force=true
+        $this->resultatRepositoryProphecy->deleteByOccasion($occasion)->shouldBeCalledOnce();
+
+        // No exclusions or past results
+        $this->exclusionRepositoryProphecy->readByParticipantsOccasion($occasion)->willReturn([]);
+        $this->resultatRepositoryProphecy->readByParticipantsOccasion($occasion)->willReturn([]);
+
+        // Track created results to verify draw validity
+        $createdResults = [];
+        $testCase = $this;
+        $this->resultatRepositoryProphecy->create($occasion, Argument::type(Utilisateur::class), Argument::type(Utilisateur::class))
+            ->will(function ($args) use ($testCase, &$createdResults) {
+                $createdResults[] = ['quiOffre' => $args[1], 'quiRecoit' => $args[2]];
+                $resultatProphecy = $testCase->prophesize(Resultat::class);
+                return $resultatProphecy->reveal();
+            })
+            ->shouldBeCalledTimes(2);
+
+        // Expect emails to be sent
+        $this->mailPluginProphecy->envoieMailTirageFait(Argument::type(Utilisateur::class), $occasion)->willReturn(true)->shouldBeCalledTimes(2);
+
+        $resultats = $this->occasionPort->lanceTirage(
+            $this->authProphecy->reveal(),
+            $occasion,
+            true,  // force
+            10
+        );
+
+        // Verify draw validity
+        $this->assertCount(2, $resultats);
+
+        // Verify everyone gives exactly once
+        $givingParticipants = array_column($createdResults, 'quiOffre');
+        $this->assertCount(2, array_unique($givingParticipants, SORT_REGULAR));
+        $this->assertEqualsCanonicalizing($participants, $givingParticipants);
+
+        // Verify everyone receives exactly once
+        $receivingParticipants = array_column($createdResults, 'quiRecoit');
+        $this->assertCount(2, array_unique($receivingParticipants, SORT_REGULAR));
+        $this->assertEqualsCanonicalizing($participants, $receivingParticipants);
+
+        // Verify no one gives to themselves (each participant gives to the other)
+        foreach ($createdResults as $result) {
+            $this->assertNotSame($result['quiOffre'], $result['quiRecoit']);
+        }
+    }
+
+    public function testLanceTiragePasAdmin()
+    {
+        $this->authProphecy->estAdmin()->willReturn(false);
+
+        $this->expectException(PasAdminException::class);
+        $this->occasionPort->lanceTirage(
+            $this->authProphecy->reveal(),
+            $this->occasionProphecy->reveal(),
+            false,
+            10
+        );
+    }
+
+    public function testLanceTirageOccasionPassee()
+    {
+        $this->authProphecy->estAdmin()->willReturn(true);
+
+        $occasion = $this->occasionProphecy->reveal();
+        $this->occasionProphecy->getDate()->willReturn(new DateTime('yesterday'));
+
+        $this->expectException(OccasionPasseeException::class);
+        $this->occasionPort->lanceTirage(
+            $this->authProphecy->reveal(),
+            $occasion,
+            false,
+            10
+        );
+    }
+
+    public function testLanceTirageDejeLance()
+    {
+        $this->authProphecy->estAdmin()->willReturn(true);
+
+        $occasion = $this->occasionProphecy->reveal();
+        $this->occasionProphecy->getDate()->willReturn(new DateTime('tomorrow'));
+
+        // Existing results and force=false
+        $this->resultatRepositoryProphecy->hasForOccasion($occasion)->willReturn(true);
+
+        $this->expectException(TirageDejaLanceException::class);
+        $this->occasionPort->lanceTirage(
+            $this->authProphecy->reveal(),
+            $occasion,
+            false,  // force=false
+            10
+        );
+    }
+
+    public function testLanceTirageEchoue()
+    {
+        $this->authProphecy->estAdmin()->willReturn(true);
+
+        $occasion = $this->occasionProphecy->reveal();
+        $this->occasionProphecy->getDate()->willReturn(new DateTime('tomorrow'));
+
+        // Create 2 participants with mutual exclusion (impossible draw)
+        $participant1Prophecy = $this->prophesize(Utilisateur::class);
+        $participant1 = $participant1Prophecy->reveal();
+        $participant2Prophecy = $this->prophesize(Utilisateur::class);
+        $participant2 = $participant2Prophecy->reveal();
+        $participants = [$participant1, $participant2];
+        $this->occasionProphecy->getParticipants()->willReturn($participants);
+
+        // No existing results
+        $this->resultatRepositoryProphecy->hasForOccasion($occasion)->willReturn(false);
+
+        // Mutual exclusions: participant1 cannot give to participant2 AND participant2 cannot give to participant1
+        $exclusion1Prophecy = $this->prophesize(Exclusion::class);
+        $exclusion1Prophecy->getQuiOffre()->willReturn($participant1);
+        $exclusion1Prophecy->getQuiNeDoitPasRecevoir()->willReturn($participant2);
+        $exclusion2Prophecy = $this->prophesize(Exclusion::class);
+        $exclusion2Prophecy->getQuiOffre()->willReturn($participant2);
+        $exclusion2Prophecy->getQuiNeDoitPasRecevoir()->willReturn($participant1);
+        $this->exclusionRepositoryProphecy->readByParticipantsOccasion($occasion)
+            ->willReturn([$exclusion1Prophecy->reveal(), $exclusion2Prophecy->reveal()]);
+
+        // No past results
+        $this->resultatRepositoryProphecy->readByParticipantsOccasion($occasion)->willReturn([]);
+
+        $this->expectException(TirageEchoueException::class);
+        $this->occasionPort->lanceTirage(
+            $this->authProphecy->reveal(),
+            $occasion,
+            false,
+            10
         );
     }
 

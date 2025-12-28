@@ -176,30 +176,6 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 - **Estimated size:** ~100-150 lines
 - **Priority:** Low - nice to have
 
-### Backend Testing - Unit Tests
-
-**Task 24:** Complete OccasionPort unit tests
-- **File:** `api/test/Unit/Dom/Port/OccasionPortTest.php`
-- **Content:**
-  - ✅ Test occasion creation/update (done)
-  - ✅ Test participant addition (done)
-  - ✅ Test result addition (done)
-  - ✅ Test listing occasions (done)
-  - ✅ Test authorization for various operations (done)
-  - ❌ **Missing: Test `lanceTirage` method (draw generation algorithm)**
-    - Test successful draw generation
-    - Test draw with exclusions enforcement
-    - Test draw with past results (avoid repeats)
-    - Test TirageDejaLanceException when draw exists and force=false
-    - Test force redraw (deletes existing results)
-    - Test TirageEchoueException when impossible draw
-    - Test OccasionPasseeException for past occasions
-    - Test PasAdminException when not admin
-    - Test email notifications sent to all participants
-- **Current state:** Partial (422 lines, 23 tests) - missing `lanceTirage` tests
-- **Estimated additions:** ~200-300 lines (8-10 tests)
-- **Priority:** High - core feature with complex draw algorithm logic
-
 ### Backend Testing - Integration Tests
 
 **Task 25:** Add comprehensive idea API integration tests
