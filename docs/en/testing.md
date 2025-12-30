@@ -578,6 +578,105 @@ public function testRequiresAdmin(): void
 
 Integration tests verify complete API endpoints with a real database and HTTP requests.
 
+#### Integration Testing Philosophy
+
+**Purpose**: Integration tests verify that components work together correctly, focusing on infrastructure concerns and end-to-end workflows. Avoid duplicating tests that are covered elsewhere.
+
+**Core Principle: Test Each Concern Once**
+
+- **Business logic** → Unit tests (exhaustive)
+- **Happy path workflows** → Workflow integration tests (one test per workflow)
+- **Infrastructure** → Specialized integration tests (database, notifications, errors)
+- **Representative errors** → ErrorHandlingIntTest (one test per error type)
+
+**What Integration Tests SHOULD Test:**
+
+1. **Complete Happy Path Workflows** - End-to-end user journeys
+   - Example: Gift exchange workflow (create occasion → add participants → create ideas → generate draw → receive notifications)
+   - Include natural side effects (emails sent, database updated) as part of the workflow
+   - **Don't** test edge cases of sub-components (those go in specialized files)
+   - One test per major workflow
+
+2. **Database Integration** - Real database persistence (in `DatabaseConstraintIntTest.php`)
+   - Unique constraints, foreign keys, NOT NULL constraints
+   - Cascade deletions
+   - **Don't** test in workflow files - already covered here
+
+3. **System-Specific Concerns** - Features requiring specialized testing
+   - **Notifications** (`NotifIntTest.php`): Preference filtering, daily digest mechanics, occasion filtering
+   - **Authentication** (`AuthIntTest.php`): Token validation, edge cases
+   - **Errors** (`ErrorHandlingIntTest.php`): All HTTP status codes, error formats
+   - These files test concerns deeply; workflow tests just verify they work in context
+
+**What Integration Tests SHOULD NOT Test:**
+
+1. **Business Logic Exhaustively** - Already in unit tests
+   - ❌ Don't test all validation rules (email format, genre values, etc.)
+   - ❌ Don't test all exception cases for every endpoint
+   - ✅ DO test that happy paths work with valid data
+
+2. **Error Cases Repetitively** - Tested once in `ErrorHandlingIntTest.php`
+   - ❌ Don't test 401/403/404 for every endpoint
+   - ✅ DO have comprehensive error testing in one place
+
+3. **Sub-Component Edge Cases** - Tested in specialized files
+   - ❌ Don't test all notification preferences in every workflow
+   - ✅ DO verify notifications are sent in happy path workflows
+   - ✅ DO test notification-specific edge cases in `NotifIntTest.php`
+
+**How to Avoid Duplication:**
+
+| Feature | Workflow Tests | Specialized Tests |
+|---------|---------------|-------------------|
+| **Idea creation** | Create one idea as part of workflow | `NotifIntTest`: Test all pref combinations |
+| **Notifications** | Verify email sent (basic check) | `NotifIntTest`: Test preferences, filtering, digest |
+| **Draw generation** | Generate draw in workflow | Test exclusions, impossible draws separately |
+| **Errors** | Don't test errors in workflows | `ErrorHandlingIntTest`: All error scenarios |
+
+**Test Organization:**
+
+**1. Workflow Files** (happy paths only):
+- `WorkflowGiftExchangeIntTest.php` - Complete gift exchange (create → participants → ideas → draw → notifications)
+- `WorkflowIdeaLifecycleIntTest.php` - If idea workflows are complex enough to warrant separate file
+- **Include:** Natural side effects (emails sent, DB updated)
+- **Exclude:** Error cases, edge cases, sub-component deep testing
+
+**2. Specialized Infrastructure Files:**
+- `NotifIntTest.php` - Notification-specific: preferences (instant/daily/none), filtering (same occasion), digest mechanics (not sent twice)
+- `ErrorHandlingIntTest.php` - All HTTP errors (400/401/403/404), error response formats, validation error messages
+- `DatabaseConstraintIntTest.php` - All database constraints (unique, foreign keys, NOT NULL, cascades)
+- `AuthIntTest.php` - Authentication edge cases (invalid token, etc.)
+
+**3. Simple Endpoint Files:**
+- `ConnexionIntTest.php` - Login (happy path + invalid credentials)
+
+**Example - Notification Testing Division:**
+
+```php
+// WorkflowGiftExchangeIntTest.php - Notifications as part of workflow
+public function testCompleteGiftExchange(): void
+{
+    // ... create occasion, add participants ...
+
+    // Create idea (part of workflow)
+    $this->requestApi($curl, 'POST', '/idee', $statusCode, $body, '', [/*...*/]);
+
+    // Verify notification sent (simple check, part of workflow)
+    $emails = $this->depileDerniersEmailsRecus();
+    $this->assertCount(1, $emails); // Just verify it happened
+
+    // ... continue with draw generation ...
+}
+
+// NotifIntTest.php - Deep testing of notification-specific concerns
+public function testNotificationPreferencesRespected(): void
+{
+    // Test instant vs daily vs none (notification-specific logic)
+    // Test same-occasion filtering (notification-specific logic)
+    // Test daily digest mechanics (notification-specific logic)
+}
+```
+
 #### Test Structure
 
 ```php
