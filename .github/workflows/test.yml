@@ -96,9 +96,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: /opt/hostedtoolcache/firefox
-          key: ${{ runner.os }}-firefox-latest-v4-${{ steps.week.outputs.week }}
-          restore-keys: |
-            ${{ runner.os }}-firefox-latest-v4-
+          key: ${{ runner.os }}-firefox-latest-v5-${{ steps.week.outputs.week }}
 
       # Install Firefox for firefox browser tests
       - name: Install Firefox from cache
