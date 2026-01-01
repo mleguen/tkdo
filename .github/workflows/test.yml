@@ -407,6 +407,29 @@ jobs:
           php bin/doctrine.php migrations:migrate --no-interaction
         working-directory: ./api
 
+      - name: Configure PHP to use MailHog SMTP
+        run: |
+          # Install msmtp as sendmail replacement
+          sudo apt-get update && sudo apt-get install -y msmtp
+
+          # Configure msmtp to use MailHog SMTP
+          cat > ~/.msmtprc << 'MSMTP_CONFIG'
+          defaults
+          auth off
+          tls off
+
+          account mailhog
+          host 127.0.0.1
+          port 1025
+          from noreply@ci
+
+          account default : mailhog
+          MSMTP_CONFIG
+          chmod 600 ~/.msmtprc
+
+          # Configure PHP to use msmtp as sendmail
+          echo "sendmail_path = /usr/bin/msmtp -t" | sudo tee -a /etc/php/8.4/cli/php.ini
+
       - name: Start PHP backend server
         env:
           MYSQL_HOST: 127.0.0.1
