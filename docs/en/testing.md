@@ -292,9 +292,6 @@ it('should submit form', () => {
 ```bash
 # From project root - run all component tests
 ./npm run ct
-
-# Run specific component test
-./npm run ct -- --spec '**/connexion.component.cy.ts'
 ```
 
 **Interactive Mode:**

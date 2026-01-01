@@ -16,20 +16,6 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 
 ### Frontend Testing - Component Tests
 
-**Task 10:** Add ListeIdeesComponent component tests
-- **File:** `front/cypress/component/liste-idees.component.cy.ts`
-- **Content:**
-  - Test idea list rendering for different participants
-  - Test filtering by participant
-  - Test add new idea form
-  - Test idea card interactions
-  - Test permission-based visibility (own vs others' ideas)
-  - Test empty state display
-  - Mock ideas fixture data
-- **Current state:** Minimal (mounting only)
-- **Estimated additions:** ~120-150 lines
-- **Priority:** High - core feature
-
 **Task 11:** Add ProfilComponent component tests
 - **File:** `front/cypress/component/profil.component.cy.ts`
 - **Content:**

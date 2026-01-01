@@ -65,6 +65,9 @@
   - Document builder patterns and best practices in docs/en/backend-dev.md
   - Add comprehensive ConnexionComponent tests (22 tests total): complete component test coverage for the login form using mocked BackendService
   - Add comprehensive OccasionComponent tests (32 tests total): complete component test coverage for occasion details rendering, participant list display with sorting, draw status, past/future occasion handling, gift recipient identification with gender-specific messaging, and error handling
+  - Add comprehensive ListeIdeesComponent tests (38 tests total): component test coverage for idea list rendering, filtering by participant (own ideas vs others' ideas), permission-based visibility with gender-specific headers, form validation, idea submission with special characters, empty state display, and child component input verification using real component instances queried via fixture.debugElement and By.directive()
+  - Document subcomponent testing pattern in frontend development guide: add comprehensive section on querying child component instances in Cypress component tests using fixture.debugElement and By.directive(), with working examples and guidance on when to use this pattern for testing component composition
+  - Update testing documentation to remove --spec flag usage recommendation for component tests as it can cause tests to run with 0 specs found without clear error messages
 
 ## V1.4.4 (December 8, 2025)
 

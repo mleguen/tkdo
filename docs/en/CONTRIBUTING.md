@@ -507,10 +507,13 @@ describe('UserListComponent', () => {
 });
 ```
 
+**Testing components with child components:**
+
+For components that render child components, you can query for child component instances to verify they're properly configured. See [Frontend Dev Guide - Testing Components with Subcomponents](frontend-dev.md#testing-components-with-subcomponents) for the complete pattern.
+
 **Run component tests:**
 ```bash
 ./npm run ct
-./npm run ct -- --spec '**/user-list.component.cy.ts'  # Specific file
 ```
 
 #### Integration Tests (Cypress)

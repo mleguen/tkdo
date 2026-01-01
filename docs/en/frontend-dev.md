@@ -317,11 +317,7 @@ describe('BackendService', () => {
 ./npm run ct
 ```
 
-**Run specific component tests**:
-
-```bash
-./npm run ct -- --spec '**/liste-idees.component.cy.ts'
-```
+> ⚠️ **Don't use --spec to only run specific component tests** as the test suite may succeed with 0 test run for these components, even if the specified spec files were found.
 
 **Interactive mode**:
 
@@ -344,6 +340,65 @@ describe('AppComponent', () => {
   });
 });
 ```
+
+#### Testing Components with Subcomponents
+
+When testing components that render child components, you can verify the child components are properly instantiated and configured by querying for their instances.
+
+**Pattern - Query for child component instances:**
+
+```typescript
+import { Type } from '@angular/core';
+import { MountResponse } from 'cypress/angular';
+import { By } from '@angular/platform-browser';
+import { ListeIdeesComponent } from './liste-idees.component';
+import { IdeeComponent } from '../idee/idee.component';
+
+describe('ListeIdeesComponent', () => {
+  // Helper function to get child component instances
+  function getSubComponents<T>(
+    mountResponse: Cypress.Chainable<MountResponse<ListeIdeesComponent>>,
+    subComponentsType: Type<T>,
+  ): Cypress.Chainable<T[]> {
+    return mountResponse.then(({ fixture }) => {
+      fixture.detectChanges();
+      return fixture.debugElement
+        .queryAllNodes(By.directive(subComponentsType))
+        .map<T>((node) => node.componentInstance);
+    });
+  }
+
+  it('should render child components with correct properties', () => {
+    const mountResponse = cy.mount(ListeIdeesComponent, {
+      componentProperties: {
+        ideesPour: { utilisateur: alice, idees: [aliceIdea] },
+        utilisateurConnecte: alice,
+      },
+    });
+
+    // Query for child IdeeComponent instances
+    getSubComponents(mountResponse, IdeeComponent).should(
+      ($ideeComponents) => {
+        expect($ideeComponents).to.have.length(1);
+        expect($ideeComponents[0].idee).to.equal(aliceIdea);
+        expect($ideeComponents[0].afficheAuteur).to.equal(false);
+      },
+    );
+  });
+});
+```
+
+**Key points:**
+- Call `fixture.detectChanges()` before querying to ensure rendering is complete
+- Use `By.directive(SubComponentType)` to find child component instances
+- Access component instance properties directly to verify correct configuration
+- This tests real component composition, not mocked subcomponents
+
+**When to use this pattern:**
+- Testing parent components pass correct data to children (`@Input()` bindings)
+- Verifying conditional rendering of child components
+- Checking the number of child components rendered based on data
+- Testing component composition and hierarchy
 
 ### Integration Tests
 
