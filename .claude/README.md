@@ -38,7 +38,7 @@ Claude Code will automatically reference these conventions when creating commits
   - Update navigation pages (INDEX.md, README.md)
   - See [Documentation Guide - Avoiding Duplication](../docs/DOCUMENTATION-GUIDE.md#avoiding-documentation-duplication)
 
-- **BACKLOG.md**: Remove completed tasks entirely (don't mark as done), renumber remaining
+- **BACKLOG.md**: Remove completed tasks entirely (don't mark as done). Gaps in task numbers are acceptable - no need to renumber remaining tasks
 
 - **CHANGELOG.md**: Always add to "Next Release" section (never to past releases)
   - Group by audience (Users, Administrators, Contributors) and scope
@@ -100,27 +100,43 @@ Example from `api/.claude/settings.json`:
 
 ### Pull Request Review Responses
 
-When responding to PR review comments using the GitHub CLI (`gh`):
+**CRITICAL WORKFLOW:** After addressing PR review comments with code changes, you MUST respond to each unresolved comment individually explaining what was fixed.
 
-**List all review comments:**
+**Step 1: List all unresolved review comments**
 ```bash
-gh api /repos/OWNER/REPO/pulls/PR_NUMBER/comments --jq 'map({id, body: .body[0:50], line, path, html_url})'
+gh api repos/OWNER/REPO/pulls/PR_NUMBER/comments --jq '.[] | {id: .id, path: .path, line: .line, body: .body | .[0:100]}'
 ```
 
-**Reply to a specific review comment thread:**
+**Step 2: Reply to EACH unresolved comment in its individual thread**
 ```bash
-gh api --method POST \
-  /repos/OWNER/REPO/pulls/PR_NUMBER/comments \
-  -f body="@Reviewer Your response message here" \
-  -F in_reply_to=COMMENT_ID
+gh api -X POST repos/OWNER/REPO/pulls/PR_NUMBER/comments/COMMENT_ID/replies \
+  -f body="Fixed in commit COMMIT_SHA.
+
+[Explanation of what was changed and how it addresses the comment]"
 ```
 
-**Key points:**
-- Use `-F in_reply_to=COMMENT_ID` to reply within an existing thread
-- Without `in_reply_to`, the comment appears as a new standalone comment
-- The `COMMENT_ID` is obtained from listing comments (the `id` field)
-- Ping the reviewer with `@username` for visibility except when the reviewer is `@copilot` as it would open a PR to implement instead of reviewing your answer (DON'T ping `@copilot`!)
-- Each review comment should be answered individually in its own thread
+**MANDATORY RULES:**
+1. **ALWAYS use the `/comments/COMMENT_ID/replies` endpoint** - This posts to the individual conversation thread
+2. **NEVER use `gh pr review` or `gh pr comment`** - These create general PR comments, not threaded replies
+3. **Reply to EVERY unresolved comment you addressed** - Never skip any, even if multiple comments have the same fix
+4. **Include the commit SHA** - Start each reply with "Fixed in commit COMMIT_SHA."
+5. **Explain the fix** - Don't just say "fixed", explain what changed
+6. **DON'T ping `@copilot`** - Copilot bots will open PRs instead of accepting your answer
+
+**Example:**
+```bash
+# 1. List comments to get IDs
+gh api repos/mleguen/tkdo/pulls/64/comments --jq '.[] | {id: .id, body: .body | .[0:80]}'
+
+# 2. Reply to comment ID 2651989539
+gh api -X POST repos/mleguen/tkdo/pulls/64/comments/2651989539/replies \
+  -f body="Fixed in commit a9212c1.
+
+Updated CHANGELOG.md to clarify that AuthIntTest.php is an existing file, not a new addition in this PR."
+```
+
+**Verification:**
+After posting replies, verify they appear in the PR's Files Changed tab under the specific lines of code, not in the general Conversation tab.
 
 ## References
 
