@@ -178,17 +178,6 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 
 ### Backend Testing - Test Infrastructure
 
-**Task 30:** Add database transaction rollback for faster tests
-- **File:** `api/test/Int/IntTestCase.php`
-- **Content:**
-  - Wrap each test in database transaction
-  - Rollback after each test
-  - Eliminate need for manual cleanup
-  - Document transaction isolation levels
-  - Measure performance improvement
-- **Estimated changes:** ~40-60 lines
-- **Priority:** High - significantly speeds up tests
-
 **Task 31:** Create test data builders for backend
 - **Files to create:**
   - `api/test/Builder/UtilisateurBuilder.php`
