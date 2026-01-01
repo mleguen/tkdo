@@ -222,13 +222,19 @@ jobs:
         uses: actions/cache@v4
         with:
           path: /opt/hostedtoolcache/firefox
-          key: ${{ runner.os }}-firefox-latest-v2-${{ steps.week.outputs.week }}
-          restore-keys: |
-            ${{ runner.os }}-firefox-latest-v2-
+          key: ${{ runner.os }}-firefox-latest-v5-${{ steps.week.outputs.week }}
 
       # Install Firefox for firefox browser tests
-      - name: Install Firefox
-        if: matrix.browser == 'firefox'
+      - name: Install Firefox from cache
+        if: matrix.browser == 'firefox' && steps.firefox-cache.outputs.cache-hit == 'true'
+        uses: browser-actions/setup-firefox@latest
+        with:
+          # default would be 'latest' which is not compatible with tc.find() as not a semver
+          firefox-version: "*"
+
+      # Distinct from the previous step because firefox-version: '*' wouldn't download the latest version (!)
+      - name: Download & install latest Firefox
+        if: matrix.browser == 'firefox' && steps.firefox-cache.outputs.cache-hit != 'true'
         id: setup-firefox
         uses: browser-actions/setup-firefox@latest
 
