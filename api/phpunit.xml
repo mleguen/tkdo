@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/11.5/phpunit.xsd" backupGlobals="false" beStrictAboutTestsThatDoNotTestAnything="true" beStrictAboutChangesToGlobalState="true" beStrictAboutOutputDuringTests="true" colors="true" processIsolation="false" stopOnFailure="false" bootstrap="test/bootstrap.php" cacheDirectory=".phpunit.cache" backupStaticProperties="false" displayDetailsOnTestsThatTriggerDeprecations="true" displayDetailsOnTestsThatTriggerWarnings="true" displayDetailsOnTestsThatTriggerNotices="true">
   <testsuites>
-    <testsuite name="Tests unitaires">
+    <testsuite name="Unit">
       <directory>./test/Unit</directory>
     </testsuite>
-    <testsuite name="Tests d'int&#xE9;gration">
+    <testsuite name="Int">
       <directory>./test/Int</directory>
     </testsuite>
   </testsuites>
