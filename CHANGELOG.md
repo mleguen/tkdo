@@ -58,6 +58,7 @@
   - Add workflow-oriented backend integration tests: WorkflowGiftExchangeIntTest.php (complete gift exchange journey from occasion creation through draw generation and result viewing), UtilisateurIntTest.php (user management workflow: create → email → login → reset password → change password → promote to admin), ExclusionIntTest.php (exclusion management: create → list exclusions)
   - Add specialized infrastructure integration tests: NotifIntTest.php (notification-specific concerns: instant notifications, daily digest mechanics, preference filtering, occasion filtering, 11 tests), ErrorHandlingIntTest.php (comprehensive error responses: 400/401/403/404 scenarios, error format consistency, 18 tests), DatabaseConstraintIntTest.php (database constraints: unique, foreign keys, NOT NULL, cascades, 13 tests); existing AuthIntTest.php and ConnexionIntTest.php now serve as specialized infrastructure tests (authentication edge cases and login workflows respectively)
   - Fix PHPUnit test suite configuration (phpunit.xml) by renaming test suites from French ("Tests unitaires", "Tests d'intégration") to English ("Unit", "Int") to match CI workflow --testsuite filter parameters, ensuring tests run correctly in GitHub Actions
+  - Upgrade Node.js from v20 to v24 (LTS) which includes npm v11, bringing improved performance and security features
 
 ## V1.4.4 (December 8, 2025)
 

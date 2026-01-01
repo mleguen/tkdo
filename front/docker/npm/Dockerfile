@@ -1,4 +1,4 @@
-FROM node:20
+FROM node:24
 
 # Install Chrome stable & Cypress dependencies
 RUN wget -O- https://dl-ssl.google.com/linux/linux_signing_key.pub | gpg --dearmor | tee /etc/apt/trusted.gpg.d/google.gpg > /dev/null \
