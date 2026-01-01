@@ -149,16 +149,14 @@ class ErrorHandlingIntTest extends IntTestCase
 
     /**
      * Tests 400 Bad Request for invalid JSON syntax
+     *
+     * Note: This test doesn't use DataProvider('provideCurl') because invalid JSON
+     * handling occurs at the HTTP/framework layer (Slim), not in business logic.
+     * Testing with Guzzle is sufficient to verify the API contract.
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
-    public function test400JsonInvalide(bool $curl): void
+    public function test400JsonInvalide(): void
     {
-        // Skip this test for curl mode as it's difficult to send invalid JSON with curl
-        if ($curl) {
-            $this->markTestSkipped('Invalid JSON test not applicable for curl mode');
-        }
-
-        $this->postConnexion($curl);
+        $this->postConnexion(false);
 
         // Send invalid JSON directly using Guzzle
         $headers = [

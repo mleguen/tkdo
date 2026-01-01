@@ -637,9 +637,9 @@ Integration tests verify complete API endpoints with a real database and HTTP re
 
 **1. Workflow Files** (happy paths only):
 - `WorkflowGiftExchangeIntTest.php` - Complete gift exchange (create → participants → ideas → draw → notifications)
-- `WorkflowIdeaLifecycleIntTest.php` - If idea workflows are complex enough to warrant separate file
 - **Include:** Natural side effects (emails sent, DB updated)
 - **Exclude:** Error cases, edge cases, sub-component deep testing
+- **Note:** Additional workflow files (e.g., idea lifecycle workflow) can be created if specific workflows become complex enough to warrant separate testing
 
 **2. Specialized Infrastructure Files:**
 - `NotifIntTest.php` - Notification-specific: preferences (instant/daily/none), filtering (same occasion), digest mechanics (not sent twice)
@@ -659,7 +659,11 @@ public function testCompleteGiftExchange(): void
     // ... create occasion, add participants ...
 
     // Create idea (part of workflow)
-    $this->requestApi($curl, 'POST', '/idee', $statusCode, $body, '', [/*...*/]);
+    $this->requestApi($curl, 'POST', '/idee', $statusCode, $body, '', [
+        'idUtilisateur' => $participant2->getId(),
+        'description' => 'Un livre de science-fiction',
+        'idAuteur' => $participant1->getId(),
+    ]);
 
     // Verify notification sent (simple check, part of workflow)
     $emails = $this->depileDerniersEmailsRecus();

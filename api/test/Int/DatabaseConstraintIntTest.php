@@ -33,7 +33,8 @@ class DatabaseConstraintIntTest extends IntTestCase
             if (!self::$em->isOpen()) {
                 $this->resetEntityManager();
             }
-            $this->assertTrue(true);
+            // Mark catching the exception as an assertion for PHPUnit's strict mode
+            $this->addToAssertionCount(1);
         }
     }
 
@@ -58,7 +59,8 @@ class DatabaseConstraintIntTest extends IntTestCase
             if (!self::$em->isOpen()) {
                 $this->resetEntityManager();
             }
-            $this->assertTrue(true);
+            // Mark catching the exception as an assertion for PHPUnit's strict mode
+            $this->addToAssertionCount(1);
         }
     }
 
@@ -86,7 +88,8 @@ class DatabaseConstraintIntTest extends IntTestCase
             if (!self::$em->isOpen()) {
                 $this->resetEntityManager();
             }
-            $this->assertTrue(true);
+            // Mark catching the exception as an assertion for PHPUnit's strict mode
+            $this->addToAssertionCount(1);
         }
     }
 
@@ -107,7 +110,8 @@ class DatabaseConstraintIntTest extends IntTestCase
             if (!self::$em->isOpen()) {
                 $this->resetEntityManager();
             }
-            $this->assertTrue(true);
+            // Mark catching the exception as an assertion for PHPUnit's strict mode
+            $this->addToAssertionCount(1);
         }
     }
 
@@ -126,7 +130,8 @@ class DatabaseConstraintIntTest extends IntTestCase
             if (!self::$em->isOpen()) {
                 $this->resetEntityManager();
             }
-            $this->assertTrue(true);
+            // Mark catching the exception as an assertion for PHPUnit's strict mode
+            $this->addToAssertionCount(1);
         }
     }
 
@@ -145,7 +150,8 @@ class DatabaseConstraintIntTest extends IntTestCase
             if (!self::$em->isOpen()) {
                 $this->resetEntityManager();
             }
-            $this->assertTrue(true);
+            // Mark catching the exception as an assertion for PHPUnit's strict mode
+            $this->addToAssertionCount(1);
         }
     }
 
@@ -166,7 +172,8 @@ class DatabaseConstraintIntTest extends IntTestCase
             if (!self::$em->isOpen()) {
                 $this->resetEntityManager();
             }
-            $this->assertTrue(true);
+            // Mark catching the exception as an assertion for PHPUnit's strict mode
+            $this->addToAssertionCount(1);
         }
     }
 
@@ -213,7 +220,8 @@ class DatabaseConstraintIntTest extends IntTestCase
             if (!self::$em->isOpen()) {
                 $this->resetEntityManager();
             }
-            $this->assertTrue(true);
+            // Mark catching the exception as an assertion for PHPUnit's strict mode
+            $this->addToAssertionCount(1);
         }
     }
 
@@ -234,7 +242,8 @@ class DatabaseConstraintIntTest extends IntTestCase
             if (!self::$em->isOpen()) {
                 $this->resetEntityManager();
             }
-            $this->assertTrue(true);
+            // Mark catching the exception as an assertion for PHPUnit's strict mode
+            $this->addToAssertionCount(1);
         }
     }
 
@@ -253,7 +262,8 @@ class DatabaseConstraintIntTest extends IntTestCase
             if (!self::$em->isOpen()) {
                 $this->resetEntityManager();
             }
-            $this->assertTrue(true);
+            // Mark catching the exception as an assertion for PHPUnit's strict mode
+            $this->addToAssertionCount(1);
         }
     }
 
