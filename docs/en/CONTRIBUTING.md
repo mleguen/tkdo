@@ -766,6 +766,7 @@ Add database migration for user notification preferences."
 - Place new entries under "Next Release" section
 - Use past tense ("Added feature", not "Add feature")
 - Be concise but descriptive
+- Add new entries at the END of each category's list to maintain chronological order
 
 **What NOT to mention in CHANGELOG:**
 

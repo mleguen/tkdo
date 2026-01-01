@@ -68,6 +68,7 @@
   - Add comprehensive ListeIdeesComponent tests (38 tests total): component test coverage for idea list rendering, filtering by participant (own ideas vs others' ideas), permission-based visibility with gender-specific headers, form validation, idea submission with special characters, empty state display, and child component input verification using real component instances queried via fixture.debugElement and By.directive()
   - Document subcomponent testing pattern in frontend development guide: add comprehensive section on querying child component instances in Cypress component tests using fixture.debugElement and By.directive(), with working examples and guidance on when to use this pattern for testing component composition
   - Update testing documentation to remove --spec flag usage recommendation for component tests as it can cause tests to run with 0 specs found without clear error messages
+  - Add comprehensive component tests for ProfilComponent covering form rendering, profile data display, form validation (name, email, password fields), successful profile updates, password change functionality, error handling, and user input handling (53 tests)
 
 ## V1.4.4 (December 8, 2025)
 

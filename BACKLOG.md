@@ -16,20 +16,6 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 
 ### Frontend Testing - Component Tests
 
-**Task 11:** Add ProfilComponent component tests
-- **File:** `front/cypress/component/profil.component.cy.ts`
-- **Content:**
-  - Test profile display
-  - Test profile edit form
-  - Test password change functionality
-  - Test notification preferences
-  - Test form validation
-  - Test successful save with confirmation
-  - Mock user data and API responses
-- **Current state:** Minimal (mounting only)
-- **Estimated additions:** ~100-130 lines
-- **Priority:** Medium - important user feature
-
 **Task 12:** Add AdminComponent component tests
 - **File:** `front/cypress/component/admin.component.cy.ts`
 - **Content:**
