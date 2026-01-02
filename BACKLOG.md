@@ -14,21 +14,6 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 - Fast test execution via parallelization
 - Compliance with general and framework-specific best practices
 
-### Frontend Testing - Component Tests
-
-**Task 13:** Add HeaderComponent component tests
-- **File:** `front/cypress/component/header.component.cy.ts`
-- **Content:**
-  - Test navigation menu rendering
-  - Test authenticated vs unauthenticated states
-  - Test admin menu visibility
-  - Test mobile hamburger menu
-  - Test logout functionality
-  - Mock authentication state
-- **Current state:** Minimal (mounting only)
-- **Estimated additions:** ~80-100 lines
-- **Priority:** Medium - navigation component
-
 ### Frontend Testing - Desktop & Mobile Viewport Testing
 
 The current test suites (unit, component, integration, and E2E) do not systematically verify behavior across different viewport sizes. All tests should cover both desktop and mobile viewports to catch responsive design issues.

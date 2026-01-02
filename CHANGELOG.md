@@ -41,7 +41,7 @@
   - Fix integration test console.log spy timing issue to ensure console is available before spying on it
   - Add @angular/cdk package to use BreakpointObserver for responsive design
   - Add GitHub Actions CI workflow for unit and component tests, frontend integration tests and E2E tests, for automated testing on pull requests and pushes to master
-  - Add comprehensive component tests for HeaderComponent covering desktop and mobile viewport behavior including menu visibility, hamburger toggle functionality, and responsive design validation using real viewport detection (cy.viewport) with BreakpointObserver
+  - Add comprehensive component tests for HeaderComponent (32 tests) covering: desktop (≥768px) and mobile (<768px) viewport behavior, breakpoint edge cases (767px vs 768px), navigation menu rendering for authenticated/unauthenticated states, admin menu visibility based on user roles, occasions dropdown rendering and interaction, navigation links and routing, hamburger menu toggle functionality on mobile, and dynamic state updates for user login/logout - all using real viewport detection (cy.viewport) with Angular CDK BreakpointObserver
   - Update backlog management guidelines in CONTRIBUTING.md to no longer require renumbering tasks when completed tasks are removed - gaps in task numbers are acceptable
   - Fix E2E test console.log spy timing issues by waiting for the window to be loaded first
   - Configure CI test parallelization and cross-browser testing: split Cypress component tests across 2 shards per browser using cypress-split plugin, add Firefox to all Cypress tests (component, integration, E2E) alongside Chrome
