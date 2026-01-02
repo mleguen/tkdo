@@ -13,6 +13,9 @@ use Doctrine\ORM\EntityManager;
 /**
  * Fluent builder for creating test Utilisateur entities
  *
+ * Note: The static counter is not thread-safe. PHPUnit runs tests sequentially
+ * by default, so this is not an issue for current test execution.
+ *
  * Usage:
  *   $user = UtilisateurBuilder::aUser()
  *       ->withIdentifiant('alice')
@@ -59,15 +62,16 @@ class UtilisateurBuilder
      */
     public function withIdentifiant(string $identifiant): self
     {
+        $oldIdentifiant = $this->identifiant;
         $this->identifiant = $identifiant;
         // Update dependent defaults
-        if ($this->email === $this->identifiant . '@localhost') {
+        if ($this->email === $oldIdentifiant . '@localhost') {
             $this->email = $identifiant . '@localhost';
         }
-        if ($this->nom === ucfirst($this->identifiant)) {
+        if ($this->nom === ucfirst($oldIdentifiant)) {
             $this->nom = ucfirst($identifiant);
         }
-        if ($this->mdpClair === 'mdp' . $this->identifiant) {
+        if ($this->mdpClair === 'mdp' . $oldIdentifiant) {
             $this->mdpClair = 'mdp' . $identifiant;
         }
         return $this;

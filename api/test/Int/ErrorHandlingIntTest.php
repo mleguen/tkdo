@@ -258,7 +258,13 @@ class ErrorHandlingIntTest extends IntTestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
     public function test400IdeeDejaSupprimee(bool $curl): void
     {
-        $idee = $this->idee()->withDateSuppression(new DateTime())->persist(self::$em);
+        $utilisateur = $this->utilisateur()->persist(self::$em);
+        $auteur = $this->utilisateur()->persist(self::$em);
+        $idee = $this->idee()
+            ->forUtilisateur($utilisateur)
+            ->byAuteur($auteur)
+            ->withDateSuppression(new DateTime())
+            ->persist(self::$em);
         $this->postConnexion($curl, $idee->getAuteur());
 
         $this->requestApi(

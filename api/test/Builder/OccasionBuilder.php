@@ -12,6 +12,9 @@ use Doctrine\ORM\EntityManager;
 /**
  * Fluent builder for creating test Occasion entities
  *
+ * Note: The static counter is not thread-safe. PHPUnit runs tests sequentially
+ * by default, so this is not an issue for current test execution.
+ *
  * Usage:
  *   $occasion = OccasionBuilder::anOccasion()
  *       ->withTitre('Noël 2024')

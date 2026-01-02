@@ -60,7 +60,9 @@
   - Fix PHPUnit test suite configuration (phpunit.xml) by renaming test suites from French ("Tests unitaires", "Tests d'intégration") to English ("Unit", "Int") to match CI workflow --testsuite filter parameters, ensuring tests run correctly in GitHub Actions
   - Upgrade Node.js from v20 to v24 (LTS) which includes npm v11, bringing improved performance and security features (updated Docker container and CI workflows)
   - Fixed high-severity qs vulnerability (GHSA-6rw7-vpxm-498p) allowing DoS via memory exhaustion by forcing qs@6.14.1+ via npm package overrides - addresses transitive dependency through @cypress/request
-  - Add fluent test data builders for backend integration tests (UtilisateurBuilder, OccasionBuilder, IdeeBuilder, ResultatBuilder) providing method chaining API for creating test entities with default valid values and customization options; migrate all integration tests to use builders exclusively; remove all legacy helper methods (creeUtilisateurEnBase, creeOccasionEnBase, creeIdeeEnBase, creeResultatEnBase, creeUtilisateurEnMemoire, creeOccasionEnMemoire, creeIdeeEnMemoire, creeResultatEnMemoire) from IntTestCase to maintain single standard for test data creation; add BuilderDemonstrationTest showcasing builder pattern usage with 6 tests demonstrating defaults, customization, relationships, and soft deletes; document all builder methods and best practices in backend-dev.md
+  - Add fluent test data builders for backend integration tests to standardize creation of test entities with sensible defaults and customization options
+  - Migrate backend integration tests to use the new builders and remove legacy helper methods from IntTestCase to maintain a single approach to test data creation
+  - Document builder patterns and best practices in docs/en/backend-dev.md
 
 ## V1.4.4 (December 8, 2025)
 
