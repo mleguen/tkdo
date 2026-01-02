@@ -19,9 +19,8 @@ class DatabaseConstraintIntTest extends IntTestCase
 
     public function testUtilisateurIdentifiantUnique(): void
     {
-        $utilisateur1 = $this->creeUtilisateurEnBase('utilisateur');
-        $utilisateur2 = $this->creeUtilisateurEnMemoire('utilisateur2');
-        $utilisateur2->setIdentifiant($utilisateur1->getIdentifiant());
+        $utilisateur1 = $this->utilisateur()->withIdentifiant('utilisateur')->persist(self::$em);
+        $utilisateur2 = $this->utilisateur()->withIdentifiant($utilisateur1->getIdentifiant())->build();
         $utilisateur2->setMdpClair('password');
 
         try {
@@ -40,16 +39,24 @@ class DatabaseConstraintIntTest extends IntTestCase
 
     public function testResultatQuiRecoitUniqueParOccasion(): void
     {
-        $occasion = $this->creeOccasionEnBase();
-        $utilisateur1 = $this->creeUtilisateurEnBase('utilisateur1');
-        $utilisateur2 = $this->creeUtilisateurEnBase('utilisateur2');
-        $utilisateur3 = $this->creeUtilisateurEnBase('utilisateur3');
+        $occasion = $this->occasion()->persist(self::$em);
+        $utilisateur1 = $this->utilisateur()->withIdentifiant('utilisateur1')->persist(self::$em);
+        $utilisateur2 = $this->utilisateur()->withIdentifiant('utilisateur2')->persist(self::$em);
+        $utilisateur3 = $this->utilisateur()->withIdentifiant('utilisateur3')->persist(self::$em);
 
         // Premier résultat: utilisateur1 offre à utilisateur3
-        $resultat1 = $this->creeResultatEnBase($occasion, $utilisateur1, $utilisateur3);
+        $this->resultat()
+            ->forOccasion($occasion)
+            ->withQuiOffre($utilisateur1)
+            ->withQuiRecoit($utilisateur3)
+            ->persist(self::$em);
 
         // Deuxième résultat: essaie de faire offrir utilisateur2 à utilisateur3 (même occasion, même destinataire)
-        $resultat2 = $this->creeResultatEnMemoire($occasion, $utilisateur2, $utilisateur3);
+        $resultat2 = $this->resultat()
+            ->forOccasion($occasion)
+            ->withQuiOffre($utilisateur2)
+            ->withQuiRecoit($utilisateur3)
+            ->build();
 
         try {
             self::$em->persist($resultat2);
@@ -73,12 +80,9 @@ class DatabaseConstraintIntTest extends IntTestCase
 
     public function testDeleteUtilisateurWithIdeesFails(): void
     {
-        $utilisateur = $this->creeUtilisateurEnBase('utilisateur');
-        $auteur = $this->creeUtilisateurEnBase('auteur');
-        $this->creeIdeeEnBase([
-            'utilisateur' => $utilisateur,
-            'auteur' => $auteur,
-        ]);
+        $utilisateur = $this->utilisateur()->withIdentifiant('utilisateur')->persist(self::$em);
+        $auteur = $this->utilisateur()->withIdentifiant('auteur')->persist(self::$em);
+        $this->idee()->byAuteur($auteur)->forUtilisateur($utilisateur)->persist(self::$em);
 
         try {
             self::$em->remove($utilisateur);
@@ -95,12 +99,9 @@ class DatabaseConstraintIntTest extends IntTestCase
 
     public function testDeleteAuteurWithIdeesFails(): void
     {
-        $utilisateur = $this->creeUtilisateurEnBase('utilisateur');
-        $auteur = $this->creeUtilisateurEnBase('auteur');
-        $this->creeIdeeEnBase([
-            'utilisateur' => $utilisateur,
-            'auteur' => $auteur,
-        ]);
+        $utilisateur = $this->utilisateur()->withIdentifiant('utilisateur')->persist(self::$em);
+        $auteur = $this->utilisateur()->withIdentifiant('auteur')->persist(self::$em);
+        $this->idee()->byAuteur($auteur)->forUtilisateur($utilisateur)->persist(self::$em);
 
         try {
             self::$em->remove($auteur);
@@ -117,10 +118,14 @@ class DatabaseConstraintIntTest extends IntTestCase
 
     public function testDeleteUtilisateurWithResultatsFails(): void
     {
-        $occasion = $this->creeOccasionEnBase();
-        $utilisateur1 = $this->creeUtilisateurEnBase('utilisateur1');
-        $utilisateur2 = $this->creeUtilisateurEnBase('utilisateur2');
-        $this->creeResultatEnBase($occasion, $utilisateur1, $utilisateur2);
+        $occasion = $this->occasion()->persist(self::$em);
+        $utilisateur1 = $this->utilisateur()->withIdentifiant('utilisateur1')->persist(self::$em);
+        $utilisateur2 = $this->utilisateur()->withIdentifiant('utilisateur2')->persist(self::$em);
+        $this->resultat()
+            ->forOccasion($occasion)
+            ->withQuiOffre($utilisateur1)
+            ->withQuiRecoit($utilisateur2)
+            ->persist(self::$em);
 
         try {
             self::$em->remove($utilisateur1);
@@ -137,10 +142,14 @@ class DatabaseConstraintIntTest extends IntTestCase
 
     public function testDeleteOccasionWithResultatsFails(): void
     {
-        $occasion = $this->creeOccasionEnBase();
-        $utilisateur1 = $this->creeUtilisateurEnBase('utilisateur1');
-        $utilisateur2 = $this->creeUtilisateurEnBase('utilisateur2');
-        $this->creeResultatEnBase($occasion, $utilisateur1, $utilisateur2);
+        $occasion = $this->occasion()->persist(self::$em);
+        $utilisateur1 = $this->utilisateur()->withIdentifiant('utilisateur1')->persist(self::$em);
+        $utilisateur2 = $this->utilisateur()->withIdentifiant('utilisateur2')->persist(self::$em);
+        $this->resultat()
+            ->forOccasion($occasion)
+            ->withQuiOffre($utilisateur1)
+            ->withQuiRecoit($utilisateur2)
+            ->persist(self::$em);
 
         try {
             self::$em->remove($occasion);
@@ -157,8 +166,8 @@ class DatabaseConstraintIntTest extends IntTestCase
 
     public function testDeleteUtilisateurWithExclusionsFails(): void
     {
-        $utilisateur1 = $this->creeUtilisateurEnBase('utilisateur1');
-        $utilisateur2 = $this->creeUtilisateurEnBase('utilisateur2');
+        $utilisateur1 = $this->utilisateur()->withIdentifiant('utilisateur1')->persist(self::$em);
+        $utilisateur2 = $this->utilisateur()->withIdentifiant('utilisateur2')->persist(self::$em);
 
         $exclusion = new ExclusionAdaptor($utilisateur1, $utilisateur2);
         self::$em->persist($exclusion);
@@ -179,7 +188,7 @@ class DatabaseConstraintIntTest extends IntTestCase
 
     public function testDeleteUtilisateurWithoutRelationsSucceeds(): void
     {
-        $utilisateur = $this->creeUtilisateurEnBase('utilisateur');
+        $utilisateur = $this->utilisateur()->withIdentifiant('utilisateur')->persist(self::$em);
         $id = $utilisateur->getId();
 
         self::$em->remove($utilisateur);
@@ -191,7 +200,7 @@ class DatabaseConstraintIntTest extends IntTestCase
 
     public function testDeleteOccasionWithoutRelationsSucceeds(): void
     {
-        $occasion = $this->creeOccasionEnBase();
+        $occasion = $this->occasion()->persist(self::$em);
         $id = $occasion->getId();
 
         self::$em->remove($occasion);
@@ -205,7 +214,7 @@ class DatabaseConstraintIntTest extends IntTestCase
 
     public function testIdeeUtilisateurCannotBeNull(): void
     {
-        $auteur = $this->creeUtilisateurEnBase('auteur');
+        $auteur = $this->utilisateur()->withIdentifiant('auteur')->persist(self::$em);
 
         $idee = new IdeeAdaptor();
         $idee->setDescription('Test idée');
@@ -227,7 +236,7 @@ class DatabaseConstraintIntTest extends IntTestCase
 
     public function testIdeeAuteurCannotBeNull(): void
     {
-        $utilisateur = $this->creeUtilisateurEnBase('utilisateur');
+        $utilisateur = $this->utilisateur()->withIdentifiant('utilisateur')->persist(self::$em);
 
         $idee = new IdeeAdaptor();
         $idee->setDescription('Test idée');
@@ -249,8 +258,8 @@ class DatabaseConstraintIntTest extends IntTestCase
 
     public function testResultatQuiRecoitCannotBeNull(): void
     {
-        $occasion = $this->creeOccasionEnBase();
-        $quiOffre = $this->creeUtilisateurEnBase('quiOffre');
+        $occasion = $this->occasion()->persist(self::$em);
+        $quiOffre = $this->utilisateur()->withIdentifiant('quiOffre')->persist(self::$em);
 
         $resultat = new ResultatAdaptor($occasion, $quiOffre);
 
@@ -269,14 +278,10 @@ class DatabaseConstraintIntTest extends IntTestCase
 
     public function testIdeeDateSuppressionCanBeNull(): void
     {
-        $utilisateur = $this->creeUtilisateurEnBase('utilisateur');
-        $auteur = $this->creeUtilisateurEnBase('auteur');
+        $utilisateur = $this->utilisateur()->withIdentifiant('utilisateur')->persist(self::$em);
+        $auteur = $this->utilisateur()->withIdentifiant('auteur')->persist(self::$em);
 
-        $idee = $this->creeIdeeEnBase([
-            'utilisateur' => $utilisateur,
-            'auteur' => $auteur,
-            'dateSuppression' => null,
-        ]);
+        $idee = $this->idee()->byAuteur($auteur)->forUtilisateur($utilisateur)->withDateSuppression(null)->persist(self::$em);
 
         $this->assertNull($idee->getDateSuppression());
 

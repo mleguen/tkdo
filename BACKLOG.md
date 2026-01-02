@@ -176,21 +176,6 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 - **Estimated size:** ~100-150 lines
 - **Priority:** Low - nice to have
 
-### Backend Testing - Test Infrastructure
-
-**Task 31:** Create test data builders for backend
-- **Files to create:**
-  - `api/test/Builder/UtilisateurBuilder.php`
-  - `api/test/Builder/OccasionBuilder.php`
-  - `api/test/Builder/IdeeBuilder.php`
-- **Content:**
-  - Fluent builder pattern for entities
-  - Default valid values
-  - Method chaining for customization
-  - Integration with IntTestCase
-- **Estimated size:** ~200-250 lines total
-- **Priority:** Medium - improves test readability
-
 ### Test Coverage and Quality
 
 **Task 32:** Set up test coverage reporting
@@ -290,6 +275,13 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
   - Configure proper timeouts
 - **Estimated changes:** ~60-80 lines
 - **Priority:** Low - developer experience
+
+**Task 39:** Final review of testing documentation
+- **Files to modify:**
+  - `docs/en/*.md`
+- **Content:**
+  - Review all testing-related documentation to ensure it follows documentation guidelines (e.g. single source of truth)
+- **Priority:** Medium - important for building upon this afterwards
 
 ## Features & Enhancements
 

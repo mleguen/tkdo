@@ -15,7 +15,7 @@ class ConnexionIntTest extends IntTestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
     public function testMauvaisMdp(bool $curl): void
     {
-        $utilisateur = $this->creeUtilisateurEnBase('utilisateur');
+        $utilisateur = $this->utilisateur()->withIdentifiant('utilisateur')->persist(self::$em);
 
         $this->requestApi(
             $curl,

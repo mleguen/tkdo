@@ -1458,6 +1458,119 @@ $this->assertStringContainsString('Your account', $message->body);
 
 Mailhog UI is available at `http://localhost:8025` when using Docker.
 
+### Test Data Builders
+
+The test suite includes **fluent builder pattern** classes for creating test entities with readable, expressive syntax.
+
+#### Using Builders in Integration Tests
+
+**Location:** `test/Builder/`
+
+**Available builders:**
+- `UtilisateurBuilder` - Create user entities
+- `OccasionBuilder` - Create occasion entities
+- `IdeeBuilder` - Create gift idea entities
+- `ResultatBuilder` - Create gift exchange result entities
+
+**Basic usage:**
+
+```php
+// Create user with defaults
+$user = $this->utilisateur()->persist(self::$em);
+
+// Create user with customization
+$admin = $this->utilisateur()
+    ->withIdentifiant('alice')
+    ->withEmail('alice@example.com')
+    ->withAdmin()
+    ->withGenre(Genre::Feminin)
+    ->persist(self::$em);
+
+// Create occasion with participants
+$occasion = $this->occasion()
+    ->withTitre('Noël 2024')
+    ->withDate(new DateTime('2024-12-25'))
+    ->withParticipants([$user1, $user2])
+    ->persist(self::$em);
+
+// Create idea with explicit relationships
+$idee = $this->idee()
+    ->forUtilisateur($recipient)
+    ->byAuteur($author)
+    ->withDescription('Un livre')
+    ->persist(self::$em);
+
+// Create gift exchange result
+$resultat = $this->resultat()
+    ->forOccasion($occasion)
+    ->withQuiOffre($giver)
+    ->withQuiRecoit($receiver)
+    ->persist(self::$em);
+```
+
+#### Builder Methods
+
+**UtilisateurBuilder:**
+
+```php
+UtilisateurBuilder::aUser()
+    ->withIdentifiant(string $identifiant)
+    ->withEmail(string $email)
+    ->withAdmin(bool $admin = true)
+    ->withGenre(string $genre)
+    ->withNom(string $nom)
+    ->withDateDerniereNotifPeriodique(DateTime $date)
+    ->withPrefNotifIdees(string $prefNotifIdees)
+    ->withMdpClair(string $mdpClair)
+    ->build()                    // Returns entity (not persisted)
+    ->persist(EntityManager $em) // Returns persisted entity
+```
+
+**OccasionBuilder:**
+
+```php
+OccasionBuilder::anOccasion()
+    ->withTitre(string $titre)
+    ->withDate(DateTime $date)
+    ->withParticipants(array $participants)
+    ->withParticipant(UtilisateurAdaptor $participant)
+    ->build()
+    ->persist(EntityManager $em)
+```
+
+**IdeeBuilder:**
+
+```php
+IdeeBuilder::anIdee()
+    ->forUtilisateur(UtilisateurAdaptor $utilisateur)
+    ->byAuteur(UtilisateurAdaptor $auteur)
+    ->withDescription(string $description)
+    ->withDateProposition(DateTime $dateProposition)
+    ->withDateSuppression(?DateTime $dateSuppression)
+    ->deleted()  // Convenience method for soft delete
+    ->build()
+    ->persist(EntityManager $em)
+```
+
+**ResultatBuilder:**
+
+```php
+ResultatBuilder::aResultat()
+    ->forOccasion(OccasionAdaptor $occasion)
+    ->withQuiOffre(UtilisateurAdaptor $quiOffre)
+    ->withQuiRecoit(UtilisateurAdaptor $quiRecoit)
+    ->build()
+    ->persist(EntityManager $em)
+```
+
+#### Builder Best Practices
+
+1. **Use method chaining** - Builders are designed for fluent syntax
+2. **Call persist() when needed** - Use `build()` for in-memory entities, `persist()` for database entities
+3. **Explicit over implicit** - Use builders when configuration makes test intent clearer
+4. **Defaults are safe** - All builders provide valid default values
+5. **Test isolation** - Builders use counters for unique defaults across tests
+
 ### Test Data Reset
 
 To reset test data between test runs:

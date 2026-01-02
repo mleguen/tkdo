@@ -20,8 +20,8 @@ class UtilisateurIntTest extends IntTestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
     public function testUserManagementWorkflow(bool $curl): void
     {
-        $admin = $this->creeUtilisateurEnBase('admin', ['admin' => true]);
-        $utilisateur = $this->creeUtilisateurEnMemoire('utilisateur');
+        $admin = $this->utilisateur()->withIdentifiant('admin')->withAdmin()->persist(self::$em);
+        $utilisateur = $this->utilisateur()->withIdentifiant('utilisateur')->build();
 
         // Admin creates user
         $this->postConnexion($curl, $admin);
@@ -129,7 +129,7 @@ class UtilisateurIntTest extends IntTestCase
 
         // Verify promoted user can now create other users (admin privilege)
         $this->postConnexion($curl, $utilisateur);
-        $autreUtilisateur = $this->creeUtilisateurEnMemoire('autreUtilisateur');
+        $autreUtilisateur = $this->utilisateur()->withIdentifiant('autreUtilisateur')->build();
         $this->requestApi(
             $curl,
             'POST',

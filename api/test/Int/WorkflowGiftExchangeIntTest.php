@@ -27,8 +27,12 @@ class WorkflowGiftExchangeIntTest extends IntTestCase
     public function testCompleteGiftExchangeWorkflow(bool $curl): void
     {
         // Setup: Create admin and occasion
-        $admin = $this->creeUtilisateurEnBase('admin', ['admin' => true]);
-        $occasion = $this->creeOccasionEnMemoire();
+        $admin = $this->utilisateur()
+            ->withIdentifiant('admin')
+            ->withAdmin()
+            ->persist(self::$em);
+
+        $occasion = $this->occasion()->build();
 
         $this->postConnexion($curl, $admin);
 
@@ -55,11 +59,18 @@ class WorkflowGiftExchangeIntTest extends IntTestCase
         $this->assertEquals([self::occasionAttendue($occasion)], $body);
 
         // Step 2: Admin adds participants
-        $participant1 = $this->creeUtilisateurEnBase('participant1');
-        $participant2 = $this->creeUtilisateurEnBase('participant2');
-        $participant3 = $this->creeUtilisateurEnBase('participant3', [
-            'prefNotifIdees' => PrefNotifIdees::Instantanee
-        ]);
+        $participant1 = $this->utilisateur()
+            ->withIdentifiant('participant1')
+            ->persist(self::$em);
+
+        $participant2 = $this->utilisateur()
+            ->withIdentifiant('participant2')
+            ->persist(self::$em);
+
+        $participant3 = $this->utilisateur()
+            ->withIdentifiant('participant3')
+            ->withPrefNotifIdees(PrefNotifIdees::Instantanee)
+            ->persist(self::$em);
 
         foreach ([$participant1, $participant2, $participant3] as $participant) {
             $this->requestApi(

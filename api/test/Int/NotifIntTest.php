@@ -15,19 +15,19 @@ class NotifIntTest extends IntTestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
     public function testNotificationInstantaneeCreationIdee(bool $curl): void
     {
-        $auteur = $this->creeUtilisateurEnBase('auteur');
-        $utilisateur = $this->creeUtilisateurEnBase('utilisateur');
+        $auteur = $this->utilisateur()->withIdentifiant('auteur')->persist(self::$em);
+        $utilisateur = $this->utilisateur()->withIdentifiant('utilisateur')->persist(self::$em);
 
         // Participant who wants instant notifications
-        $participantInstant = $this->creeUtilisateurEnBase('participantInstant', [
-            'prefNotifIdees' => PrefNotifIdees::Instantanee
-        ]);
+        $participantInstant = $this->utilisateur()
+            ->withIdentifiant('participantInstant')
+            ->withPrefNotifIdees(PrefNotifIdees::Instantanee)
+            ->persist(self::$em);
 
         // Create an occasion with the user and the instant notification participant
-        $this->creeOccasionEnBase(['participants' => [
-            $utilisateur,
-            $participantInstant,
-        ]]);
+        $this->occasion()
+            ->withParticipants([$utilisateur, $participantInstant])
+            ->persist(self::$em);
 
         $this->postConnexion($curl, $auteur);
 
@@ -60,25 +60,25 @@ class NotifIntTest extends IntTestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
     public function testNotificationInstantaneeSuppressionIdee(bool $curl): void
     {
-        $auteur = $this->creeUtilisateurEnBase('auteur');
-        $utilisateur = $this->creeUtilisateurEnBase('utilisateur');
+        $auteur = $this->utilisateur()->withIdentifiant('auteur')->persist(self::$em);
+        $utilisateur = $this->utilisateur()->withIdentifiant('utilisateur')->persist(self::$em);
 
         // Participant who wants instant notifications
-        $participantInstant = $this->creeUtilisateurEnBase('participantInstant', [
-            'prefNotifIdees' => PrefNotifIdees::Instantanee
-        ]);
+        $participantInstant = $this->utilisateur()
+            ->withIdentifiant('participantInstant')
+            ->withPrefNotifIdees(PrefNotifIdees::Instantanee)
+            ->persist(self::$em);
 
         // Create an occasion
-        $this->creeOccasionEnBase(['participants' => [
-            $utilisateur,
-            $participantInstant,
-        ]]);
+        $this->occasion()
+            ->withParticipants([$utilisateur, $participantInstant])
+            ->persist(self::$em);
 
         // Create an idea
-        $idee = $this->creeIdeeEnBase([
-            'auteur' => $auteur,
-            'utilisateur' => $utilisateur,
-        ]);
+        $idee = $this->idee()
+            ->byAuteur($auteur)
+            ->forUtilisateur($utilisateur)
+            ->persist(self::$em);
 
         // Clear emails from creation
         $this->depileDerniersEmailsRecus();
@@ -108,19 +108,19 @@ class NotifIntTest extends IntTestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
     public function testPasDeNotificationSiPreferenceAucune(bool $curl): void
     {
-        $auteur = $this->creeUtilisateurEnBase('auteur');
-        $utilisateur = $this->creeUtilisateurEnBase('utilisateur');
+        $auteur = $this->utilisateur()->withIdentifiant('auteur')->persist(self::$em);
+        $utilisateur = $this->utilisateur()->withIdentifiant('utilisateur')->persist(self::$em);
 
         // Participant who doesn't want notifications
-        $participantAucune = $this->creeUtilisateurEnBase('participantAucune', [
-            'prefNotifIdees' => PrefNotifIdees::Aucune
-        ]);
+        $participantAucune = $this->utilisateur()
+            ->withIdentifiant('participantAucune')
+            ->withPrefNotifIdees(PrefNotifIdees::Aucune)
+            ->persist(self::$em);
 
         // Create an occasion
-        $this->creeOccasionEnBase(['participants' => [
-            $utilisateur,
-            $participantAucune,
-        ]]);
+        $this->occasion()
+            ->withParticipants([$utilisateur, $participantAucune])
+            ->persist(self::$em);
 
         $this->postConnexion($curl, $auteur);
 
@@ -150,32 +150,32 @@ class NotifIntTest extends IntTestCase
      */
     public function testNotificationQuotidienneDigest(): void
     {
-        $auteur = $this->creeUtilisateurEnBase('auteur');
-        $utilisateur = $this->creeUtilisateurEnBase('utilisateur');
+        $auteur = $this->utilisateur()->withIdentifiant('auteur')->persist(self::$em);
+        $utilisateur = $this->utilisateur()->withIdentifiant('utilisateur')->persist(self::$em);
 
         // Participant who wants daily notifications
-        $participantQuotidien = $this->creeUtilisateurEnBase('participantQuotidien', [
-            'prefNotifIdees' => PrefNotifIdees::Quotidienne,
-            'dateDerniereNotifPeriodique' => new DateTime('yesterday')
-        ]);
+        $participantQuotidien = $this->utilisateur()
+            ->withIdentifiant('participantQuotidien')
+            ->withPrefNotifIdees(PrefNotifIdees::Quotidienne)
+            ->withDateDerniereNotifPeriodique(new DateTime('yesterday'))
+            ->persist(self::$em);
 
         // Create an occasion
-        $this->creeOccasionEnBase(['participants' => [
-            $utilisateur,
-            $participantQuotidien,
-        ]]);
+        $this->occasion()
+            ->withParticipants([$utilisateur, $participantQuotidien])
+            ->persist(self::$em);
 
         // Create multiple ideas
-        $this->creeIdeeEnBase([
-            'auteur' => $auteur,
-            'utilisateur' => $utilisateur,
-            'description' => 'Première idée',
-        ]);
-        $this->creeIdeeEnBase([
-            'auteur' => $auteur,
-            'utilisateur' => $utilisateur,
-            'description' => 'Deuxième idée',
-        ]);
+        $this->idee()
+            ->byAuteur($auteur)
+            ->forUtilisateur($utilisateur)
+            ->withDescription('Première idée')
+            ->persist(self::$em);
+        $this->idee()
+            ->byAuteur($auteur)
+            ->forUtilisateur($utilisateur)
+            ->withDescription('Deuxième idée')
+            ->persist(self::$em);
 
         // Clear any instant notification emails
         $this->depileDerniersEmailsRecus();
@@ -198,27 +198,27 @@ class NotifIntTest extends IntTestCase
      */
     public function testNotificationQuotidiennePasEnvoyeeDeuxFois(): void
     {
-        $auteur = $this->creeUtilisateurEnBase('auteur');
-        $utilisateur = $this->creeUtilisateurEnBase('utilisateur');
+        $auteur = $this->utilisateur()->withIdentifiant('auteur')->persist(self::$em);
+        $utilisateur = $this->utilisateur()->withIdentifiant('utilisateur')->persist(self::$em);
 
         // Participant who wants daily notifications
-        $participantQuotidien = $this->creeUtilisateurEnBase('participantQuotidien', [
-            'prefNotifIdees' => PrefNotifIdees::Quotidienne,
-            'dateDerniereNotifPeriodique' => new DateTime('yesterday')
-        ]);
+        $participantQuotidien = $this->utilisateur()
+            ->withIdentifiant('participantQuotidien')
+            ->withPrefNotifIdees(PrefNotifIdees::Quotidienne)
+            ->withDateDerniereNotifPeriodique(new DateTime('yesterday'))
+            ->persist(self::$em);
 
         // Create an occasion
-        $this->creeOccasionEnBase(['participants' => [
-            $utilisateur,
-            $participantQuotidien,
-        ]]);
+        $this->occasion()
+            ->withParticipants([$utilisateur, $participantQuotidien])
+            ->persist(self::$em);
 
         // Create an idea
-        $this->creeIdeeEnBase([
-            'auteur' => $auteur,
-            'utilisateur' => $utilisateur,
-            'description' => 'Test idea',
-        ]);
+        $this->idee()
+            ->byAuteur($auteur)
+            ->forUtilisateur($utilisateur)
+            ->withDescription('Test idea')
+            ->persist(self::$em);
 
         // Clear any instant notification emails
         $this->depileDerniersEmailsRecus();
@@ -248,30 +248,31 @@ class NotifIntTest extends IntTestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
     public function testNotificationSeulementParticipantsMemeOccasion(bool $curl): void
     {
-        $auteur = $this->creeUtilisateurEnBase('auteur');
-        $utilisateur = $this->creeUtilisateurEnBase('utilisateur');
+        $auteur = $this->utilisateur()->withIdentifiant('auteur')->persist(self::$em);
+        $utilisateur = $this->utilisateur()->withIdentifiant('utilisateur')->persist(self::$em);
 
         // Participant in the same occasion
-        $participantDansOccasion = $this->creeUtilisateurEnBase('participantDansOccasion', [
-            'prefNotifIdees' => PrefNotifIdees::Instantanee
-        ]);
+        $participantDansOccasion = $this->utilisateur()
+            ->withIdentifiant('participantDansOccasion')
+            ->withPrefNotifIdees(PrefNotifIdees::Instantanee)
+            ->persist(self::$em);
 
         // Participant in a different occasion
-        $participantAutreOccasion = $this->creeUtilisateurEnBase('participantAutreOccasion', [
-            'prefNotifIdees' => PrefNotifIdees::Instantanee
-        ]);
+        $participantAutreOccasion = $this->utilisateur()
+            ->withIdentifiant('participantAutreOccasion')
+            ->withPrefNotifIdees(PrefNotifIdees::Instantanee)
+            ->persist(self::$em);
 
         // Create first occasion with utilisateur and participantDansOccasion
-        $this->creeOccasionEnBase(['participants' => [
-            $utilisateur,
-            $participantDansOccasion,
-        ]]);
+        $this->occasion()
+            ->withParticipants([$utilisateur, $participantDansOccasion])
+            ->persist(self::$em);
 
         // Create second occasion with only participantAutreOccasion
-        $this->creeOccasionEnBase([
-            'titre' => 'Autre occasion',
-            'participants' => [$participantAutreOccasion],
-        ]);
+        $this->occasion()
+            ->withTitre('Autre occasion')
+            ->withParticipants([$participantAutreOccasion])
+            ->persist(self::$em);
 
         $this->postConnexion($curl, $auteur);
 
@@ -303,16 +304,16 @@ class NotifIntTest extends IntTestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
     public function testAuteurNePasRecevoirNotification(bool $curl): void
     {
-        $auteur = $this->creeUtilisateurEnBase('auteur', [
-            'prefNotifIdees' => PrefNotifIdees::Instantanee
-        ]);
-        $utilisateur = $this->creeUtilisateurEnBase('utilisateur');
+        $auteur = $this->utilisateur()
+            ->withIdentifiant('auteur')
+            ->withPrefNotifIdees(PrefNotifIdees::Instantanee)
+            ->persist(self::$em);
+        $utilisateur = $this->utilisateur()->withIdentifiant('utilisateur')->persist(self::$em);
 
         // Create an occasion where the author is a participant
-        $this->creeOccasionEnBase(['participants' => [
-            $utilisateur,
-            $auteur,
-        ]]);
+        $this->occasion()
+            ->withParticipants([$utilisateur, $auteur])
+            ->persist(self::$em);
 
         $this->postConnexion($curl, $auteur);
 
@@ -342,38 +343,38 @@ class NotifIntTest extends IntTestCase
      */
     public function testNotificationQuotidienneInclutCreationEtSuppression(): void
     {
-        $auteur = $this->creeUtilisateurEnBase('auteur');
-        $utilisateur = $this->creeUtilisateurEnBase('utilisateur');
+        $auteur = $this->utilisateur()->withIdentifiant('auteur')->persist(self::$em);
+        $utilisateur = $this->utilisateur()->withIdentifiant('utilisateur')->persist(self::$em);
 
         // Participant who wants daily notifications
-        $participantQuotidien = $this->creeUtilisateurEnBase('participantQuotidien', [
-            'prefNotifIdees' => PrefNotifIdees::Quotidienne,
-            'dateDerniereNotifPeriodique' => new DateTime('yesterday')
-        ]);
+        $participantQuotidien = $this->utilisateur()
+            ->withIdentifiant('participantQuotidien')
+            ->withPrefNotifIdees(PrefNotifIdees::Quotidienne)
+            ->withDateDerniereNotifPeriodique(new DateTime('yesterday'))
+            ->persist(self::$em);
 
         // Create an occasion
-        $this->creeOccasionEnBase(['participants' => [
-            $utilisateur,
-            $participantQuotidien,
-        ]]);
+        $this->occasion()
+            ->withParticipants([$utilisateur, $participantQuotidien])
+            ->persist(self::$em);
 
         // Create an idea
-        $idee = $this->creeIdeeEnBase([
-            'auteur' => $auteur,
-            'utilisateur' => $utilisateur,
-            'description' => 'Idée à supprimer',
-        ]);
+        $idee = $this->idee()
+            ->byAuteur($auteur)
+            ->forUtilisateur($utilisateur)
+            ->withDescription('Idée à supprimer')
+            ->persist(self::$em);
 
         // Mark it as deleted
         $idee->setDateSuppression(new DateTime());
         self::$em->flush();
 
         // Create another idea that's still active
-        $this->creeIdeeEnBase([
-            'auteur' => $auteur,
-            'utilisateur' => $utilisateur,
-            'description' => 'Nouvelle idée',
-        ]);
+        $this->idee()
+            ->byAuteur($auteur)
+            ->forUtilisateur($utilisateur)
+            ->withDescription('Nouvelle idée')
+            ->persist(self::$em);
 
         // Clear any instant notification emails
         $this->depileDerniersEmailsRecus();
@@ -396,26 +397,26 @@ class NotifIntTest extends IntTestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
     public function testNotificationInstantaneeEtQuotidienneCoexistent(bool $curl): void
     {
-        $auteur = $this->creeUtilisateurEnBase('auteur');
-        $utilisateur = $this->creeUtilisateurEnBase('utilisateur');
+        $auteur = $this->utilisateur()->withIdentifiant('auteur')->persist(self::$em);
+        $utilisateur = $this->utilisateur()->withIdentifiant('utilisateur')->persist(self::$em);
 
         // One participant wants instant notifications
-        $participantInstant = $this->creeUtilisateurEnBase('participantInstant', [
-            'prefNotifIdees' => PrefNotifIdees::Instantanee
-        ]);
+        $participantInstant = $this->utilisateur()
+            ->withIdentifiant('participantInstant')
+            ->withPrefNotifIdees(PrefNotifIdees::Instantanee)
+            ->persist(self::$em);
 
         // Another wants daily notifications
-        $participantQuotidien = $this->creeUtilisateurEnBase('participantQuotidien', [
-            'prefNotifIdees' => PrefNotifIdees::Quotidienne,
-            'dateDerniereNotifPeriodique' => new DateTime('yesterday')
-        ]);
+        $participantQuotidien = $this->utilisateur()
+            ->withIdentifiant('participantQuotidien')
+            ->withPrefNotifIdees(PrefNotifIdees::Quotidienne)
+            ->withDateDerniereNotifPeriodique(new DateTime('yesterday'))
+            ->persist(self::$em);
 
         // Create an occasion with both participants
-        $this->creeOccasionEnBase(['participants' => [
-            $utilisateur,
-            $participantInstant,
-            $participantQuotidien,
-        ]]);
+        $this->occasion()
+            ->withParticipants([$utilisateur, $participantInstant, $participantQuotidien])
+            ->persist(self::$em);
 
         $this->postConnexion($curl, $auteur);
 
@@ -455,19 +456,19 @@ class NotifIntTest extends IntTestCase
      */
     public function testNotificationQuotidiennePasDIdees(): void
     {
-        $utilisateur = $this->creeUtilisateurEnBase('utilisateur');
+        $utilisateur = $this->utilisateur()->withIdentifiant('utilisateur')->persist(self::$em);
 
         // Participant who wants daily notifications but has no ideas
-        $participantQuotidien = $this->creeUtilisateurEnBase('participantQuotidien', [
-            'prefNotifIdees' => PrefNotifIdees::Quotidienne,
-            'dateDerniereNotifPeriodique' => new DateTime('yesterday')
-        ]);
+        $participantQuotidien = $this->utilisateur()
+            ->withIdentifiant('participantQuotidien')
+            ->withPrefNotifIdees(PrefNotifIdees::Quotidienne)
+            ->withDateDerniereNotifPeriodique(new DateTime('yesterday'))
+            ->persist(self::$em);
 
         // Create an occasion
-        $this->creeOccasionEnBase(['participants' => [
-            $utilisateur,
-            $participantQuotidien,
-        ]]);
+        $this->occasion()
+            ->withParticipants([$utilisateur, $participantQuotidien])
+            ->persist(self::$em);
 
         // Run the daily notification command without creating any ideas
         exec("php bin/notif-quotidienne.php", $output, $return_var);
@@ -483,35 +484,35 @@ class NotifIntTest extends IntTestCase
      */
     public function testNotificationQuotidienneSeulementIdeesPeriode(): void
     {
-        $auteur = $this->creeUtilisateurEnBase('auteur');
-        $utilisateur = $this->creeUtilisateurEnBase('utilisateur');
+        $auteur = $this->utilisateur()->withIdentifiant('auteur')->persist(self::$em);
+        $utilisateur = $this->utilisateur()->withIdentifiant('utilisateur')->persist(self::$em);
 
         // Participant who wants daily notifications
-        $participantQuotidien = $this->creeUtilisateurEnBase('participantQuotidien', [
-            'prefNotifIdees' => PrefNotifIdees::Quotidienne,
-            'dateDerniereNotifPeriodique' => new DateTime('yesterday')
-        ]);
+        $participantQuotidien = $this->utilisateur()
+            ->withIdentifiant('participantQuotidien')
+            ->withPrefNotifIdees(PrefNotifIdees::Quotidienne)
+            ->withDateDerniereNotifPeriodique(new DateTime('yesterday'))
+            ->persist(self::$em);
 
         // Create an occasion
-        $this->creeOccasionEnBase(['participants' => [
-            $utilisateur,
-            $participantQuotidien,
-        ]]);
+        $this->occasion()
+            ->withParticipants([$utilisateur, $participantQuotidien])
+            ->persist(self::$em);
 
         // Create an old idea (before the last notification)
-        $this->creeIdeeEnBase([
-            'auteur' => $auteur,
-            'utilisateur' => $utilisateur,
-            'description' => 'Old idea',
-            'dateProposition' => new DateTime('2 days ago'),
-        ]);
+        $this->idee()
+            ->byAuteur($auteur)
+            ->forUtilisateur($utilisateur)
+            ->withDescription('Old idea')
+            ->withDateProposition(new DateTime('2 days ago'))
+            ->persist(self::$em);
 
         // Create a new idea (today)
-        $this->creeIdeeEnBase([
-            'auteur' => $auteur,
-            'utilisateur' => $utilisateur,
-            'description' => 'New idea',
-        ]);
+        $this->idee()
+            ->byAuteur($auteur)
+            ->forUtilisateur($utilisateur)
+            ->withDescription('New idea')
+            ->persist(self::$em);
 
         // Clear any instant notification emails
         $this->depileDerniersEmailsRecus();

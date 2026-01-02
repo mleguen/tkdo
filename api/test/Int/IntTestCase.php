@@ -26,6 +26,10 @@ use PHPUnit\Framework\TestCase;
 use rpkamp\Mailhog\MailhogClient;
 use rpkamp\Mailhog\Message\Contact;
 use rpkamp\Mailhog\Message\Message;
+use Test\Builder\IdeeBuilder;
+use Test\Builder\OccasionBuilder;
+use Test\Builder\ResultatBuilder;
+use Test\Builder\UtilisateurBuilder;
 
 class IntTestCase extends TestCase
 {
@@ -92,95 +96,6 @@ class IntTestCase extends TestCase
         self::assertTrue($message->recipients->contains(new Contact($email)));
     }
 
-    protected function creeIdeeEnBase(array $options = []): IdeeAdaptor
-    {
-        $idee = $this->creeIdeeEnMemoire($options);
-        self::$em->persist($idee);
-        self::$em->flush();
-        return $idee;
-    }
-
-    protected function creeIdeeEnMemoire(array $options = []): IdeeAdaptor
-    {
-        $idee = new IdeeAdaptor()
-            ->setUtilisateur($options['utilisateur'] ?? $this->creeUtilisateurEnBase('utilisateur'))
-            ->setDescription($options['description'] ?? 'nouvelle idée')
-            ->setAuteur($options['auteur'] ?? $this->creeUtilisateurEnBase('auteur'))
-            ->setDateProposition($options['dateProposition'] ?? new DateTime());
-        if (isset($options['dateSuppression'])) $idee->setDateSuppression($options['dateSuppression']);
-        return $idee;
-    }
-
-    /**
-     * @param UtilisateurAdaptor[] $participants
-     */
-    protected function creeOccasionEnBase(array $options = []): OccasionAdaptor
-    {
-        $occasion = $this->creeOccasionEnMemoire($options);
-        self::$em->persist($occasion);
-        self::$em->flush();
-        return $occasion;
-    }
-
-    /**
-     * @param UtilisateurAdaptor[] $participants
-     */
-    protected function creeOccasionEnMemoire(array $options = []): OccasionAdaptor
-    {
-        return new OccasionAdaptor()
-            ->setDate($options['date'] ?? new DateTime('tomorrow'))
-            ->setParticipants($options['participants'] ?? [])
-            ->setTitre($options['titre'] ?? 'demain');
-    }
-
-    protected function creeResultatEnBase(
-        OccasionAdaptor $occasion,
-        UtilisateurAdaptor $quiOffre,
-        UtilisateurAdaptor $quiRecoit
-    ): ResultatAdaptor
-    {
-        $resultat = $this->creeResultatEnMemoire($occasion, $quiOffre, $quiRecoit);
-        self::$em->persist($resultat);
-        self::$em->flush();
-
-        return $resultat;
-    }
-
-    protected function creeResultatEnMemoire(
-        OccasionAdaptor $occasion,
-        UtilisateurAdaptor $quiOffre,
-        UtilisateurAdaptor $quiRecoit
-    ): ResultatAdaptor
-    {
-        return new ResultatAdaptor()
-            ->setOccasion($occasion)
-            ->setQuiOffre($quiOffre)
-            ->setQuiRecoit($quiRecoit);
-    }
-
-    protected function creeUtilisateurEnBase(string $identifiant, array $options = []): UtilisateurAdaptor
-    {
-        $mdp = $options['mdp'] ?? 'mdp' . $identifiant;
-        $utilisateur = $this->creeUtilisateurEnMemoire($identifiant, $options)
-            ->setMdpClair($mdp);
-        self::$em->persist($utilisateur);
-        self::$em->flush();
-
-        return $utilisateur;
-    }
-
-    protected function creeUtilisateurEnMemoire(string $identifiant, array $options = []): UtilisateurAdaptor
-    {
-        return new UtilisateurAdaptor()
-            ->setEmail($options['email'] ?? $identifiant . '@localhost')
-            ->setAdmin($options['admin'] ?? false)
-            ->setGenre($options['genre'] ?? Genre::Masculin)
-            ->setIdentifiant($identifiant)
-            ->setNom($options['nom'] ?? $identifiant)
-            ->setDateDerniereNotifPeriodique($options['dateDerniereNotifPeriodique'] ?? new DateTime())
-            ->setPrefNotifIdees($options['prefNotifIdees'] ?? PrefNotifIdees::Aucune);
-    }
-
     /**
      * @return Message[]
      */
@@ -193,7 +108,9 @@ class IntTestCase extends TestCase
 
     protected function postConnexion(bool $curl, ?UtilisateurAdaptor $utilisateur = null): UtilisateurAdaptor
     {
-        if (!$utilisateur) $utilisateur = $this->creeUtilisateurEnBase('connecte');
+        if (!$utilisateur) {
+            $utilisateur = $this->utilisateur()->withIdentifiant('connecte')->persist(self::$em);
+        }
         $this->requestApi(
             $curl,
             'POST',
@@ -331,5 +248,55 @@ class IntTestCase extends TestCase
         $bootstrap = new Bootstrap();
         $container = $bootstrap->initContainer();
         self::$em = $container->get(EntityManager::class);
+    }
+
+    // ========== Test Data Builders ==========
+    // Fluent builder methods for creating test entities with readable, expressive syntax.
+
+    /**
+     * Create a new UtilisateurBuilder for fluent test data creation
+     *
+     * @example
+     * $user = $this->utilisateur()->withIdentifiant('alice')->persist(self::$em);
+     * $admin = $this->utilisateur()->withIdentifiant('admin')->withAdmin()->persist(self::$em);
+     */
+    protected function utilisateur(): UtilisateurBuilder
+    {
+        return UtilisateurBuilder::aUser();
+    }
+
+    /**
+     * Create a new OccasionBuilder for fluent test data creation
+     *
+     * @example
+     * $occasion = $this->occasion()->persist(self::$em);
+     * $occasion = $this->occasion()->withTitre('Noël')->withParticipants([$user1, $user2])->persist(self::$em);
+     */
+    protected function occasion(): OccasionBuilder
+    {
+        return OccasionBuilder::anOccasion();
+    }
+
+    /**
+     * Create a new IdeeBuilder for fluent test data creation
+     *
+     * @example
+     * $idee = $this->idee()->forUtilisateur($user)->byAuteur($author)->persist(self::$em);
+     * $idee = $this->idee()->forUtilisateur($user)->byAuteur($author)->withDescription('Un livre')->persist(self::$em);
+     */
+    protected function idee(): IdeeBuilder
+    {
+        return IdeeBuilder::anIdee();
+    }
+
+    /**
+     * Create a new ResultatBuilder for fluent test data creation
+     *
+     * @example
+     * $resultat = $this->resultat()->forOccasion($occasion)->withQuiOffre($giver)->withQuiRecoit($receiver)->persist(self::$em);
+     */
+    protected function resultat(): ResultatBuilder
+    {
+        return ResultatBuilder::aResultat();
     }
 }

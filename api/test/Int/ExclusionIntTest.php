@@ -22,11 +22,11 @@ class ExclusionIntTest extends IntTestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
     public function testExclusionWorkflow(bool $curl): void
     {
-        $admin = $this->creeUtilisateurEnBase('admin', ['admin' => true]);
+        $admin = $this->utilisateur()->withIdentifiant('admin')->withAdmin()->persist(self::$em);
         $this->postConnexion($curl, $admin);
 
         // Verify new user has no exclusions
-        $quiOffre = $this->creeUtilisateurEnBase('quiOffre');
+        $quiOffre = $this->utilisateur()->withIdentifiant('quiOffre')->persist(self::$em);
         $this->requestApi(
             $curl,
             'GET',
@@ -38,7 +38,7 @@ class ExclusionIntTest extends IntTestCase
         $this->assertEquals([], $body);
 
         // Create first exclusion
-        $quiNeDoitPasRecevoir1 = $this->creeUtilisateurEnBase('quiNeDoitPasRecevoir1');
+        $quiNeDoitPasRecevoir1 = $this->utilisateur()->withIdentifiant('quiNeDoitPasRecevoir1')->persist(self::$em);
         $this->requestApi(
             $curl,
             'POST',
@@ -63,7 +63,7 @@ class ExclusionIntTest extends IntTestCase
         $this->assertEquals([self::exclusionAttendue($quiNeDoitPasRecevoir1)], $body);
 
         // Create second exclusion
-        $quiNeDoitPasRecevoir2 = $this->creeUtilisateurEnBase('quiNeDoitPasRecevoir2');
+        $quiNeDoitPasRecevoir2 = $this->utilisateur()->withIdentifiant('quiNeDoitPasRecevoir2')->persist(self::$em);
         $this->requestApi(
             $curl,
             'POST',

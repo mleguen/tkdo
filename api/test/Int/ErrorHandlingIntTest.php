@@ -27,7 +27,7 @@ class ErrorHandlingIntTest extends IntTestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
     public function test401TokenAbsent(bool $curl): void
     {
-        $utilisateur = $this->creeUtilisateurEnBase('utilisateur');
+        $utilisateur = $this->utilisateur()->withIdentifiant('utilisateur')->persist(self::$em);
 
         // Test various endpoints without authentication
         $endpoints = [
@@ -84,7 +84,7 @@ class ErrorHandlingIntTest extends IntTestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
     public function test400IdentifiantsInvalides(bool $curl): void
     {
-        $utilisateur = $this->creeUtilisateurEnBase('utilisateur');
+        $utilisateur = $this->utilisateur()->withIdentifiant('utilisateur')->persist(self::$em);
 
         // Test with wrong password
         $this->requestApi(
@@ -218,8 +218,8 @@ class ErrorHandlingIntTest extends IntTestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
     public function test400DoublonExclusion(bool $curl): void
     {
-        $user1 = $this->creeUtilisateurEnBase('user1', ['admin' => true]);
-        $user2 = $this->creeUtilisateurEnBase('user2');
+        $user1 = $this->utilisateur()->withIdentifiant('user1')->withAdmin()->persist(self::$em);
+        $user2 = $this->utilisateur()->withIdentifiant('user2')->persist(self::$em);
 
         $this->postConnexion($curl, $user1);
 
@@ -258,7 +258,7 @@ class ErrorHandlingIntTest extends IntTestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
     public function test400IdeeDejaSupprimee(bool $curl): void
     {
-        $idee = $this->creeIdeeEnBase(['dateSuppression' => new DateTime()]);
+        $idee = $this->idee()->withDateSuppression(new DateTime())->persist(self::$em);
         $this->postConnexion($curl, $idee->getAuteur());
 
         $this->requestApi(
@@ -279,7 +279,7 @@ class ErrorHandlingIntTest extends IntTestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
     public function test403PasAdmin(bool $curl): void
     {
-        $nonAdmin = $this->creeUtilisateurEnBase('nonAdmin', ['admin' => false]);
+        $nonAdmin = $this->utilisateur()->withIdentifiant('nonAdmin')->persist(self::$em);
         $this->postConnexion($curl, $nonAdmin);
 
         // Try to list all users (admin only)
@@ -303,9 +303,9 @@ class ErrorHandlingIntTest extends IntTestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
     public function test403PasAuteur(bool $curl): void
     {
-        $auteur = $this->creeUtilisateurEnBase('auteur');
-        $utilisateur = $this->creeUtilisateurEnBase('utilisateur');
-        $tiers = $this->creeUtilisateurEnBase('tiers');
+        $auteur = $this->utilisateur()->withIdentifiant('auteur')->persist(self::$em);
+        $utilisateur = $this->utilisateur()->withIdentifiant('utilisateur')->persist(self::$em);
+        $tiers = $this->utilisateur()->withIdentifiant('tiers')->persist(self::$em);
 
         $this->postConnexion($curl, $tiers);
 
@@ -333,9 +333,9 @@ class ErrorHandlingIntTest extends IntTestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
     public function test403PasParticipant(bool $curl): void
     {
-        $participant = $this->creeUtilisateurEnBase('participant');
-        $nonParticipant = $this->creeUtilisateurEnBase('nonParticipant');
-        $occasion = $this->creeOccasionEnBase(['participants' => [$participant]]);
+        $participant = $this->utilisateur()->withIdentifiant('participant')->persist(self::$em);
+        $nonParticipant = $this->utilisateur()->withIdentifiant('nonParticipant')->persist(self::$em);
+        $occasion = $this->occasion()->withParticipants([$participant])->persist(self::$em);
 
         $this->postConnexion($curl, $nonParticipant);
 
@@ -422,7 +422,7 @@ class ErrorHandlingIntTest extends IntTestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
     public function testFormatReponseErreurConsistant(bool $curl): void
     {
-        $utilisateur = $this->creeUtilisateurEnBase('utilisateur');
+        $utilisateur = $this->utilisateur()->withIdentifiant('utilisateur')->persist(self::$em);
 
         // Collect various error responses
         $errors = [];
@@ -487,9 +487,9 @@ class ErrorHandlingIntTest extends IntTestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
     public function test400UtilisateurDejaParticipant(bool $curl): void
     {
-        $admin = $this->creeUtilisateurEnBase('admin', ['admin' => true]);
-        $user = $this->creeUtilisateurEnBase('user');
-        $occasion = $this->creeOccasionEnBase(['participants' => [$user]]);
+        $admin = $this->utilisateur()->withIdentifiant('admin')->withAdmin()->persist(self::$em);
+        $user = $this->utilisateur()->withIdentifiant('user')->persist(self::$em);
+        $occasion = $this->occasion()->withParticipants([$user])->persist(self::$em);
 
         $this->postConnexion($curl, $admin);
 
@@ -514,10 +514,10 @@ class ErrorHandlingIntTest extends IntTestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
     public function test400TirageDejaLance(bool $curl): void
     {
-        $admin = $this->creeUtilisateurEnBase('admin', ['admin' => true]);
-        $user1 = $this->creeUtilisateurEnBase('user1');
-        $user2 = $this->creeUtilisateurEnBase('user2');
-        $occasion = $this->creeOccasionEnBase(['participants' => [$user1, $user2]]);
+        $admin = $this->utilisateur()->withIdentifiant('admin')->withAdmin()->persist(self::$em);
+        $user1 = $this->utilisateur()->withIdentifiant('user1')->persist(self::$em);
+        $user2 = $this->utilisateur()->withIdentifiant('user2')->persist(self::$em);
+        $occasion = $this->occasion()->withParticipants([$user1, $user2])->persist(self::$em);
 
         $this->postConnexion($curl, $admin);
 

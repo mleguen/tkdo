@@ -12,7 +12,7 @@ class AuthIntTest extends IntTestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
     function testGetUtilisateurTokenInvalide(bool $curl)
     {
-        $utilisateur = $this->creeUtilisateurEnBase('utilisateur');
+        $utilisateur = $this->utilisateur()->withIdentifiant('utilisateur')->persist(self::$em);
         $this->token = 'invalide';
 
         $this->requestApi(
