@@ -59,6 +59,7 @@
   - Add specialized infrastructure integration tests: NotifIntTest.php (notification-specific concerns: instant notifications, daily digest mechanics, preference filtering, occasion filtering, 11 tests), ErrorHandlingIntTest.php (comprehensive error responses: 400/401/403/404 scenarios, error format consistency, 18 tests), DatabaseConstraintIntTest.php (database constraints: unique, foreign keys, NOT NULL, cascades, 13 tests); existing AuthIntTest.php and ConnexionIntTest.php now serve as specialized infrastructure tests (authentication edge cases and login workflows respectively)
   - Fix PHPUnit test suite configuration (phpunit.xml) by renaming test suites from French ("Tests unitaires", "Tests d'intégration") to English ("Unit", "Int") to match CI workflow --testsuite filter parameters, ensuring tests run correctly in GitHub Actions
   - Upgrade Node.js from v20 to v24 (LTS) which includes npm v11, bringing improved performance and security features (updated Docker container and CI workflows)
+  - Fixed high-severity qs vulnerability (GHSA-6rw7-vpxm-498p) allowing DoS via memory exhaustion by forcing qs@6.14.1+ via npm package overrides - addresses transitive dependency through @cypress/request
 
 ## V1.4.4 (December 8, 2025)
 
