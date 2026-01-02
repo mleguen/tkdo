@@ -12,6 +12,8 @@ use Doctrine\ORM\EntityManager;
 /**
  * Fluent builder for creating test Idee entities
  *
+ * Note: Both utilisateur and auteur are required fields.
+ *
  * Usage:
  *   $idee = IdeeBuilder::anIdee()
  *       ->forUtilisateur($recipient)
@@ -107,20 +109,22 @@ class IdeeBuilder
     /**
      * Build the Idee entity in memory (not persisted)
      *
-     * Note: If utilisateur or auteur are not set, default users will be created.
-     * For integration tests, consider setting these explicitly or persisting them first.
+     * Note: Both utilisateur and auteur must be set before calling build().
      */
     public function build(): IdeeAdaptor
     {
-        // Ensure required fields are set with defaults if not provided
-        $utilisateur = $this->utilisateur ?? UtilisateurBuilder::aUser()->build();
-        $auteur = $this->auteur ?? UtilisateurBuilder::aUser()->build();
+        if ($this->utilisateur === null) {
+            throw new \InvalidArgumentException('Utilisateur is required for IdeeBuilder');
+        }
+        if ($this->auteur === null) {
+            throw new \InvalidArgumentException('Auteur is required for IdeeBuilder');
+        }
 
         $idee = new IdeeAdaptor();
         $idee
-            ->setUtilisateur($utilisateur)
+            ->setUtilisateur($this->utilisateur)
             ->setDescription($this->description)
-            ->setAuteur($auteur)
+            ->setAuteur($this->auteur)
             ->setDateProposition($this->dateProposition)
             ->setDateSuppression($this->dateSuppression);
 
