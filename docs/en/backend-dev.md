@@ -1522,8 +1522,9 @@ UtilisateurBuilder::aUser()
     ->withDateDerniereNotifPeriodique(DateTime $date)
     ->withPrefNotifIdees(string $prefNotifIdees)
     ->withMdpClair(string $mdpClair)
-    ->build()                    // Returns entity (not persisted)
-    ->persist(EntityManager $em) // Returns persisted entity
+    ->build();                    // Returns entity (not persisted)
+    // OR
+    ->persist(EntityManager $em); // Returns persisted entity
 ```
 
 **OccasionBuilder:**
@@ -1534,8 +1535,9 @@ OccasionBuilder::anOccasion()
     ->withDate(DateTime $date)
     ->withParticipants(array $participants)
     ->withParticipant(UtilisateurAdaptor $participant)
-    ->build()
-    ->persist(EntityManager $em)
+    ->build();
+    // OR
+    ->persist(EntityManager $em);
 ```
 
 **IdeeBuilder:**
@@ -1548,8 +1550,9 @@ IdeeBuilder::anIdee()
     ->withDateProposition(DateTime $dateProposition)
     ->withDateSuppression(?DateTime $dateSuppression)
     ->deleted()  // Convenience method for soft delete
-    ->build()
-    ->persist(EntityManager $em)
+    ->build();
+    // OR
+    ->persist(EntityManager $em);
 ```
 
 **ResultatBuilder:**
@@ -1559,8 +1562,9 @@ ResultatBuilder::aResultat()
     ->forOccasion(OccasionAdaptor $occasion)
     ->withQuiOffre(UtilisateurAdaptor $quiOffre)
     ->withQuiRecoit(UtilisateurAdaptor $quiRecoit)
-    ->build()
-    ->persist(EntityManager $em)
+    ->build();
+    // OR
+    ->persist(EntityManager $em);
 ```
 
 #### Builder Best Practices
