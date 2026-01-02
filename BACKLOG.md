@@ -16,19 +16,6 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 
 ### Frontend Testing - Component Tests
 
-**Task 12:** Add AdminComponent component tests
-- **File:** `front/cypress/component/admin.component.cy.ts`
-- **Content:**
-  - Test user list rendering
-  - Test create user form
-  - Test user deletion
-  - Test admin-only access
-  - Test form validation
-  - Mock user list and API responses
-- **Current state:** Minimal (mounting only)
-- **Estimated additions:** ~100-130 lines
-- **Priority:** Medium - admin functionality
-
 **Task 13:** Add HeaderComponent component tests
 - **File:** `front/cypress/component/header.component.cy.ts`
 - **Content:**

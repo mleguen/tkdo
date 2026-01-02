@@ -69,6 +69,7 @@
   - Document subcomponent testing pattern in frontend development guide: add comprehensive section on querying child component instances in Cypress component tests using fixture.debugElement and By.directive(), with working examples and guidance on when to use this pattern for testing component composition
   - Update testing documentation to remove --spec flag usage recommendation for component tests as it can cause tests to run with 0 specs found without clear error messages
   - Add comprehensive component tests for ProfilComponent covering form rendering, profile data display, form validation (name, email, password fields), successful profile updates, password change functionality, error handling, and user input handling (53 tests)
+  - Add component tests for AdminComponent covering API documentation page rendering with real-life examples (authentication token display, API URL usage, user ID interpolation in curl commands), reactive updates when user changes, and authenticated vs unauthenticated states (11 tests)
 
 ## V1.4.4 (December 8, 2025)
 
