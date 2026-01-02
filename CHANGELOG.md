@@ -70,6 +70,7 @@
   - Update testing documentation to remove --spec flag usage recommendation for component tests as it can cause tests to run with 0 specs found without clear error messages
   - Add comprehensive component tests for ProfilComponent covering form rendering, profile data display, form validation (name, email, password fields), successful profile updates, password change functionality, error handling, and user input handling (53 tests)
   - Add component tests for AdminComponent covering API documentation page rendering with real-life examples (authentication token display, API URL usage, user ID interpolation in curl commands), reactive updates when user changes, and authenticated vs unauthenticated states (11 tests)
+  - Add comprehensive component tests for IdeeComponent (18 tests) covering: basic rendering and edge cases (empty inputs, long descriptions, special characters), French date formatting with moment.js, author display logic ("Vous" vs author name based on afficheAuteur input), delete button visibility based on authorship, and event emissions for delete actions
 
 ## V1.4.4 (December 8, 2025)
 

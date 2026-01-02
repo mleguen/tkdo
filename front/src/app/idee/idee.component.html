@@ -10,7 +10,11 @@
   <div class="card-body">
     <h3 class="card-title">{{ idee.description }}</h3>
     @if (idee.auteur.id === utilisateurConnecte.id) {
-      <button (click)="supprime.emit()" class="btn btn-danger btnSupprimer">
+      <button
+        (click)="onSupprime()"
+        [disabled]="isDeleting"
+        class="btn btn-danger btnSupprimer"
+      >
         Supprimer
       </button>
     }

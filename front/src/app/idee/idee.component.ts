@@ -28,6 +28,7 @@ export class IdeeComponent implements OnChanges {
   @Output() supprime = new EventEmitter();
 
   datePropositionFormatee = '';
+  isDeleting = false;
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['idee']) {
@@ -38,5 +39,13 @@ export class IdeeComponent implements OnChanges {
         .locale('fr')
         .format('L à LT');
     }
+  }
+
+  onSupprime(): void {
+    if (this.isDeleting) {
+      return;
+    }
+    this.isDeleting = true;
+    this.supprime.emit();
   }
 }
