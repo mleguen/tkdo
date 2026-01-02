@@ -28,6 +28,9 @@ export class IdeeComponent implements OnChanges {
   @Output() supprime = new EventEmitter();
 
   datePropositionFormatee = '';
+  /**
+   * Flag used to prevent double-clicks on the delete button and avoid duplicate delete operations.
+   */
   isDeleting = false;
 
   ngOnChanges(changes: SimpleChanges): void {

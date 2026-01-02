@@ -515,7 +515,7 @@ describe('ListeIdeesComponent', () => {
       getSubComponents(mountResponse, IdeeComponent).should(
         ($ideeComponents) => {
           expect($ideeComponents).to.have.length(1);
-          expect($ideeComponents[0].idee).to.equal(aliceIdea);
+          expect($ideeComponents[0].utilisateurConnecte).to.equal(alice);
         },
       );
     });

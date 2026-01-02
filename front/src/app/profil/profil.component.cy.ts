@@ -288,10 +288,9 @@ describe('ProfilComponent', () => {
       cy.get('button[type="submit"]').should('be.disabled');
     });
 
-    it('should disable submit button when no changes are made', () => {
-      // All fields are already filled but we need to mark them as touched/dirty
-      // or have at least one change. In this case, the form should be valid
-      // but the requireOne validator requires at least one field to be filled
+    it('should enable submit button with pre-filled fields', () => {
+      // All fields are already filled with valid data; in this case, the form
+      // should be considered valid and the submit button should be enabled.
       cy.get('button[type="submit"]').should('not.be.disabled');
     });
   });
