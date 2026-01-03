@@ -98,22 +98,190 @@ Example from `api/.claude/settings.json`:
 }
 ```
 
+## GitHub Integration
+
+### Overview
+
+Claude Code uses the **GitHub MCP (Model Context Protocol)** server for structured access to GitHub operations. This provides:
+
+- **Autonomous read operations** - Claude can view issues, PRs, comments, and checks without asking permission
+- **Permission-required writes** - All modifications (creating issues/PRs, posting comments) require user approval
+- **Native tool integration** - GitHub operations work like built-in tools (Read, Write, Grep)
+- **Structured responses** - JSON data instead of text parsing
+
+### Configuration
+
+**MCP Server:** `@modelcontextprotocol/server-github`
+
+**Location:** `.claude/settings.local.json`
+
+**Authentication:** Requires `GITHUB_TOKEN` environment variable
+
+### Setting Up GitHub Token
+
+**1. Generate a Personal Access Token:**
+
+Visit https://github.com/settings/tokens and create a new token (classic) with these scopes:
+
+- **`repo`** - Full repository access (required for private repos)
+- **`read:org`** - Read organization data
+- **`workflow`** - Read GitHub Actions workflow runs
+
+**Token name suggestion:** "Claude Code - Tkdo"
+
+**2. Set the environment variable:**
+
+Add to your shell profile (`~/.bashrc`, `~/.zshrc`, etc.):
+
+```bash
+export GITHUB_TOKEN="ghp_your_token_here"
+```
+
+Then reload your shell:
+```bash
+source ~/.bashrc  # or ~/.zshrc
+```
+
+**3. Verify the setup:**
+
+Claude Code will now autonomously use GitHub MCP for read operations.
+
+**Note for multiple worktrees:** All worktrees share the same `GITHUB_TOKEN` environment variable. Each Claude Code instance spawns its own independent MCP server process, so there are no conflicts.
+
+### Read Operations (Autonomous)
+
+Claude Code can perform these operations **without asking permission:**
+
+**Issues:**
+- View issue details
+- List repository issues
+- Search issues
+- Read issue comments
+
+**Pull Requests:**
+- View PR details
+- List PRs
+- Get PR diff and file changes
+- View PR checks/status
+- List PR reviews
+- Read review comments
+
+**Repository:**
+- View repository information
+- Search code
+- Get file contents
+- List commits
+- View commit details
+- List branches
+
+**GitHub Actions:**
+- List workflows
+- View workflow runs
+- Check run status
+
+### Write Operations (Require Permission)
+
+These operations **always require user approval:**
+
+**Issues:**
+- Create new issue
+- Update existing issue
+- Create issue comment
+
+**Pull Requests:**
+- Create pull request
+- Update pull request
+- Create review
+- Create review comment
+- Reply to review comment thread
+
+**Repository:**
+- Create or update files
+- Push files
+- Create branch
+
+### Hybrid Approach: GitHub MCP + gh CLI
+
+**Why both tools?**
+
+The official GitHub MCP server doesn't yet support **threaded review comment replies** (the `/comments/COMMENT_ID/replies` endpoint). Until this feature is added, we use a hybrid approach:
+
+- **GitHub MCP** - All read operations (autonomous)
+- **gh CLI** - Threaded review comment replies (requires permission)
+
+**Tracking:** GitHub MCP feature requests for threaded replies:
+- [Issue #1322](https://github.com/github/github-mcp-server/issues/1322)
+- [Issue #635](https://github.com/github/github-mcp-server/issues/635)
+
+When these are implemented, we'll migrate fully to GitHub MCP.
+
+### Tool Comparison
+
+| Operation | GitHub MCP | gh CLI | Status |
+|-----------|------------|--------|--------|
+| View issues | `github_get_issue` | `gh issue view` | Autonomous (MCP) |
+| List PRs | `github_list_pull_requests` | `gh pr list` | Autonomous (MCP) |
+| View PR | `github_get_pull_request` | `gh pr view` | Autonomous (MCP) |
+| PR diff | `github_get_pull_request` | `gh pr diff` | Autonomous (MCP) |
+| PR checks | `github_get_workflow_run` | `gh pr checks` | Autonomous (MCP) |
+| Review comments | `github_get_review_comments` | `gh api repos/.../comments` | Autonomous (MCP) |
+| Reply to thread | Not yet supported | `gh api -X POST .../replies` | Requires permission (gh CLI) |
+| Create PR | `github_create_pull_request` | `gh pr create` | Requires permission |
+
+### Troubleshooting
+
+**MCP server not starting:**
+1. Verify `GITHUB_TOKEN` is set: `echo $GITHUB_TOKEN`
+2. Check token has required scopes at https://github.com/settings/tokens
+3. Restart Claude Code to reload environment variables
+
+**Permission denied errors:**
+- Ensure token has `repo` scope for private repositories
+- For organization repos, ensure token has `read:org` scope
+
+**Claude asking permission for read operations:**
+- Check `.claude/settings.local.json` includes the operation in the `allow` list
+- Verify MCP server configuration is correct
+
+**Rate limiting:**
+- GitHub allows 5,000 API requests/hour with authentication
+- Check current usage: `curl -H "Authorization: token $GITHUB_TOKEN" https://api.github.com/rate_limit`
+- Multiple worktrees share the same rate limit (5,000/hour is typically sufficient)
+
 ### Pull Request Review Responses
 
 **CRITICAL WORKFLOW:** After addressing PR review comments with code changes, you MUST respond to each unresolved comment individually explaining what was fixed.
 
 **Step 1: List all unresolved review comments**
+
+Claude Code will autonomously fetch review comments using GitHub MCP:
+
+```
+Uses github_get_review_comments tool - returns structured data with:
+- Comment IDs
+- File paths and line numbers
+- Comment bodies
+- Thread status (resolved/unresolved)
+```
+
+**Equivalent gh CLI command (for reference):**
 ```bash
 gh api repos/OWNER/REPO/pulls/PR_NUMBER/comments --jq '.[] | {id: .id, path: .path, line: .line, body: .body | .[0:100]}'
 ```
 
 **Step 2: Reply to EACH unresolved comment in its individual thread**
+
+**IMPORTANT:** Claude will request permission before posting any replies.
+
+**Using gh CLI (current method):**
 ```bash
 gh api -X POST repos/OWNER/REPO/pulls/PR_NUMBER/comments/COMMENT_ID/replies \
   -f body="Fixed in commit COMMIT_SHA.
 
 [Explanation of what was changed and how it addresses the comment]"
 ```
+
+**Note:** GitHub MCP doesn't yet support threaded review comment replies. When support is added (tracking: Issues #1322, #635), we'll use the native MCP operation instead.
 
 **MANDATORY RULES:**
 1. **ALWAYS use the `/comments/COMMENT_ID/replies` endpoint** - This posts to the individual conversation thread
