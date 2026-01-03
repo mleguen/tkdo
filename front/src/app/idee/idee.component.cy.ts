@@ -158,7 +158,6 @@ describe('IdeeComponent', () => {
 
       cy.get('.card-header').should('contain', '25/12/2024 à 22:30');
     });
-
   });
 
   describe('Author Display', () => {
@@ -337,5 +336,4 @@ describe('IdeeComponent', () => {
       cy.get('@supprimeEmit').should('have.been.calledOnce'); // Still only called once
     });
   });
-
 });

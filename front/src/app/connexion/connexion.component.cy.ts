@@ -255,7 +255,7 @@ describe('ConnexionComponent', () => {
       cy.get('#mdp').should('have.value', 'P@ssw0rd!#$');
     });
 
-    it("shouldn't trim whitespace from inputs", () => {
+    it('should preserve whitespace in inputs', () => {
       connecteStub.resolves();
 
       cy.get('#identifiant').type('  testuser  ');

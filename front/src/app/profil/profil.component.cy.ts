@@ -213,7 +213,7 @@ describe('ProfilComponent', () => {
       cy.get('.alert-danger').should('not.exist');
     });
 
-    it('should allow empty password field', () => {
+    it('should allow form submission when password field is empty', () => {
       cy.get('#mdp').should('have.value', '');
       cy.get('button[type="submit"]').should('not.be.disabled');
     });
@@ -387,15 +387,11 @@ describe('ProfilComponent', () => {
 
       cy.get('@modifieUtilisateur').then((stub) => {
         const utilisateur = (stub as unknown as SinonStub).getCall(0).args[0];
-        // When password fields are empty, mdp should not be added to the object
-        // However, if the original user object had mdp, it will still be there
-        // because Object.assign doesn't remove properties
-        // The key is that we don't add/update mdp when password is empty
+        // When password fields are empty, mdp should not be included in the update payload
         expect(utilisateur.nom).to.equal('Alice Updated');
         expect(utilisateur.email).to.equal('alice@example.com');
-        // The important check: password wasn't changed/added
+        // Verify password wasn't changed/added
         if (utilisateur.mdp !== undefined) {
-          // If mdp exists, it should not have been changed from any potential initial value
           expect(utilisateur.mdp).not.to.equal('');
         }
       });

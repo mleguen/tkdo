@@ -10,6 +10,7 @@
         "plugin:@angular-eslint/recommended",
         "plugin:@angular-eslint/template/process-inline-templates"
       ],
+      "plugins": ["@stylistic"],
       "rules": {
         "@typescript-eslint/no-deprecated": "error",
         "@angular-eslint/directive-selector": [
@@ -33,7 +34,16 @@
           {
             "ignoreRestSiblings": true
           }
-        ]
+        ],
+        "@stylistic/no-multiple-empty-lines": [
+          "error",
+          {
+            "max": 1,
+            "maxEOF": 0,
+            "maxBOF": 0
+          }
+        ],
+        "@stylistic/no-trailing-spaces": "error"
       },
       "parserOptions": {
         "project": [

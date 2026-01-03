@@ -286,11 +286,22 @@ Run before committing:
 ./npm test  # Includes formatting, linting, and unit tests
 ```
 
+**Automated formatting and linting:**
+- **Prettier**: Handles code formatting (indentation, line length, blank lines, etc.)
+- **ESLint**: Enforces code quality and style rules
+- **Running `./npm test`** automatically runs both Prettier and ESLint before tests
+
 **ESLint configuration:**
 - No unused variables (except rest siblings)
 - Strict TypeScript rules enforced
 - Angular-specific linting enabled
 - Accessibility checks on templates
+- **Stylistic rules** (via @stylistic/eslint-plugin):
+  - No multiple consecutive empty lines (max 1)
+  - No trailing whitespace
+  - No blank lines at beginning/end of files
+
+**Important:** The test suite will automatically format your code with Prettier. If you see files being reformatted when running `./npm test`, commit those formatting changes along with your code changes.
 
 ### Backend (PHP/Slim Framework)
 

@@ -398,7 +398,9 @@ describe('HeaderComponent', () => {
     });
 
     it('should show menu when user logs in', () => {
-      const utilisateurConnecte$ = new BehaviorSubject<UtilisateurPrive | null>(null);
+      const utilisateurConnecte$ = new BehaviorSubject<UtilisateurPrive | null>(
+        null,
+      );
       const mockBackend = {
         occasions$: new BehaviorSubject([]),
         utilisateurConnecte$,
@@ -429,7 +431,6 @@ describe('HeaderComponent', () => {
       cy.get('#menuMonProfil').should('exist');
       cy.get('#btnSeDeconnecter').should('exist');
     });
-
   });
 
   describe('Admin Menu Visibility', () => {
@@ -517,7 +518,6 @@ describe('HeaderComponent', () => {
 
       cy.contains('Administration').should('exist');
     });
-
   });
 
   describe('Occasions Dropdown', () => {
@@ -749,7 +749,6 @@ describe('HeaderComponent', () => {
       cy.get('.menuMesOccasionsItem').should('have.length', 3);
       cy.contains('.menuMesOccasionsItem', 'Nouvel An').should('exist');
     });
-
   });
 
   describe('Navigation Links', () => {
@@ -786,6 +785,5 @@ describe('HeaderComponent', () => {
 
       cy.get('#menuMonProfil').should('have.attr', 'href', '/profil');
     });
-
   });
 });

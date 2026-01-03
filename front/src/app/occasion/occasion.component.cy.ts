@@ -36,9 +36,12 @@ describe('OccasionComponent', () => {
     date: '2020-12-25',
   };
 
+  // Future date for testing future occasion logic (computed dynamically to always be in the future)
+  const futureDate = new Date();
+  futureDate.setFullYear(futureDate.getFullYear() + 5);
   const mockOccasionFutureDate: Occasion = {
     ...mockOccasion,
-    date: '2030-12-25',
+    date: futureDate.toISOString().split('T')[0],
   };
 
   function mountComponent(occasion: Occasion | null, userConnected = true) {
