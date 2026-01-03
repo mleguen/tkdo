@@ -39,6 +39,7 @@ describe('OccasionComponent', () => {
   // Future date for testing future occasion logic (computed dynamically to always be in the future)
   const futureDate = new Date();
   futureDate.setFullYear(futureDate.getFullYear() + 5);
+  const futureDateFormatted = `${String(futureDate.getDate()).padStart(2, '0')}/${String(futureDate.getMonth() + 1).padStart(2, '0')}/${futureDate.getFullYear()}`;
   const mockOccasionFutureDate: Occasion = {
     ...mockOccasion,
     date: futureDate.toISOString().split('T')[0],
@@ -102,7 +103,7 @@ describe('OccasionComponent', () => {
       cy.get('#dateRemiseCadeaux')
         .should('exist')
         .should('contain.text', 'Date de remise des cadeaux :')
-        .should('contain.text', '25/12/2030');
+        .should('contain.text', futureDateFormatted);
     });
 
     it('should display date with primary alert class for future occasions', () => {
