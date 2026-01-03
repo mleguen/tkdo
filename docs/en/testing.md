@@ -436,6 +436,371 @@ front/cypress/
     └── e2e.ts
 ```
 
+### Responsive Design Testing
+
+All frontend tests should verify that components and user flows work correctly across different viewport sizes. This ensures a consistent user experience on desktop, tablet, and mobile devices.
+
+#### Understanding Application Breakpoints
+
+**This application uses Bootstrap 5's grid breakpoints:**
+
+```scss
+// From bootstrap/scss/_variables.scss
+$grid-breakpoints: (
+  xs: 0,
+  sm: 576px,
+  md: 768px,    // navbar-expand-md - our mobile/desktop breakpoint
+  lg: 992px,
+  xl: 1200px,
+  xxl: 1400px
+)
+```
+
+**Critical breakpoint: `md` at 768px** - Components like HeaderComponent (front/src/app/header/header.component.ts:33) use Angular CDK's `BreakpointObserver` with `(min-width: 768px)` to match Bootstrap's `navbar-expand-md` behavior.
+
+**Why not use Angular CDK Breakpoints?**
+
+Angular CDK provides predefined breakpoints, but **`Breakpoints.Medium` starts at 960px, not 768px**. Using it would contradict Bootstrap's grid system and cause inconsistent behavior.
+
+**Why not read Bootstrap breakpoints programmatically?**
+
+While we could export Bootstrap's SCSS variables to TypeScript, it's overkill for just defining two test viewport sizes. The pragmatic approach is to define constants in tests with comments referencing Bootstrap.
+
+#### Standard Viewport Sizes
+
+**For most tests, use only two viewports:**
+
+| Viewport | Width | Height | Bootstrap Alignment |
+|----------|-------|--------|---------------------|
+| **Mobile**  | 375px | 667px  | Below `md` (768px) - common mobile device (iPhone SE) |
+| **Desktop** | 768px | 1024px | At Bootstrap `md` breakpoint - matches `navbar-expand-md` |
+
+**Why 375px for mobile?**
+- 375px is a real device width (iPhone SE, very common)
+- It's clearly below Bootstrap's `md` breakpoint at 768px
+- Alternative: Could use 767px to test just below the breakpoint, but 375px is more realistic
+
+**When to test additional viewports:**
+
+- **Breakpoint edge (767px)**: Only when specifically testing `BreakpointObserver` components (like HeaderComponent) where exact breakpoint behavior matters
+- **Wider viewports (992px+)**: Only if your component has responsive behavior at Bootstrap `lg`, `xl`, or `xxl` breakpoints
+
+**Default Cypress viewport**: 1000px × 660px (above `md`, desktop mode)
+
+**Pragmatic approach**: Most components only need mobile (375px) and desktop (768px). Don't test every Bootstrap breakpoint unless your component actually changes behavior at those breakpoints.
+
+#### When to Test Multiple Viewports
+
+**Always test multiple viewports when:**
+- Components have responsive behavior (hamburger menu, collapsible sections, etc.)
+- Layout changes significantly between mobile and desktop
+- Testing navigation components
+- Testing forms with complex layouts
+- Testing tables or lists that might need horizontal scrolling
+
+**Single viewport is acceptable when:**
+- Component has no responsive behavior
+- Testing pure logic without UI changes
+- Quick smoke tests
+
+#### Component Tests - Viewport Examples
+
+**Testing a component on different viewports:**
+
+```typescript
+// user-card.component.cy.ts
+describe('UserCardComponent - Responsive', () => {
+  it('should display full details on desktop (≥768px)', () => {
+    cy.viewport(768, 1024); // At Bootstrap navbar-expand-md breakpoint
+
+    cy.mount(UserCardComponent, {
+      componentProperties: {
+        user: { id: 1, nom: 'Alice', email: 'alice@example.com' }
+      }
+    });
+
+    // Desktop shows all fields inline
+    cy.get('[data-cy=user-name]').should('be.visible');
+    cy.get('[data-cy=user-email]').should('be.visible');
+    cy.get('[data-cy=user-actions]').should('be.visible');
+  });
+
+  it('should stack elements on mobile (<768px)', () => {
+    cy.viewport(375, 667); // Below Bootstrap breakpoint
+
+    cy.mount(UserCardComponent, {
+      componentProperties: {
+        user: { id: 1, nom: 'Alice', email: 'alice@example.com' }
+      }
+    });
+
+    // Mobile stacks elements vertically
+    cy.get('[data-cy=user-name]').should('be.visible');
+    cy.get('[data-cy=user-email]').should('be.visible');
+
+    // Check that elements are stacked (email is below name)
+    cy.get('[data-cy=user-name]').then($name => {
+      cy.get('[data-cy=user-email]').then($email => {
+        expect($email[0].offsetTop).to.be.greaterThan($name[0].offsetTop);
+      });
+    });
+  });
+});
+```
+
+**Testing navigation with hamburger menu:**
+
+```typescript
+// header.component.cy.ts
+describe('HeaderComponent - Responsive Navigation', () => {
+  beforeEach(() => {
+    cy.mount(HeaderComponent, {
+      imports: [HttpClientTestingModule],
+      providers: [provideRouter([])],
+    });
+  });
+
+  it('should show full navigation menu on desktop (≥768px)', () => {
+    cy.viewport(768, 1024); // At Bootstrap navbar-expand-md breakpoint
+
+    // Desktop shows all nav items inline
+    cy.get('[data-cy=nav-home]').should('be.visible');
+    cy.get('[data-cy=nav-occasions]').should('be.visible');
+    cy.get('[data-cy=nav-profile]').should('be.visible');
+
+    // Hamburger menu not visible on desktop
+    cy.get('[data-cy=hamburger-menu]').should('not.exist');
+  });
+
+  it('should show hamburger menu on mobile (<768px)', () => {
+    cy.viewport(375, 667); // Below Bootstrap breakpoint
+
+    // Mobile hides nav items initially
+    cy.get('[data-cy=nav-home]').should('not.be.visible');
+    cy.get('[data-cy=nav-occasions]').should('not.be.visible');
+
+    // Hamburger menu is visible
+    cy.get('[data-cy=hamburger-menu]').should('be.visible');
+
+    // Click hamburger to open menu
+    cy.get('[data-cy=hamburger-menu]').click();
+
+    // Nav items now visible
+    cy.get('[data-cy=nav-home]').should('be.visible');
+    cy.get('[data-cy=nav-occasions]').should('be.visible');
+  });
+});
+```
+
+#### Integration Tests - Viewport Examples
+
+**Testing a complete user flow on both mobile and desktop:**
+
+```typescript
+// connexion.cy.ts
+describe('connexion/déconnexion', () => {
+  const testOnViewport = (viewportName: string, width: number, height: number) => {
+    describe(`on ${viewportName}`, () => {
+      beforeEach(() => {
+        cy.viewport(width, height);
+      });
+
+      it('se connecter', () => {
+        cy.visit('/');
+
+        const connexionPage = new ConnexionPage();
+        connexionPage.titre().should('have.text', 'Connexion');
+
+        cy.fixture('utilisateurs').then((utilisateurs) => {
+          connexionPage.identifiant().type(utilisateurs.soi.identifiant);
+          connexionPage.motDePasse().type(utilisateurs.soi.mdp);
+          connexionPage.boutonSeConnecter().click();
+          connexionPage.nomUtilisateur().should('have.text', utilisateurs.soi.nom);
+        });
+      });
+
+      it('se déconnecter', () => {
+        // Login first
+        cy.visit('/');
+        cy.fixture('utilisateurs').then((utilisateurs) => {
+          const connexionPage = new ConnexionPage();
+          connexionPage.identifiant().type(utilisateurs.soi.identifiant);
+          connexionPage.motDePasse().type(utilisateurs.soi.mdp);
+          connexionPage.boutonSeConnecter().click();
+
+          // Then logout
+          connexionPage.boutonSeDeconnecter().click();
+          connexionPage.titre().should('have.text', 'Connexion');
+        });
+      });
+    });
+  };
+
+  // Test on mobile (below 768px breakpoint)
+  testOnViewport('mobile', 375, 667);
+
+  // Test on desktop (at 768px breakpoint - matches Bootstrap navbar-expand-md)
+  testOnViewport('desktop', 768, 1024);
+});
+```
+
+**Alternative approach - Testing specific viewport-dependent behaviors:**
+
+```typescript
+// liste-idees.cy.ts
+describe('liste des idées', () => {
+  beforeEach(() => {
+    cy.visit('/');
+    // Login and navigate to ideas page
+  });
+
+  it('should display ideas in grid on desktop (≥768px)', () => {
+    cy.viewport(768, 1024); // At Bootstrap breakpoint
+
+    cy.get('[data-cy=idea-container]').should('have.css', 'display', 'grid');
+    cy.get('[data-cy=idea-card]').should('have.length.greaterThan', 0);
+  });
+
+  it('should display ideas in single column on mobile (<768px)', () => {
+    cy.viewport(375, 667); // Below Bootstrap breakpoint
+
+    cy.get('[data-cy=idea-container]').should('have.css', 'flex-direction', 'column');
+    cy.get('[data-cy=idea-card]').should('have.length.greaterThan', 0);
+  });
+});
+```
+
+#### E2E Tests - Viewport Examples
+
+E2E tests follow the same patterns as integration tests:
+
+```typescript
+// e2e/complete-workflow.cy.ts
+describe('Complete gift exchange workflow', () => {
+  // Test critical path on both mobile and desktop
+  // Using 768px for desktop to match Bootstrap's navbar-expand-md breakpoint
+  [
+    { name: 'mobile', width: 375, height: 667 },   // Below 768px
+    { name: 'desktop', width: 768, height: 1024 }  // At 768px breakpoint
+  ].forEach(viewport => {
+    it(`should complete workflow on ${viewport.name}`, () => {
+      cy.viewport(viewport.width, viewport.height);
+
+      // Reset database
+      cy.exec('./composer run install-fixtures');
+
+      // Login
+      cy.visit('/');
+      cy.get('[data-cy=identifiant]').type('admin');
+      cy.get('[data-cy=password]').type('admin');
+      cy.get('[data-cy=submit]').click();
+
+      // Create occasion
+      cy.get('[data-cy=create-occasion]').click();
+      // ... rest of workflow
+    });
+  });
+});
+```
+
+#### Viewport Testing Helper (Optional)
+
+**For simple tests, just use `cy.viewport()` directly:**
+
+```typescript
+it('should work on mobile', () => {
+  cy.viewport(375, 667);  // Below Bootstrap md (768px)
+  // ... test
+});
+
+it('should work on desktop', () => {
+  cy.viewport(768, 1024);  // At Bootstrap md breakpoint
+  // ... test
+});
+```
+
+**Optional: Create a reusable helper for consistency** (only if you have many responsive tests):
+
+```typescript
+// cypress/support/commands.ts
+
+// Viewport sizes aligned with Bootstrap 5 grid breakpoints
+// See: bootstrap/scss/_variables.scss $grid-breakpoints
+export const VIEWPORTS = {
+  mobile: { width: 375, height: 667 },   // Below Bootstrap md (768px) - iPhone SE
+  desktop: { width: 768, height: 1024 }  // At Bootstrap md - navbar-expand-md
+} as const;
+
+Cypress.Commands.add('setViewport', (device: keyof typeof VIEWPORTS) => {
+  const { width, height } = VIEWPORTS[device];
+  cy.viewport(width, height);
+});
+
+// Usage:
+// cy.setViewport('mobile');
+// cy.setViewport('desktop');
+```
+
+Declare the custom command:
+
+```typescript
+declare global {
+  namespace Cypress {
+    interface Chainable {
+      setViewport(device: 'mobile' | 'desktop'): Chainable<void>;
+    }
+  }
+}
+```
+
+**Note**: We don't programmatically import Bootstrap's SCSS variables because it would require a build step to export SCSS to TypeScript. For just two viewport sizes, defining constants with clear comments is more pragmatic.
+
+#### Best Practices for Viewport Testing
+
+1. **Don't over-test** - Only test multiple viewports for components with actual responsive behavior (navigation, modals, forms with changing layouts)
+
+2. **Use two viewports for most tests** - Mobile (375×667) and desktop (768×1024) are sufficient for most responsive components
+
+3. **Align with Bootstrap breakpoints** - Always use Bootstrap's `md` breakpoint at 768px for desktop tests (see `$grid-breakpoints` in `bootstrap/scss/_variables.scss`)
+
+4. **Never assume Angular CDK aligns with Bootstrap** - `Breakpoints.Medium` is 960px, not 768px
+
+5. **Test breakpoint edges only when needed** - Only test 767px vs 768px for components using `BreakpointObserver` (like HeaderComponent)
+
+6. **Keep it simple** - Use `cy.viewport(375, 667)` and `cy.viewport(768, 1024)` directly in tests unless you have many responsive tests
+
+7. **Don't programmatically import Bootstrap SCSS** - Defining viewport constants in TypeScript with clear comments is more pragmatic than a SCSS-to-TS build step
+
+8. **Consider touch vs. mouse** (rare) - Only if testing gesture-specific features
+   ```typescript
+   // Mobile - use touch events when needed
+   cy.get('[data-cy=swipeable]').trigger('touchstart');
+   ```
+
+#### Running Tests with Specific Viewports
+
+You can also set default viewport in `cypress.config.ts`:
+
+```typescript
+// cypress.config.ts
+export default defineConfig({
+  // Set to desktop mode (at 768px breakpoint) as default
+  viewportWidth: 768,
+  viewportHeight: 1024,
+  // ... other config
+});
+```
+
+Or override for specific test runs:
+
+```bash
+# Run with mobile viewport as default (below 768px breakpoint)
+./npm run int -- --config viewportWidth=375,viewportHeight=667
+
+# Run at exact desktop breakpoint (768px)
+./npm run int -- --config viewportWidth=768,viewportHeight=1024
+```
+
 ## Backend Testing
 
 The backend uses **PHPUnit** for both unit and integration tests.

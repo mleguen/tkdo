@@ -522,6 +522,10 @@ describe('UserListComponent', () => {
 
 For components that render child components, you can query for child component instances to verify they're properly configured. See [Frontend Dev Guide - Testing Components with Subcomponents](frontend-dev.md#testing-components-with-subcomponents) for the complete pattern.
 
+**Responsive design testing:**
+
+Components with responsive behavior should be tested across multiple viewport sizes (mobile, tablet, desktop). See [Testing Guide - Responsive Design Testing](testing.md#responsive-design-testing) for detailed guidelines and examples.
+
 **Run component tests:**
 ```bash
 ./npm run ct
@@ -543,6 +547,10 @@ describe('Login Flow', () => {
   });
 });
 ```
+
+**Responsive design testing:**
+
+User workflows that involve responsive UI elements (navigation, forms, modals) should be tested on both mobile and desktop viewports to ensure proper behavior across devices. See [Testing Guide - Responsive Design Testing](testing.md#responsive-design-testing) for patterns and examples.
 
 **Run integration tests:**
 ```bash

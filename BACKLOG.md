@@ -18,16 +18,6 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 
 The current test suites (unit, component, integration, and E2E) do not systematically verify behavior across different viewport sizes. All tests should cover both desktop and mobile viewports to catch responsive design issues.
 
-**Task 13 bis:** Establish viewport testing guidelines for all test levels
-- **Update testing documentation:**
-  - Add section to `docs/en/testing.md` on responsive testing practices
-  - Document standard viewport sizes to test (desktop, tablet, mobile)
-  - Provide code examples for viewport testing in Cypress component and E2E tests
-- **Component tests:** Key UI components (header, navigation, modals) should include desktop/mobile variants
-- **Integration tests:** User workflows should be tested on both desktop and mobile viewports
-- **E2E tests:** Critical paths should include viewport variations where UI differs significantly
-- **Documentation reference:** Update `docs/en/CONTRIBUTING.md#testing-requirements` with viewport testing expectations
-
 **Task 13 ter:** Audit existing tests for viewport coverage
 - Review all component tests (`.component.cy.ts` files) to identify components that change behavior based on viewport
 - Review integration tests (`front/cypress/integration/`) for missing mobile/desktop coverage
