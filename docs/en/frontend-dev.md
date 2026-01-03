@@ -317,7 +317,7 @@ describe('BackendService', () => {
 ./npm run ct
 ```
 
-> ⚠️ **Don't use --spec to only run specific component tests** as the test suite may succeed with 0 test run for these components, even if the specified spec files were found.
+> ⚠️ **Don't use --spec to run specific component test files** as this can cause Cypress to report 0 tests run without a clear error message, even when the spec files exist.
 
 **Interactive mode**:
 

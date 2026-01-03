@@ -5,6 +5,7 @@
 ### Users
 - **Bug Fixes:**
   - Fixed desktop navigation menu not visible on initial connection - menu now appears by default on desktop viewports (≥768px) while remaining collapsed on mobile (<768px), using Angular CDK's BreakpointObserver for responsive behavior
+  - Fixed IdeeComponent delete button allowing multiple clicks, which could cause duplicate delete operations
 
 ### Contributors
 - **Documentation:**

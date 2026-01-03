@@ -41,6 +41,8 @@ export class IdeeComponent implements OnChanges {
       )
         .locale('fr')
         .format('L à LT');
+      // Reset the deleting flag when the idee changes (e.g., when a new idea is displayed)
+      this.isDeleting = false;
     }
   }
 
