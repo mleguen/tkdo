@@ -1572,7 +1572,7 @@ ResultatBuilder::aResultat()
 1. **Use method chaining** - Builders are designed for fluent syntax
 2. **Call persist() when needed** - Use `build()` for in-memory entities, `persist()` for database entities
 3. **Explicit over implicit** - Use builders when configuration makes test intent clearer
-4. **Defaults are safe** - All builders provide valid default values
+4. **Defaults where possible** - UtilisateurBuilder and OccasionBuilder work without configuration, while IdeeBuilder and ResultatBuilder require explicit relationship parameters
 5. **Test isolation** - Builders use counters for unique defaults across tests
 
 ### Test Data Reset
