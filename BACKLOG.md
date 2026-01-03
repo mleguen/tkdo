@@ -14,16 +14,6 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 - Fast test execution via parallelization
 - Compliance with general and framework-specific best practices
 
-### Frontend Testing - Desktop & Mobile Viewport Testing
-
-The current test suites (unit, component, integration, and E2E) do not systematically verify behavior across different viewport sizes. All tests should cover both desktop and mobile viewports to catch responsive design issues.
-
-**Task 13 ter:** Audit existing tests for viewport coverage
-- Review all component tests (`.component.cy.ts` files) to identify components that change behavior based on viewport
-- Review integration tests (`front/cypress/integration/`) for missing mobile/desktop coverage
-- Add viewport tests to components with responsive behavior (forms, tables, cards, navigation)
-- Estimated scope: ~10-15 component files may need viewport test variants
-
 ### Frontend Testing - Integration Tests Enhancement
 
 **Task 14:** Add mobile viewport testing to all integration tests
