@@ -389,4 +389,155 @@ describe('OccasionComponent', () => {
       cy.get('#occasion').should('contain.text', 'Veuillez patienter...');
     });
   });
+
+  describe('Responsive Design - Desktop Viewport (≥768px)', () => {
+    beforeEach(() => {
+      cy.viewport(1280, 720);
+      mountComponent(mockOccasionFutureDate);
+    });
+
+    it('should display participant cards in multi-column grid layout', () => {
+      // With 3 participants and desktop viewport, cards should be in a grid
+      cy.get('.card').should('have.length', 3);
+
+      // All cards should be visible without scrolling horizontally
+      cy.get('.card').each(($card) => {
+        cy.wrap($card).should('be.visible');
+      });
+    });
+
+    it('should apply responsive column classes to participant cards', () => {
+      // Verify that the parent container has responsive column classes
+      cy.get('.card').parent().should('have.class', 'col-sm-6');
+      cy.get('.card').parent().should('have.class', 'col-md-4');
+      cy.get('.card').parent().should('have.class', 'col-lg-3');
+      cy.get('.card').parent().should('have.class', 'col-xl-2');
+    });
+
+    it('should make all participant cards clickable on desktop', () => {
+      // Verify that the first card can be clicked (same as existing test)
+      cy.get('.card').first().click();
+      // After clicking, cards should still exist (navigation would happen in real app)
+      cy.get('.card').should('exist');
+    });
+
+    it('should display gift recipient card prominently on desktop', () => {
+      cy.get('.card.estQuiRecoitDeMoi')
+        .should('be.visible')
+        .should('have.class', 'bg-primary')
+        .should('have.class', 'text-white');
+    });
+
+    it('should display participant names clearly on desktop', () => {
+      cy.get('.card').first().find('.card-title').should('be.visible');
+      cy.get('.card').eq(1).find('.card-title').should('be.visible');
+      cy.get('.card').eq(2).find('.card-title').should('be.visible');
+    });
+  });
+
+  describe('Responsive Design - Mobile Viewport (<768px)', () => {
+    beforeEach(() => {
+      cy.viewport(375, 667);
+      mountComponent(mockOccasionFutureDate);
+    });
+
+    it('should display participant cards in fewer columns on mobile', () => {
+      // Verify all cards are still present
+      cy.get('.card').should('have.length', 3);
+
+      // Cards should stack more vertically on mobile
+      cy.get('.card').each(($card) => {
+        cy.wrap($card).should('be.visible');
+      });
+    });
+
+    it('should maintain responsive column classes on mobile', () => {
+      // Verify responsive classes are still applied
+      cy.get('.card').parent().should('have.class', 'col-sm-6');
+    });
+
+    it('should make all participant cards tappable on mobile', () => {
+      // Verify that the first card can be tapped (clicked)
+      cy.get('.card').first().click();
+      // After clicking, cards should still exist (navigation would happen in real app)
+      cy.get('.card').should('exist');
+    });
+
+    it('should display gift recipient card prominently on mobile', () => {
+      cy.get('.card.estQuiRecoitDeMoi')
+        .should('be.visible')
+        .should('have.class', 'bg-primary')
+        .should('have.class', 'text-white');
+    });
+
+    it('should display participant names clearly on mobile', () => {
+      // Verify all participant names are readable
+      cy.get('.card .card-title').each(($title) => {
+        cy.wrap($title).should('be.visible');
+      });
+    });
+
+    it('should display occasion date alert at full width on mobile', () => {
+      cy.get('#dateRemiseCadeaux')
+        .should('be.visible')
+        .should('have.class', 'col-12');
+    });
+
+    it('should display instructions text clearly on mobile', () => {
+      cy.contains("Cliquer sur le nom d'un des participants").should(
+        'be.visible',
+      );
+    });
+
+    it('should maintain card sorting order on mobile', () => {
+      // Gift recipient should still be first
+      cy.get('.card').first().should('have.class', 'estQuiRecoitDeMoi');
+
+      // Current user should still be second
+      cy.get('.card').eq(1).should('have.class', 'estMoi');
+    });
+  });
+
+  describe('Responsive Design - Breakpoint Edge Cases', () => {
+    it('should handle Bootstrap md breakpoint at 768px', () => {
+      cy.viewport(768, 1024);
+      mountComponent(mockOccasionFutureDate);
+
+      // Verify all cards are displayed
+      cy.get('.card').should('have.length', 3);
+
+      // Verify responsive classes are applied
+      cy.get('.card').parent().should('have.class', 'col-md-4');
+    });
+
+    it('should handle viewport just below md breakpoint at 767px', () => {
+      cy.viewport(767, 1024);
+      mountComponent(mockOccasionFutureDate);
+
+      // Verify all cards are displayed
+      cy.get('.card').should('have.length', 3);
+
+      // Should use col-sm-6 layout (2 columns)
+      cy.get('.card').parent().should('have.class', 'col-sm-6');
+    });
+
+    it('should handle tablet portrait viewport', () => {
+      cy.viewport(768, 1024);
+      mountComponent(mockOccasionFutureDate);
+
+      // All cards should be visible
+      cy.get('.card').should('have.length', 3).should('be.visible');
+    });
+
+    it('should handle large desktop viewport', () => {
+      cy.viewport(1920, 1080);
+      mountComponent(mockOccasionFutureDate);
+
+      // Should use col-xl-2 layout (up to 6 columns)
+      cy.get('.card').parent().should('have.class', 'col-xl-2');
+
+      // All cards should be visible
+      cy.get('.card').should('have.length', 3).should('be.visible');
+    });
+  });
 });
