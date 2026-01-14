@@ -46,7 +46,7 @@
   - Update backlog management guidelines in CONTRIBUTING.md to no longer require renumbering tasks when completed tasks are removed - gaps in task numbers are acceptable
   - Fix E2E test console.log spy timing issues by waiting for the window to be loaded first
   - Configure CI test parallelization and cross-browser testing: split Cypress component tests across 2 shards per browser using cypress-split plugin, add Firefox to all Cypress tests (component, integration, E2E) alongside Chrome
-  - Fix CI Firefox cache corruption issue by introducing dedicated setup-firefox job that runs before test jobs to ensure only one job downloads and caches Firefox, preventing race conditions when multiple parallel jobs try to save the cache simultaneously
+  - Fix CI Firefox cache corruption issue by creating a shared reusable setup-firefox workflow that ensures only one job across all workflows handles Firefox caching, preventing race conditions when test.yml and e2e.yml workflows run in parallel
   - Add comprehensive unit tests for connexionGuard covering authentication checks, navigation blocking, redirect behavior with return URLs, and CanActivate interface implementation (5 tests)
   - Add comprehensive unit tests for adminGuard covering admin authorization logic, navigation blocking for non-admin users, and CanActivate interface implementation (4 tests)
   - Add comprehensive unit tests for HTTP interceptors (25 tests total):
