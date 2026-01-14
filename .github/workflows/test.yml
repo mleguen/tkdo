@@ -27,6 +27,8 @@ jobs:
     # Call the reusable setup-firefox workflow
     # This ensures only one job across all workflows handles Firefox caching
     uses: ./.github/workflows/setup-firefox.yml
+    permissions:
+      contents: read
     # Skip for draft PRs - only run when PR is ready for review
     if: github.event_name != 'pull_request' || !github.event.pull_request.draft
 
