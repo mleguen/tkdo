@@ -33,7 +33,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: /opt/hostedtoolcache/firefox
-          key: ${{ runner.os }}-firefox-latest-v5-${{ steps.week.outputs.week }}
+          key: ${{ runner.os }}-firefox-latest-v6-${{ steps.week.outputs.week }}
 
       # Download & install latest Firefox only if cache miss
       - name: Download & install latest Firefox
@@ -49,5 +49,10 @@ jobs:
           if [ -d "/opt/hostedtoolcache/firefox/latest" ]; then
             echo "Renaming /opt/hostedtoolcache/firefox/latest to /opt/hostedtoolcache/firefox/$VERSION"
             mv /opt/hostedtoolcache/firefox/latest "/opt/hostedtoolcache/firefox/$VERSION"
+            # Move the .complete marker file if it exists in the version directory
+            if [ -f "/opt/hostedtoolcache/firefox/$VERSION/x64.complete" ]; then
+              echo "Moving .complete marker from $VERSION/x64.complete to $VERSION.complete for tc.find() compatibility"
+              mv "/opt/hostedtoolcache/firefox/$VERSION/x64.complete" "/opt/hostedtoolcache/firefox/$VERSION.complete"
+            fi
             echo "Firefox $VERSION cached for tool-cache API compatibility"
           fi
