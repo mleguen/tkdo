@@ -112,27 +112,18 @@ jobs:
       # Restore Firefox binary from cache (populated by setup-firefox job)
       - name: Restore Firefox binary from cache
         if: matrix.browser == 'firefox'
+        id: firefox-cache
         uses: actions/cache/restore@v4
         with:
           path: /opt/hostedtoolcache/firefox
-          key: ${{ runner.os }}-firefox-latest-v5-${{ steps.week.outputs.week }}
+          key: ${{ runner.os }}-firefox-latest-v6-${{ steps.week.outputs.week }}
 
-      # Add Firefox to PATH from cache
-      - name: Add Firefox to PATH
+      # Install Firefox from cache (uses tc.find() to locate cached Firefox)
+      - name: Install Firefox from cache
         if: matrix.browser == 'firefox'
-        run: |
-          # Find the Firefox version directory
-          FIREFOX_DIR=$(find /opt/hostedtoolcache/firefox -mindepth 1 -maxdepth 1 -type d | head -1)
-          if [ -z "$FIREFOX_DIR" ]; then
-            echo "Error: No Firefox directory found in cache"
-            exit 1
-          fi
-          # Add Firefox binary to PATH
-          FIREFOX_BIN="$FIREFOX_DIR/x64"
-          echo "$FIREFOX_BIN" >> $GITHUB_PATH
-          echo "Added Firefox from $FIREFOX_BIN to PATH"
-          # Verify Firefox is accessible
-          "$FIREFOX_BIN/firefox" --version
+        uses: browser-actions/setup-firefox@latest
+        with:
+          firefox-version: "*"
 
       # cypress-io/github-action with install: false since we handle it above
       # Use cypress-split plugin for test sharding across parallel CI machines
@@ -227,27 +218,18 @@ jobs:
       # Restore Firefox binary from cache (populated by setup-firefox job)
       - name: Restore Firefox binary from cache
         if: matrix.browser == 'firefox'
+        id: firefox-cache
         uses: actions/cache/restore@v4
         with:
           path: /opt/hostedtoolcache/firefox
-          key: ${{ runner.os }}-firefox-latest-v5-${{ steps.week.outputs.week }}
+          key: ${{ runner.os }}-firefox-latest-v6-${{ steps.week.outputs.week }}
 
-      # Add Firefox to PATH from cache
-      - name: Add Firefox to PATH
+      # Install Firefox from cache (uses tc.find() to locate cached Firefox)
+      - name: Install Firefox from cache
         if: matrix.browser == 'firefox'
-        run: |
-          # Find the Firefox version directory
-          FIREFOX_DIR=$(find /opt/hostedtoolcache/firefox -mindepth 1 -maxdepth 1 -type d | head -1)
-          if [ -z "$FIREFOX_DIR" ]; then
-            echo "Error: No Firefox directory found in cache"
-            exit 1
-          fi
-          # Add Firefox binary to PATH
-          FIREFOX_BIN="$FIREFOX_DIR/x64"
-          echo "$FIREFOX_BIN" >> $GITHUB_PATH
-          echo "Added Firefox from $FIREFOX_BIN to PATH"
-          # Verify Firefox is accessible
-          "$FIREFOX_BIN/firefox" --version
+        uses: browser-actions/setup-firefox@latest
+        with:
+          firefox-version: "*"
 
       # Run integration tests with mocked backend using ng e2e
       # ng e2e starts its own dev server, so we don't use start/wait-on
