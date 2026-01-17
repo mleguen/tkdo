@@ -730,72 +730,22 @@ Before submitting documentation changes:
 
 ## Localization
 
-### English as Source Language
+### English-Only Documentation
 
-**All documentation originates in English** (`docs/`).
+**All documentation is written and maintained in English only** (`docs/`).
+
+**Policy:**
+- Documentation is not translated to other languages
+- No translation workflow is maintained for documentation
+- All contributors should write documentation in English
 
 **Reasons:**
 - Largest developer audience
 - Industry standard for technical documentation
-- Easier to maintain single source language
+- Simpler to maintain (single language)
+- Avoids synchronization issues between translations
 
-### Translation Process
-
-**When creating translations:**
-
-1. **Translate from English source**
-   - Always translate from `docs/` files
-   - Never translate from other translations
-   - Preserve formatting and structure
-
-2. **Organize by language code**
-   ```
-   docs/
-     en/           # English (source)
-     fr/           # French
-     es/           # Spanish
-   ```
-
-3. **Maintain feature parity**
-   - All languages should have same documents
-   - Translations should be complete (no partial translations)
-   - Update translations when English changes
-
-4. **Translation guidelines**
-   - Preserve technical terms (class names, commands)
-   - Translate UI strings consistently
-   - Adapt examples for cultural relevance
-   - Keep same heading structure (for anchor links)
-
-### Maintaining Translations
-
-**When updating English documentation:**
-
-1. Make changes in `docs/`
-2. Note changes in CHANGELOG
-3. Create tracking issue for translation updates
-4. Tag with language codes that need updates
-
-**Translation workflow:**
-1. English maintainer updates source
-2. Create issue: "Update [language] translation for [file]"
-3. Native speaker reviews and updates
-4. Changes merged when complete
-
-**Translation status tracking:**
-
-Create `docs/TRANSLATION-STATUS.md`:
-
-```markdown
-| Document            | English | French | Spanish |
-|---------------------|---------|--------|---------|
-| user-guide.md       | ✅      | ✅     | ❌      |
-| admin-guide.md      | ✅      | ⚠️     | ❌      |
-
-✅ = Up to date
-⚠️ = Needs update
-❌ = Not translated
-```
+**Note:** This policy applies only to documentation. The frontend application has a separate localization infrastructure for user-facing text (see [BACKLOG.md](../BACKLOG.md) for frontend localization tasks).
 
 ---
 

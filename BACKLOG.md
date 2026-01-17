@@ -252,17 +252,6 @@ Following the viewport testing audit, components with responsive behavior need v
 
 ---
 
-### Documentation Restructuring (Priority)
-
-**Task I18N04:** Update Documentation Guide for English-only policy
-- **File:** `docs/DOCUMENTATION-GUIDE.md`
-- **Content:**
-  - Update the Localization section to clarify documentation is English-only (no translations maintained)
-  - Remove references to translation workflow for documentation
-- **Priority:** Medium - clarifies documentation policy
-
----
-
 ### Frontend Localization Infrastructure
 
 **Task I18N05:** Set up Angular i18n configuration
