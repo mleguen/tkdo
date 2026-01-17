@@ -247,33 +247,12 @@ Following the viewport testing audit, components with responsive behavior need v
 
 **Reference Documentation**:
 - [Documentation Guide - Localization](docs/DOCUMENTATION-GUIDE.md#localization)
-- [Contributing Guide - Coding Standards](docs/CONTRIBUTING.md#coding-standards)
+- [Contributing Guide - Coding Standards](CONTRIBUTING.md#coding-standards)
 - [Angular i18n Documentation](https://angular.dev/guide/i18n)
 
 ---
 
 ### Documentation Restructuring (Priority)
-
-**Task I18N02:** Replace deprecated French CONTRIBUTING.md at root
-- **Files:**
-  - `CONTRIBUTING.md` (root - currently French, deprecated)
-  - `docs/CONTRIBUTING.md`
-- **Content:**
-  - Move `docs/CONTRIBUTING.md` to project root, replacing the deprecated French version
-  - Update any links pointing to `docs/CONTRIBUTING.md` to point to root `CONTRIBUTING.md`
-- **Priority:** High - standard practice for open source projects
-
-**Task I18N03:** Update documentation references to root CONTRIBUTING.md
-- **Files:**
-  - `README.md` (root)
-  - `BACKLOG.md`
-  - `.claude/README.md`
-  - All files in `docs/`
-- **Content:**
-  - Update references to `docs/CONTRIBUTING.md` to point to root `CONTRIBUTING.md`
-  - Remove any "coming soon" labels for completed documentation
-- **Dependencies:** Task I18N02
-- **Priority:** High - ensures documentation links work
 
 **Task I18N04:** Update Documentation Guide for English-only policy
 - **File:** `docs/DOCUMENTATION-GUIDE.md`
@@ -728,7 +707,7 @@ Following the viewport testing audit, components with responsive behavior need v
    - **Alternative:** Switch to compiled Bootstrap CSS instead of Sass imports (eliminates all Sass warnings but loses customization ability)
    - **Priority:** Low (third-party dependency, blocked by Bootstrap development timeline)
 
-**Note:** See [CONTRIBUTING.md - Tracking Deprecation Warnings](docs/CONTRIBUTING.md#tracking-deprecation-warnings) for the process of tracking new deprecations.
+**Note:** See [CONTRIBUTING.md - Tracking Deprecation Warnings](CONTRIBUTING.md#tracking-deprecation-warnings) for the process of tracking new deprecations.
 
 ### Dependencies & General Security
 

@@ -2140,4 +2140,4 @@ $qb->select('COUNT(i.id)')
 
 - Check existing code for examples of similar features
 - Review unit and integration tests for usage patterns
-- Consult the [CONTRIBUTING guide](../../CONTRIBUTING.md) for contribution guidelines
+- Consult the [CONTRIBUTING guide](../CONTRIBUTING.md) for contribution guidelines

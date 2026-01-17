@@ -247,7 +247,7 @@ Default credentials: `admin` / `admin` (change password immediately!)
 - [Testing Guide](testing.md)
 - [API Reference](api-reference.md)
 - [Architecture & Design Decisions](architecture.md)
-- [Contributing Guidelines](CONTRIBUTING.md)
+- [Contributing Guidelines](../CONTRIBUTING.md)
 
 ### Deployment Documentation
 
@@ -284,7 +284,7 @@ Contributions are welcome! This project follows:
 - Angular style guide for TypeScript
 - Test-driven development practices
 
-See [Contributing Guidelines](CONTRIBUTING.md) for details.
+See [Contributing Guidelines](../CONTRIBUTING.md) for details.
 
 ## License
 

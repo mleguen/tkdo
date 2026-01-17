@@ -1321,4 +1321,4 @@ $BASE_URL/idee
 
 - Check the [Administrator Guide](./admin-guide.md) for practical examples
 - Review controller implementations in `api/src/Appli/Controller/`
-- Consult the [CONTRIBUTING guide](../../CONTRIBUTING.md)
+- Consult the [CONTRIBUTING guide](../CONTRIBUTING.md)

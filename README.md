@@ -92,7 +92,7 @@ The application ensures fairness with exclusion rules (e.g., prevent spouses fro
 **Want to contribute?** Follow these steps:
 
 1. **Set up development environment** - See [Development Setup Guide](docs/dev-setup.md)
-2. **Review contribution guidelines** - Read [Contributing Guidelines](docs/CONTRIBUTING.md)
+2. **Review contribution guidelines** - Read [Contributing Guidelines](CONTRIBUTING.md)
 3. **Understand the architecture** - Check [Architecture Documentation](docs/architecture.md)
 4. **Start coding** - See frontend and backend development guides
 
@@ -113,7 +113,7 @@ The application ensures fairness with exclusion rules (e.g., prevent spouses fro
 |-----------------------|-------------------------------------------------------------------------------------------------------------|
 | **User**              | [User Guide](docs/user-guide.md) • [Email Notifications](docs/notifications.md)                      |
 | **Administrator**     | [Admin Guide](docs/admin-guide.md) • [API Reference](docs/api-reference.md) • [Deployment Guide](docs/deployment-apache.md) |
-| **Developer**         | [Dev Setup](docs/dev-setup.md) • [Contributing](docs/CONTRIBUTING.md) • [Architecture](docs/architecture.md) • [Frontend Dev](docs/frontend-dev.md) • [Backend Dev](docs/backend-dev.md) |
+| **Developer**         | [Dev Setup](docs/dev-setup.md) • [Contributing](CONTRIBUTING.md) • [Architecture](docs/architecture.md) • [Frontend Dev](docs/frontend-dev.md) • [Backend Dev](docs/backend-dev.md) |
 | **System Admin**      | [Apache Deployment](docs/deployment-apache.md) • [Environment Variables](docs/environment-variables.md) • [Troubleshooting](docs/troubleshooting.md) |
 
 ### Additional Resources
@@ -136,7 +136,7 @@ Tkdo is actively maintained. See the [backlog](BACKLOG.md) for planned features 
 
 ### Contributing
 
-Contributions are welcome! Please read the [Contributing Guidelines](docs/CONTRIBUTING.md) before submitting pull requests.
+Contributions are welcome! Please read the [Contributing Guidelines](CONTRIBUTING.md) before submitting pull requests.
 
 **Ways to contribute:**
 - Report bugs and request features via GitHub issues
@@ -152,7 +152,7 @@ Contributions are welcome! Please read the [Contributing Guidelines](docs/CONTRI
 4. Write tests for your changes
 5. Submit a pull request
 
-For detailed instructions, see [Contributing Guidelines](docs/CONTRIBUTING.md).
+For detailed instructions, see [Contributing Guidelines](CONTRIBUTING.md).
 
 ### Support and Community
 

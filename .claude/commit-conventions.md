@@ -4,7 +4,7 @@ This document defines the commit message standards that Claude Code must follow 
 
 ## Format
 
-All commits created by Claude Code MUST follow the [Commit Message Conventions](../docs/CONTRIBUTING.md#commit-message-conventions).
+All commits created by Claude Code MUST follow the [Commit Message Conventions](../CONTRIBUTING.md#commit-message-conventions).
 
 ## Examples
 

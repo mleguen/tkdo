@@ -354,7 +354,7 @@ flowchart LR
 - Documentation with broken examples erodes user trust
 - Untested examples may work now but break with future changes
 - All test levels catch different types of issues
-- See [CONTRIBUTING.md](./en/CONTRIBUTING.md#testing-requirements) for detailed testing requirements
+- See [CONTRIBUTING.md](../CONTRIBUTING.md#testing-requirements) for detailed testing requirements
 
 ### Command-Line Examples
 

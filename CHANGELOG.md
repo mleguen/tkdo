@@ -24,6 +24,7 @@
   - Document Dart Sass 3.0.0 deprecation warnings in BACKLOG.md with specific actionable items for liste-idees component styles and monitoring tasks for Bootstrap compatibility
   - Investigate and document that Sass @import deprecation warnings cannot be fixed until Bootstrap v6 release - Bootstrap 5.3 does not support @use syntax and attempting conversion causes compilation errors
   - Restructure documentation from docs/en/ to docs/ and update all internal links across the project
+  - Move CONTRIBUTING.md from docs/ to project root following open source best practices, replacing the deprecated French version, and update all documentation links accordingly
 - **Project Configuration:**
   - Add Mermaid diagram quality standards (high contrast colors, readability, proper layouts)
 - **Technical Tasks:**

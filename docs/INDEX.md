@@ -27,7 +27,7 @@ New to Tkdo? Start here:
 
 - **I want to use Tkdo:** Read [User Guide](user-guide.md)
 - **I want to deploy Tkdo:** Read [Apache Deployment Guide](deployment-apache.md)
-- **I want to contribute:** Read [Development Setup](dev-setup.md) → [Contributing Guidelines](CONTRIBUTING.md)
+- **I want to contribute:** Read [Development Setup](dev-setup.md) → [Contributing Guidelines](../CONTRIBUTING.md)
 
 ---
 
@@ -60,7 +60,7 @@ Documentation for developers contributing to or extending Tkdo.
 | Document                                  | Description                                                           |
 |-------------------------------------------|-----------------------------------------------------------------------|
 | [Development Setup](dev-setup.md)         | Docker environment, running services, helper scripts                  |
-| [Contributing Guidelines](CONTRIBUTING.md)| Workflow, coding standards, testing, commit conventions, PR process   |
+| [Contributing Guidelines](../CONTRIBUTING.md)| Workflow, coding standards, testing, commit conventions, PR process   |
 | [Testing Guide](testing.md)               | Frontend, backend, and E2E testing strategies                         |
 | [CI Testing Strategy](ci-testing-strategy.md) | GitHub Actions CI/CD investigation and implementation guide      |
 
@@ -134,7 +134,7 @@ We welcome documentation improvements! Here's how to contribute:
 
 ### Making Changes
 
-1. **Follow the guidelines** - Read [Contributing Guidelines](CONTRIBUTING.md)
+1. **Follow the guidelines** - Read [Contributing Guidelines](../CONTRIBUTING.md)
 2. **Update in same commit** - Documentation changes go with related code changes
 3. **Test examples** - Ensure all code examples work
 4. **Check cross-references** - Update links when files change
@@ -147,7 +147,7 @@ We welcome documentation improvements! Here's how to contribute:
 - **Formatting** - Use proper markdown, align tables, format code blocks
 - **Diagrams** - Use Mermaid for technical diagrams
 
-For detailed documentation writing guidelines, see the [Contributing Guidelines](CONTRIBUTING.md).
+For detailed documentation writing guidelines, see the [Contributing Guidelines](../CONTRIBUTING.md).
 
 ### Reporting Issues
 
@@ -211,7 +211,7 @@ Found a problem in the documentation?
 
 **Developer:**
 1. [Development Setup](dev-setup.md) - Set up your environment
-2. [Contributing Guidelines](CONTRIBUTING.md) - Follow project standards
+2. [Contributing Guidelines](../CONTRIBUTING.md) - Follow project standards
 3. [Architecture](architecture.md) - Understand the system design
 4. [Frontend Development](frontend-dev.md) - Work on Angular app
 5. [Backend Development](backend-dev.md) - Work on PHP API

@@ -1170,4 +1170,4 @@ Use this matrix to decide on testing approach for different scenarios:
 
 - [Testing Guide](testing.md) - Current testing practices
 - [Development Setup](dev-setup.md) - Local development environment
-- [Contributing Guide](CONTRIBUTING.md) - Testing requirements for contributors
+- [Contributing Guide](../CONTRIBUTING.md) - Testing requirements for contributors

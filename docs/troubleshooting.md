@@ -769,7 +769,7 @@ When reporting an issue, include:
 - **Deployment Guides:**
   - [Apache Deployment](deployment-apache.md)
   - [Environment Variables](environment-variables.md)
-- **Contributing:** See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines
+- **Contributing:** See [CONTRIBUTING.md](../CONTRIBUTING.md) for contribution guidelines
 
 ---
 

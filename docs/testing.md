@@ -1730,4 +1730,4 @@ When adding new features:
 - Check test examples in `api/test/` and `front/cypress/`
 - Review PHPUnit documentation: https://phpunit.de/
 - Review Cypress documentation: https://docs.cypress.io/
-- Consult the [CONTRIBUTING guide](../../CONTRIBUTING.md)
+- Consult the [CONTRIBUTING guide](../CONTRIBUTING.md)

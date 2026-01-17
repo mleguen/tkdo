@@ -971,4 +971,4 @@ SELECT 'exclusion', COUNT(*) FROM tkdo_exclusion;
 
 - Check the [Backend Development Guide](./backend-dev.md) for Doctrine ORM usage
 - Review [Doctrine Documentation](https://www.doctrine-project.org/projects/doctrine-orm/en/current/index.html)
-- Consult the [CONTRIBUTING guide](../../CONTRIBUTING.md) for contribution guidelines
+- Consult the [CONTRIBUTING guide](../CONTRIBUTING.md) for contribution guidelines
