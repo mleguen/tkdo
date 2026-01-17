@@ -14,22 +14,58 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 - Fast test execution via parallelization
 - Compliance with general and framework-specific best practices
 
+### Frontend Testing - Component Viewport Testing
+
+Following the viewport testing audit, components with responsive behavior need viewport test coverage. See [docs/en/testing.md#responsive-design-testing](docs/en/testing.md#responsive-design-testing) for guidelines.
+
+**Task 14:** Add viewport tests to ListeIdeesComponent
+- **File:** `front/src/app/liste-idees/liste-idees.component.cy.ts`
+- **Content:**
+  - Test `card-columns` layout on mobile (375x667) vs desktop (768x1024)
+  - Verify header layout responsiveness (title + "Actualiser" button)
+  - Test form usability on mobile viewport
+- **Responsive behavior:** Uses Bootstrap columns (`col-10`, `col-auto`, `col-12`) and `card-columns` for responsive masonry layout
+- **Estimated additions:** ~40-60 lines
+- **Priority:** Medium - component has responsive layout behavior
+
+**Task 15:** Add viewport tests to form components
+- **Files:**
+  - `front/src/app/connexion/connexion.component.cy.ts`
+  - `front/src/app/profil/profil.component.cy.ts`
+- **Content:**
+  - Verify form usability on mobile (input sizes, button clickability)
+  - Test dropdown interactions on mobile
+- **Note:** These components have no specific responsive layout changes, but should verify mobile usability
+- **Estimated additions:** ~30-50 lines per file
+- **Priority:** Low - forms typically work on all viewports
+
+**Task 16:** Expand minimal component tests before adding viewport coverage
+- **Files:**
+  - `front/src/app/liste-occasions/liste-occasions.component.cy.ts`
+  - `front/src/app/page-idees/page-idees.component.cy.ts`
+  - `front/src/app/deconnexion/deconnexion.component.cy.ts`
+  - `front/src/app/app.component.cy.ts`
+- **Content:**
+  - Add comprehensive component tests first (currently only mount tests)
+  - Evaluate viewport testing needs after comprehensive tests exist
+- **Note:** Viewport tests should only be added after components have proper functional test coverage
+- **Estimated additions:** ~100-200 lines per file
+- **Priority:** Low - prerequisite for viewport tests on these components
+
 ### Frontend Testing - Integration Tests Enhancement
 
-**Task 14:** Add mobile viewport testing to all integration tests
+**Task 17:** Add mobile viewport testing to all integration tests
 - **Files:**
   - `front/cypress/e2e/*.cy.ts` (all test files)
   - `front/cypress/support/e2e.ts`
 - **Content:**
-  - Add viewport configuration helper
-  - Test all flows on mobile (375x667) and desktop (1280x720)
+  - Test all flows on mobile and desktop viewports (see [testing.md#standard-viewport-sizes](docs/en/testing.md#standard-viewport-sizes) for exact sizes)
   - Test responsive UI elements (hamburger menu, cards)
-  - Add viewport switcher to test suite
-  - Document mobile testing patterns
+  - Follow patterns from [testing.md#integration-tests---viewport-examples](docs/en/testing.md#integration-tests---viewport-examples)
 - **Estimated additions:** ~150-200 lines across files
 - **Priority:** High - mobile support is critical
 
-**Task 15:** Refactor integration tests to remove component-level concerns
+**Task 18:** Refactor integration tests to remove component-level concerns
 - **Files:**
   - `front/cypress/e2e/connexion.cy.ts`
   - `front/cypress/e2e/liste-idees.cy.ts`
@@ -40,10 +76,10 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
   - Reduce redundancy with component tests
   - Improve test performance
 - **Estimated changes:** ~50-100 lines removed, reorganized
-- **Dependencies:** Tasks 9-14 completed
+- **Dependencies:** Tasks 14-17 completed
 - **Priority:** Medium - maintains test pyramid balance
 
-**Task 16:** Add comprehensive error handling integration tests
+**Task 19:** Add comprehensive error handling integration tests
 - **File:** `front/cypress/e2e/error-handling.cy.ts` (new)
 - **Content:**
   - Test network failure scenarios
@@ -55,7 +91,7 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 - **Estimated size:** ~120-150 lines
 - **Priority:** Medium - important for resilience
 
-**Task 17:** Add notification preferences integration tests
+**Task 20:** Add notification preferences integration tests
 - **File:** `front/cypress/e2e/notifications.cy.ts` (new)
 - **Content:**
   - Test notification preference changes
@@ -68,7 +104,7 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 
 ### Frontend Testing - Test Infrastructure
 
-**Task 18:** Implement test data builders for fixtures
+**Task 21:** Implement test data builders for fixtures
 - **Files to create:**
   - `front/cypress/support/builders/utilisateur.builder.ts`
   - `front/cypress/support/builders/occasion.builder.ts`
@@ -81,7 +117,7 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 - **Estimated size:** ~150-200 lines total
 - **Priority:** Medium - improves test maintainability
 
-**Task 19:** Add reusable test assertions library
+**Task 22:** Add reusable test assertions library
 - **File:** `front/cypress/support/assertions.ts` (new)
 - **Content:**
   - Custom Cypress commands for common assertions
@@ -93,7 +129,7 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 
 ### Test Coverage and Quality
 
-**Task 32:** Set up test coverage reporting
+**Task 23:** Set up test coverage reporting
 - **Files to modify:**
   - `api/phpunit.xml`
   - `front/karma.conf.js` (if exists) or create
@@ -108,7 +144,7 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 - **Estimated size:** ~80-100 lines across files
 - **Priority:** Medium - tracks progress
 
-**Task 33:** Add mutation testing for backend
+**Task 24:** Add mutation testing for backend
 - **Files to create/modify:**
   - `api/infection.json.dist`
   - `api/composer.json` (add infection/infection)
@@ -123,7 +159,7 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 
 ### Performance Testing
 
-**Task 34:** Add performance benchmarks for critical paths
+**Task 25:** Add performance benchmarks for critical paths
 - **Files to create:**
   - `front/cypress/e2e/performance.cy.ts`
   - `api/test/Performance/DrawPerformanceTest.php`
@@ -139,7 +175,7 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 
 ### Accessibility Testing
 
-**Task 35:** Add accessibility testing to E2E tests
+**Task 26:** Add accessibility testing to E2E tests
 - **Files to create:**
   - `front/cypress/e2e/accessibility.cy.ts`
   - `front/package.json` (add cypress-axe)
@@ -155,7 +191,7 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 
 ### Documentation and Process
 
-**Task 36:** Create testing contribution guide
+**Task 27:** Create testing contribution guide
 - **File:** `docs/en/testing.md`
 - **Content:**
   - Add "Writing Tests" section with TDD workflow
@@ -167,7 +203,7 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 - **Estimated additions:** ~200-250 lines
 - **Priority:** Medium - enables contributor TDD
 
-**Task 37:** Create PR checklist template
+**Task 28:** Create PR checklist template
 - **File:** `.github/pull_request_template.md` (new)
 - **Content:**
   - Require test evidence for all PRs
@@ -178,7 +214,7 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 - **Estimated size:** ~40-60 lines
 - **Priority:** Medium - enforces testing standards
 
-**Task 38:** Add test execution time tracking and optimization
+**Task 29:** Add test execution time tracking and optimization
 - **Files to modify:**
   - `.github/workflows/test.yml`
   - `docs/en/testing.md`
@@ -191,7 +227,7 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 - **Estimated changes:** ~60-80 lines
 - **Priority:** Low - developer experience
 
-**Task 39:** Final review of testing documentation
+**Task 30:** Final review of testing documentation
 - **Files to modify:**
   - `docs/en/*.md`
 - **Content:**
