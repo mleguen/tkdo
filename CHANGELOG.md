@@ -1,87 +1,49 @@
 # Changelog
 
-## Next Release
+## V1.5.0 (January 18, 2026)
 
 ### Users
 - **Bug Fixes:**
-  - Fixed desktop navigation menu not visible on initial connection - menu now appears by default on desktop viewports (≥768px) while remaining collapsed on mobile (<768px), using Angular CDK's BreakpointObserver for responsive behavior
-  - Fixed IdeeComponent delete button allowing multiple clicks, which could cause duplicate delete operations
+  - Fixed desktop navigation menu not visible on initial page load (now uses responsive breakpoints)
+  - Fixed delete button allowing multiple clicks on gift ideas
 
 ### Contributors
 - **Documentation:**
-  - Create documentation writing guide (docs/DOCUMENTATION-GUIDE.md) consolidating all documentation standards, writing style, markdown conventions, diagram guidelines, code examples, link management, consistency practices, and localization process
-  - Update main README.md to English with project description, technology stack, getting started guides, and links to comprehensive documentation index
-  - Create documentation index and navigation (docs/INDEX.md) organizing all documentation by category with quick reference paths by user role
-  - Create comprehensive troubleshooting guide (docs/troubleshooting.md) consolidating all troubleshooting content into single source covering user issues, administrator issues, email notifications, development environment, production deployment, frontend, and backend problems
-  - Create backend/API development guide (docs/backend-dev.md) with hexagonal architecture documentation
-  - Create database documentation (docs/database.md) with schema diagrams, entity descriptions, and migration workflows
-  - Create testing guide (docs/testing.md) covering frontend, backend, and E2E testing strategies
-  - Create API reference (docs/api-reference.md) with complete endpoint documentation and curl examples
-  - Create architecture and design decisions documentation (docs/architecture.md) covering system architecture, frontend/backend design rationale, database design decisions, authentication strategy, email notification system, and deployment architecture
-  - Create contributing guidelines (docs/CONTRIBUTING.md) with development workflow, coding standards, testing requirements, commit conventions, pull request process, and release procedures
-  - Consolidate and streamline all English documentation (docs/) to remove inconsistency & redundancies and establish clear single sources of truth for each topic
-  - Update frontend development guide (docs/frontend-dev.md) with Angular v21 technology stack versions and common issues during major Angular upgrades
-  - Document Dart Sass 3.0.0 deprecation warnings in BACKLOG.md with specific actionable items for liste-idees component styles and monitoring tasks for Bootstrap compatibility
-  - Investigate and document that Sass @import deprecation warnings cannot be fixed until Bootstrap v6 release - Bootstrap 5.3 does not support @use syntax and attempting conversion causes compilation errors
-  - Restructure documentation from docs/en/ to docs/ and update all internal links across the project
-  - Move CONTRIBUTING.md from docs/ to project root following open source best practices, replacing the deprecated French version, and update all documentation links accordingly
-- **Project Configuration:**
-  - Add Mermaid diagram quality standards (high contrast colors, readability, proper layouts)
+  - Complete documentation overhaul: created 10+ guides covering architecture, API reference, backend/frontend development, testing, troubleshooting, database schema, and contributing guidelines
+  - Restructured documentation from docs/en/ to docs/ with centralized index (docs/INDEX.md)
+  - Moved CONTRIBUTING.md to project root following open source best practices
+  - Added responsive design testing guidelines aligned with Bootstrap 5 breakpoints
+  - Documented backend integration testing philosophy and builder patterns
 - **Technical Tasks:**
-  - Upgrade Angular from v17.3 to v21.0 to address critical security vulnerabilities
-  - Upgrade esbuild from 0.17.x to 0.26.0 (included in @angular/devkit/build-angular v21.0.3) to fix critical arbitrary file read vulnerability (CVE affecting <=0.24.2)
-  - Upgrade Cypress from v14.4.1 to v15.7.1 to fix critical unsafe random function vulnerability in form-data dependency (GHSA-fjxv-7rqg-78g4, upgraded from v4.0.3 to v4.0.5 via @cypress/request@3.0.9) and low severity symbolic link vulnerability in tmp dependency (GHSA-52f5-9888-hmc6, upgraded from v0.2.3 to v0.2.5)
-  - Upgrade TypeScript from 5.4 to 5.9
-  - Upgrade @ng-bootstrap/ng-bootstrap from v16.0 to v20.0
-  - Upgrade @angular-eslint packages from v17.3 to v21.1 to fix moderate severity vulnerabilities via nx dependency and tmp symbolic link attack (GHSA-52f5-9888-hmc6)
-  - Upgrade ESLint from v8.57.1 to v9.39.2 and migrate from archived eslint-plugin-deprecation to @typescript-eslint/no-deprecated rule, fixing brace-expansion ReDoS vulnerability (GHSA-v6h2-p8h4-qcjw/CVE-2025-5889) in ESLint dependencies
-  - Fix brace-expansion ReDoS vulnerability (GHSA-v6h2-p8h4-qcjw/CVE-2025-5889, CVSS 1.3) by upgrading transitive dependencies from karma and karma-coverage (1.1.11→1.1.12, 2.0.1→2.0.2) via npm audit fix, also upgrading Cypress from 15.7.1 to 15.8.1 to fix systeminformation command injection vulnerability (GHSA-wphj-fx3q-84ch) on Windows
-  - Apply Angular automatic migrations including inject() function pattern and block control flow syntax
-  - Update all component test files to use provideHttpClientTesting() instead of deprecated HttpClientTestingModule
-  - Update app.config.ts to use provideHttpClient(withInterceptorsFromDi()) instead of deprecated HttpClientModule
-  - Fix deprecated HttpErrorResponse.statusText usage for HTTP/2 compatibility
-  - Fix integration test whitespace assertion to handle Angular v21 block control flow whitespace preservation
-  - Fix integration test console.log spy timing issue to ensure console is available before spying on it
-  - Add @angular/cdk package to use BreakpointObserver for responsive design
-  - Add GitHub Actions CI workflow for unit and component tests, frontend integration tests and E2E tests, for automated testing on pull requests and pushes to master
-  - Add comprehensive component tests for HeaderComponent (32 tests) covering: desktop (≥768px) and mobile (<768px) viewport behavior, breakpoint edge cases (767px vs 768px), navigation menu rendering for authenticated/unauthenticated states, admin menu visibility based on user roles, occasions dropdown rendering and interaction, navigation links and routing, hamburger menu toggle functionality on mobile, and dynamic state updates for user login/logout - all using real viewport detection (cy.viewport) with Angular CDK BreakpointObserver
-  - Update backlog management guidelines in CONTRIBUTING.md to no longer require renumbering tasks when completed tasks are removed - gaps in task numbers are acceptable
-  - Fix E2E test console.log spy timing issues by waiting for the window to be loaded first
-  - Configure CI test parallelization and cross-browser testing: split Cypress component tests across 2 shards per browser using cypress-split plugin, add Firefox to all Cypress tests (component, integration, E2E) alongside Chrome
-  - Fix CI Firefox cache corruption issue by creating a shared reusable setup-firefox workflow that ensures only one job across all workflows handles Firefox caching, preventing race conditions when test.yml and e2e.yml workflows run in parallel
-  - Add comprehensive unit tests for connexionGuard covering authentication checks, navigation blocking, redirect behavior with return URLs, and CanActivate interface implementation (5 tests)
-  - Add comprehensive unit tests for adminGuard covering admin authorization logic, navigation blocking for non-admin users, and CanActivate interface implementation (4 tests)
-  - Add comprehensive unit tests for HTTP interceptors (25 tests total):
-    - AuthBackendInterceptor: token injection in requests, URL filtering, header preservation (6 tests)
-    - ErreurBackendInterceptor: error handling, 401 redirect to login, success notifications (8 tests)
-    - DevBackendInterceptor: API mocking, authentication, request routing, network delay simulation (11 tests)
-  - Add comprehensive unit tests for ExclusionPort covering listeExclusions method with admin authorization checks (2 tests) completing full test coverage for all exclusion business logic
-  - Add comprehensive unit tests for OccasionPort covering lanceTirage method (draw generation algorithm) with success cases (basic draw, with exclusions, with past results, force redraw) and error cases (not admin, past occasion, already launched, impossible draw) including email notifications (8 tests) completing full test coverage for all occasion business logic
-  - Remove local-cypress which is no longer needed and whose post-install script conflicted with cypress install
-  - Document backend integration testing philosophy in testing.md: integration tests should test complete workflows and infrastructure integration (database, email, API contracts), not exhaustive business logic (covered by unit tests); organize tests by workflows instead of by class; avoid duplication between test layers; include comprehensive testing philosophy table showing division of responsibilities between unit and integration tests
-  - Add workflow-oriented backend integration tests: WorkflowGiftExchangeIntTest.php (complete gift exchange journey from occasion creation through draw generation and result viewing), UtilisateurIntTest.php (user management workflow: create → email → login → reset password → change password → promote to admin), ExclusionIntTest.php (exclusion management: create → list exclusions)
-  - Add specialized infrastructure integration tests: NotifIntTest.php (notification-specific concerns: instant notifications, daily digest mechanics, preference filtering, occasion filtering, 11 tests), ErrorHandlingIntTest.php (comprehensive error responses: 400/401/403/404 scenarios, error format consistency, 18 tests), DatabaseConstraintIntTest.php (database constraints: unique, foreign keys, NOT NULL, cascades, 13 tests); existing AuthIntTest.php and ConnexionIntTest.php now serve as specialized infrastructure tests (authentication edge cases and login workflows respectively)
-  - Fix PHPUnit test suite configuration (phpunit.xml) by renaming test suites from French ("Tests unitaires", "Tests d'intégration") to English ("Unit", "Int") to match CI workflow --testsuite filter parameters, ensuring tests run correctly in GitHub Actions
-  - Upgrade Node.js from v20 to v24 (LTS) which includes npm v11, bringing improved performance and security features (updated Docker container and CI workflows)
-  - Fixed high-severity qs vulnerability (GHSA-6rw7-vpxm-498p) allowing DoS via memory exhaustion by forcing qs@6.14.1+ via npm package overrides - addresses transitive dependency through @cypress/request
-  - Add fluent test data builders for backend integration tests to standardize creation of test entities with sensible defaults and customization options
-  - Migrate backend integration tests to use the new builders and remove legacy helper methods from IntTestCase to maintain a single approach to test data creation
-  - Document builder patterns and best practices in docs/backend-dev.md
-  - Add comprehensive ConnexionComponent tests (22 tests total): complete component test coverage for the login form using mocked BackendService
-  - Add comprehensive OccasionComponent tests (32 tests total): complete component test coverage for occasion details rendering, participant list display with sorting, draw status, past/future occasion handling, gift recipient identification with gender-specific messaging, and error handling
-  - Add comprehensive ListeIdeesComponent tests (38 tests total): component test coverage for idea list rendering, filtering by participant (own ideas vs others' ideas), permission-based visibility with gender-specific headers, form validation, idea submission with special characters, empty state display, and child component input verification using real component instances queried via fixture.debugElement and By.directive()
-  - Document subcomponent testing pattern in frontend development guide: add comprehensive section on querying child component instances in Cypress component tests using fixture.debugElement and By.directive(), with working examples and guidance on when to use this pattern for testing component composition
-  - Update testing documentation to remove --spec flag usage recommendation for component tests as it can cause tests to run with 0 specs found without clear error messages
-  - Add comprehensive component tests for ProfilComponent covering form rendering, profile data display, form validation (name, email, password fields), successful profile updates, password change functionality, error handling, and user input handling (53 tests)
-  - Add component tests for AdminComponent covering API documentation page rendering with real-life examples (authentication token display, API URL usage, user ID interpolation in curl commands), reactive updates when user changes, and authenticated vs unauthenticated states (11 tests)
-  - Add comprehensive component tests for IdeeComponent (18 tests) covering: basic rendering and edge cases (empty inputs, long descriptions, special characters), French date formatting with moment.js, author display logic ("Vous" vs author name based on afficheAuteur input), delete button visibility based on authorship, and event emissions for delete actions
-  - Configure ESLint with @stylistic/eslint-plugin for automated whitespace checking: prevent multiple consecutive empty lines, trailing whitespace, and blank lines at beginning/end of files; Prettier already handles formatting blank lines before closing braces
-  - Document responsive design testing practices in testing guide (docs/testing.md) with pragmatic viewport testing guidelines explicitly aligned to Bootstrap 5's grid breakpoints: displays Bootstrap's $grid-breakpoints from _variables.scss showing md at 768px, explains why Angular CDK Breakpoints.Medium (960px) contradicts Bootstrap and why programmatically importing SCSS variables would be overkill, recommends testing only two viewports for most tests (mobile 375×667 below Bootstrap md, desktop 768×1024 at Bootstrap md matching navbar-expand-md), advises testing breakpoint edges only for BreakpointObserver components, provides component/integration/E2E test examples with Bootstrap-referencing comments, includes optional viewport helper with Bootstrap alignment documentation, and best practices emphasizing Bootstrap alignment and pragmatism
-  - Add viewport testing references to contributing guidelines (docs/CONTRIBUTING.md) linking to responsive design testing section for both component and integration tests
-  - Complete comprehensive viewport testing audit: reviewed all 11 component test files and 2 integration test files for viewport coverage; identified HeaderComponent as having complete viewport testing (32 tests); classified 10 components by priority (1 high: OccasionComponent with responsive grid col-sm-6 col-md-4 col-lg-3 col-xl-2; 1 medium: ListeIdeesComponent with card-columns; 3 low: form-based components; 1 not applicable: IdeeComponent inherits parent layout); findings integrated into BACKLOG.md as tasks 14-16 and testing guidelines in docs/testing.md
-  - Add comprehensive viewport tests for OccasionComponent (19 new tests): desktop viewport tests (≥768px, 6 tests) verify multi-column grid layout, responsive column classes, clickability, gift recipient prominence, and participant name visibility; mobile viewport tests (<768px, 9 tests) verify 2-column layout, mobile-friendly stacking, tappability, prominence on mobile, readability, full-width alerts, instructions visibility, and sorting order preservation; breakpoint edge case tests (4 tests) cover Bootstrap md breakpoint at 768px, just below at 767px, tablet portrait, and large desktop viewports - all 49 tests passing (30 existing + 19 new)
-  - Add comprehensive 10-phase localization and internationalization plan to BACKLOG.md covering frontend i18n (Angular with English/French support), code translation (TypeScript/PHP from French to English), database schema documentation (mapping English code to French column names), configuration and documentation restructuring, screenshot regeneration, and testing
-  - Update Documentation Guide localization section to clarify English-only policy for documentation (no translations maintained) and remove obsolete translation workflow references
+  - **Framework Upgrades:**
+    - Angular 17.3 → 21.0
+    - TypeScript 5.4 → 5.9
+    - Node.js 20 → 24 (LTS)
+    - ng-bootstrap 16.0 → 20.0
+    - ESLint 8.57 → 9.39
+    - Cypress 14.4 → 15.8
+  - **Security Fixes:**
+    - Critical: esbuild arbitrary file read vulnerability (CVE affecting <=0.24.2)
+    - Critical: form-data unsafe random function (GHSA-fjxv-7rqg-78g4)
+    - High: qs DoS via memory exhaustion (GHSA-6rw7-vpxm-498p)
+    - Moderate: brace-expansion ReDoS (CVE-2025-5889)
+    - Moderate: nx/tmp symbolic link attacks (GHSA-52f5-9888-hmc6)
+    - Low: systeminformation command injection on Windows (GHSA-wphj-fx3q-84ch)
+  - **CI/CD:**
+    - Added GitHub Actions workflows for automated testing on PRs and master
+    - Configured test parallelization with cypress-split plugin
+    - Added cross-browser testing (Chrome + Firefox)
+  - **Test Coverage:**
+    - Added comprehensive frontend unit tests for guards and HTTP interceptors (34 tests)
+    - Added comprehensive backend unit tests for ExclusionPort and OccasionPort (10 tests)
+    - Added component tests for all major components: Header (32), Connexion (22), Occasion (49), ListeIdees (38), Profil (53), Admin (11), Idee (18)
+    - Added workflow-oriented backend integration tests and infrastructure tests
+    - Added fluent test data builders for backend tests
+  - **Code Modernization:**
+    - Migrated to Angular inject() function pattern and block control flow syntax
+    - Updated to provideHttpClient() and provideHttpClientTesting() APIs
+    - Added @angular/cdk BreakpointObserver for responsive design
+    - Configured ESLint @stylistic plugin for whitespace rules
 
 ## V1.4.4 (December 8, 2025)
 

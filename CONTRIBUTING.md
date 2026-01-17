@@ -1027,15 +1027,25 @@ Example: `1.4.3` → `1.5.0` (new features) or `1.4.4` (bug fixes)
 
 ### Release Steps
 
-1. **Update version numbers** in relevant files
-2. **Finalize CHANGELOG.md** - Move "Next Release" to versioned section
+1. **Run all tests** (E2E tests are mandatory for releases):
+   ```bash
+   ./npm test && ./npm run ct && ./npm run int
+   ./composer test
+   docker compose up -d front && ./composer run install-fixtures && ./npm run e2e
+   ```
+2. **Finalize CHANGELOG.md**:
+   - Replace "Next Release" with versioned section (e.g., "V1.5.0 (January 18, 2026)")
+   - Review and consolidate entries to be synthetic and coherent (describe final outcomes, not intermediate steps)
+   - Ensure all changes since last release are documented
 3. **Create release commit:**
    ```bash
-   git commit -m "chore: release v1.5.0"
+   git add CHANGELOG.md
+   git commit -m "chore: finalize v1.5.0"
    ```
 4. **Tag the release:**
    ```bash
    git tag -a v1.5.0 -m "Release version 1.5.0"
+   git push origin master
    git push origin v1.5.0
    ```
 5. **Build and package:**
