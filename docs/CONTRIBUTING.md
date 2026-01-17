@@ -663,7 +663,7 @@ See [Documentation Guide - Keeping Documentation Current](../DOCUMENTATION-GUIDE
 
 ### Documentation Structure
 
-All English documentation is in `docs/en/` - see [Documentation Index](INDEX.md) for complete list.
+All English documentation is in `docs/` - see [Documentation Index](INDEX.md) for complete list.
 
 **Key documents:**
 - `INDEX.md` - Documentation navigation and index
@@ -885,7 +885,7 @@ Use these severity levels based on the deprecation notice:
 When adding deprecation sections, include a cross-reference to this guideline:
 
 ```markdown
-**Note:** See [CONTRIBUTING.md - Tracking Deprecation Warnings](docs/en/CONTRIBUTING.md#tracking-deprecation-warnings)
+**Note:** See [CONTRIBUTING.md - Tracking Deprecation Warnings](docs/CONTRIBUTING.md#tracking-deprecation-warnings)
 for the process of tracking new deprecations.
 ```
 

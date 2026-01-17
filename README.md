@@ -72,7 +72,7 @@ The application ensures fairness with exclusion rules (e.g., prevent spouses fro
 
 ### For Users
 
-**New to Tkdo?** Start with the [User Guide](docs/en/user-guide.md) to learn how to:
+**New to Tkdo?** Start with the [User Guide](docs/user-guide.md) to learn how to:
 - Create and manage your profile
 - Participate in occasions
 - Add gift ideas
@@ -81,7 +81,7 @@ The application ensures fairness with exclusion rules (e.g., prevent spouses fro
 
 ### For Administrators
 
-**Deploying or managing Tkdo?** See the [Apache Deployment Guide](docs/en/deployment-apache.md) for:
+**Deploying or managing Tkdo?** See the [Apache Deployment Guide](docs/deployment-apache.md) for:
 - Complete installation instructions
 - Configuration options
 - User management via API
@@ -91,36 +91,36 @@ The application ensures fairness with exclusion rules (e.g., prevent spouses fro
 
 **Want to contribute?** Follow these steps:
 
-1. **Set up development environment** - See [Development Setup Guide](docs/en/dev-setup.md)
-2. **Review contribution guidelines** - Read [Contributing Guidelines](docs/en/CONTRIBUTING.md)
-3. **Understand the architecture** - Check [Architecture Documentation](docs/en/architecture.md)
+1. **Set up development environment** - See [Development Setup Guide](docs/dev-setup.md)
+2. **Review contribution guidelines** - Read [Contributing Guidelines](docs/CONTRIBUTING.md)
+3. **Understand the architecture** - Check [Architecture Documentation](docs/architecture.md)
 4. **Start coding** - See frontend and backend development guides
 
 ## Documentation
 
 ### Complete Documentation Index
 
-**All documentation is available in the [Documentation Index](docs/en/INDEX.md)**, organized by category:
+**All documentation is available in the [Documentation Index](docs/INDEX.md)**, organized by category:
 
-- **[Getting Started](docs/en/INDEX.md#getting-started)** - Overview, user guide, development setup
-- **[User Documentation](docs/en/INDEX.md#user-documentation)** - For end users and administrators
-- **[Developer Documentation](docs/en/INDEX.md#developer-documentation)** - For contributors
-- **[Deployment Documentation](docs/en/INDEX.md#deployment-documentation)** - For system administrators
+- **[Getting Started](docs/INDEX.md#getting-started)** - Overview, user guide, development setup
+- **[User Documentation](docs/INDEX.md#user-documentation)** - For end users and administrators
+- **[Developer Documentation](docs/INDEX.md#developer-documentation)** - For contributors
+- **[Deployment Documentation](docs/INDEX.md#deployment-documentation)** - For system administrators
 
 ### Quick Links
 
 | Role                  | Essential Documentation                                                                                     |
 |-----------------------|-------------------------------------------------------------------------------------------------------------|
-| **User**              | [User Guide](docs/en/user-guide.md) • [Email Notifications](docs/en/notifications.md)                      |
-| **Administrator**     | [Admin Guide](docs/en/admin-guide.md) • [API Reference](docs/en/api-reference.md) • [Deployment Guide](docs/en/deployment-apache.md) |
-| **Developer**         | [Dev Setup](docs/en/dev-setup.md) • [Contributing](docs/en/CONTRIBUTING.md) • [Architecture](docs/en/architecture.md) • [Frontend Dev](docs/en/frontend-dev.md) • [Backend Dev](docs/en/backend-dev.md) |
-| **System Admin**      | [Apache Deployment](docs/en/deployment-apache.md) • [Environment Variables](docs/en/environment-variables.md) • [Troubleshooting](docs/en/troubleshooting.md) |
+| **User**              | [User Guide](docs/user-guide.md) • [Email Notifications](docs/notifications.md)                      |
+| **Administrator**     | [Admin Guide](docs/admin-guide.md) • [API Reference](docs/api-reference.md) • [Deployment Guide](docs/deployment-apache.md) |
+| **Developer**         | [Dev Setup](docs/dev-setup.md) • [Contributing](docs/CONTRIBUTING.md) • [Architecture](docs/architecture.md) • [Frontend Dev](docs/frontend-dev.md) • [Backend Dev](docs/backend-dev.md) |
+| **System Admin**      | [Apache Deployment](docs/deployment-apache.md) • [Environment Variables](docs/environment-variables.md) • [Troubleshooting](docs/troubleshooting.md) |
 
 ### Additional Resources
 
-- [Database Documentation](docs/en/database.md) - Schema, entities, migrations
-- [Testing Guide](docs/en/testing.md) - Frontend, backend, and E2E testing
-- [Troubleshooting Guide](docs/en/troubleshooting.md) - Common issues and solutions
+- [Database Documentation](docs/database.md) - Schema, entities, migrations
+- [Testing Guide](docs/testing.md) - Frontend, backend, and E2E testing
+- [Troubleshooting Guide](docs/troubleshooting.md) - Common issues and solutions
 
 ## Project Information
 
@@ -136,7 +136,7 @@ Tkdo is actively maintained. See the [backlog](BACKLOG.md) for planned features 
 
 ### Contributing
 
-Contributions are welcome! Please read the [Contributing Guidelines](docs/en/CONTRIBUTING.md) before submitting pull requests.
+Contributions are welcome! Please read the [Contributing Guidelines](docs/CONTRIBUTING.md) before submitting pull requests.
 
 **Ways to contribute:**
 - Report bugs and request features via GitHub issues
@@ -152,13 +152,13 @@ Contributions are welcome! Please read the [Contributing Guidelines](docs/en/CON
 4. Write tests for your changes
 5. Submit a pull request
 
-For detailed instructions, see [Contributing Guidelines](docs/en/CONTRIBUTING.md).
+For detailed instructions, see [Contributing Guidelines](docs/CONTRIBUTING.md).
 
 ### Support and Community
 
-- **Documentation:** [Complete documentation index](docs/en/INDEX.md)
+- **Documentation:** [Complete documentation index](docs/INDEX.md)
 - **Bug Reports:** GitHub Issues
-- **Questions:** Check [Troubleshooting Guide](docs/en/troubleshooting.md) first
+- **Questions:** Check [Troubleshooting Guide](docs/troubleshooting.md) first
 
 ## License
 
@@ -166,4 +166,4 @@ This project is open source. See the repository for license details.
 
 ---
 
-**Ready to get started?** Visit the [Documentation Index](docs/en/INDEX.md) to find the guides you need.
+**Ready to get started?** Visit the [Documentation Index](docs/INDEX.md) to find the guides you need.

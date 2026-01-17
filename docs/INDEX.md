@@ -112,7 +112,7 @@ Documentation for deploying and maintaining Tkdo in production.
 ### Documentation Conventions
 
 **File organization:**
-- All English documentation is in `docs/en/`
+- All documentation is in `docs/`
 - Each document focuses on a specific topic
 - Cross-references link related content
 

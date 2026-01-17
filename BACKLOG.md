@@ -2,7 +2,7 @@
 
 ## Testing
 
-This section tracks tasks to achieve comprehensive test coverage with automated CI/CD integration, following the testing philosophy outlined in [docs/en/testing.md](docs/en/testing.md).
+This section tracks tasks to achieve comprehensive test coverage with automated CI/CD integration, following the testing philosophy outlined in [docs/testing.md](docs/testing.md).
 
 **Testing Targets:**
 - All major features and use cases covered by tests
@@ -16,7 +16,7 @@ This section tracks tasks to achieve comprehensive test coverage with automated 
 
 ### Frontend Testing - Component Viewport Testing
 
-Following the viewport testing audit, components with responsive behavior need viewport test coverage. See [docs/en/testing.md#responsive-design-testing](docs/en/testing.md#responsive-design-testing) for guidelines.
+Following the viewport testing audit, components with responsive behavior need viewport test coverage. See [docs/testing.md#responsive-design-testing](docs/testing.md#responsive-design-testing) for guidelines.
 
 **Task 14:** Add viewport tests to ListeIdeesComponent
 - **File:** `front/src/app/liste-idees/liste-idees.component.cy.ts`
@@ -59,9 +59,9 @@ Following the viewport testing audit, components with responsive behavior need v
   - `front/cypress/e2e/*.cy.ts` (all test files)
   - `front/cypress/support/e2e.ts`
 - **Content:**
-  - Test all flows on mobile and desktop viewports (see [testing.md#standard-viewport-sizes](docs/en/testing.md#standard-viewport-sizes) for exact sizes)
+  - Test all flows on mobile and desktop viewports (see [testing.md#standard-viewport-sizes](docs/testing.md#standard-viewport-sizes) for exact sizes)
   - Test responsive UI elements (hamburger menu, cards)
-  - Follow patterns from [testing.md#integration-tests---viewport-examples](docs/en/testing.md#integration-tests---viewport-examples)
+  - Follow patterns from [testing.md#integration-tests---viewport-examples](docs/testing.md#integration-tests---viewport-examples)
 - **Estimated additions:** ~150-200 lines across files
 - **Priority:** High - mobile support is critical
 
@@ -192,7 +192,7 @@ Following the viewport testing audit, components with responsive behavior need v
 ### Documentation and Process
 
 **Task 27:** Create testing contribution guide
-- **File:** `docs/en/testing.md`
+- **File:** `docs/testing.md`
 - **Content:**
   - Add "Writing Tests" section with TDD workflow
   - Document test-first development process
@@ -217,7 +217,7 @@ Following the viewport testing audit, components with responsive behavior need v
 **Task 29:** Add test execution time tracking and optimization
 - **Files to modify:**
   - `.github/workflows/test.yml`
-  - `docs/en/testing.md`
+  - `docs/testing.md`
 - **Content:**
   - Track test suite execution times
   - Set target times (unit: <30s, component: <2m, integration: <5m, e2e: <10m)
@@ -229,7 +229,7 @@ Following the viewport testing audit, components with responsive behavior need v
 
 **Task 30:** Final review of testing documentation
 - **Files to modify:**
-  - `docs/en/*.md`
+  - `docs/*.md`
 - **Content:**
   - Review all testing-related documentation to ensure it follows documentation guidelines (e.g. single source of truth)
 - **Priority:** Medium - important for building upon this afterwards
@@ -237,7 +237,7 @@ Following the viewport testing audit, components with responsive behavior need v
 ## Localization & Internationalization
 
 **Context**: The application is currently hardcoded in French throughout frontend code, backend code, database schema, and documentation. The goal is to:
-1. Restructure documentation to English-only (move `docs/en/` to `docs/`)
+1. ~~Restructure documentation to English-only (moved from `docs/en/` to `docs/`)~~ ✓ Done
 2. Implement proper frontend localization infrastructure with English as the reference language and French as a translation
 3. Translate all French code to English (comments, class/method/variable names in frontend and backend)
 4. Document database schema in English (tables and columns remain French for backward compatibility)
@@ -247,53 +247,39 @@ Following the viewport testing audit, components with responsive behavior need v
 
 **Reference Documentation**:
 - [Documentation Guide - Localization](docs/DOCUMENTATION-GUIDE.md#localization)
-- [Contributing Guide - Coding Standards](docs/en/CONTRIBUTING.md#coding-standards)
+- [Contributing Guide - Coding Standards](docs/CONTRIBUTING.md#coding-standards)
 - [Angular i18n Documentation](https://angular.dev/guide/i18n)
 
 ---
 
 ### Documentation Restructuring (Priority)
 
-**Task I18N01:** Move documentation from `docs/en/` to `docs/`
-- **Files:**
-  - All files in `docs/en/` (14 files: INDEX.md, README.md, CONTRIBUTING.md, admin-guide.md, api-reference.md, architecture.md, backend-dev.md, ci-testing-strategy.md, database.md, deployment-apache.md, dev-setup.md, environment-variables.md, frontend-dev.md, notifications.md, testing.md, troubleshooting.md, user-guide.md)
-- **Content:**
-  - Move all files from `docs/en/` to `docs/`
-  - Update all internal links within documentation files to reflect new paths (remove `/en` from paths)
-  - Remove empty `docs/en/` directory
-- **Priority:** High - prerequisite for other documentation tasks
-
 **Task I18N02:** Replace deprecated French CONTRIBUTING.md at root
 - **Files:**
   - `CONTRIBUTING.md` (root - currently French, deprecated)
-  - `docs/CONTRIBUTING.md` (after Task I18N01 moves it from `docs/en/`)
+  - `docs/CONTRIBUTING.md`
 - **Content:**
   - Move `docs/CONTRIBUTING.md` to project root, replacing the deprecated French version
-  - Update any links pointing to `docs/CONTRIBUTING.md` or `docs/en/CONTRIBUTING.md` to point to root `CONTRIBUTING.md`
-- **Dependencies:** Task I18N01
+  - Update any links pointing to `docs/CONTRIBUTING.md` to point to root `CONTRIBUTING.md`
 - **Priority:** High - standard practice for open source projects
 
-**Task I18N03:** Update documentation references across the project
+**Task I18N03:** Update documentation references to root CONTRIBUTING.md
 - **Files:**
   - `README.md` (root)
   - `BACKLOG.md`
-  - `CHANGELOG.md`
   - `.claude/README.md`
-  - All files in `docs/` (after Task I18N01)
+  - All files in `docs/`
 - **Content:**
-  - Update all references from `docs/en/` to `docs/`
-  - Update references to `docs/CONTRIBUTING.md` to root `CONTRIBUTING.md`
+  - Update references to `docs/CONTRIBUTING.md` to point to root `CONTRIBUTING.md`
   - Remove any "coming soon" labels for completed documentation
-- **Dependencies:** Tasks I18N01, I18N02
+- **Dependencies:** Task I18N02
 - **Priority:** High - ensures documentation links work
 
 **Task I18N04:** Update Documentation Guide for English-only policy
 - **File:** `docs/DOCUMENTATION-GUIDE.md`
 - **Content:**
-  - Update example paths to use `docs/` instead of `docs/en/`
   - Update the Localization section to clarify documentation is English-only (no translations maintained)
   - Remove references to translation workflow for documentation
-- **Dependencies:** Task I18N01
 - **Priority:** Medium - clarifies documentation policy
 
 ---
@@ -742,7 +728,7 @@ Following the viewport testing audit, components with responsive behavior need v
    - **Alternative:** Switch to compiled Bootstrap CSS instead of Sass imports (eliminates all Sass warnings but loses customization ability)
    - **Priority:** Low (third-party dependency, blocked by Bootstrap development timeline)
 
-**Note:** See [CONTRIBUTING.md - Tracking Deprecation Warnings](docs/en/CONTRIBUTING.md#tracking-deprecation-warnings) for the process of tracking new deprecations.
+**Note:** See [CONTRIBUTING.md - Tracking Deprecation Warnings](docs/CONTRIBUTING.md#tracking-deprecation-warnings) for the process of tracking new deprecations.
 
 ### Dependencies & General Security
 

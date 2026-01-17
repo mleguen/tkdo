@@ -201,7 +201,7 @@ class UserService {
 
 Use backticks for:
 - Commands: `npm install`
-- File paths: `docs/en/user-guide.md`
+- File paths: `docs/user-guide.md`
 - Variable names: `TKDO_BASE_URI`
 - Class/function names: `UserService`
 - Short code snippets: `const user = { id: 1 }`
@@ -486,11 +486,11 @@ Jump to [Troubleshooting](#troubleshooting) for common issues.
 **Cross-directory links:**
 
 ```markdown
-<!-- From docs/en/ to root -->
+<!-- From docs/ to root -->
 See [CHANGELOG.md](../../CHANGELOG.md) for version history.
 
-<!-- From root to docs/en/ -->
-See [User Guide](docs/en/user-guide.md) for details.
+<!-- From root to docs/ -->
+See [User Guide](docs/user-guide.md) for details.
 ```
 
 ### External Links
@@ -522,10 +522,10 @@ See https://angular.io/docs for more details.
 1. **Check for broken links**
    ```bash
    # Find all markdown links
-   grep -r "\[.*\](.*)" docs/en/
+   grep -r "\[.*\](.*)" docs/
 
    # Check for "coming soon" markers
-   grep -r "coming soon" docs/en/
+   grep -r "coming soon" docs/
    ```
 
 2. **Update cross-references**
@@ -570,8 +570,8 @@ See https://angular.io/docs for more details.
    ```
 
 2. **Update index/navigation pages**
-   - `docs/en/INDEX.md` - Main documentation index
-   - `docs/en/README.md` - Project overview
+   - `docs/INDEX.md` - Main documentation index
+   - `docs/README.md` - Project overview
    - `README.md` - Root readme
 
 3. **Update related documentation**
@@ -732,7 +732,7 @@ Before submitting documentation changes:
 
 ### English as Source Language
 
-**All documentation originates in English** (`docs/en/`).
+**All documentation originates in English** (`docs/`).
 
 **Reasons:**
 - Largest developer audience
@@ -744,7 +744,7 @@ Before submitting documentation changes:
 **When creating translations:**
 
 1. **Translate from English source**
-   - Always translate from `docs/en/` files
+   - Always translate from `docs/` files
    - Never translate from other translations
    - Preserve formatting and structure
 
@@ -771,7 +771,7 @@ Before submitting documentation changes:
 
 **When updating English documentation:**
 
-1. Make changes in `docs/en/`
+1. Make changes in `docs/`
 2. Note changes in CHANGELOG
 3. Create tracking issue for translation updates
 4. Tag with language codes that need updates
