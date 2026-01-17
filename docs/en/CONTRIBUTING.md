@@ -524,7 +524,7 @@ For components that render child components, you can query for child component i
 
 **Responsive design testing:**
 
-Components with responsive behavior should be tested across multiple viewport sizes (mobile, tablet, desktop). See [Testing Guide - Responsive Design Testing](testing.md#responsive-design-testing) for detailed guidelines and examples.
+Components with responsive behavior should be tested across different viewport sizes (for example, mobile and desktop). See [Testing Guide - Responsive Design Testing](testing.md#responsive-design-testing) for detailed guidelines and examples.
 
 **Run component tests:**
 ```bash
