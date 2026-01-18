@@ -26,8 +26,9 @@ workflow_status:
   document-project: docs/project-scan-report.json
 
   # Phase 1: Analysis (Optional - user selected)
-  brainstorm-project: optional
-  research: optional
+  brainstorm-project: _bmad-output/analysis/brainstorming-session-2026-01-18.md
+  product-brief: _bmad-output/planning-artifacts/product-brief-tkdo-2026-01-18.md
+  research: skipped  # Not needed - product vision is clear, no framework comparisons required for MVP
 
   # Phase 2: Planning
   prd: required
