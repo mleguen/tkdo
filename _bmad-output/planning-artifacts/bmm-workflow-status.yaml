@@ -23,7 +23,7 @@ workflow_path: "method-brownfield.yaml"
 
 workflow_status:
   # Phase 0: Documentation (Prerequisite for brownfield)
-  document-project: required
+  document-project: docs/project-scan-report.json
 
   # Phase 1: Analysis (Optional - user selected)
   brainstorm-project: optional

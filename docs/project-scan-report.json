@@ -1,0 +1,360 @@
+{
+  "workflow_version": "1.2.0",
+  "timestamps": {
+    "started": "2026-01-18T09:30:00Z",
+    "last_updated": "2026-01-18T09:50:00Z",
+    "completed": "2026-01-18T09:50:00Z"
+  },
+  "mode": "initial_scan",
+  "scan_level": "deep",
+  "project_root": "/home/mael/Documents/mleguen/tkdo",
+  "output_folder": "/home/mael/Documents/mleguen/tkdo/docs",
+  "repository_type": "multi-part",
+  "project_name": "Tkdo",
+  "project_description": "Gift exchange web application for organizing occasions, managing participants, collecting gift ideas, and performing random draw assignments",
+  "project_types": [
+    {
+      "part_id": "api",
+      "project_type_id": "backend",
+      "display_name": "PHP Backend API",
+      "root_path": "api/",
+      "technology_stack": {
+        "language": "PHP 8.4",
+        "framework": "Slim Framework 4.x",
+        "orm": "Doctrine ORM 2.x",
+        "database": "MySQL 5.6",
+        "authentication": "JWT (firebase/php-jwt)",
+        "dependency_injection": "PHP-DI",
+        "logging": "Monolog",
+        "architecture_pattern": "Hexagonal/Clean Architecture"
+      },
+      "source_structure": {
+        "src/Appli": "Application layer - Controllers, Services, Middleware, Adaptors",
+        "src/Dom": "Domain layer - Models (interfaces), Repositories (interfaces), Ports, Plugins",
+        "src/Infra": "Infrastructure layer - Migrations, Tools",
+        "test": "PHPUnit tests",
+        "bin": "Console scripts",
+        "public": "Web entry point"
+      }
+    },
+    {
+      "part_id": "front",
+      "project_type_id": "web",
+      "display_name": "Angular Frontend",
+      "root_path": "front/",
+      "technology_stack": {
+        "language": "TypeScript 5.9",
+        "framework": "Angular 21",
+        "ui_library": "Bootstrap 5.3 + ng-bootstrap",
+        "state_management": "RxJS 7.8 (BehaviorSubject/Observable)",
+        "styling": "SCSS",
+        "testing_e2e": "Cypress 15",
+        "testing_unit": "Karma + Jasmine",
+        "linting": "ESLint + Prettier"
+      },
+      "source_structure": {
+        "src/app": "Angular components and services",
+        "src/app/admin": "Admin section",
+        "src/app/connexion": "Login component",
+        "src/app/deconnexion": "Logout component",
+        "src/app/header": "Header component",
+        "src/app/idee": "Gift idea component",
+        "src/app/liste-idees": "Ideas list component",
+        "src/app/liste-occasions": "Occasions list component",
+        "src/app/occasion": "Occasion component",
+        "src/app/page-idees": "Ideas page component",
+        "src/app/profil": "User profile component",
+        "cypress": "E2E tests"
+      }
+    }
+  ],
+  "infrastructure": {
+    "development": {
+      "containerization": "Docker + Docker Compose",
+      "services": {
+        "angular": "Build container for Angular",
+        "front": "Nginx serving Angular build",
+        "slim-fpm": "PHP-FPM for API",
+        "slim-web": "Nginx reverse proxy for API",
+        "mysql": "MySQL 5.6 database",
+        "mailhog": "Email testing",
+        "npm": "Node.js dev container",
+        "php-cli": "PHP CLI for commands"
+      },
+      "helper_scripts": {
+        "description": "Shell scripts at project root that wrap docker compose commands - use these instead of running commands directly",
+        "scripts": {
+          "./npm": "Runs npm commands in Docker (e.g., ./npm install, ./npm test)",
+          "./npx": "Runs npx commands in Docker (e.g., ./npx prettier --check .)",
+          "./ng": "Runs Angular CLI in Docker (e.g., ./ng serve, ./ng build)",
+          "./composer": "Runs Composer in Docker (e.g., ./composer install)",
+          "./console": "Runs PHP console commands in Docker",
+          "./doctrine": "Runs Doctrine CLI in Docker",
+          "./cypress": "Runs Cypress tests in Docker",
+          "./phpstan": "Runs PHPStan static analysis in Docker",
+          "./build": "Full build: generates auth keys, builds frontend, installs API dependencies",
+          "./apache-pack": "Packages app for Apache deployment (creates tkdo-<version>.tar.gz)",
+          "./init-ng": "One-time Angular project initialization (scaffolds entire frontend)"
+        },
+        "pattern": "docker compose run --rm <service> <command>"
+      },
+      "note": "Docker infrastructure is for development only - always use helper scripts at project root"
+    },
+    "production": {
+      "web_server": "Apache",
+      "deployment_guide": "docs/deployment-apache.md"
+    },
+    "ci_cd": {
+      "platform": "GitHub Actions",
+      "workflows": ["e2e.yml", "setup-firefox.yml", "test.yml"]
+    }
+  },
+  "domain_model": {
+    "entities": [
+      {"name": "Utilisateur", "description": "User account with profile, credentials, and admin flag"},
+      {"name": "Occasion", "description": "Gift exchange event with date, title, and participants"},
+      {"name": "Idee", "description": "Gift idea with description, author, and recipient"},
+      {"name": "Resultat", "description": "Draw result indicating who gives to whom"},
+      {"name": "Exclusion", "description": "Rule preventing specific users from drawing each other"},
+      {"name": "Auth", "description": "Authentication session data"},
+      {"name": "Genre", "description": "Gender enum (F/M)"},
+      {"name": "PrefNotifIdees", "description": "Notification preference (None/Instant/Daily)"}
+    ],
+    "tables": [
+      "tkdo_utilisateur",
+      "tkdo_occasion",
+      "tkdo_participation",
+      "tkdo_idee",
+      "tkdo_resultat",
+      "tkdo_exclusion"
+    ]
+  },
+  "api_endpoints": {
+    "authentication": [
+      {"method": "POST", "path": "/connexion", "description": "Login, returns JWT token"}
+    ],
+    "users": [
+      {"method": "GET", "path": "/utilisateur", "description": "List all users"},
+      {"method": "POST", "path": "/utilisateur", "description": "Create user"},
+      {"method": "GET", "path": "/utilisateur/{id}", "description": "View user details"},
+      {"method": "PUT", "path": "/utilisateur/{id}", "description": "Update user"},
+      {"method": "POST", "path": "/utilisateur/{id}/reinitmdp", "description": "Reset password"}
+    ],
+    "occasions": [
+      {"method": "GET", "path": "/occasion", "description": "List occasions"},
+      {"method": "POST", "path": "/occasion", "description": "Create occasion"},
+      {"method": "GET", "path": "/occasion/{id}", "description": "View occasion"},
+      {"method": "PUT", "path": "/occasion/{id}", "description": "Edit occasion"},
+      {"method": "POST", "path": "/occasion/{id}/participant", "description": "Add participant"},
+      {"method": "POST", "path": "/occasion/{id}/resultat", "description": "Save draw result"},
+      {"method": "POST", "path": "/occasion/{id}/tirage", "description": "Perform draw"}
+    ],
+    "ideas": [
+      {"method": "GET", "path": "/idee", "description": "List gift ideas"},
+      {"method": "POST", "path": "/idee", "description": "Create idea"},
+      {"method": "POST", "path": "/idee/{id}/suppression", "description": "Delete idea (soft)"}
+    ],
+    "exclusions": [
+      {"method": "GET", "path": "/utilisateur/{id}/exclusion", "description": "List exclusions"},
+      {"method": "POST", "path": "/utilisateur/{id}/exclusion", "description": "Create exclusion"}
+    ]
+  },
+  "integration_architecture": {
+    "communication": "REST API over HTTP with JSON",
+    "flow": "Frontend (Angular) → HTTP/REST → Backend (Slim) → Doctrine ORM → MySQL",
+    "authentication_flow": "Login → JWT token → LocalStorage → HttpInterceptor adds Authorization header",
+    "data_flow": "BackendService (RxJS observables) → HttpClient → API endpoints → Controllers → Services → Repositories"
+  },
+  "completed_steps": [
+    {"step": "step_1", "status": "completed", "timestamp": "2026-01-18T09:30:00Z", "summary": "Classified as multi-part with 2 parts"},
+    {"step": "step_2", "status": "completed", "timestamp": "2026-01-18T09:35:00Z", "summary": "Found 24 existing docs"},
+    {"step": "step_3", "status": "completed", "timestamp": "2026-01-18T09:40:00Z", "summary": "Tech stack analyzed"},
+    {"step": "step_4", "status": "completed", "timestamp": "2026-01-18T09:45:00Z", "summary": "Conditional analysis complete - existing docs comprehensive"},
+    {"step": "step_5-9", "status": "skipped", "timestamp": "2026-01-18T09:45:00Z", "summary": "Existing documentation covers all areas"},
+    {"step": "step_10", "status": "completed", "timestamp": "2026-01-18T09:48:00Z", "summary": "Existing INDEX.md serves as master index"},
+    {"step": "step_11-12", "status": "completed", "timestamp": "2026-01-18T09:50:00Z", "summary": "Validation complete, workflow finalized"}
+  ],
+  "current_step": "completed",
+  "findings": {
+    "project_classification": "Multi-part web application: PHP backend API + Angular frontend",
+    "parts_count": 2,
+    "primary_tech": "PHP 8.4/Slim 4 + Angular 21",
+    "domain_models_count": 8,
+    "api_endpoints_count": 18,
+    "architecture_patterns": {
+      "backend": "Hexagonal/Clean Architecture (Appli/Dom/Infra layers)",
+      "frontend": "Single BackendService with RxJS observables"
+    },
+    "documentation_quality": "Comprehensive - 24 documentation files covering all aspects",
+    "missing_docs": "project-context.md (AI-optimized context file) - can be generated via generate-project-context workflow"
+  },
+  "ongoing_reworks": {
+    "note": "Documentation was created via AI-assisted rework. Two additional reworks are in progress with detailed tasks in BACKLOG.md",
+    "completed": [
+      {
+        "name": "Documentation Rework",
+        "status": "completed",
+        "result": "24 documentation files covering all aspects of the project"
+      }
+    ],
+    "in_progress": [
+      {
+        "name": "Testing Rework",
+        "status": "in_progress",
+        "backlog_section": "## Testing",
+        "tasks": "Tasks 14-30",
+        "scope": [
+          "Frontend viewport testing (mobile/desktop)",
+          "Integration tests enhancement",
+          "Test infrastructure (builders, assertions)",
+          "Test coverage reporting",
+          "Mutation testing",
+          "Performance benchmarks",
+          "Accessibility testing (WCAG 2.1 AA)",
+          "Testing documentation and PR checklist"
+        ],
+        "targets": [
+          "All major features covered by tests",
+          "Mobile and desktop viewport coverage",
+          "Balanced test pyramid",
+          "GitHub CI with PR merge blocking",
+          "Test-driven development practices"
+        ],
+        "reference": "docs/testing.md"
+      },
+      {
+        "name": "Internationalization (i18n)",
+        "status": "in_progress",
+        "backlog_section": "## Localization & Internationalization",
+        "tasks": "Tasks I18N05-I18N33",
+        "scope": [
+          "Frontend localization infrastructure (Angular i18n)",
+          "Language selection mechanism (en/fr)",
+          "Frontend component localization (templates + TypeScript)",
+          "Frontend code translation (French → English)",
+          "Backend code translation (French → English)",
+          "Database schema documentation (code maps to French DB columns)",
+          "Screenshot regeneration in English",
+          "Localization maintenance guide"
+        ],
+        "key_decisions": [
+          "English is reference/source language for frontend UI",
+          "French is a translation",
+          "Backend remains English-only (no localization infrastructure)",
+          "Database columns remain French for backward compatibility",
+          "Documentation is English-only"
+        ],
+        "reference": "docs/DOCUMENTATION-GUIDE.md#localization"
+      }
+    ]
+  },
+  "outputs_generated": ["project-scan-report.json"],
+  "existing_documentation": {
+    "total_count": 24,
+    "docs_folder": {
+      "count": 17,
+      "location": "docs/",
+      "index_file": "INDEX.md",
+      "files": [
+        "INDEX.md", "README.md", "DOCUMENTATION-GUIDE.md",
+        "api-reference.md", "admin-guide.md", "architecture.md",
+        "backend-dev.md", "ci-testing-strategy.md", "database.md",
+        "deployment-apache.md", "dev-setup.md", "environment-variables.md",
+        "frontend-dev.md", "notifications.md", "testing.md",
+        "troubleshooting.md", "user-guide.md"
+      ]
+    },
+    "root_level": {
+      "count": 4,
+      "files": ["README.md", "CONTRIBUTING.md", "CHANGELOG.md", "BACKLOG.md"]
+    },
+    "claude_config": {
+      "count": 2,
+      "location": ".claude/",
+      "files": ["README.md", "commit-conventions.md"],
+      "note": "AI development context: project preferences, commit standards, PR workflow"
+    },
+    "ci_cd": {
+      "count": 3,
+      "location": ".github/workflows/",
+      "files": ["e2e.yml", "setup-firefox.yml", "test.yml"]
+    },
+    "coverage": {
+      "user_guide": true,
+      "admin_guide": true,
+      "api_reference": true,
+      "architecture": true,
+      "database": true,
+      "frontend_dev": true,
+      "backend_dev": true,
+      "deployment": true,
+      "testing": true,
+      "troubleshooting": true,
+      "contributing": true
+    }
+  },
+  "upgrade_history": {
+    "completed_with_ai": [
+      "Frontend upgrade (Angular 21) - audit issues fixed",
+      "API upgrade (PHP 8.4) - audit issues fixed",
+      "Documentation rework - comprehensive docs created"
+    ],
+    "pending": [
+      {
+        "item": "MySQL upgrade",
+        "current": "MySQL 5.6",
+        "target": "MySQL 8",
+        "status": "blocked",
+        "blocker": "Testing harness completion prioritized first"
+      }
+    ]
+  },
+  "architectural_considerations": {
+    "note": "Areas to potentially challenge/rethink in future iterations",
+    "frontend_framework": {
+      "current": "Angular 21",
+      "consideration": "Angular vs Vue",
+      "context": "Angular is powerful but complex; Vue might be simpler for this app's scale"
+    },
+    "frontend_componentization": {
+      "issue": "Not enough componentization",
+      "example": "PageOccasionComponent could be split like PageIdeesComponent/ListeIdeesComponent/IdeeComponent pattern",
+      "backlog_ref": "## Features & Enhancements > UI/UX Improvements"
+    },
+    "ux_design": {
+      "issue": "Poor UX - needs rework",
+      "context": "Developer is not a frontend designer",
+      "current_state": "Functional but not user-friendly",
+      "needs": "Professional UX review and redesign"
+    },
+    "api_coupling": {
+      "issue": "Frontend/backend coupling",
+      "current": "REST with hardcoded routes in frontend",
+      "consideration": "JSON+HAL - front would no longer build routes; actions provided with state",
+      "backlog_ref": "## Technical Improvements > API enhancement"
+    },
+    "backend_framework": {
+      "current": "Slim Framework 4.x",
+      "consideration": "Slim vs Symfony",
+      "context": "Slim is simple but limited and has smaller community; Symfony more batteries-included"
+    },
+    "production_infrastructure": {
+      "current": "Apache on traditional server",
+      "consideration": "AWS serverless",
+      "constraint": "Must stay very cheap",
+      "usage_pattern": {
+        "active_period": "~2 months/year",
+        "traffic": "Few user connections per day",
+        "implication": "Serverless pay-per-use could be cost-effective"
+      },
+      "backlog_ref": "## Technical Improvements > Infrastructure & Deployment"
+    }
+  },
+  "recommendations": [
+    "Consider running generate-project-context workflow to create AI-optimized project-context.md",
+    "Documentation is comprehensive - no immediate gaps identified",
+    "project-scan-report.json now provides machine-readable metadata for AI context",
+    "Complete testing harness before MySQL upgrade",
+    "Architectural decisions (Angular/Vue, Slim/Symfony, etc.) should be evaluated holistically when planning major rework"
+  ]
+}
