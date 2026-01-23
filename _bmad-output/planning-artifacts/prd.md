@@ -457,6 +457,10 @@ Test architecture (including negative/penetration-style tests) should be designe
 
 ## Functional Requirements
 
+### Data Integrity Principles
+
+- **FR0:** All write operations involving group-scoped resources (ideas, comments, group membership changes) validate group membership and visibility constraints against current database state at submission time; JWT claims may be used for read-path filtering but are insufficient for write authorization
+
 ### User & Account Management
 
 - **FR1:** Users can sign up by clicking a valid invite link and providing email and password
@@ -477,8 +481,10 @@ Test architecture (including negative/penetration-style tests) should be designe
 - **FR13:** Authors can view ideas they created (regardless of beneficiary), unless marked deleted
 - **FR14:** Users can view ideas created by others for other users in their active groups (not ideas for themselves), unless marked deleted
 - **FR15:** Users cannot see ideas others created for them (gift surprise preserved)
-- **FR16:** Authors can set which groups can see each idea they created; only groups that both author AND beneficiary belong to are available as options
-- **FR17:** At idea creation, all eligible groups are pre-selected; author can deselect groups before saving
+- **FR16:** Authors can set and edit which groups can see each idea they created; only groups that both author AND beneficiary belong to are available as options
+- **FR16a:** Idea creation validates at submission time that the author and beneficiary share at least one active group (database check); creation fails with an error if no common group exists
+- **FR17:** At idea creation, the current viewing context group is pre-selected by default; author can expand visibility to other eligible groups before saving
+- **FR17a:** When an author narrows idea visibility (removes a group): (1) comments visible to multiple groups have the removed group stripped from their visibility; (2) comments visible only to the removed group are permanently deleted (cascade — the idea author owns the idea space)
 
 ### Orphaned Ideas (Admin Handling)
 
@@ -492,14 +498,23 @@ Test architecture (including negative/penetration-style tests) should be designe
 - **FR22:** Users can unmark an idea they previously marked as "giving"
 - **FR23:** Users can see that an idea (where they are not the beneficiary) is marked as "being given" (anonymous — no giver identity shown)
 - **FR24:** Users can add comments to any visible idea (where they are not the beneficiary)
-- **FR25:** Users can view comments on ideas where they are not the beneficiary
+- **FR24a:** When creating a comment, authors select which groups can see it; only groups where both author and idea are visible are available as options
+- **FR24b:** At comment creation, the current viewing context group is pre-selected by default; author can expand visibility to other eligible groups
+- **FR24c:** Comment creation validates at submission time that all selected visibility groups are still in the idea's current visible groups (database check); creation fails with an error if any selected group is no longer valid
+- **FR25:** Users can view comments on ideas where they are not the beneficiary, filtered by groups they share with the comment author
 - **FR26:** Users cannot view comments on ideas where they are the beneficiary
-- **FR27:** Users can edit their own comments
-- **FR28:** Users can delete their own comments
+- **FR27:** Users can edit their own comments (content and visibility); visibility options remain constrained to the idea's current visible groups
+- **FR28:** Users can delete their own comments (hard delete — comment is permanently removed)
 
 ### Idea Filtering
 
 - **FR29:** Users can filter their merged idea view by groups that have an upcoming occasion
+
+### Cross-Group Navigation
+
+- **FR29a:** When viewing another user's ideas in a group context, the API returns per-group comment counts for groups where additional comments exist
+- **FR29b:** Cross-group hints display the count of comments visible in each other shared group (not an aggregate total)
+- **FR29c:** Users can navigate to a specific group context via hint links to see the comments visible in that group
 
 ### Group Management
 
@@ -535,6 +550,7 @@ Test architecture (including negative/penetration-style tests) should be designe
 - **FR53:** Group admin can revoke invite links for groups they are admin of
 - **FR54:** Accepting an invite link automatically adds user to that group
 - **FR55:** Existing users clicking an invite link log in with their existing credentials and are added to the group without creating a new account
+- **FR55a:** After invitation acceptance, the user's JWT must be refreshed to include the newly granted group membership (groupe_ids claim update)
 
 ### Notifications (Idea-Related)
 
@@ -627,7 +643,7 @@ Test architecture (including negative/penetration-style tests) should be designe
 
 | Area | Requirement |
 |------|-------------|
-| **Authentication** | Password minimum 8 characters; session expires after 7 days of inactivity; "Remember me" option available |
+| **Authentication** | Password minimum 8 characters; session expires after 7 days of inactivity; "Remember me" option available; two-step token exchange flow (credentials → one-time code → HttpOnly cookie with JWT); frontend never accesses JWT directly |
 | **Brute-force protection** | Rate limiting on login attempts: 5 failed attempts per account → 15-minute lockout (auto-unlock) |
 | **Data protection** | Passwords hashed; HTTPS required for all connections |
 | **Group isolation** | Users cannot access data from groups they don't belong to (tested via positive and negative API tests) |
