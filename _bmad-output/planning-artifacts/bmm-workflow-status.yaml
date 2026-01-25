@@ -38,7 +38,7 @@ workflow_status:
   create-architecture: _bmad-output/planning-artifacts/architecture.md
   create-epics-and-stories: _bmad-output/planning-artifacts/epics.md
   test-design: _bmad-output/planning-artifacts/test-design-system-level.md
-  implementation-readiness: required
+  implementation-readiness: _bmad-output/planning-artifacts/implementation-readiness-report-2026-01-25.md
 
   # Phase 4: Implementation
   sprint-planning: required
