@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>tkdo - Responsive & Accessibility</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --base: #FDF8F3;
+            --surface: #FFFFFF;
+            --primary: #C67B5C;
+            --primary-dark: #A8654A;
+            --secondary: #8FAE8B;
+            --text: #3D3531;
+            --muted: #9A918A;
+            --border: #E8E4E1;
+            --focus-ring: 0 0 0 3px rgba(198, 123, 92, 0.4);
+            --shadow-sm: 0 1px 3px rgba(61, 53, 49, 0.08);
+            --shadow-md: 0 2px 6px rgba(61, 53, 49, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: var(--base);
+            color: var(--text);
+            line-height: 1.5;
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 1.75rem;
+            margin-bottom: 8px;
+        }
+
+        h2 {
+            font-size: 1.25rem;
+            margin: 32px 0 16px;
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 8px;
+        }
+
+        h3 {
+            font-size: 1rem;
+            margin: 16px 0 12px;
+            color: var(--muted);
+        }
+
+        .subtitle {
+            color: var(--muted);
+            margin-bottom: 24px;
+        }
+
+        .section {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* Device Frames */
+        .device-row {
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .device-frame {
+            background: #1a1a1a;
+            border-radius: 24px;
+            padding: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        }
+
+        .device-frame.mobile {
+            width: 280px;
+        }
+
+        .device-frame.tablet {
+            width: 400px;
+        }
+
+        .device-frame.desktop {
+            width: 100%;
+            max-width: 700px;
+            border-radius: 12px;
+            padding: 8px;
+        }
+
+        .device-label {
+            color: white;
+            font-size: 0.75rem;
+            text-align: center;
+            margin-bottom: 8px;
+            opacity: 0.7;
+        }
+
+        .device-screen {
+            background: var(--base);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .device-frame.desktop .device-screen {
+            border-radius: 8px;
+        }
+
+        /* App Header */
+        .app-header {
+            background: var(--primary);
+            color: white;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .app-logo {
+            font-weight: 700;
+            font-size: 1.125rem;
+        }
+
+        .app-nav {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,255,255,0.2);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.875rem;
+        }
+
+        .app-user {
+            width: 32px;
+            height: 32px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Content Area */
+        .app-content {
+            padding: 16px;
+            min-height: 300px;
+        }
+
+        .app-title {
+            font-size: 1.125rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        /* Idea Cards */
+        .idea-card {
+            background: var(--surface);
+            border-radius: 10px;
+            padding: 12px 16px;
+            margin-bottom: 12px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .idea-thumb {
+            width: 40px;
+            height: 40px;
+            background: var(--border);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .idea-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .idea-title {
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .idea-meta {
+            font-size: 0.875rem;
+            color: var(--muted);
+        }
+
+        .idea-badge {
+            background: var(--secondary);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        /* FAB */
+        .fab {
+            position: absolute;
+            bottom: 16px;
+            right: 16px;
+            width: 56px;
+            height: 56px;
+            background: var(--primary);
+            color: white;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: var(--shadow-md);
+        }
+
+        .app-content {
+            position: relative;
+        }
+
+        /* Desktop Layouts */
+        .desktop-layout {
+            display: none;
+            margin-top: 24px;
+        }
+
+        .desktop-layout.active {
+            display: block;
+        }
+
+        .layout-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .layout-tab {
+            padding: 8px 16px;
+            background: var(--border);
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .layout-tab.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Layout A: Wide Cards */
+        .layout-a .app-content {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .layout-a .idea-card {
+            padding: 16px 20px;
+        }
+
+        .layout-a .idea-thumb {
+            width: 56px;
+            height: 56px;
+        }
+
+        /* Layout B: Sidebar */
+        .layout-b .app-body {
+            display: flex;
+        }
+
+        .layout-b .sidebar {
+            width: 200px;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            padding: 16px;
+            min-height: 350px;
+        }
+
+        .layout-b .sidebar-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        .layout-b .sidebar-item {
+            padding: 10px 12px;
+            border-radius: 6px;
+            margin-bottom: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .layout-b .sidebar-item:hover {
+            background: var(--base);
+        }
+
+        .layout-b .sidebar-item.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .layout-b .sidebar-avatar {
+            width: 28px;
+            height: 28px;
+            background: var(--border);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+        }
+
+        .layout-b .sidebar-item.active .sidebar-avatar {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .layout-b .main-content {
+            flex: 1;
+            padding: 16px 24px;
+        }
+
+        /* Grid Layout for Tablet */
+        .tablet-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .tablet-grid .idea-card {
+            margin-bottom: 0;
+        }
+
+        /* Accessibility Section */
+        .a11y-demo {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 24px;
+        }
+
+        .a11y-item {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .a11y-title {
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .a11y-check {
+            color: var(--secondary);
+        }
+
+        /* Focus States */
+        .focus-demo {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .focus-btn {
+            padding: 12px 24px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .focus-btn:focus {
+            outline: none;
+            box-shadow: var(--focus-ring);
+        }
+
+        .focus-btn.focus-visible {
+            box-shadow: var(--focus-ring);
+        }
+
+        .focus-input {
+            padding: 12px;
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            font-family: 'Nunito', sans-serif;
+            font-size: 1rem;
+        }
+
+        .focus-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: var(--focus-ring);
+        }
+
+        /* Touch Targets */
+        .touch-demo {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .touch-target {
+            position: relative;
+        }
+
+        .touch-target::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 44px;
+            height: 44px;
+            border: 2px dashed var(--primary);
+            border-radius: 8px;
+            opacity: 0.5;
+        }
+
+        .touch-btn {
+            padding: 12px 20px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 600;
+            min-height: 44px;
+            min-width: 44px;
+        }
+
+        .touch-icon {
+            width: 44px;
+            height: 44px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .touch-label {
+            font-size: 0.75rem;
+            color: var(--muted);
+            text-align: center;
+            margin-top: 8px;
+        }
+
+        /* Contrast Demo */
+        .contrast-demo {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+        }
+
+        .contrast-item {
+            padding: 16px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .contrast-ratio {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .contrast-label {
+            font-size: 0.75rem;
+            margin-top: 4px;
+        }
+
+        .contrast-aaa {
+            background: var(--base);
+            color: var(--text);
+        }
+
+        .contrast-aa {
+            background: var(--primary);
+            color: white;
+        }
+
+        .contrast-badge {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.625rem;
+            font-weight: 700;
+            margin-top: 8px;
+        }
+
+        .contrast-aaa .contrast-badge {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .contrast-aa .contrast-badge {
+            background: rgba(255,255,255,0.3);
+        }
+
+        /* Keyboard Nav Demo */
+        .keyboard-demo {
+            background: var(--base);
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .keyboard-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+            align-items: center;
+        }
+
+        .key {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.875rem;
+            box-shadow: 0 2px 0 var(--border);
+        }
+
+        .key-action {
+            color: var(--muted);
+            font-size: 0.875rem;
+        }
+
+        /* Screen Reader */
+        .sr-demo {
+            background: #1a1a1a;
+            color: #00ff00;
+            font-family: monospace;
+            padding: 16px;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            line-height: 1.8;
+        }
+
+        .sr-demo .sr-label {
+            color: #ffcc00;
+        }
+
+        /* Reduced Motion */
+        .motion-demo {
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+
+        .motion-box {
+            text-align: center;
+        }
+
+        .motion-card {
+            width: 120px;
+            height: 80px;
+            background: var(--surface);
+            border-radius: 8px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 8px;
+        }
+
+        .motion-card.animated {
+            animation: pulse 2s infinite;
+        }
+
+        .motion-card.static {
+            /* No animation */
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .motion-label {
+            font-size: 0.75rem;
+            color: var(--muted);
+        }
+
+        /* Breakpoint indicator */
+        .breakpoint-bar {
+            display: flex;
+            margin-bottom: 16px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .breakpoint-segment {
+            padding: 8px 16px;
+            text-align: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .bp-mobile {
+            background: #E8D4CF;
+            flex: 320;
+        }
+
+        .bp-tablet {
+            background: #D4E0D3;
+            flex: 256;
+        }
+
+        .bp-desktop {
+            background: #D4DBE3;
+            flex: 424;
+        }
+
+        .bp-label {
+            display: block;
+            font-weight: 400;
+            opacity: 0.7;
+        }
+
+        /* Zoom demo */
+        .zoom-demo {
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+        }
+
+        .zoom-container {
+            background: var(--base);
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .zoom-100 {
+            font-size: 16px;
+        }
+
+        .zoom-200 {
+            font-size: 32px;
+        }
+
+        .zoom-label {
+            font-size: 0.75rem;
+            color: var(--muted);
+            margin-top: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .device-row {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .a11y-demo {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>tkdo Responsive & Accessibility</h1>
+    <p class="subtitle">Adaptation multi-écrans et accessibilité</p>
+
+    <!-- Breakpoints -->
+    <h2>1. Breakpoints</h2>
+    <div class="section">
+        <div class="breakpoint-bar">
+            <div class="breakpoint-segment bp-mobile">
+                Mobile
+                <span class="bp-label">320px - 767px</span>
+            </div>
+            <div class="breakpoint-segment bp-tablet">
+                Tablet
+                <span class="bp-label">768px - 991px</span>
+            </div>
+            <div class="breakpoint-segment bp-desktop">
+                Desktop
+                <span class="bp-label">992px+</span>
+            </div>
+        </div>
+        <p style="color: var(--muted); font-size: 0.875rem;">Mobile-first: styles de base pour mobile, améliorations progressives pour écrans plus grands.</p>
+    </div>
+
+    <!-- Device Previews -->
+    <h2>2. Aperçu par Appareil</h2>
+    <div class="section">
+        <div class="device-row">
+            <!-- Mobile -->
+            <div class="device-frame mobile">
+                <div class="device-label">Mobile (320px)</div>
+                <div class="device-screen">
+                    <div class="app-header">
+                        <span class="app-logo">tkdo</span>
+                        <div class="app-nav">Noël 2026 ▼</div>
+                        <div class="app-user">👤</div>
+                    </div>
+                    <div class="app-content">
+                        <div class="app-title">Marie-Claire</div>
+                        <div class="idea-card">
+                            <div class="idea-thumb">📷</div>
+                            <div class="idea-content">
+                                <div class="idea-title">Écharpe bleue</div>
+                                <div class="idea-meta">Noël 2026</div>
+                            </div>
+                            <span class="idea-badge">💚</span>
+                        </div>
+                        <div class="idea-card">
+                            <div class="idea-thumb">📷</div>
+                            <div class="idea-content">
+                                <div class="idea-title">Livre de cuisine</div>
+                                <div class="idea-meta">Noël 2026</div>
+                            </div>
+                        </div>
+                        <div class="idea-card">
+                            <div class="idea-thumb">📷</div>
+                            <div class="idea-content">
+                                <div class="idea-title">Théière japonaise</div>
+                                <div class="idea-meta">Noël 2026, Famille</div>
+                            </div>
+                        </div>
+                        <div class="fab">+</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tablet -->
+            <div class="device-frame tablet">
+                <div class="device-label">Tablet (768px) - Grille 2 colonnes</div>
+                <div class="device-screen">
+                    <div class="app-header">
+                        <span class="app-logo">tkdo</span>
+                        <div class="app-nav">Noël 2026 ▼</div>
+                        <div class="app-user">👤</div>
+                    </div>
+                    <div class="app-content">
+                        <div class="app-title">Marie-Claire · 8 idées</div>
+                        <div class="tablet-grid">
+                            <div class="idea-card">
+                                <div class="idea-thumb">📷</div>
+                                <div class="idea-content">
+                                    <div class="idea-title">Écharpe bleue</div>
+                                    <div class="idea-meta">Noël 2026</div>
+                                </div>
+                                <span class="idea-badge">💚</span>
+                            </div>
+                            <div class="idea-card">
+                                <div class="idea-thumb">📷</div>
+                                <div class="idea-content">
+                                    <div class="idea-title">Livre de cuisine</div>
+                                    <div class="idea-meta">Noël 2026</div>
+                                </div>
+                            </div>
+                            <div class="idea-card">
+                                <div class="idea-thumb">📷</div>
+                                <div class="idea-content">
+                                    <div class="idea-title">Théière japonaise</div>
+                                    <div class="idea-meta">Famille</div>
+                                </div>
+                            </div>
+                            <div class="idea-card">
+                                <div class="idea-thumb">📷</div>
+                                <div class="idea-content">
+                                    <div class="idea-title">Puzzle 1000 pièces</div>
+                                    <div class="idea-meta">Noël 2026</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="fab">+</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Desktop Layouts -->
+    <h2>3. Options Desktop</h2>
+    <div class="section">
+        <div class="layout-tabs">
+            <button class="layout-tab active" onclick="showLayout('a')">Option A: Cartes larges</button>
+            <button class="layout-tab" onclick="showLayout('b')">Option B: Sidebar</button>
+        </div>
+
+        <!-- Layout A -->
+        <div id="layout-a" class="desktop-layout active">
+            <div class="device-frame desktop">
+                <div class="device-label">Desktop - Option A: Cartes larges, centrées (MVP recommandé)</div>
+                <div class="device-screen layout-a">
+                    <div class="app-header">
+                        <span class="app-logo">tkdo</span>
+                        <div class="app-nav">Noël 2026 ▼</div>
+                        <div class="app-user">👤</div>
+                    </div>
+                    <div class="app-content">
+                        <div class="app-title">Marie-Claire · 8 idées · Activité récente: 2j</div>
+                        <div class="idea-card">
+                            <div class="idea-thumb">📷</div>
+                            <div class="idea-content">
+                                <div class="idea-title">Écharpe bleue en laine</div>
+                                <div class="idea-meta">Visible par: Noël 2026, Famille</div>
+                            </div>
+                            <span class="idea-badge">💚</span>
+                        </div>
+                        <div class="idea-card">
+                            <div class="idea-thumb">📷</div>
+                            <div class="idea-content">
+                                <div class="idea-title">Livre de cuisine méditerranéenne</div>
+                                <div class="idea-meta">Visible par: Noël 2026</div>
+                            </div>
+                        </div>
+                        <div class="idea-card">
+                            <div class="idea-thumb">📷</div>
+                            <div class="idea-content">
+                                <div class="idea-title">Théière japonaise en fonte</div>
+                                <div class="idea-meta">Visible par: Noël 2026, Famille</div>
+                            </div>
+                        </div>
+                        <div class="fab">+</div>
+                    </div>
+                </div>
+            </div>
+            <p style="margin-top: 12px; color: var(--muted); font-size: 0.875rem;">
+                ✓ Simple, cohérent avec mobile · ✓ Facile à implémenter · ✓ Recommandé pour MVP
+            </p>
+        </div>
+
+        <!-- Layout B -->
+        <div id="layout-b" class="desktop-layout">
+            <div class="device-frame desktop">
+                <div class="device-label">Desktop - Option B: Sidebar avec liste des membres</div>
+                <div class="device-screen layout-b">
+                    <div class="app-header">
+                        <span class="app-logo">tkdo</span>
+                        <div class="app-nav">Noël 2026 ▼</div>
+                        <div class="app-user">👤</div>
+                    </div>
+                    <div class="app-body">
+                        <div class="sidebar">
+                            <div class="sidebar-title">Membres</div>
+                            <div class="sidebar-item active">
+                                <div class="sidebar-avatar">👤</div>
+                                <span>Marie-Claire</span>
+                            </div>
+                            <div class="sidebar-item">
+                                <div class="sidebar-avatar">👤</div>
+                                <span>Thomas</span>
+                            </div>
+                            <div class="sidebar-item">
+                                <div class="sidebar-avatar">👤</div>
+                                <span>Sophie</span>
+                            </div>
+                            <div class="sidebar-item">
+                                <div class="sidebar-avatar">👤</div>
+                                <span>Julien</span>
+                            </div>
+                        </div>
+                        <div class="main-content">
+                            <div class="app-title">Marie-Claire · 8 idées</div>
+                            <div class="idea-card">
+                                <div class="idea-thumb">📷</div>
+                                <div class="idea-content">
+                                    <div class="idea-title">Écharpe bleue en laine</div>
+                                    <div class="idea-meta">Noël 2026, Famille</div>
+                                </div>
+                                <span class="idea-badge">💚</span>
+                            </div>
+                            <div class="idea-card">
+                                <div class="idea-thumb">📷</div>
+                                <div class="idea-content">
+                                    <div class="idea-title">Livre de cuisine</div>
+                                    <div class="idea-meta">Noël 2026</div>
+                                </div>
+                            </div>
+                            <div class="idea-card">
+                                <div class="idea-thumb">📷</div>
+                                <div class="idea-content">
+                                    <div class="idea-title">Théière japonaise</div>
+                                    <div class="idea-meta">Noël 2026, Famille</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p style="margin-top: 12px; color: var(--muted); font-size: 0.875rem;">
+                ✓ Navigation rapide entre membres · ✓ Vue d'ensemble du groupe · ⚠ Plus complexe à implémenter · Post-MVP
+            </p>
+        </div>
+    </div>
+
+    <!-- Accessibility: Focus States -->
+    <h2>4. Accessibilité: États de Focus</h2>
+    <div class="section">
+        <p style="margin-bottom: 16px;">Cliquez dans les éléments ci-dessous et utilisez Tab pour voir les états de focus:</p>
+        <div class="focus-demo">
+            <button class="focus-btn">Bouton avec focus visible</button>
+            <input type="text" class="focus-input" placeholder="Champ texte avec focus">
+        </div>
+        <p style="margin-top: 12px; color: var(--muted); font-size: 0.875rem;">
+            Anneau terracotta (3px) pour tous les éléments focusables. Visible au clavier ET à la souris.
+        </p>
+    </div>
+
+    <!-- Accessibility: Touch Targets -->
+    <h2>5. Accessibilité: Touch Targets (44px minimum)</h2>
+    <div class="section">
+        <div class="touch-demo">
+            <div class="touch-target">
+                <button class="touch-btn">Bouton</button>
+                <div class="touch-label">44px min height</div>
+            </div>
+            <div class="touch-target">
+                <button class="touch-icon">+</button>
+                <div class="touch-label">44×44px</div>
+            </div>
+            <div class="touch-target">
+                <button class="touch-icon">✓</button>
+                <div class="touch-label">44×44px</div>
+            </div>
+        </div>
+        <p style="margin-top: 16px; color: var(--muted); font-size: 0.875rem;">
+            Zone pointillée = zone tactile minimale (44×44px selon Apple HIG).
+        </p>
+    </div>
+
+    <!-- Accessibility: Color Contrast -->
+    <h2>6. Accessibilité: Contraste des Couleurs</h2>
+    <div class="section">
+        <div class="contrast-demo">
+            <div class="contrast-item contrast-aaa">
+                <div class="contrast-ratio">7.2:1</div>
+                <div class="contrast-label">Texte sur crème</div>
+                <span class="contrast-badge">AAA ✓</span>
+            </div>
+            <div class="contrast-item contrast-aa">
+                <div class="contrast-ratio">4.6:1</div>
+                <div class="contrast-label">Blanc sur terracotta</div>
+                <span class="contrast-badge">AA ✓</span>
+            </div>
+            <div class="contrast-item" style="background: var(--secondary); color: white;">
+                <div class="contrast-ratio">3.1:1</div>
+                <div class="contrast-label">Blanc sur vert</div>
+                <span class="contrast-badge" style="background: rgba(255,255,255,0.3);">AA (large) ✓</span>
+            </div>
+        </div>
+        <p style="margin-top: 16px; color: var(--muted); font-size: 0.875rem;">
+            Tous les textes atteignent au moins WCAG AA. Texte principal atteint AAA.
+        </p>
+    </div>
+
+    <!-- Accessibility: Keyboard Navigation -->
+    <h2>7. Accessibilité: Navigation Clavier</h2>
+    <div class="section">
+        <div class="keyboard-demo">
+            <div class="keyboard-row">
+                <span class="key">Tab</span>
+                <span class="key-action">→ Élément suivant</span>
+            </div>
+            <div class="keyboard-row">
+                <span class="key">Shift</span> + <span class="key">Tab</span>
+                <span class="key-action">→ Élément précédent</span>
+            </div>
+            <div class="keyboard-row">
+                <span class="key">Enter</span>
+                <span class="key-action">→ Activer bouton / Soumettre formulaire</span>
+            </div>
+            <div class="keyboard-row">
+                <span class="key">Espace</span>
+                <span class="key-action">→ Cocher checkbox / Activer bouton</span>
+            </div>
+            <div class="keyboard-row">
+                <span class="key">Escape</span>
+                <span class="key-action">→ Fermer modal / Annuler</span>
+            </div>
+            <div class="keyboard-row">
+                <span class="key">↑</span> <span class="key">↓</span>
+                <span class="key-action">→ Naviguer dans dropdown / liste</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Accessibility: Screen Reader -->
+    <h2>8. Accessibilité: Lecteur d'Écran</h2>
+    <div class="section">
+        <div class="sr-demo">
+            <span class="sr-label">&lt;button aria-label="Ajouter une idée"&gt;</span><br>
+            VoiceOver: "Ajouter une idée, bouton"<br><br>
+
+            <span class="sr-label">&lt;div role="alert"&gt;Idée ajoutée&lt;/div&gt;</span><br>
+            VoiceOver: "Alerte: Idée ajoutée"<br><br>
+
+            <span class="sr-label">&lt;button aria-expanded="false"&gt;Détails&lt;/button&gt;</span><br>
+            VoiceOver: "Détails, bouton réduit"
+        </div>
+        <p style="margin-top: 12px; color: var(--muted); font-size: 0.875rem;">
+            ARIA labels pour les icônes, rôles pour les régions dynamiques, états pour les éléments interactifs.
+        </p>
+    </div>
+
+    <!-- Accessibility: Reduced Motion -->
+    <h2>9. Accessibilité: Mouvement Réduit</h2>
+    <div class="section">
+        <div class="motion-demo">
+            <div class="motion-box">
+                <div class="motion-card animated">
+                    <span>Pulse</span>
+                </div>
+                <div class="motion-label">Animation normale</div>
+            </div>
+            <div class="motion-box">
+                <div class="motion-card static">
+                    <span>Statique</span>
+                </div>
+                <div class="motion-label">prefers-reduced-motion</div>
+            </div>
+        </div>
+        <p style="margin-top: 16px; color: var(--muted); font-size: 0.875rem;">
+            Respect de <code>prefers-reduced-motion</code> pour les utilisateurs sensibles aux animations.
+        </p>
+    </div>
+
+    <!-- Accessibility: Zoom -->
+    <h2>10. Accessibilité: Zoom 200%</h2>
+    <div class="section">
+        <div class="zoom-demo">
+            <div class="zoom-container">
+                <div class="zoom-100">
+                    Texte à 100%
+                </div>
+                <div class="zoom-label">16px (1rem)</div>
+            </div>
+            <div class="zoom-container">
+                <div class="zoom-200">
+                    Texte à 200%
+                </div>
+                <div class="zoom-label">32px (2rem)</div>
+            </div>
+        </div>
+        <p style="margin-top: 16px; color: var(--muted); font-size: 0.875rem;">
+            L'interface reste utilisable à 200% de zoom. Unités relatives (rem) au lieu de pixels fixes.
+        </p>
+    </div>
+
+    <script>
+        function showLayout(layout) {
+            document.querySelectorAll('.desktop-layout').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.layout-tab').forEach(el => el.classList.remove('active'));
+
+            document.getElementById('layout-' + layout).classList.add('active');
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>

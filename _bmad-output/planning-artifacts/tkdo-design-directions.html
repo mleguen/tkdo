@@ -1,0 +1,1339 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>tkdo Design Directions</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --tkdo-base: #FDF8F3;
+            --tkdo-surface: #FFFFFF;
+            --tkdo-primary: #C67B5C;
+            --tkdo-primary-hover: #B56A4B;
+            --tkdo-secondary: #8FAE8B;
+            --tkdo-text: #3D3531;
+            --tkdo-muted: #9A918A;
+            --tkdo-border: #E8E4E1;
+            --tkdo-draft: #E8E4E1;
+            --tkdo-warning: #D4A84B;
+            --tkdo-error: #C97B7B;
+            --tkdo-info: #7A8FA8;
+            --shadow-sm: 0 1px 3px rgba(61, 53, 49, 0.08);
+            --shadow-md: 0 2px 6px rgba(61, 53, 49, 0.1);
+            --shadow-lg: 0 4px 12px rgba(61, 53, 49, 0.12);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Nunito', -apple-system, sans-serif;
+            background: #f0f0f0;
+            color: var(--tkdo-text);
+            line-height: 1.5;
+        }
+
+        .page-header {
+            background: white;
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--tkdo-border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .page-header h1 {
+            font-size: 1.5rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .page-header p {
+            color: var(--tkdo-muted);
+            font-size: 0.9rem;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-tab {
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            border: 2px solid transparent;
+            background: var(--tkdo-base);
+            color: var(--tkdo-muted);
+            transition: all 0.2s;
+        }
+
+        .nav-tab:hover {
+            background: var(--tkdo-border);
+        }
+
+        .nav-tab.active {
+            background: var(--tkdo-primary);
+            color: white;
+        }
+
+        .directions-container {
+            padding: 2rem;
+        }
+
+        .direction-section {
+            display: none;
+        }
+
+        .direction-section.active {
+            display: block;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+            color: var(--tkdo-text);
+        }
+
+        .section-desc {
+            color: var(--tkdo-muted);
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+        }
+
+        .mockup-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 2rem;
+        }
+
+        .mockup-wrapper {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-md);
+        }
+
+        .mockup-label {
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--tkdo-text);
+        }
+
+        .mockup-desc {
+            font-size: 0.85rem;
+            color: var(--tkdo-muted);
+            margin-bottom: 1rem;
+        }
+
+        .pros-cons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 1rem;
+            font-size: 0.8rem;
+        }
+
+        .pros, .cons {
+            padding: 0.75rem;
+            border-radius: 6px;
+        }
+
+        .pros {
+            background: rgba(143, 174, 139, 0.1);
+        }
+
+        .cons {
+            background: rgba(201, 123, 123, 0.1);
+        }
+
+        .pros strong, .cons strong {
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        /* Mobile Frame */
+        .mobile-frame {
+            max-width: 375px;
+            margin: 0 auto;
+            border: 6px solid #333;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+            background: var(--tkdo-base);
+        }
+
+        .mobile-status-bar {
+            background: var(--tkdo-primary);
+            padding: 0.25rem 1rem;
+            font-size: 0.7rem;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .mobile-header {
+            background: var(--tkdo-primary);
+            color: white;
+            padding: 0.75rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .mobile-header-title {
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .mobile-content {
+            min-height: 420px;
+            background: var(--tkdo-base);
+            padding: 1rem;
+            overflow-y: auto;
+        }
+
+        .mobile-bottom-nav {
+            display: flex;
+            background: white;
+            border-top: 1px solid var(--tkdo-border);
+        }
+
+        .mobile-nav-item {
+            flex: 1;
+            text-align: center;
+            padding: 0.75rem 0.5rem;
+            font-size: 0.7rem;
+            color: var(--tkdo-muted);
+        }
+
+        .mobile-nav-item.active {
+            color: var(--tkdo-primary);
+            font-weight: 600;
+        }
+
+        .mobile-nav-icon {
+            font-size: 1.2rem;
+            margin-bottom: 0.1rem;
+        }
+
+        /* Idea Cards */
+        .idea-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .idea-card-title {
+            font-weight: 600;
+            color: var(--tkdo-text);
+            margin-bottom: 0.25rem;
+        }
+
+        .idea-card-meta {
+            font-size: 0.8rem;
+            color: var(--tkdo-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .idea-card-desc {
+            font-size: 0.85rem;
+            color: var(--tkdo-text);
+            margin-bottom: 0.5rem;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .badge-giving {
+            background: var(--tkdo-secondary);
+            color: white;
+        }
+
+        .badge-draft {
+            background: var(--tkdo-draft);
+            color: var(--tkdo-muted);
+        }
+
+        .badge-groups {
+            background: var(--tkdo-info);
+            color: white;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-family: 'Nunito', sans-serif;
+        }
+
+        .btn-primary {
+            background: var(--tkdo-primary);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: var(--tkdo-border);
+            color: var(--tkdo-text);
+        }
+
+        .btn-full {
+            width: 100%;
+        }
+
+        /* Direction-specific styles */
+
+        /* Direction A: Bottom Tab Navigation */
+        .dir-a .group-selector {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            overflow-x: auto;
+            padding-bottom: 0.5rem;
+        }
+
+        .dir-a .group-chip {
+            padding: 0.4rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            background: white;
+            color: var(--tkdo-muted);
+            border: 1px solid var(--tkdo-border);
+        }
+
+        .dir-a .group-chip.active {
+            background: var(--tkdo-primary);
+            color: white;
+            border-color: var(--tkdo-primary);
+        }
+
+        /* Direction B: Sidebar Navigation */
+        .dir-b .mobile-content {
+            display: flex;
+            padding: 0;
+        }
+
+        .dir-b .sidebar {
+            width: 70px;
+            background: white;
+            border-right: 1px solid var(--tkdo-border);
+            padding: 0.5rem;
+        }
+
+        .dir-b .sidebar-item {
+            text-align: center;
+            padding: 0.75rem 0.25rem;
+            margin-bottom: 0.5rem;
+            border-radius: 8px;
+            font-size: 0.65rem;
+            color: var(--tkdo-muted);
+        }
+
+        .dir-b .sidebar-item.active {
+            background: var(--tkdo-base);
+            color: var(--tkdo-primary);
+        }
+
+        .dir-b .sidebar-icon {
+            font-size: 1.25rem;
+            margin-bottom: 0.15rem;
+        }
+
+        .dir-b .main-area {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+
+        /* Direction C: Header Dropdown */
+        .dir-c .header-dropdown {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            background: rgba(255,255,255,0.2);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.85rem;
+        }
+
+        /* Direction D: Segmented Control */
+        .dir-d .segment-control {
+            display: flex;
+            background: rgba(255,255,255,0.2);
+            border-radius: 8px;
+            padding: 0.2rem;
+            margin: 0.5rem 1rem;
+        }
+
+        .dir-d .segment-item {
+            flex: 1;
+            text-align: center;
+            padding: 0.4rem;
+            font-size: 0.75rem;
+            border-radius: 6px;
+            color: rgba(255,255,255,0.7);
+        }
+
+        .dir-d .segment-item.active {
+            background: white;
+            color: var(--tkdo-primary);
+            font-weight: 600;
+        }
+
+        /* Card Styles */
+        .card-minimal {
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-minimal .idea-card-title {
+            font-size: 0.9rem;
+        }
+
+        .card-detailed {
+            padding: 1.25rem;
+        }
+
+        .card-detailed .idea-card-image {
+            width: 100%;
+            height: 80px;
+            background: var(--tkdo-border);
+            border-radius: 6px;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--tkdo-muted);
+            font-size: 0.8rem;
+        }
+
+        .card-expandable {
+            border-left: 3px solid var(--tkdo-primary);
+        }
+
+        .card-expandable .expand-hint {
+            font-size: 0.75rem;
+            color: var(--tkdo-primary);
+            margin-top: 0.5rem;
+        }
+
+        /* List compact style */
+        .list-compact .idea-row {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem;
+            background: white;
+            margin-bottom: 0.5rem;
+            border-radius: 8px;
+            gap: 0.75rem;
+        }
+
+        .list-compact .idea-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--tkdo-base);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .list-compact .idea-info {
+            flex: 1;
+        }
+
+        .list-compact .idea-title {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .list-compact .idea-subtitle {
+            font-size: 0.75rem;
+            color: var(--tkdo-muted);
+        }
+
+        /* Add Idea Flows */
+        .inline-add {
+            background: white;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border: 2px dashed var(--tkdo-border);
+        }
+
+        .inline-add input {
+            width: 100%;
+            border: none;
+            font-size: 1rem;
+            font-family: 'Nunito', sans-serif;
+            padding: 0.5rem 0;
+            outline: none;
+        }
+
+        .inline-add input::placeholder {
+            color: var(--tkdo-muted);
+        }
+
+        .modal-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.4);
+            display: flex;
+            align-items: flex-end;
+        }
+
+        .modal-sheet {
+            background: white;
+            width: 100%;
+            border-radius: 16px 16px 0 0;
+            padding: 1.5rem;
+        }
+
+        .modal-handle {
+            width: 40px;
+            height: 4px;
+            background: var(--tkdo-border);
+            border-radius: 2px;
+            margin: 0 auto 1rem;
+        }
+
+        /* Summary Section */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .summary-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-md);
+        }
+
+        .summary-card h3 {
+            color: var(--tkdo-primary);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .option-row {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .option-row:hover {
+            background: var(--tkdo-base);
+        }
+
+        .option-row.recommended {
+            border-color: var(--tkdo-secondary);
+            background: rgba(143, 174, 139, 0.05);
+        }
+
+        .option-letter {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--tkdo-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+
+        .option-row.recommended .option-letter {
+            background: var(--tkdo-secondary);
+            color: white;
+        }
+
+        .option-text {
+            flex: 1;
+        }
+
+        .option-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .option-desc {
+            font-size: 0.8rem;
+            color: var(--tkdo-muted);
+        }
+
+        .rec-badge {
+            font-size: 0.7rem;
+            background: var(--tkdo-secondary);
+            color: white;
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+        }
+
+        @media (max-width: 768px) {
+            .page-header {
+                padding: 1rem;
+            }
+            .directions-container {
+                padding: 1rem;
+            }
+            .mockup-grid {
+                grid-template-columns: 1fr;
+            }
+            .nav-tabs {
+                overflow-x: auto;
+                flex-wrap: nowrap;
+                padding-bottom: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-header">
+        <h1>tkdo Design Directions</h1>
+        <p>Explore different layout and navigation approaches for your app</p>
+        <div class="nav-tabs">
+            <div class="nav-tab active" onclick="showSection('nav')">1. Navigation</div>
+            <div class="nav-tab" onclick="showSection('cards')">2. Idea Cards</div>
+            <div class="nav-tab" onclick="showSection('add')">3. Add Idea Flow</div>
+            <div class="nav-tab" onclick="showSection('summary')">4. Summary</div>
+        </div>
+    </div>
+
+    <div class="directions-container">
+
+        <!-- SECTION 1: Navigation Patterns -->
+        <div id="section-nav" class="direction-section active">
+            <h2 class="section-title">Navigation Patterns</h2>
+            <p class="section-desc">How users switch between "Ma liste" and group views</p>
+
+            <div class="mockup-grid">
+
+                <!-- Direction A: Bottom Tabs + Horizontal Chips -->
+                <div class="mockup-wrapper">
+                    <div class="mockup-label">A. Bottom Tabs + Group Chips</div>
+                    <div class="mockup-desc">Main sections in bottom nav, groups as horizontal scrollable chips</div>
+
+                    <div class="mobile-frame dir-a">
+                        <div class="mobile-status-bar">
+                            <span>9:41</span>
+                            <span>100%</span>
+                        </div>
+                        <div class="mobile-header">
+                            <span class="mobile-header-title">tkdo</span>
+                            <span>👤</span>
+                        </div>
+                        <div class="mobile-content">
+                            <div class="group-selector">
+                                <div class="group-chip active">Ma liste</div>
+                                <div class="group-chip">Famille</div>
+                                <div class="group-chip">Amis</div>
+                                <div class="group-chip">Collègues</div>
+                            </div>
+                            <div class="idea-card">
+                                <div class="idea-card-title">Guitare Yamaha FG800</div>
+                                <div class="idea-card-meta">~250€ · <span class="badge badge-groups">Famille, Amis</span></div>
+                            </div>
+                            <div class="idea-card">
+                                <div class="idea-card-title">Livre cuisine italienne</div>
+                                <div class="idea-card-meta"><span class="badge badge-draft">Brouillon</span></div>
+                            </div>
+                            <div class="idea-card">
+                                <div class="idea-card-title">Écharpe mérinos</div>
+                                <div class="idea-card-meta">~80€ · <span class="badge badge-groups">Famille</span></div>
+                            </div>
+                        </div>
+                        <div class="mobile-bottom-nav">
+                            <div class="mobile-nav-item active">
+                                <div class="mobile-nav-icon">📋</div>
+                                Listes
+                            </div>
+                            <div class="mobile-nav-item">
+                                <div class="mobile-nav-icon">🎁</div>
+                                Occasions
+                            </div>
+                            <div class="mobile-nav-item">
+                                <div class="mobile-nav-icon">⚙️</div>
+                                Réglages
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pros-cons">
+                        <div class="pros">
+                            <strong>✓ Avantages</strong>
+                            Familier (WhatsApp-like), groupes visibles, facile à naviguer
+                        </div>
+                        <div class="cons">
+                            <strong>✗ Inconvénients</strong>
+                            Peut être encombré avec beaucoup de groupes
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Direction B: Sidebar -->
+                <div class="mockup-wrapper">
+                    <div class="mockup-label">B. Sidebar Navigation</div>
+                    <div class="mockup-desc">Groups always visible in left sidebar</div>
+
+                    <div class="mobile-frame dir-b">
+                        <div class="mobile-status-bar">
+                            <span>9:41</span>
+                            <span>100%</span>
+                        </div>
+                        <div class="mobile-header">
+                            <span class="mobile-header-title">Ma liste</span>
+                            <span>👤</span>
+                        </div>
+                        <div class="mobile-content">
+                            <div class="sidebar">
+                                <div class="sidebar-item active">
+                                    <div class="sidebar-icon">📋</div>
+                                    Ma liste
+                                </div>
+                                <div class="sidebar-item">
+                                    <div class="sidebar-icon">👨‍👩‍👧</div>
+                                    Famille
+                                </div>
+                                <div class="sidebar-item">
+                                    <div class="sidebar-icon">👫</div>
+                                    Amis
+                                </div>
+                                <div class="sidebar-item">
+                                    <div class="sidebar-icon">⚙️</div>
+                                    Réglages
+                                </div>
+                            </div>
+                            <div class="main-area">
+                                <div class="idea-card card-minimal">
+                                    <div class="idea-card-title">Guitare Yamaha</div>
+                                    <span class="badge badge-groups">2 groupes</span>
+                                </div>
+                                <div class="idea-card card-minimal">
+                                    <div class="idea-card-title">Livre cuisine</div>
+                                    <span class="badge badge-draft">Brouillon</span>
+                                </div>
+                                <div class="idea-card card-minimal">
+                                    <div class="idea-card-title">Écharpe</div>
+                                    <span class="badge badge-groups">1 groupe</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pros-cons">
+                        <div class="pros">
+                            <strong>✓ Avantages</strong>
+                            Groupes toujours accessibles, bon pour desktop
+                        </div>
+                        <div class="cons">
+                            <strong>✗ Inconvénients</strong>
+                            Prend de l'espace sur mobile, moins familier
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Direction C: Header Dropdown -->
+                <div class="mockup-wrapper">
+                    <div class="mockup-label">C. Header Dropdown</div>
+                    <div class="mockup-desc">Current context in header, tap to switch groups</div>
+
+                    <div class="mobile-frame dir-c">
+                        <div class="mobile-status-bar">
+                            <span>9:41</span>
+                            <span>100%</span>
+                        </div>
+                        <div class="mobile-header">
+                            <div class="header-dropdown">
+                                <span>Ma liste</span>
+                                <span>▼</span>
+                            </div>
+                            <span>👤</span>
+                        </div>
+                        <div class="mobile-content">
+                            <div class="idea-card">
+                                <div class="idea-card-title">Guitare Yamaha FG800</div>
+                                <div class="idea-card-meta">~250€</div>
+                                <div class="idea-card-desc">Modèle acoustique, couleur naturelle</div>
+                                <span class="badge badge-groups">Famille, Amis</span>
+                            </div>
+                            <div class="idea-card">
+                                <div class="idea-card-title">Livre cuisine italienne</div>
+                                <div class="idea-card-meta"><span class="badge badge-draft">Brouillon</span></div>
+                                <div class="idea-card-desc">Recettes authentiques de grand-mère</div>
+                            </div>
+                            <div class="idea-card">
+                                <div class="idea-card-title">Écharpe laine mérinos</div>
+                                <div class="idea-card-meta">~80€</div>
+                                <span class="badge badge-groups">Famille</span>
+                            </div>
+                            <button class="btn btn-primary btn-full" style="margin-top: 1rem;">+ Nouvelle idée</button>
+                        </div>
+                    </div>
+
+                    <div class="pros-cons">
+                        <div class="pros">
+                            <strong>✓ Avantages</strong>
+                            Maximum d'espace pour le contenu, contexte clair
+                        </div>
+                        <div class="cons">
+                            <strong>✗ Inconvénients</strong>
+                            Changement de groupe moins visible/accessible
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Direction D: Segmented Control -->
+                <div class="mockup-wrapper">
+                    <div class="mockup-label">D. Segmented Control</div>
+                    <div class="mockup-desc">iOS-style segmented control below header</div>
+
+                    <div class="mobile-frame dir-d">
+                        <div class="mobile-status-bar">
+                            <span>9:41</span>
+                            <span>100%</span>
+                        </div>
+                        <div class="mobile-header" style="padding-bottom: 0;">
+                            <span class="mobile-header-title">tkdo</span>
+                            <span>👤</span>
+                        </div>
+                        <div class="segment-control">
+                            <div class="segment-item active">Ma liste</div>
+                            <div class="segment-item">Famille</div>
+                            <div class="segment-item">Amis</div>
+                        </div>
+                        <div class="mobile-content" style="padding-top: 0.5rem;">
+                            <div class="idea-card">
+                                <div class="idea-card-title">Guitare Yamaha FG800</div>
+                                <div class="idea-card-meta">~250€ · Famille, Amis</div>
+                            </div>
+                            <div class="idea-card">
+                                <div class="idea-card-title">Livre cuisine italienne</div>
+                                <div class="idea-card-meta">Brouillon</div>
+                            </div>
+                            <div class="idea-card">
+                                <div class="idea-card-title">Écharpe laine mérinos</div>
+                                <div class="idea-card-meta">~80€ · Famille</div>
+                            </div>
+                        </div>
+                        <div class="mobile-bottom-nav">
+                            <div class="mobile-nav-item active">
+                                <div class="mobile-nav-icon">📋</div>
+                                Listes
+                            </div>
+                            <div class="mobile-nav-item">
+                                <div class="mobile-nav-icon">🎁</div>
+                                Occasions
+                            </div>
+                            <div class="mobile-nav-item">
+                                <div class="mobile-nav-icon">⚙️</div>
+                                Réglages
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pros-cons">
+                        <div class="pros">
+                            <strong>✓ Avantages</strong>
+                            Très clair, switchs rapides entre 2-4 groupes
+                        </div>
+                        <div class="cons">
+                            <strong>✗ Inconvénients</strong>
+                            Limité à ~4 groupes visibles, espace header
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- SECTION 2: Card Styles -->
+        <div id="section-cards" class="direction-section">
+            <h2 class="section-title">Idea Card Styles</h2>
+            <p class="section-desc">How individual ideas are displayed in lists</p>
+
+            <div class="mockup-grid">
+
+                <!-- Minimal Cards -->
+                <div class="mockup-wrapper">
+                    <div class="mockup-label">A. Minimal Cards</div>
+                    <div class="mockup-desc">Compact, high density, title-focused</div>
+
+                    <div class="mobile-frame">
+                        <div class="mobile-header">
+                            <span class="mobile-header-title">Ma liste</span>
+                        </div>
+                        <div class="mobile-content">
+                            <div class="idea-card card-minimal">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <div class="idea-card-title">Guitare Yamaha FG800</div>
+                                    <span class="badge badge-groups">2</span>
+                                </div>
+                            </div>
+                            <div class="idea-card card-minimal">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <div class="idea-card-title">Livre cuisine italienne</div>
+                                    <span class="badge badge-draft">Draft</span>
+                                </div>
+                            </div>
+                            <div class="idea-card card-minimal">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <div class="idea-card-title">Écharpe laine mérinos</div>
+                                    <span class="badge badge-groups">1</span>
+                                </div>
+                            </div>
+                            <div class="idea-card card-minimal">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <div class="idea-card-title">Coffret thés du monde</div>
+                                    <span class="badge badge-groups">2</span>
+                                </div>
+                            </div>
+                            <div class="idea-card card-minimal">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <div class="idea-card-title">Carnet Moleskine A5</div>
+                                    <span class="badge badge-draft">Draft</span>
+                                </div>
+                            </div>
+                            <div class="idea-card card-minimal">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <div class="idea-card-title">Puzzle 1000 pièces</div>
+                                    <span class="badge badge-groups">1</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pros-cons">
+                        <div class="pros">
+                            <strong>✓ Avantages</strong>
+                            Plus d'idées visibles, scan rapide
+                        </div>
+                        <div class="cons">
+                            <strong>✗ Inconvénients</strong>
+                            Moins de contexte immédiat
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detailed Cards -->
+                <div class="mockup-wrapper">
+                    <div class="mockup-label">B. Detailed Cards</div>
+                    <div class="mockup-desc">Rich info, image placeholder, full description</div>
+
+                    <div class="mobile-frame">
+                        <div class="mobile-header">
+                            <span class="mobile-header-title">Ma liste</span>
+                        </div>
+                        <div class="mobile-content">
+                            <div class="idea-card card-detailed">
+                                <div class="idea-card-image">🎸 Image</div>
+                                <div class="idea-card-title">Guitare Yamaha FG800</div>
+                                <div class="idea-card-desc">Modèle acoustique, couleur naturelle. Parfait pour débuter la guitare!</div>
+                                <div class="idea-card-meta">~250€ · <span class="badge badge-groups">Famille, Amis</span></div>
+                            </div>
+                            <div class="idea-card card-detailed">
+                                <div class="idea-card-image">📚 Image</div>
+                                <div class="idea-card-title">Livre cuisine italienne</div>
+                                <div class="idea-card-desc">Recettes authentiques de grand-mère italienne.</div>
+                                <div class="idea-card-meta"><span class="badge badge-draft">Brouillon</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pros-cons">
+                        <div class="pros">
+                            <strong>✓ Avantages</strong>
+                            Contexte riche, décision facile pour le giver
+                        </div>
+                        <div class="cons">
+                            <strong>✗ Inconvénients</strong>
+                            Moins d'idées visibles, scrolling
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Compact List -->
+                <div class="mockup-wrapper">
+                    <div class="mockup-label">C. Compact List</div>
+                    <div class="mockup-desc">Row-based, icon + title, very dense</div>
+
+                    <div class="mobile-frame">
+                        <div class="mobile-header">
+                            <span class="mobile-header-title">Ma liste</span>
+                        </div>
+                        <div class="mobile-content list-compact">
+                            <div class="idea-row">
+                                <div class="idea-icon">🎸</div>
+                                <div class="idea-info">
+                                    <div class="idea-title">Guitare Yamaha FG800</div>
+                                    <div class="idea-subtitle">~250€ · Famille, Amis</div>
+                                </div>
+                            </div>
+                            <div class="idea-row">
+                                <div class="idea-icon">📚</div>
+                                <div class="idea-info">
+                                    <div class="idea-title">Livre cuisine italienne</div>
+                                    <div class="idea-subtitle">Brouillon</div>
+                                </div>
+                            </div>
+                            <div class="idea-row">
+                                <div class="idea-icon">🧣</div>
+                                <div class="idea-info">
+                                    <div class="idea-title">Écharpe laine mérinos</div>
+                                    <div class="idea-subtitle">~80€ · Famille</div>
+                                </div>
+                            </div>
+                            <div class="idea-row">
+                                <div class="idea-icon">🍵</div>
+                                <div class="idea-info">
+                                    <div class="idea-title">Coffret thés du monde</div>
+                                    <div class="idea-subtitle">~40€ · Famille, Amis</div>
+                                </div>
+                            </div>
+                            <div class="idea-row">
+                                <div class="idea-icon">📓</div>
+                                <div class="idea-info">
+                                    <div class="idea-title">Carnet Moleskine A5</div>
+                                    <div class="idea-subtitle">Brouillon</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pros-cons">
+                        <div class="pros">
+                            <strong>✓ Avantages</strong>
+                            Maximum densité, familier (contacts, emails)
+                        </div>
+                        <div class="cons">
+                            <strong>✗ Inconvénients</strong>
+                            Pas de description visible, moins "cadeau"
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Expandable Cards -->
+                <div class="mockup-wrapper">
+                    <div class="mockup-label">D. Expandable Cards</div>
+                    <div class="mockup-desc">Compact by default, tap to expand details</div>
+
+                    <div class="mobile-frame">
+                        <div class="mobile-header">
+                            <span class="mobile-header-title">Ma liste</span>
+                        </div>
+                        <div class="mobile-content">
+                            <div class="idea-card card-expandable" style="background: var(--tkdo-base);">
+                                <div class="idea-card-title">Guitare Yamaha FG800</div>
+                                <div class="idea-card-desc">Modèle acoustique, couleur naturelle. Parfait pour débuter la guitare!</div>
+                                <div class="idea-card-meta">~250€ · <span class="badge badge-groups">Famille, Amis</span></div>
+                                <div style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--tkdo-border);">
+                                    <button class="btn btn-primary" style="font-size: 0.8rem; padding: 0.4rem 0.75rem;">Je l'offre</button>
+                                    <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.75rem;">Commenter</button>
+                                </div>
+                            </div>
+                            <div class="idea-card card-expandable">
+                                <div class="idea-card-title">Livre cuisine italienne</div>
+                                <div class="idea-card-meta"><span class="badge badge-draft">Brouillon</span></div>
+                                <div class="expand-hint">Tap pour voir plus ▼</div>
+                            </div>
+                            <div class="idea-card card-expandable">
+                                <div class="idea-card-title">Écharpe laine mérinos</div>
+                                <div class="idea-card-meta">~80€ · <span class="badge badge-groups">Famille</span></div>
+                                <div class="expand-hint">Tap pour voir plus ▼</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pros-cons">
+                        <div class="pros">
+                            <strong>✓ Avantages</strong>
+                            Best of both: compact + détails à la demande
+                        </div>
+                        <div class="cons">
+                            <strong>✗ Inconvénients</strong>
+                            Tap supplémentaire pour les détails
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- SECTION 3: Add Idea Flows -->
+        <div id="section-add" class="direction-section">
+            <h2 class="section-title">Add Idea Flow</h2>
+            <p class="section-desc">How users add new ideas to their list</p>
+
+            <div class="mockup-grid">
+
+                <!-- Inline Add -->
+                <div class="mockup-wrapper">
+                    <div class="mockup-label">A. Inline Quick Add</div>
+                    <div class="mockup-desc">Type directly at top of list, minimal friction</div>
+
+                    <div class="mobile-frame">
+                        <div class="mobile-header">
+                            <span class="mobile-header-title">Ma liste</span>
+                        </div>
+                        <div class="mobile-content">
+                            <div class="inline-add">
+                                <input type="text" placeholder="Ajouter une idée...">
+                            </div>
+                            <div class="idea-card">
+                                <div class="idea-card-title">Guitare Yamaha FG800</div>
+                                <div class="idea-card-meta">~250€ · Famille, Amis</div>
+                            </div>
+                            <div class="idea-card">
+                                <div class="idea-card-title">Livre cuisine italienne</div>
+                                <div class="idea-card-meta">Brouillon</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pros-cons">
+                        <div class="pros">
+                            <strong>✓ Avantages</strong>
+                            Ultra rapide, comme envoyer un message
+                        </div>
+                        <div class="cons">
+                            <strong>✗ Inconvénients</strong>
+                            Pas d'options visibles (prix, groupes)
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bottom Sheet Modal -->
+                <div class="mockup-wrapper">
+                    <div class="mockup-label">B. Bottom Sheet Modal</div>
+                    <div class="mockup-desc">Slide-up modal with all options visible</div>
+
+                    <div class="mobile-frame" style="position: relative;">
+                        <div class="mobile-header">
+                            <span class="mobile-header-title">Ma liste</span>
+                        </div>
+                        <div class="mobile-content" style="filter: brightness(0.7);">
+                            <div class="idea-card">
+                                <div class="idea-card-title">Guitare Yamaha</div>
+                            </div>
+                        </div>
+                        <div class="modal-overlay">
+                            <div class="modal-sheet">
+                                <div class="modal-handle"></div>
+                                <div style="font-weight: 700; margin-bottom: 1rem;">Nouvelle idée</div>
+                                <input type="text" placeholder="Titre de l'idée" style="width: 100%; padding: 0.75rem; border: 1px solid var(--tkdo-border); border-radius: 8px; font-family: 'Nunito'; margin-bottom: 0.75rem;">
+                                <textarea placeholder="Description (optionnel)" style="width: 100%; padding: 0.75rem; border: 1px solid var(--tkdo-border); border-radius: 8px; font-family: 'Nunito'; margin-bottom: 0.75rem; resize: none;" rows="2"></textarea>
+                                <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+                                    <input type="text" placeholder="Prix" style="flex: 1; padding: 0.75rem; border: 1px solid var(--tkdo-border); border-radius: 8px; font-family: 'Nunito';">
+                                    <input type="text" placeholder="Lien" style="flex: 2; padding: 0.75rem; border: 1px solid var(--tkdo-border); border-radius: 8px; font-family: 'Nunito';">
+                                </div>
+                                <button class="btn btn-primary btn-full">Ajouter</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pros-cons">
+                        <div class="pros">
+                            <strong>✓ Avantages</strong>
+                            Toutes options visibles, focus clair
+                        </div>
+                        <div class="cons">
+                            <strong>✗ Inconvénients</strong>
+                            Plus de taps, interrompt le flux
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAB + Expandable -->
+                <div class="mockup-wrapper">
+                    <div class="mockup-label">C. FAB + Expandable Form</div>
+                    <div class="mockup-desc">Floating button expands to inline form</div>
+
+                    <div class="mobile-frame">
+                        <div class="mobile-header">
+                            <span class="mobile-header-title">Ma liste</span>
+                        </div>
+                        <div class="mobile-content" style="position: relative;">
+                            <div class="idea-card">
+                                <div class="idea-card-title">Guitare Yamaha FG800</div>
+                                <div class="idea-card-meta">~250€ · Famille, Amis</div>
+                            </div>
+                            <div class="idea-card">
+                                <div class="idea-card-title">Livre cuisine italienne</div>
+                                <div class="idea-card-meta">Brouillon</div>
+                            </div>
+                            <div class="idea-card">
+                                <div class="idea-card-title">Écharpe mérinos</div>
+                                <div class="idea-card-meta">~80€ · Famille</div>
+                            </div>
+                            <div style="position: absolute; bottom: 1rem; right: 1rem; width: 56px; height: 56px; background: var(--tkdo-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem; box-shadow: var(--shadow-lg);">
+                                +
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pros-cons">
+                        <div class="pros">
+                            <strong>✓ Avantages</strong>
+                            Toujours accessible, pattern Material Design
+                        </div>
+                        <div class="cons">
+                            <strong>✗ Inconvénients</strong>
+                            Cache du contenu, moins "cozy"
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- SECTION 4: Summary -->
+        <div id="section-summary" class="direction-section">
+            <h2 class="section-title">Summary: Your Choices</h2>
+            <p class="section-desc">Pick your preferred approach for each category</p>
+
+            <div class="summary-grid">
+
+                <div class="summary-card">
+                    <h3>Navigation Pattern</h3>
+                    <div class="option-row recommended">
+                        <div class="option-letter">A</div>
+                        <div class="option-text">
+                            <div class="option-name">Bottom Tabs + Group Chips <span class="rec-badge">Recommandé</span></div>
+                            <div class="option-desc">Familier, flexible, WhatsApp-like</div>
+                        </div>
+                    </div>
+                    <div class="option-row">
+                        <div class="option-letter">B</div>
+                        <div class="option-text">
+                            <div class="option-name">Sidebar</div>
+                            <div class="option-desc">Meilleur pour desktop</div>
+                        </div>
+                    </div>
+                    <div class="option-row">
+                        <div class="option-letter">C</div>
+                        <div class="option-text">
+                            <div class="option-name">Header Dropdown</div>
+                            <div class="option-desc">Maximum d'espace contenu</div>
+                        </div>
+                    </div>
+                    <div class="option-row">
+                        <div class="option-letter">D</div>
+                        <div class="option-text">
+                            <div class="option-name">Segmented Control</div>
+                            <div class="option-desc">iOS-style, limité à ~4 groupes</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="summary-card">
+                    <h3>Idea Card Style</h3>
+                    <div class="option-row">
+                        <div class="option-letter">A</div>
+                        <div class="option-text">
+                            <div class="option-name">Minimal Cards</div>
+                            <div class="option-desc">Compact, scan rapide</div>
+                        </div>
+                    </div>
+                    <div class="option-row recommended">
+                        <div class="option-letter">B</div>
+                        <div class="option-text">
+                            <div class="option-name">Detailed Cards <span class="rec-badge">Recommandé</span></div>
+                            <div class="option-desc">Contexte riche pour gift-givers</div>
+                        </div>
+                    </div>
+                    <div class="option-row">
+                        <div class="option-letter">C</div>
+                        <div class="option-text">
+                            <div class="option-name">Compact List</div>
+                            <div class="option-desc">Maximum densité</div>
+                        </div>
+                    </div>
+                    <div class="option-row">
+                        <div class="option-letter">D</div>
+                        <div class="option-text">
+                            <div class="option-name">Expandable Cards</div>
+                            <div class="option-desc">Best of both worlds</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="summary-card">
+                    <h3>Add Idea Flow</h3>
+                    <div class="option-row recommended">
+                        <div class="option-letter">A</div>
+                        <div class="option-text">
+                            <div class="option-name">Inline Quick Add <span class="rec-badge">Recommandé</span></div>
+                            <div class="option-desc">Ultra rapide, comme texting</div>
+                        </div>
+                    </div>
+                    <div class="option-row">
+                        <div class="option-letter">B</div>
+                        <div class="option-text">
+                            <div class="option-name">Bottom Sheet Modal</div>
+                            <div class="option-desc">Toutes options visibles</div>
+                        </div>
+                    </div>
+                    <div class="option-row">
+                        <div class="option-letter">C</div>
+                        <div class="option-text">
+                            <div class="option-name">FAB Button</div>
+                            <div class="option-desc">Material Design pattern</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div style="background: var(--tkdo-base); border-radius: 12px; padding: 1.5rem; margin-top: 2rem;">
+                <h3 style="margin-bottom: 1rem;">My Recommendations for tkdo</h3>
+                <p style="margin-bottom: 1rem;">Based on your goals (Marie-Claire usability, mobile-first, WhatsApp-like simplicity):</p>
+                <ul style="margin-left: 1.5rem; line-height: 1.8;">
+                    <li><strong>Navigation:</strong> A (Bottom Tabs + Chips) - familiar, scalable, works on mobile</li>
+                    <li><strong>Cards:</strong> B (Detailed) or D (Expandable) - gift-givers need context to decide</li>
+                    <li><strong>Add Flow:</strong> A (Inline) with B (Modal) for "add more details" - progressive disclosure</li>
+                </ul>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function showSection(id) {
+            // Hide all sections
+            document.querySelectorAll('.direction-section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+
+            // Show selected section
+            document.getElementById('section-' + id).classList.add('active');
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>

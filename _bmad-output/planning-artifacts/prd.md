@@ -1,5 +1,10 @@
 ---
-stepsCompleted: ['step-01-init', 'step-02-discovery', 'step-03-success', 'step-04-journeys', 'step-05-domain (skipped)', 'step-06-innovation (skipped)', 'step-07-project-type', 'step-08-scoping', 'step-09-functional-requirements', 'step-10-nonfunctional', 'step-11-polish']
+stepsCompleted: ['step-01-init', 'step-02-discovery', 'step-03-success', 'step-04-journeys', 'step-05-domain (skipped)', 'step-06-innovation (skipped)', 'step-07-project-type', 'step-08-scoping', 'step-09-functional-requirements', 'step-10-nonfunctional', 'step-11-polish', 'step-e-01-discovery', 'step-e-02-review', 'step-e-03-edit']
+lastEdited: '2026-01-25'
+editHistory:
+  - date: '2026-01-25'
+    source: 'ux-design-specification.md'
+    changes: 'Aligned PRD with UX design decisions: added draft ideas concept (FR106-FR109), My List view (FR110-FR113), archived ideas handling (FR114-FR116), bulk share on invite (FR55b-FR55f), navigation architecture, API design principles, Journey 7, UX success metrics'
 inputDocuments:
   - '_bmad-output/planning-artifacts/product-brief-tkdo-2026-01-18.md'
   - '_bmad-output/project-context.md'
@@ -77,6 +82,15 @@ workflowType: 'prd'
 | **Expansion** | They ask about secret santa: "Can we use this for Christmas too?" |
 | **Retention** | They come back next year without prompting |
 
+### UX Success Metrics
+
+| Metric | Target | Rationale |
+|--------|--------|-----------|
+| **Time to add simple idea** | < 10 seconds | Adding ideas should feel like texting a friend |
+| **Time to find right gift** | < 30 seconds scanning | Gift givers should quickly find actionable ideas |
+| **Required fields for idea** | Zero (title only, description optional) | Zero friction to capture ideas |
+| **Duplicate gift anxiety** | Zero | Clear "being given" status eliminates uncertainty |
+
 ### Quality Guardrails
 
 | Guardrail | Failure Mode to Avoid |
@@ -126,12 +140,16 @@ The MVP solves the core problem: eliminate duplicate gifts and "what does X want
 | Feature | Why Essential |
 |---------|---------------|
 | List-centered model | Core pivot — users own one persistent list |
-| Rich editable ideas | Title, description, link — editable without delete/recreate |
+| Rich editable ideas | Title, description, link — editable without delete/recreate (no price field — gifts can be handmade) |
+| Draft ideas | Ideas with no visibility (personal inventory) — captured but not shared yet |
+| "My List" view | Personal view of all ideas (drafts + active + archived) with visibility indicators |
 | Comment threads | Coordination ("I'll get the blue one", cost-splitting) |
 | "Being given" flag (anonymous) | Prevent duplicates |
 | Groups with isolation | Privacy boundary |
 | Per-idea visibility | Share specific ideas with specific groups |
+| Archived idea revival | Ideas from archived groups can be shared to new groups |
 | Single-use expiring invite links | Secure onboarding, trust preservation |
+| Bulk share on invite | Existing users prompted to share ideas when joining new group |
 | Basic admin UI | Password reset + group management |
 | Group admin password reset | Group admins can support their own members |
 | Email notifications (adapted) | Parity with current system, adapted for list-centric model |
@@ -363,6 +381,35 @@ Sophie gets a gift she wanted. Thomas feels connected despite the distance.
 
 ---
 
+### Journey 7: Sophie — Joining a New Group
+
+**Opening Scene:**
+Sophie's friend Camille starts using tkdo for her friend group "Les filles." Camille sends Sophie an invite link via WhatsApp.
+
+**Rising Action:**
+Sophie clicks the link. She already has a tkdo account from family use. She logs in with her existing credentials and is automatically added to "Les filles."
+
+A welcome screen appears: "Bienvenue dans Les filles!" showing the group members. Below, a prompt: "Tu as déjà des idées. Veux-tu en partager avec ce groupe?"
+
+She sees her existing ideas with context: "Casque audio (partagé avec Famille)", "Livre de cuisine (brouillon)", "Écharpe en laine (archivé - Noël 2024)." The Famille-shared and draft ideas are pre-checked. The archived one is unchecked.
+
+Sophie unchecks the casque audio (too expensive for friends) and confirms.
+
+**Climax:**
+Her selected ideas instantly appear in "Les filles." Her friends can now see and coordinate on them.
+
+**Resolution:**
+Sophie manages context-appropriate sharing across groups. The bulk share saved her from manually adding each idea again.
+
+**Capabilities Revealed:**
+- Existing user invite flow (login, not signup)
+- Bulk share prompt with multi-select
+- Context labels (shared with X, draft, archived)
+- Atomic bulk share operation
+- Skip option available
+
+---
+
 ### Journey Requirements Summary
 
 | Journey | Key Capabilities | Scope |
@@ -373,6 +420,7 @@ Sophie gets a gift she wanted. Thomas feels connected despite the distance.
 | **Julien (Troubleshooting)** | Instance admin panel, password reset, email logs | MVP |
 | **Sophie (Cross-Group)** | Per-idea visibility, multi-group, group admin invites, group admin password reset, isolation | MVP |
 | **Thomas (Gift Giver)** | Single-use invites, view + mark permissions, anonymous indicator | MVP |
+| **Sophie (Joining New Group)** | Existing user invite, bulk share prompt, context labels, atomic share | MVP |
 
 ## System Architecture
 
@@ -396,6 +444,12 @@ tkdo is a **Single Page Application** built with Angular (existing). The rewrite
 
 - **Instance admin:** Creates groups, resets all passwords, sees all users and groups
 - **Group admin:** Invites members to their group, manages their group, resets passwords for group members, removes members from their group
+
+### Navigation & Information Architecture
+
+- **Groups as primary navigation:** Users navigate between groups and their personal "My List" view
+- **Occasions within groups:** Occasions are NOT a separate navigation destination; they display as a section/banner within each group page showing the first upcoming occasion
+- **"My List" as personal inventory:** Shows all user's ideas (drafts, active, archived) with visibility indicators and management controls
 
 ### Invite Link Security
 
@@ -444,6 +498,13 @@ tkdo is a **Single Page Application** built with Angular (existing). The rewrite
 
 *Rationale:* Good practices benefit everyone without requiring formal audit.
 
+### API Design Principles
+
+- **One path per resource:** Use querystring for filtering (e.g., `/api/utilisateur/{id}/idees?groupe={groupeId}`)
+- **No `/me` aliases:** Use explicit user IDs for consistency
+- **French naming convention:** Resource names in French (utilisateur, idees, groupe, membres) for codebase consistency
+- **Server-computed fields:** API returns computed fields like `status` (active/draft/archived), `eligible_groups`, and `comment_counts_by_group`
+
 ### Test Architecture
 
 **Critical requirement:** Group isolation is the highest-risk feature.
@@ -485,6 +546,26 @@ Test architecture (including negative/penetration-style tests) should be designe
 - **FR16a:** Idea creation validates at submission time that the author and beneficiary share at least one active group (database check); creation fails with an error if no common group exists
 - **FR17:** At idea creation, the current viewing context group is pre-selected by default; author can expand visibility to other eligible groups before saving
 - **FR17a:** When an author narrows idea visibility (removes a group): (1) comments visible to multiple groups have the removed group stripped from their visibility; (2) comments visible only to the removed group are permanently deleted (cascade — the idea author owns the idea space)
+
+### Draft Ideas
+
+- **FR106:** Users can create ideas with visibility = none (no groups selected); these are "draft" ideas
+- **FR107:** Draft ideas are only visible in the user's personal "My List" view
+- **FR108:** When removing an idea from its last visible group, the idea becomes a draft (visibility = none) rather than being deleted
+- **FR109:** Users can share draft ideas to one or more groups at any time via the visibility controls
+
+### My List View
+
+- **FR110:** Users can view all their own ideas in a personal "My List" view regardless of group visibility
+- **FR111:** My List displays ideas with their current status: active (visible to groups), draft (visibility = none), or archived (only visible to archived groups)
+- **FR112:** My List shows visibility indicators for each idea (which groups can see it, or "draft" / "archived" labels)
+- **FR113:** In My List, users can manage idea visibility: share drafts to groups, expand/narrow visibility, or remove from groups
+
+### Archived Ideas
+
+- **FR114:** Ideas whose visibility includes only archived groups display with "archived" status and the originating group name(s)
+- **FR115:** Users can "revive" archived ideas by sharing them to active groups via visibility controls
+- **FR116:** Archived ideas remain in My List view but are hidden from group views until revived
 
 ### Orphaned Ideas (Admin Handling)
 
@@ -551,6 +632,11 @@ Test architecture (including negative/penetration-style tests) should be designe
 - **FR54:** Accepting an invite link automatically adds user to that group
 - **FR55:** Existing users clicking an invite link log in with their existing credentials and are added to the group without creating a new account
 - **FR55a:** After invitation acceptance, the user's JWT must be refreshed to include the newly granted group membership (groupe_ids claim update)
+- **FR55b:** When an existing user with ideas accepts an invite, they are prompted to bulk-share existing ideas with the new group
+- **FR55c:** The bulk share prompt displays a multi-select list of the user's shareable ideas with context labels (e.g., "shared with Famille", "draft", "archived - Noël 2024")
+- **FR55d:** Ideas already shared with other groups are pre-selected; archived ideas are shown unchecked
+- **FR55e:** Users can skip the bulk share prompt; a reminder toast indicates they can share ideas later from My List
+- **FR55f:** Bulk share is an atomic operation: all selected ideas are shared with the new group, or none if the operation fails
 
 ### Notifications (Idea-Related)
 

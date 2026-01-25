@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>tkdo Theme Explorer</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.5;
+            padding: 2rem;
+            background: #f5f5f5;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 2rem;
+        }
+
+        .section {
+            margin-bottom: 3rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #ddd;
+            color: #333;
+        }
+
+        .theme-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 2rem;
+        }
+
+        .theme-card {
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .theme-header {
+            padding: 1rem;
+            color: white;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .theme-preview {
+            padding: 1.5rem;
+        }
+
+        /* Sample UI Components */
+        .sample-card {
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .sample-card-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .sample-card-meta {
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .sample-card-desc {
+            font-size: 0.9rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin-right: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid;
+        }
+
+        .nav-sample {
+            display: flex;
+            gap: 1rem;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .nav-item {
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+        }
+
+        .color-swatches {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .swatch {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            font-size: 0.6rem;
+            padding-bottom: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        /* Theme A: Warm Terracotta */
+        .theme-a .theme-header { background: #C67B5C; }
+        .theme-a .theme-preview { background: #FDF8F3; color: #3D3531; }
+        .theme-a .sample-card { background: #FFFFFF; }
+        .theme-a .sample-card-meta { color: #9A918A; }
+        .theme-a .badge { background: #8FAE8B; color: white; }
+        .theme-a .btn { background: #C67B5C; color: white; }
+        .theme-a .btn-outline { color: #C67B5C; border-color: #C67B5C; background: transparent; }
+        .theme-a .nav-sample { background: #C67B5C; color: white; }
+        .theme-a .nav-item.active { background: rgba(255,255,255,0.2); }
+        .theme-a .link { color: #C67B5C; }
+
+        /* Theme B: Dusty Rose */
+        .theme-b .theme-header { background: #C4908D; }
+        .theme-b .theme-preview { background: #FAF6F5; color: #423538; }
+        .theme-b .sample-card { background: #FFFFFF; }
+        .theme-b .sample-card-meta { color: #958B8E; }
+        .theme-b .badge { background: #7A8FA8; color: white; }
+        .theme-b .btn { background: #C4908D; color: white; }
+        .theme-b .btn-outline { color: #C4908D; border-color: #C4908D; background: transparent; }
+        .theme-b .nav-sample { background: #C4908D; color: white; }
+        .theme-b .nav-item.active { background: rgba(255,255,255,0.2); }
+        .theme-b .link { color: #C4908D; }
+
+        /* Theme C: Warm Gold */
+        .theme-c .theme-header { background: #C9A962; }
+        .theme-c .theme-preview { background: #FFFDF8; color: #3A3330; }
+        .theme-c .sample-card { background: #FFFFFF; }
+        .theme-c .sample-card-meta { color: #8E857D; }
+        .theme-c .badge { background: #6B8E6B; color: white; }
+        .theme-c .btn { background: #C9A962; color: white; }
+        .theme-c .btn-outline { color: #C9A962; border-color: #C9A962; background: transparent; }
+        .theme-c .nav-sample { background: #C9A962; color: white; }
+        .theme-c .nav-item.active { background: rgba(255,255,255,0.2); }
+        .theme-c .link { color: #C9A962; }
+
+        /* Typography Section */
+        .typo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .typo-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .typo-card h3 {
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .typo-system {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        .typo-friendly {
+            font-family: 'Nunito', 'Quicksand', 'Poppins', -apple-system, sans-serif;
+        }
+
+        .typo-classic h4, .typo-classic .heading {
+            font-family: 'Merriweather', 'Georgia', serif;
+        }
+        .typo-classic p, .typo-classic .body {
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        .typo-sample h4 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .typo-sample p {
+            color: #666;
+            margin-bottom: 1rem;
+        }
+
+        .typo-sample .small {
+            font-size: 0.85rem;
+            color: #888;
+        }
+
+        /* Spacing Section */
+        .spacing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 2rem;
+        }
+
+        .spacing-card {
+            background: #FDF8F3;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .spacing-header {
+            background: #C67B5C;
+            color: white;
+            padding: 1rem;
+            font-weight: 600;
+        }
+
+        .spacing-compact .spacing-preview {
+            padding: 0.75rem;
+        }
+
+        .spacing-compact .idea-card {
+            background: white;
+            border-radius: 6px;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+
+        .spacing-compact .idea-title {
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 0.25rem;
+            color: #3D3531;
+        }
+
+        .spacing-compact .idea-desc {
+            font-size: 0.8rem;
+            color: #9A918A;
+        }
+
+        .spacing-airy .spacing-preview {
+            padding: 1.5rem;
+        }
+
+        .spacing-airy .idea-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        }
+
+        .spacing-airy .idea-title {
+            font-weight: 600;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            color: #3D3531;
+        }
+
+        .spacing-airy .idea-desc {
+            font-size: 0.9rem;
+            color: #9A918A;
+            line-height: 1.6;
+        }
+
+        /* Mobile simulation */
+        .mobile-frame {
+            max-width: 375px;
+            margin: 0 auto;
+            border: 8px solid #333;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+        }
+
+        .mobile-header {
+            padding: 0.75rem 1rem;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .mobile-content {
+            min-height: 400px;
+        }
+
+        .mobile-nav {
+            display: flex;
+            border-top: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .mobile-nav-item {
+            flex: 1;
+            text-align: center;
+            padding: 0.75rem;
+            font-size: 0.75rem;
+        }
+
+        /* Full Mobile Mockup */
+        .mockup-section {
+            margin-top: 3rem;
+        }
+
+        .mockup-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 2rem;
+            justify-items: center;
+        }
+
+        .mockup-label {
+            text-align: center;
+            margin-bottom: 1rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        /* Vote section */
+        .vote-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            margin-top: 2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .vote-section h2 {
+            margin-bottom: 1rem;
+        }
+
+        .vote-section ul {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .vote-section li {
+            margin-bottom: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+            .theme-grid, .typo-grid, .spacing-grid, .mockup-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <h1>tkdo Theme Explorer</h1>
+    <p class="subtitle">Visual options for "Warm & Cozy with a touch of Playful"</p>
+
+    <!-- Color Palettes Section -->
+    <div class="section">
+        <h2 class="section-title">1. Color Palettes</h2>
+        <div class="theme-grid">
+
+            <!-- Theme A: Warm Terracotta -->
+            <div class="theme-card theme-a">
+                <div class="theme-header">A. Warm Terracotta</div>
+                <div class="theme-preview">
+                    <div class="nav-sample">
+                        <span class="nav-item active">Ma liste</span>
+                        <span class="nav-item">Famille</span>
+                        <span class="nav-item">Amis</span>
+                    </div>
+
+                    <div class="sample-card">
+                        <div class="sample-card-title">Guitare acoustique Yamaha</div>
+                        <div class="sample-card-meta">Ajouté par Sophie</div>
+                        <div class="sample-card-desc">Modèle FG800, couleur naturelle. Parfait pour débuter!</div>
+                        <span class="badge">Je l'offre</span>
+                    </div>
+
+                    <div class="sample-card">
+                        <div class="sample-card-title">Livre de cuisine italienne</div>
+                        <div class="sample-card-meta">Ajouté par moi</div>
+                        <div class="sample-card-desc">N'importe quel livre de recettes italiennes authentiques.</div>
+                    </div>
+
+                    <button class="btn">+ Ajouter une idée</button>
+                    <button class="btn btn-outline">Voir les commentaires</button>
+
+                    <div class="color-swatches">
+                        <div class="swatch" style="background: #FDF8F3; color: #666;">Base</div>
+                        <div class="swatch" style="background: #C67B5C; color: white;">Primary</div>
+                        <div class="swatch" style="background: #8FAE8B; color: white;">Success</div>
+                        <div class="swatch" style="background: #3D3531; color: white;">Text</div>
+                        <div class="swatch" style="background: #9A918A; color: white;">Muted</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Theme B: Dusty Rose -->
+            <div class="theme-card theme-b">
+                <div class="theme-header">B. Dusty Rose</div>
+                <div class="theme-preview">
+                    <div class="nav-sample">
+                        <span class="nav-item active">Ma liste</span>
+                        <span class="nav-item">Famille</span>
+                        <span class="nav-item">Amis</span>
+                    </div>
+
+                    <div class="sample-card">
+                        <div class="sample-card-title">Guitare acoustique Yamaha</div>
+                        <div class="sample-card-meta">Ajouté par Sophie</div>
+                        <div class="sample-card-desc">Modèle FG800, couleur naturelle. Parfait pour débuter!</div>
+                        <span class="badge">Je l'offre</span>
+                    </div>
+
+                    <div class="sample-card">
+                        <div class="sample-card-title">Livre de cuisine italienne</div>
+                        <div class="sample-card-meta">Ajouté par moi</div>
+                        <div class="sample-card-desc">N'importe quel livre de recettes italiennes authentiques.</div>
+                    </div>
+
+                    <button class="btn">+ Ajouter une idée</button>
+                    <button class="btn btn-outline">Voir les commentaires</button>
+
+                    <div class="color-swatches">
+                        <div class="swatch" style="background: #FAF6F5; color: #666;">Base</div>
+                        <div class="swatch" style="background: #C4908D; color: white;">Primary</div>
+                        <div class="swatch" style="background: #7A8FA8; color: white;">Secondary</div>
+                        <div class="swatch" style="background: #423538; color: white;">Text</div>
+                        <div class="swatch" style="background: #958B8E; color: white;">Muted</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Theme C: Warm Gold -->
+            <div class="theme-card theme-c">
+                <div class="theme-header">C. Warm Gold</div>
+                <div class="theme-preview">
+                    <div class="nav-sample">
+                        <span class="nav-item active">Ma liste</span>
+                        <span class="nav-item">Famille</span>
+                        <span class="nav-item">Amis</span>
+                    </div>
+
+                    <div class="sample-card">
+                        <div class="sample-card-title">Guitare acoustique Yamaha</div>
+                        <div class="sample-card-meta">Ajouté par Sophie</div>
+                        <div class="sample-card-desc">Modèle FG800, couleur naturelle. Parfait pour débuter!</div>
+                        <span class="badge">Je l'offre</span>
+                    </div>
+
+                    <div class="sample-card">
+                        <div class="sample-card-title">Livre de cuisine italienne</div>
+                        <div class="sample-card-meta">Ajouté par moi</div>
+                        <div class="sample-card-desc">N'importe quel livre de recettes italiennes authentiques.</div>
+                    </div>
+
+                    <button class="btn">+ Ajouter une idée</button>
+                    <button class="btn btn-outline">Voir les commentaires</button>
+
+                    <div class="color-swatches">
+                        <div class="swatch" style="background: #FFFDF8; color: #666;">Base</div>
+                        <div class="swatch" style="background: #C9A962; color: white;">Primary</div>
+                        <div class="swatch" style="background: #6B8E6B; color: white;">Success</div>
+                        <div class="swatch" style="background: #3A3330; color: white;">Text</div>
+                        <div class="swatch" style="background: #8E857D; color: white;">Muted</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Typography Section -->
+    <div class="section">
+        <h2 class="section-title">2. Typography</h2>
+        <div class="typo-grid">
+
+            <div class="typo-card typo-system">
+                <h3>A. System Fonts</h3>
+                <p style="color: #888; font-size: 0.85rem; margin-bottom: 1rem;">Fast, native feel - like Signal</p>
+                <div class="typo-sample">
+                    <h4>Liste de Marie-Claire</h4>
+                    <p>Voici mes idées pour Noël cette année. N'hésitez pas à me poser des questions!</p>
+                    <p class="small">Ajouté il y a 2 jours · 3 commentaires</p>
+                </div>
+            </div>
+
+            <div class="typo-card typo-friendly">
+                <h3>B. Friendly Sans-Serif</h3>
+                <p style="color: #888; font-size: 0.85rem; margin-bottom: 1rem;">Warmer, rounder - like Airbnb</p>
+                <div class="typo-sample">
+                    <h4 style="font-family: 'Nunito', sans-serif; font-weight: 700;">Liste de Marie-Claire</h4>
+                    <p style="font-family: 'Nunito', sans-serif;">Voici mes idées pour Noël cette année. N'hésitez pas à me poser des questions!</p>
+                    <p class="small" style="font-family: 'Nunito', sans-serif;">Ajouté il y a 2 jours · 3 commentaires</p>
+                </div>
+            </div>
+
+            <div class="typo-card typo-classic">
+                <h3>C. Classic Serif + Sans</h3>
+                <p style="color: #888; font-size: 0.85rem; margin-bottom: 1rem;">Traditional, cozy - like a book</p>
+                <div class="typo-sample">
+                    <h4 style="font-family: 'Merriweather', serif; font-weight: 700;">Liste de Marie-Claire</h4>
+                    <p>Voici mes idées pour Noël cette année. N'hésitez pas à me poser des questions!</p>
+                    <p class="small">Ajouté il y a 2 jours · 3 commentaires</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Spacing Section -->
+    <div class="section">
+        <h2 class="section-title">3. Spacing & Density</h2>
+        <div class="spacing-grid">
+
+            <div class="spacing-card spacing-compact">
+                <div class="spacing-header">A. Compact / Cozy</div>
+                <div class="spacing-preview">
+                    <div class="idea-card">
+                        <div class="idea-title">Guitare acoustique Yamaha FG800</div>
+                        <div class="idea-desc">Couleur naturelle, parfait pour débuter</div>
+                    </div>
+                    <div class="idea-card">
+                        <div class="idea-title">Livre de cuisine italienne</div>
+                        <div class="idea-desc">Recettes authentiques de grand-mère</div>
+                    </div>
+                    <div class="idea-card">
+                        <div class="idea-title">Écharpe en laine mérinos</div>
+                        <div class="idea-desc">Couleur bordeaux ou bleu marine</div>
+                    </div>
+                    <div class="idea-card">
+                        <div class="idea-title">Coffret thés du monde</div>
+                        <div class="idea-desc">Assortiment découverte</div>
+                    </div>
+                    <div class="idea-card">
+                        <div class="idea-title">Carnet Moleskine</div>
+                        <div class="idea-desc">Format A5, pages lignées</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="spacing-card spacing-airy">
+                <div class="spacing-header">B. Airy / Spacious</div>
+                <div class="spacing-preview">
+                    <div class="idea-card">
+                        <div class="idea-title">Guitare acoustique Yamaha FG800</div>
+                        <div class="idea-desc">Couleur naturelle, parfait pour débuter</div>
+                    </div>
+                    <div class="idea-card">
+                        <div class="idea-title">Livre de cuisine italienne</div>
+                        <div class="idea-desc">Recettes authentiques de grand-mère</div>
+                    </div>
+                    <div class="idea-card">
+                        <div class="idea-title">Écharpe en laine mérinos</div>
+                        <div class="idea-desc">Couleur bordeaux ou bleu marine</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Full Mobile Mockups -->
+    <div class="section mockup-section">
+        <h2 class="section-title">4. Full Mobile Preview (Theme A + Friendly Font + Airy)</h2>
+        <div class="mockup-grid">
+
+            <div>
+                <div class="mockup-label">Ma Liste (Personal Inventory)</div>
+                <div class="mobile-frame">
+                    <div class="mobile-header" style="background: #C67B5C; color: white;">
+                        <span>Ma liste</span>
+                        <span style="font-size: 0.8rem;">3 brouillons</span>
+                    </div>
+                    <div class="mobile-content" style="background: #FDF8F3; padding: 1rem; font-family: 'Nunito', sans-serif;">
+                        <div style="background: white; border-radius: 10px; padding: 1rem; margin-bottom: 1rem; box-shadow: 0 2px 6px rgba(0,0,0,0.08);">
+                            <div style="display: flex; justify-content: space-between; align-items: start;">
+                                <div>
+                                    <div style="font-weight: 600; color: #3D3531;">Guitare Yamaha FG800</div>
+                                    <div style="font-size: 0.85rem; color: #9A918A;">~250€</div>
+                                </div>
+                                <span style="background: #8FAE8B; color: white; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.7rem;">Famille, Amis</span>
+                            </div>
+                        </div>
+                        <div style="background: white; border-radius: 10px; padding: 1rem; margin-bottom: 1rem; box-shadow: 0 2px 6px rgba(0,0,0,0.08);">
+                            <div style="display: flex; justify-content: space-between; align-items: start;">
+                                <div>
+                                    <div style="font-weight: 600; color: #3D3531;">Livre cuisine italienne</div>
+                                    <div style="font-size: 0.85rem; color: #9A918A;">N'importe quel livre authentique</div>
+                                </div>
+                                <span style="background: #E8E4E1; color: #666; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.7rem;">Brouillon</span>
+                            </div>
+                        </div>
+                        <div style="background: white; border-radius: 10px; padding: 1rem; margin-bottom: 1rem; box-shadow: 0 2px 6px rgba(0,0,0,0.08);">
+                            <div style="display: flex; justify-content: space-between; align-items: start;">
+                                <div>
+                                    <div style="font-weight: 600; color: #3D3531;">Écharpe laine mérinos</div>
+                                    <div style="font-size: 0.85rem; color: #9A918A;">Bordeaux ou bleu marine</div>
+                                </div>
+                                <span style="background: #8FAE8B; color: white; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.7rem;">Famille</span>
+                            </div>
+                        </div>
+                        <button style="width: 100%; background: #C67B5C; color: white; border: none; padding: 0.75rem; border-radius: 8px; font-family: 'Nunito', sans-serif; font-weight: 600; font-size: 1rem; cursor: pointer;">
+                            + Nouvelle idée
+                        </button>
+                    </div>
+                    <div class="mobile-nav" style="background: white; font-family: 'Nunito', sans-serif;">
+                        <div class="mobile-nav-item" style="color: #C67B5C; font-weight: 600;">Ma liste</div>
+                        <div class="mobile-nav-item" style="color: #9A918A;">Famille</div>
+                        <div class="mobile-nav-item" style="color: #9A918A;">Amis</div>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <div class="mockup-label">Groupe "Famille" (Viewing Sophie's List)</div>
+                <div class="mobile-frame">
+                    <div class="mobile-header" style="background: #C67B5C; color: white;">
+                        <span>← Sophie</span>
+                        <span style="font-size: 0.8rem;">Famille</span>
+                    </div>
+                    <div class="mobile-content" style="background: #FDF8F3; padding: 1rem; font-family: 'Nunito', sans-serif;">
+                        <div style="background: white; border-radius: 10px; padding: 1rem; margin-bottom: 1rem; box-shadow: 0 2px 6px rgba(0,0,0,0.08);">
+                            <div style="font-weight: 600; color: #3D3531; margin-bottom: 0.25rem;">Casque audio Sony WH-1000</div>
+                            <div style="font-size: 0.85rem; color: #9A918A; margin-bottom: 0.5rem;">Bluetooth, réduction de bruit</div>
+                            <div style="display: flex; gap: 0.5rem; align-items: center;">
+                                <span style="background: #8FAE8B; color: white; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.7rem;">Quelqu'un l'offre</span>
+                                <span style="font-size: 0.75rem; color: #9A918A;">2 commentaires</span>
+                            </div>
+                        </div>
+                        <div style="background: white; border-radius: 10px; padding: 1rem; margin-bottom: 1rem; box-shadow: 0 2px 6px rgba(0,0,0,0.08);">
+                            <div style="font-weight: 600; color: #3D3531; margin-bottom: 0.25rem;">Cours de poterie</div>
+                            <div style="font-size: 0.85rem; color: #9A918A; margin-bottom: 0.5rem;">Stage découverte, 1 journée</div>
+                            <button style="background: #C67B5C; color: white; border: none; padding: 0.4rem 0.75rem; border-radius: 6px; font-size: 0.8rem; font-family: 'Nunito', sans-serif; cursor: pointer;">Je l'offre</button>
+                        </div>
+                        <div style="background: white; border-radius: 10px; padding: 1rem; margin-bottom: 1rem; box-shadow: 0 2px 6px rgba(0,0,0,0.08);">
+                            <div style="font-weight: 600; color: #3D3531; margin-bottom: 0.25rem;">Puzzle 1000 pièces</div>
+                            <div style="font-size: 0.85rem; color: #9A918A; margin-bottom: 0.5rem;">Paysage ou œuvre d'art</div>
+                            <button style="background: #C67B5C; color: white; border: none; padding: 0.4rem 0.75rem; border-radius: 6px; font-size: 0.8rem; font-family: 'Nunito', sans-serif; cursor: pointer;">Je l'offre</button>
+                        </div>
+                        <div style="text-align: center; color: #9A918A; font-size: 0.85rem; padding: 0.5rem;">
+                            ℹ️ 2 autres idées dans d'autres groupes
+                        </div>
+                    </div>
+                    <div class="mobile-nav" style="background: white; font-family: 'Nunito', sans-serif;">
+                        <div class="mobile-nav-item" style="color: #9A918A;">Ma liste</div>
+                        <div class="mobile-nav-item" style="color: #C67B5C; font-weight: 600;">Famille</div>
+                        <div class="mobile-nav-item" style="color: #9A918A;">Amis</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Voting Section -->
+    <div class="vote-section">
+        <h2>Your Choices</h2>
+        <p>After reviewing the visuals above, note your preferences:</p>
+        <ul>
+            <li><strong>Color Palette:</strong> A (Terracotta) / B (Dusty Rose) / C (Warm Gold) / Mix?</li>
+            <li><strong>Typography:</strong> A (System) / B (Friendly) / C (Classic Serif)?</li>
+            <li><strong>Spacing:</strong> A (Compact) / B (Airy)?</li>
+        </ul>
+        <p style="margin-top: 1rem; color: #666;">The mobile mockups show Theme A + Friendly Font + Airy spacing as one possible combination.</p>
+    </div>
+</body>
+</html>

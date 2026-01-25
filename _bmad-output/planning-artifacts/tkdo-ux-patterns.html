@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>tkdo - UX Consistency Patterns</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --base: #FDF8F3;
+            --surface: #FFFFFF;
+            --primary: #C67B5C;
+            --primary-dark: #A8654A;
+            --secondary: #8FAE8B;
+            --text: #3D3531;
+            --muted: #9A918A;
+            --border: #E8E4E1;
+            --success: #8FAE8B;
+            --warning: #D4A84B;
+            --error: #C97B7B;
+            --info: #7A8FA8;
+            --shadow-sm: 0 1px 3px rgba(61, 53, 49, 0.08);
+            --shadow-md: 0 2px 6px rgba(61, 53, 49, 0.1);
+            --shadow-lg: 0 4px 12px rgba(61, 53, 49, 0.12);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: var(--base);
+            color: var(--text);
+            line-height: 1.5;
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 1.75rem;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+
+        h2 {
+            font-size: 1.25rem;
+            margin: 32px 0 16px;
+            color: var(--text);
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 8px;
+        }
+
+        h3 {
+            font-size: 1rem;
+            margin: 16px 0 8px;
+            color: var(--muted);
+        }
+
+        .subtitle {
+            color: var(--muted);
+            margin-bottom: 24px;
+        }
+
+        .section {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* Button Patterns */
+        .button-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-family: 'Nunito', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+            min-height: 44px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            border-color: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background: var(--surface);
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--base);
+        }
+
+        .btn-destructive {
+            background: var(--error);
+            color: white;
+            border-color: var(--error);
+        }
+
+        .btn-destructive:hover {
+            background: #B56A6A;
+        }
+
+        .btn-disabled {
+            background: var(--border);
+            color: var(--muted);
+            border-color: var(--border);
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .btn-loading {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            position: relative;
+        }
+
+        .btn-loading::after {
+            content: '';
+            width: 16px;
+            height: 16px;
+            border: 2px solid white;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-left: 8px;
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Toast Patterns */
+        .toast-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-width: 400px;
+        }
+
+        .toast {
+            padding: 12px 16px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: var(--shadow-md);
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .toast-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .toast-error {
+            background: var(--error);
+            color: white;
+        }
+
+        .toast-warning {
+            background: var(--warning);
+            color: white;
+        }
+
+        .toast-info {
+            background: var(--info);
+            color: white;
+        }
+
+        .toast-icon {
+            font-size: 1.2rem;
+        }
+
+        .toast-dismiss {
+            margin-left: auto;
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            opacity: 0.7;
+            font-size: 1.2rem;
+        }
+
+        .toast-dismiss:hover {
+            opacity: 1;
+        }
+
+        .toast-action {
+            margin-left: auto;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 600;
+        }
+
+        /* Form Patterns */
+        .form-demo {
+            max-width: 400px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .form-label .optional {
+            font-weight: 400;
+            color: var(--muted);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            font-family: 'Nunito', sans-serif;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(198, 123, 92, 0.1);
+        }
+
+        .form-input::placeholder {
+            color: var(--muted);
+        }
+
+        .form-input.error {
+            border-color: var(--error);
+        }
+
+        .form-input.success {
+            border-color: var(--success);
+        }
+
+        .form-error {
+            color: var(--error);
+            font-size: 0.875rem;
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .form-success {
+            color: var(--success);
+            font-size: 0.875rem;
+            margin-top: 4px;
+        }
+
+        textarea.form-input {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        /* Modal Patterns */
+        .modal-demo-container {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .modal-preview {
+            background: rgba(0,0,0,0.4);
+            border-radius: 12px;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-width: 300px;
+        }
+
+        .modal-center {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 320px;
+            box-shadow: var(--shadow-lg);
+            text-align: center;
+        }
+
+        .modal-title {
+            font-size: 1.125rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .modal-body {
+            color: var(--muted);
+            margin-bottom: 20px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .modal-actions .btn {
+            flex: 1;
+        }
+
+        /* Bottom Sheet Preview */
+        .bottom-sheet-preview {
+            background: rgba(0,0,0,0.4);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            min-height: 300px;
+            min-width: 280px;
+        }
+
+        .bottom-sheet {
+            background: var(--surface);
+            border-radius: 16px 16px 0 0;
+            padding: 16px 20px 24px;
+        }
+
+        .sheet-handle {
+            width: 40px;
+            height: 4px;
+            background: var(--border);
+            border-radius: 2px;
+            margin: 0 auto 16px;
+        }
+
+        .sheet-title {
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .sheet-option {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+            gap: 12px;
+        }
+
+        .sheet-option:last-child {
+            border-bottom: none;
+        }
+
+        .checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--primary);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+        }
+
+        .checkbox.checked {
+            background: var(--primary);
+        }
+
+        /* Empty States */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+
+        .empty-illustration {
+            font-size: 3rem;
+            margin-bottom: 16px;
+        }
+
+        .empty-title {
+            font-size: 1.125rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .empty-description {
+            color: var(--muted);
+            margin-bottom: 20px;
+        }
+
+        /* Loading States */
+        .skeleton-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-width: 400px;
+        }
+
+        .skeleton-card {
+            background: var(--surface);
+            border-radius: 10px;
+            padding: 16px;
+            display: flex;
+            gap: 12px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .skeleton {
+            background: linear-gradient(90deg, var(--border) 25%, #f0ebe8 50%, var(--border) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 4px;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        .skeleton-thumb {
+            width: 48px;
+            height: 48px;
+            border-radius: 6px;
+            flex-shrink: 0;
+        }
+
+        .skeleton-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .skeleton-title {
+            height: 16px;
+            width: 70%;
+        }
+
+        .skeleton-text {
+            height: 12px;
+            width: 50%;
+        }
+
+        /* Error Patterns */
+        .error-examples {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .error-inline {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .error-banner {
+            background: #FEF3F3;
+            border: 1px solid var(--error);
+            border-radius: 8px;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .error-banner-icon {
+            color: var(--error);
+            font-size: 1.25rem;
+        }
+
+        .error-banner-content {
+            flex: 1;
+        }
+
+        .error-banner-title {
+            font-weight: 600;
+            color: var(--error);
+        }
+
+        .error-banner-message {
+            font-size: 0.875rem;
+            color: var(--text);
+        }
+
+        .sync-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--warning);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        /* Badges */
+        .badge-row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge-giving {
+            background: var(--success);
+            color: white;
+        }
+
+        .badge-draft {
+            background: var(--border);
+            color: var(--muted);
+        }
+
+        .badge-archived {
+            background: var(--info);
+            color: white;
+        }
+
+        /* Navigation Demo */
+        .nav-demo {
+            background: var(--surface);
+            border-radius: 8px;
+            overflow: hidden;
+            max-width: 400px;
+        }
+
+        .nav-header {
+            background: var(--primary);
+            color: white;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .nav-logo {
+            font-weight: 700;
+        }
+
+        .nav-dropdown {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255,255,255,0.2);
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .nav-menu {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin: 8px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .nav-item {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-item:last-child {
+            border-bottom: none;
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .nav-item-star {
+            color: var(--warning);
+        }
+
+        /* Idea Card States */
+        .card-states {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .idea-card {
+            background: var(--surface);
+            border-radius: 10px;
+            padding: 12px 16px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 280px;
+            transition: all 0.2s;
+        }
+
+        .idea-card:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .idea-card.draft {
+            opacity: 0.7;
+            border: 1px dashed var(--border);
+        }
+
+        .idea-card.archived {
+            background: #F5F3F1;
+        }
+
+        .idea-thumb {
+            width: 40px;
+            height: 40px;
+            background: var(--border);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .idea-content {
+            flex: 1;
+        }
+
+        .idea-title {
+            font-weight: 600;
+        }
+
+        .idea-meta {
+            font-size: 0.875rem;
+            color: var(--muted);
+        }
+
+        /* Comparison tables */
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 12px;
+        }
+
+        .comparison-item {
+            padding: 12px;
+            border-radius: 8px;
+        }
+
+        .comparison-bad {
+            background: #FEF3F3;
+            border: 1px solid var(--error);
+        }
+
+        .comparison-good {
+            background: #F3FEF5;
+            border: 1px solid var(--success);
+        }
+
+        .comparison-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .comparison-bad .comparison-label {
+            color: var(--error);
+        }
+
+        .comparison-good .comparison-label {
+            color: var(--success);
+        }
+
+        @media (max-width: 600px) {
+            .comparison {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-demo-container {
+                flex-direction: column;
+            }
+
+            .card-states {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>tkdo UX Consistency Patterns</h1>
+    <p class="subtitle">Patterns visuels pour une expérience utilisateur cohérente</p>
+
+    <!-- Button Hierarchy -->
+    <h2>1. Hiérarchie des Boutons</h2>
+    <div class="section">
+        <h3>Actions principales</h3>
+        <div class="button-row">
+            <button class="btn btn-primary">Ajouter</button>
+            <button class="btn btn-primary">Partager</button>
+            <button class="btn btn-primary">Je l'offre</button>
+        </div>
+
+        <h3>Actions secondaires</h3>
+        <div class="button-row">
+            <button class="btn btn-secondary">Annuler</button>
+            <button class="btn btn-secondary">Plus tard</button>
+            <button class="btn btn-secondary">Retour</button>
+        </div>
+
+        <h3>Actions destructives</h3>
+        <div class="button-row">
+            <button class="btn btn-destructive">Supprimer</button>
+            <button class="btn btn-destructive">Retirer du groupe</button>
+        </div>
+
+        <h3>États spéciaux</h3>
+        <div class="button-row">
+            <button class="btn btn-disabled" disabled>Désactivé</button>
+            <button class="btn btn-loading">Chargement</button>
+        </div>
+
+        <h3>Placement typique</h3>
+        <div style="display: flex; gap: 12px; justify-content: flex-end; padding: 16px; background: var(--base); border-radius: 8px; margin-top: 12px;">
+            <button class="btn btn-secondary">Annuler</button>
+            <button class="btn btn-primary">Confirmer</button>
+        </div>
+    </div>
+
+    <!-- Feedback Patterns -->
+    <h2>2. Feedback (Toasts)</h2>
+    <div class="section">
+        <div class="toast-container">
+            <div class="toast toast-success">
+                <span class="toast-icon">✓</span>
+                <span>Idée ajoutée</span>
+                <button class="toast-dismiss">×</button>
+            </div>
+            <div class="toast toast-error">
+                <span class="toast-icon">✕</span>
+                <span>Échec de la sauvegarde</span>
+                <button class="toast-action">Réessayer</button>
+            </div>
+            <div class="toast toast-warning">
+                <span class="toast-icon">⚠</span>
+                <span>Connexion instable</span>
+                <button class="toast-dismiss">×</button>
+            </div>
+            <div class="toast toast-info">
+                <span class="toast-icon">ℹ</span>
+                <span>Tu peux partager plus tard depuis Ma liste</span>
+                <button class="toast-dismiss">×</button>
+            </div>
+        </div>
+
+        <h3>Badges de statut</h3>
+        <div class="badge-row">
+            <span class="badge badge-giving">💚 Quelqu'un offre</span>
+            <span class="badge badge-draft">Brouillon</span>
+            <span class="badge badge-archived">Archivé</span>
+            <span class="sync-badge">⟳ Non synchronisé</span>
+        </div>
+    </div>
+
+    <!-- Form Patterns -->
+    <h2>3. Formulaires</h2>
+    <div class="section">
+        <div class="form-demo">
+            <div class="form-group">
+                <label class="form-label">Titre</label>
+                <input type="text" class="form-input" placeholder="Ex: Écharpe bleue en laine">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Description <span class="optional">(optionnel)</span></label>
+                <textarea class="form-input" placeholder="Détails, taille, couleur..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Lien <span class="optional">(optionnel)</span></label>
+                <input type="url" class="form-input" placeholder="https://...">
+            </div>
+
+            <h3>États des champs</h3>
+
+            <div class="form-group">
+                <label class="form-label">Champ avec focus</label>
+                <input type="text" class="form-input" style="border-color: var(--primary); box-shadow: 0 0 0 3px rgba(198, 123, 92, 0.1);" value="Texte en cours...">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Champ avec erreur</label>
+                <input type="text" class="form-input error" value="ab">
+                <div class="form-error">✕ Ce champ doit contenir au moins 3 caractères</div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Champ validé</label>
+                <input type="text" class="form-input success" value="Écharpe bleue">
+                <div class="form-success">✓ Parfait</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Patterns -->
+    <h2>4. Modales et Overlays</h2>
+    <div class="section">
+        <div class="modal-demo-container">
+            <div>
+                <h3>Modale de confirmation</h3>
+                <div class="modal-preview">
+                    <div class="modal-center">
+                        <div class="modal-title">Tu offres ce cadeau ?</div>
+                        <div class="modal-body">
+                            "Blue wool scarf"<br>
+                            pour Marie-Claire
+                        </div>
+                        <div class="modal-actions">
+                            <button class="btn btn-secondary">Annuler</button>
+                            <button class="btn btn-primary">Oui, je l'offre</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <h3>Bottom Sheet</h3>
+                <div class="bottom-sheet-preview">
+                    <div class="bottom-sheet">
+                        <div class="sheet-handle"></div>
+                        <div class="sheet-title">Visible par:</div>
+                        <div class="sheet-option">
+                            <div class="checkbox checked">✓</div>
+                            <span>Noël 2026</span>
+                        </div>
+                        <div class="sheet-option">
+                            <div class="checkbox"></div>
+                            <span>Famille</span>
+                        </div>
+                        <div class="sheet-option">
+                            <div class="checkbox"></div>
+                            <span>Les copains</span>
+                        </div>
+                        <button class="btn btn-primary" style="width: 100%; margin-top: 16px;">Confirmer</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Empty States -->
+    <h2>5. États Vides</h2>
+    <div class="section">
+        <div style="display: flex; flex-wrap: wrap; gap: 20px;">
+            <div class="empty-state" style="background: var(--base); border-radius: 12px;">
+                <div class="empty-illustration">📝</div>
+                <div class="empty-title">Ta liste est vide</div>
+                <div class="empty-description">Ajoute des idées pour que ta famille sache quoi t'offrir</div>
+                <button class="btn btn-primary">Ajouter ta première idée</button>
+            </div>
+
+            <div class="empty-state" style="background: var(--base); border-radius: 12px;">
+                <div class="empty-illustration">👥</div>
+                <div class="empty-title">Thomas n'a pas encore d'idées</div>
+                <div class="empty-description">Reviens plus tard pour voir sa liste</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading States -->
+    <h2>6. États de Chargement</h2>
+    <div class="section">
+        <h3>Skeleton Loaders</h3>
+        <div class="skeleton-container">
+            <div class="skeleton-card">
+                <div class="skeleton skeleton-thumb"></div>
+                <div class="skeleton-content">
+                    <div class="skeleton skeleton-title"></div>
+                    <div class="skeleton skeleton-text"></div>
+                </div>
+            </div>
+            <div class="skeleton-card">
+                <div class="skeleton skeleton-thumb"></div>
+                <div class="skeleton-content">
+                    <div class="skeleton skeleton-title"></div>
+                    <div class="skeleton skeleton-text"></div>
+                </div>
+            </div>
+            <div class="skeleton-card">
+                <div class="skeleton skeleton-thumb"></div>
+                <div class="skeleton-content">
+                    <div class="skeleton skeleton-title"></div>
+                    <div class="skeleton skeleton-text"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Error Handling -->
+    <h2>7. Gestion des Erreurs</h2>
+    <div class="section">
+        <div class="error-examples">
+            <div class="error-banner">
+                <span class="error-banner-icon">⚠</span>
+                <div class="error-banner-content">
+                    <div class="error-banner-title">Connexion perdue</div>
+                    <div class="error-banner-message">Tes modifications seront enregistrées dès que possible.</div>
+                </div>
+                <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.875rem;">Réessayer</button>
+            </div>
+        </div>
+
+        <h3>Messages d'erreur : Bon vs Mauvais</h3>
+        <div class="comparison">
+            <div class="comparison-item comparison-bad">
+                <div class="comparison-label">❌ Mauvais</div>
+                <div>"Error 500"</div>
+            </div>
+            <div class="comparison-item comparison-good">
+                <div class="comparison-label">✓ Bon</div>
+                <div>"Quelque chose s'est mal passé. Réessaye."</div>
+            </div>
+        </div>
+        <div class="comparison">
+            <div class="comparison-item comparison-bad">
+                <div class="comparison-label">❌ Mauvais</div>
+                <div>"Invalid input"</div>
+            </div>
+            <div class="comparison-item comparison-good">
+                <div class="comparison-label">✓ Bon</div>
+                <div>"Ce champ doit contenir au moins 3 caractères"</div>
+            </div>
+        </div>
+        <div class="comparison">
+            <div class="comparison-item comparison-bad">
+                <div class="comparison-label">❌ Mauvais</div>
+                <div>"Network error"</div>
+            </div>
+            <div class="comparison-item comparison-good">
+                <div class="comparison-label">✓ Bon</div>
+                <div>"Connexion perdue. Tes modifications seront enregistrées dès que possible."</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <h2>8. Navigation</h2>
+    <div class="section">
+        <div class="nav-demo">
+            <div class="nav-header">
+                <span class="nav-logo">tkdo</span>
+                <div class="nav-dropdown">
+                    Noël 2026 <span>▼</span>
+                </div>
+                <span>👤</span>
+            </div>
+            <div class="nav-menu">
+                <div class="nav-item">
+                    <span class="nav-item-star">★</span>
+                    <span>Ma liste</span>
+                </div>
+                <div class="nav-item active">
+                    <span>✓</span>
+                    <span>Noël 2026</span>
+                </div>
+                <div class="nav-item">
+                    <span style="opacity: 0;">✓</span>
+                    <span>Famille</span>
+                </div>
+                <div class="nav-item">
+                    <span style="opacity: 0;">✓</span>
+                    <span>Les copains</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card States -->
+    <h2>9. États des Cartes Idée</h2>
+    <div class="section">
+        <div class="card-states">
+            <div class="idea-card">
+                <div class="idea-thumb">📷</div>
+                <div class="idea-content">
+                    <div class="idea-title">Écharpe bleue en laine</div>
+                    <div class="idea-meta">Noël 2026, Famille</div>
+                </div>
+                <span class="badge badge-giving">💚</span>
+            </div>
+
+            <div class="idea-card draft">
+                <div class="idea-thumb">📷</div>
+                <div class="idea-content">
+                    <div class="idea-title">Tickets de concert</div>
+                    <div class="idea-meta"><span class="badge badge-draft">Brouillon</span></div>
+                </div>
+            </div>
+
+            <div class="idea-card archived">
+                <div class="idea-thumb">📷</div>
+                <div class="idea-content">
+                    <div class="idea-title">Anciens écouteurs</div>
+                    <div class="idea-meta"><span class="badge badge-archived">Archivé (Noël 2024)</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Member Cards -->
+    <h2>10. Cartes Membre</h2>
+    <div class="section">
+        <div style="display: flex; flex-direction: column; gap: 8px; max-width: 300px;">
+            <div class="idea-card">
+                <div class="idea-thumb">👤</div>
+                <div class="idea-content">
+                    <div class="idea-title">Marie-Claire</div>
+                    <div class="idea-meta">8 idées · Activité récente: 2j</div>
+                </div>
+            </div>
+            <div class="idea-card">
+                <div class="idea-thumb">👤</div>
+                <div class="idea-content">
+                    <div class="idea-title">Grand-père</div>
+                    <div class="idea-meta">3 idées</div>
+                </div>
+            </div>
+            <div class="idea-card">
+                <div class="idea-thumb">👤</div>
+                <div class="idea-content">
+                    <div class="idea-title">Thomas</div>
+                    <div class="idea-meta" style="color: var(--muted); font-style: italic;">Pas encore d'idées</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

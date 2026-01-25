@@ -1,6 +1,14 @@
 ---
 status: 'complete'
 stepsCompleted: [1, 2, 3, 4, 5, 6, 7, 8]
+lastEdited: '2026-01-25'
+editHistory:
+  - date: '2026-01-25'
+    source: 'prd.md (post-UX alignment), ux-design-specification.md'
+    changes: 'Added draft ideas model (FR106-109), My List view (FR110-113), archived ideas (FR114-116), bulk share on invite (FR55b-f), navigation architecture, updated implementation sequence'
+  - date: '2026-01-25'
+    source: 'ux-design-specification.md (Winston review)'
+    changes: 'Added member activity API (derniereActivite), session persistence (localStorage lastGroupeId), prochaine-occasion endpoint for group page banner'
 inputDocuments:
   - '_bmad-output/planning-artifacts/prd.md'
   - '_bmad-output/planning-artifacts/product-brief-tkdo-2026-01-18.md'
@@ -34,7 +42,7 @@ _This document builds collaboratively through step-by-step discovery. Sections a
 ### Requirements Overview
 
 **Functional Requirements:**
-115 FRs across 10 domains representing a model pivot from occasion-centric to list-centric architecture:
+127 FRs across 13 domains representing a model pivot from occasion-centric to list-centric architecture:
 
 | Domain | Count | Architectural Impact |
 |--------|-------|---------------------|
@@ -46,7 +54,10 @@ _This document builds collaboratively through step-by-step discovery. Sections a
 | FR-SHARE (Sharing) | 15 | Per-idea visibility + FR29a-c (cross-group hints) |
 | FR-COORD (Coordination) | 11 | Comments + FR24a-c (visibility selection & validation) |
 | FR-NOTIFY (Notifications) | 9 | Extend existing email system, new event types |
-| FR-INVITE (Invites) | 7 | New user onboarding + FR55a (JWT refresh after accept) |
+| FR-INVITE (Invites) | 12 | New user onboarding + FR55a (JWT refresh) + FR55b-f (bulk share on accept) |
+| FR-DRAFT (Draft Ideas) | 4 | FR106-109: Ideas with visibility = none, My List only |
+| FR-MYLIST (My List View) | 4 | FR110-113: Personal aggregate view of all ideas |
+| FR-ARCHIVE (Archived Ideas) | 3 | FR114-116: Revival of archived ideas |
 | FR-COMPAT (Compatibility) | 8 | Migration, secret santa as group-scoped occasion |
 
 **Non-Functional Requirements:**
@@ -172,9 +183,11 @@ This is an evolutionary rewrite of an existing application, not a greenfield pro
 
 **Important Decisions (Shape Architecture):**
 - Migration strategy (Big Bang with console command)
-- State management approach (Hybrid: aggregated own list, group-switched for others)
+- State management approach (Hybrid: My List aggregate, group-switched for others)
 - Route structure (Entity-Centric)
 - Invite token mechanism (DB Token table)
+- Navigation architecture (Occasions within groups, not separate destination)
+- Bulk share on invite (Atomic multi-select operation)
 
 **Deferred Decisions (Post-MVP):**
 - i18n implementation strategy
@@ -210,9 +223,12 @@ This is an evolutionary rewrite of an existing application, not a greenfield pro
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
-| **State Management** | Hybrid Context | **Own list:** Aggregated view showing all ideas with optional group filter. **Viewing others:** Group-switched context (select group first). **Cross-group hints:** Display count indicator with switch links when additional content exists in other shared groups. |
+| **State Management** | Hybrid Context | **My List:** Personal aggregate view (drafts + active + archived) with status indicators. **Group View:** Group-scoped view of member's ideas. **Cross-group hints:** Count indicator with switch links. |
 | **Route Structure** | Entity-Centric | `/utilisateurs/{id}/idees` for all users including self. Same resource = same route. Avoids false multiplicity. |
 | **Auth Context Access** | User Payload from Token Exchange | Frontend receives `utilisateur` object (including `id`, `groupe_ids`) from token exchange endpoint. Uses `utilisateur.id` to build routes. No `/me` alias; no JWT parsing in frontend. |
+| **My List Navigation** | Header Dropdown | "Ma liste" always accessible from header dropdown alongside group list. First-class navigation destination. |
+| **Onboarding Flow** | Welcome Screen + Bulk Share | After invite acceptance, Welcome Screen shows group info, then prompts existing users to bulk-share ideas. |
+| **Session Persistence** | localStorage | Last active group stored in `tkdo_lastGroupeId`. On return visit, navigate to stored group if still a member, otherwise My List. |
 
 ### Infrastructure & Deployment
 
@@ -296,6 +312,27 @@ Both ideas and comments use the same visibility pattern:
 - Author selects visible groups at creation (can edit later)
 - Constraint: visible groups must be subset of (author's groups ∩ beneficiary's groups)
 - Default on creation: current viewing context (expandable to other valid groups)
+
+**Idea Status (Server-Computed):**
+
+| Status | Condition | Visibility |
+|--------|-----------|------------|
+| `active` | At least one active group in visibility | Group views + My List |
+| `draft` | Visibility = empty set (no groups) | My List only |
+| `archived` | Only archived groups in visibility | My List only (with source group labels) |
+| `mixed` | Both active + archived groups | Treated as `active` |
+
+**Draft Ideas:**
+- Created when user adds idea from "My List" context (default visibility = none)
+- Created when user removes idea from its last visible group
+- Drafts are personal inventory - captured but not shared
+- Users share drafts by adding groups to visibility
+
+**Archived Ideas:**
+- Result from group archival (all idea's visible groups become archived)
+- Display with "(archivé - [group name])" label in My List
+- Can be "revived" by sharing to active groups via visibility controls
+- Archived ideas with `being_given = true` retain that status through revival
 
 **Cross-Group Hints Format:**
 ```json
@@ -406,16 +443,68 @@ POST   /api/groupes
 PUT    /api/groupes/{id}
 GET    /api/groupes/{id}/membres
 DELETE /api/groupes/{id}/membres/{utilisateurId}
+GET    /api/groupes/{id}/prochaine-occasion          # Upcoming occasion for group page banner
 ```
+
+**Members Response Format:**
+```json
+{
+  "membres": [
+    {
+      "id": 5,
+      "nom": "Marie-Claire",
+      "ideeCount": 8,
+      "derniereActivite": "2026-01-23T14:30:00Z"
+    },
+    {
+      "id": 12,
+      "nom": "Grand-père",
+      "ideeCount": 3,
+      "derniereActivite": null
+    }
+  ]
+}
+```
+`derniereActivite`: Last idea change or comment by this member in this group. Null if no recent activity. Server-computed.
 
 **Ideas:**
 ```
-GET    /api/utilisateurs/{id}/idees
+GET    /api/utilisateurs/{id}/idees                    # Group-scoped (filtered by JWT groups)
+GET    /api/utilisateurs/{id}/idees?vue=maliste       # My List: all ideas (drafts + active + archived)
+GET    /api/utilisateurs/{id}/idees?groupe={groupeId} # Specific group context
 POST   /api/idees
 PUT    /api/idees/{id}
-POST   /api/idees/{id}/supprimer    (soft-delete)
-POST   /api/idees/{id}/offrir       (mark "being given")
-DELETE /api/idees/{id}/offrir       (unmark)
+PUT    /api/idees/{id}/visibilite                      # Update visibility (add/remove groups)
+POST   /api/idees/{id}/supprimer                       # Soft-delete
+POST   /api/idees/{id}/offrir                          # Mark "being given"
+DELETE /api/idees/{id}/offrir                          # Unmark
+```
+
+**My List Response Format:**
+```json
+{
+  "idees": [
+    {
+      "id": 5,
+      "titre": "Blue teapot",
+      "status": "active",
+      "groupesVisibles": [{"id": 1, "nom": "Famille"}],
+      "autresGroupes": { "2": { "commentaireCount": 3 } }
+    },
+    {
+      "id": 8,
+      "titre": "Draft idea",
+      "status": "draft",
+      "groupesVisibles": []
+    },
+    {
+      "id": 12,
+      "titre": "Old scarf",
+      "status": "archived",
+      "groupesVisibles": [{"id": 4, "nom": "Noël 2024", "archived": true}]
+    }
+  ]
+}
 ```
 
 **Comments:**
@@ -429,9 +518,56 @@ DELETE /api/idees/{id}/commentaires/{commentaireId}  (hard delete)
 **Invitations:**
 ```
 POST   /api/groupes/{id}/invitations
-PUT    /api/invitations/{token}
 GET    /api/invitations/{token}
 POST   /api/invitations/{token}/accepter
+```
+
+**Bulk Share (Post-Invite):**
+```
+GET    /api/utilisateurs/{id}/idees/partageables?groupe={nouveauGroupeId}
+POST   /api/utilisateurs/{id}/idees/partager-en-masse
+```
+
+**Bulk Share Request Format:**
+```json
+{
+  "groupeId": 5,
+  "ideeIds": [1, 3, 7, 12]
+}
+```
+
+**Bulk Share Operation:**
+- Atomic: all ideas shared or none (transaction)
+- Validates each idea: user must be author, group must be eligible
+- Returns 200 with count on success, 400 with first error on failure
+
+**Shareable Ideas Response (for UI multi-select):**
+```json
+{
+  "idees": [
+    {
+      "id": 1,
+      "titre": "Blue teapot",
+      "status": "active",
+      "contexte": "partagé avec Famille",
+      "preSelected": true
+    },
+    {
+      "id": 8,
+      "titre": "Cookbook",
+      "status": "draft",
+      "contexte": "brouillon",
+      "preSelected": true
+    },
+    {
+      "id": 12,
+      "titre": "Old scarf",
+      "status": "archived",
+      "contexte": "archivé - Noël 2024",
+      "preSelected": false
+    }
+  ]
+}
 ```
 
 #### Error Response Pattern
@@ -448,9 +584,10 @@ Never reveal that a resource exists if user shouldn't see it.
 | Service | Responsibility |
 |---------|---------------|
 | `GroupeService` | Group CRUD, membership management |
-| `IdeeService` | Idea CRUD, visibility, "being given" |
+| `IdeeService` | Idea CRUD, visibility, "being given", My List queries |
 | `CommentaireService` | Comment CRUD, visibility |
-| `InvitationService` | Invite creation, acceptance |
+| `InvitationService` | Invite creation, acceptance, bulk share |
+| `OnboardingService` | Welcome screen state, shareable ideas fetch, bulk share execution |
 
 ### Enforcement Guidelines
 
@@ -464,6 +601,9 @@ Never reveal that a resource exists if user shouldn't see it.
 7. Apply unified visibility model to both ideas and comments
 8. Every protected endpoint MUST have integration test verifying 404 on unauthorized access
 9. Validate all write operations against current database state at submission time; JWT `groupe_ids` claim may be stale — never trust it for write authorization
+10. Compute idea `status` server-side (active/draft/archived) based on visibility groups — never trust client-provided status
+11. Handle bulk share as atomic transaction — all succeed or all fail
+12. When removing idea from last group, set visibility to empty (draft), never delete
 
 ## Project Structure & Boundaries
 
@@ -582,10 +722,16 @@ tkdo/
 │   │   │   ├── [extend] connexion/                 # Token exchange
 │   │   │   ├── [extend] idee/                      # Visibility UI
 │   │   │   ├── [extend] liste-idees/               # Cross-group hints
+│   │   │   ├── [new] ma-liste/                     # My List (personal aggregate)
+│   │   │   │   ├── ma-liste.component.*
+│   │   │   │   └── ma-liste-idee-card.component.* # Status-aware card
 │   │   │   ├── [new] groupe/
 │   │   │   │   ├── groupe-list.component.*
 │   │   │   │   ├── groupe-detail.component.*
 │   │   │   │   └── groupe-membres.component.*
+│   │   │   ├── [new] onboarding/                   # Welcome + Bulk Share
+│   │   │   │   ├── welcome-screen.component.*
+│   │   │   │   └── bulk-share-prompt.component.*
 │   │   │   ├── [new] commentaire/
 │   │   │   │   ├── commentaire-list.component.*
 │   │   │   │   └── commentaire-form.component.*
@@ -838,12 +984,15 @@ Architecture extends a proven, production codebase with well-understood patterns
 3. JWT enhancement with `groupe_ids` claim + refresh mechanism
 4. Group isolation at Port layer (membership validation)
 5. Group isolation at Repository layer (query filtering)
-6. Invite token infrastructure (create, accept, revoke)
-7. Comment system with per-group scoping
-8. Cross-group hints API extension
-9. Frontend state management refactor
-10. Data migration console command
-11. Full cutover deployment
+6. Draft ideas + My List API (visibility = none, status computation)
+7. Archived ideas handling (status, revival)
+8. Invite token infrastructure (create, accept, revoke)
+9. Bulk share on invite (Welcome Screen, atomic operation)
+10. Comment system with per-group scoping
+11. Cross-group hints API extension
+12. Frontend state management refactor (My List, group views, onboarding)
+13. Data migration console command
+14. Full cutover deployment
 
 **Transition Note:** Full cutover deployment means old clients (without cookie JWT support) will stop working. No backward compatibility layer needed.
 
@@ -859,12 +1008,13 @@ Architecture extends a proven, production codebase with well-understood patterns
 
 This architecture document provides:
 
-1. **115 Functional Requirements** analyzed across 10 domains
-2. **12 Core Architectural Decisions** with explicit rationale
-3. **9 Mandatory Implementation Rules** for AI agents
-4. **Complete Project Structure** with 50+ files mapped ([existing]/[extend]/[new])
+1. **127 Functional Requirements** analyzed across 13 domains
+2. **14 Core Architectural Decisions** with explicit rationale
+3. **12 Mandatory Implementation Rules** for AI agents
+4. **Complete Project Structure** with 55+ files mapped ([existing]/[extend]/[new])
 5. **Defense in Depth Security Model** for group isolation
-6. **Unified Visibility Pattern** for ideas and comments
+6. **Unified Visibility Pattern** for ideas and comments (including draft/archived states)
+7. **Bulk Share Pattern** for invite onboarding flow
 
 ### Critical Architecture Highlights
 
@@ -872,11 +1022,13 @@ This architecture document provides:
 |--------|----------|
 | Group Isolation | Defense in Depth (Port validates + Repo filters) |
 | JWT Security | HttpOnly cookie via two-step token exchange |
-| Visibility Model | ManyToMany join tables for ideas and comments |
+| Visibility Model | ManyToMany join tables with status computation (active/draft/archived) |
 | API Pattern | Entity-centric routes with action endpoints |
 | Error Response | 404 for all isolation violations |
 | Token Hashing | bcrypt/Argon2 (same as passwords) |
 | Migration | Big Bang with console command |
+| Navigation | Occasions within groups, My List as first-class destination |
+| Onboarding | Welcome Screen + Bulk Share prompt for existing users |
 
 ### Next Steps
 

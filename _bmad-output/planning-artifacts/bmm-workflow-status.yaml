@@ -31,11 +31,11 @@ workflow_status:
   research: skipped  # Not needed - product vision is clear, no framework comparisons required for MVP
 
   # Phase 2: Planning
-  prd: required
-  create-ux-design: conditional
+  prd: _bmad-output/planning-artifacts/prd.md
+  create-ux-design: _bmad-output/planning-artifacts/ux-design-specification.md
 
   # Phase 3: Solutioning
-  create-architecture: required
+  create-architecture: _bmad-output/planning-artifacts/architecture.md
   create-epics-and-stories: required
   test-design: optional
   implementation-readiness: required
