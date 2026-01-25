@@ -293,6 +293,18 @@ The following requirements apply to ALL UI stories and should be verified during
 - Stories marked [EXISTS] require minimal changes but should be tested against new design system
 - Stories marked [NEW] in Epics 2, 3, 4 are core list-centric functionality and cannot be deferred
 
+### Per-Story Definition of Done (Testing)
+
+The following testing requirements apply to ALL stories:
+
+- [ ] All acceptance criteria have corresponding tests
+- [ ] Unit tests pass (PHPUnit + Karma)
+- [ ] Integration tests pass (PHPUnit)
+- [ ] Relevant E2E tests pass (Cypress)
+- [ ] Coverage threshold maintained (80% backend, 70% frontend)
+- [ ] UI changes tested on mobile viewport (375x667) per UX1
+- [ ] No new flaky tests introduced
+
 ## Epic List
 
 ### Epic 1: Secure Authentication Foundation
@@ -471,6 +483,8 @@ So that I can compare post-rewrite performance against a known reference.
 - Baseline results file committed to repo
 - Test scenario documentation for regression testing
 
+**BACKLOG Alignment:** This story fulfills BACKLOG.md Task 25 (Performance benchmarks). The baseline captured here is used by Story 1.0 for CI regression detection and Story 9.8 for post-migration validation.
+
 ---
 
 ## Epic 1: Secure Authentication Foundation
@@ -478,6 +492,50 @@ So that I can compare post-rewrite performance against a known reference.
 **Goal:** Users can securely create accounts, log in, and manage their profiles with modern JWT cookie-based security.
 
 **FRs covered:** FR2-FR8, NFR6-12, ARCH5
+
+---
+
+### Story 1.0: Test Infrastructure Setup [NEW]
+
+**Brownfield Context:** Test infrastructure exists (PHPUnit 11.5, Cypress 15.8, transaction rollback in IntTestCase) but lacks: coverage enforcement in CI, test data builders for v2 entities, and k6 integration for performance regression. Must establish these before Epic 1 stories begin.
+
+As a **developer**,
+I want test infrastructure configured for v2 development,
+So that all subsequent stories have consistent fixtures, coverage gates, and performance regression detection.
+
+**Acceptance Criteria:**
+
+**Given** the CI pipeline runs
+**When** backend test coverage drops below 80%
+**Then** the build fails with clear message indicating coverage gap
+
+**Given** v2 development begins
+**When** I need to create test data for groups and visibility
+**Then** PHPUnit builders exist: `$this->creeGroupeEnBase()`, `$this->creeListeEnBase()`
+**And** Cypress fixtures exist: `groupes.json`, `listes.json`
+**And** Backend fixtures exist: `GroupeFixture.php`, `ListeFixture.php`
+
+**Given** Story 0.1 baseline exists
+**When** CI runs on v2 code
+**Then** k6 performance tests execute against key endpoints
+**And** results are compared to baseline
+**And** regressions >20% are flagged (not blocking initially)
+
+**Given** a developer writes a new integration test
+**When** they need group-scoped test data
+**Then** builders support: group creation, user-group membership, idea visibility assignment
+
+**Deliverables:**
+- Coverage threshold configuration in CI (`.github/workflows/test.yml`)
+- PHPUnit builders in `api/test/` for Groupe, Liste, Visibility
+- Cypress fixtures in `front/cypress/fixtures/` for groups and lists
+- Backend fixtures in `api/src/Appli/Fixture/`
+- k6 CI integration with baseline comparison
+- Updated `docs/testing.md` documenting new fixtures and builders
+
+**Dependencies:** Story 0.1 (Performance Baseline) must be complete
+
+**BACKLOG Alignment:** This story fulfills BACKLOG.md Task 21 (Test data builders) and Task 23 (Coverage enforcement).
 
 ---
 
@@ -709,11 +767,11 @@ So that I receive emails at my preferred frequency.
 
 ---
 
-**Epic 1 Complete: 8 stories covering FR2-FR8, NFR6-12, ARCH5**
+**Epic 1 Complete: 9 stories covering FR2-FR8, NFR6-12, ARCH5**
 
 **Brownfield Summary:**
 - 3 stories [MODIFY]: Token exchange, login, logout (security hardening)
-- 1 story [NEW]: Rate limiting
+- 2 stories [NEW]: Test infrastructure setup, Rate limiting
 - 4 stories [EXISTS]: Profile/password/notification management (minimal changes)
 
 ---
@@ -2375,7 +2433,7 @@ So that I can verify the rewrite meets performance requirements.
 | Epic | Stories | [NEW] | [MODIFY] | [EXTEND] | [EXISTS] |
 |------|---------|-------|----------|----------|----------|
 | 0. Pre-Implementation | 1 | 1 | 0 | 0 | 0 |
-| 1. Auth | 8 | 1 | 3 | 0 | 4 |
+| 1. Auth | 9 | 2 | 3 | 0 | 4 |
 | 2. Groups | 7 | 6 | 0 | 1 | 0 |
 | 3. Ideas | 10 | 5 | 2 | 2 | 1 |
 | 4. Invites | 7 | 7 | 0 | 0 | 0 |
@@ -2384,10 +2442,10 @@ So that I can verify the rewrite meets performance requirements.
 | 7. Notifications | 5 | 2 | 2 | 0 | 1 |
 | 8. Occasions | 8 | 1 | 2 | 0 | 5 |
 | 9. Migration | 8 | 5 | 2 | 0 | 1 |
-| **Total** | **67** | **38** | **13** | **3** | **13** |
+| **Total** | **68** | **39** | **13** | **3** | **13** |
 
 This brownfield breakdown shows:
-- **38 stories (57%)** are completely new functionality
+- **39 stories (57%)** are completely new functionality
 - **13 stories (19%)** modify existing code for new requirements
 - **3 stories (4%)** extend existing code with new capabilities
 - **13 stories (19%)** leverage existing code with minimal changes
