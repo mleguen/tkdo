@@ -1,0 +1,147 @@
+# generated: 2026-01-25
+# project: tkdo
+# project_key: tkdo
+# tracking_system: file-system
+# story_location: _bmad-output/implementation-artifacts
+
+# STATUS DEFINITIONS:
+# ==================
+# Epic Status:
+#   - backlog: Epic not yet started
+#   - in-progress: Epic actively being worked on
+#   - done: All stories in epic completed
+#
+# Epic Status Transitions:
+#   - backlog → in-progress: Automatically when first story is created (via create-story)
+#   - in-progress → done: Manually when all stories reach 'done' status
+#
+# Story Status:
+#   - backlog: Story only exists in epic file
+#   - ready-for-dev: Story file created in stories folder
+#   - in-progress: Developer actively working on implementation
+#   - review: Ready for code review (via Dev's code-review workflow)
+#   - done: Story completed
+#
+# Retrospective Status:
+#   - optional: Can be completed but not required
+#   - done: Retrospective has been completed
+#
+# WORKFLOW NOTES:
+# ===============
+# - Epic transitions to 'in-progress' automatically when first story is created
+# - Stories can be worked in parallel if team capacity allows
+# - SM typically creates next story after previous one is 'done' to incorporate learnings
+# - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
+
+generated: "2026-01-25"
+project: tkdo
+project_key: tkdo
+tracking_system: file-system
+story_location: _bmad-output/implementation-artifacts
+
+development_status:
+  # Pre-Implementation
+  0-1-performance-baseline-capture: backlog
+
+  # Epic 1: Secure Authentication Foundation
+  epic-1: backlog
+  1-0-test-infrastructure-setup: backlog
+  1-1-jwt-token-exchange-system: backlog
+  1-2-user-login: backlog
+  1-3-user-logout: backlog
+  1-4-login-rate-limiting: backlog
+  1-5-view-profile: backlog
+  1-6-edit-profile: backlog
+  1-7-change-password: backlog
+  1-8-notification-preferences: backlog
+  epic-1-retrospective: optional
+
+  # Epic 2: Groups & Membership
+  epic-2: backlog
+  2-1-groupe-entity-database-schema: backlog
+  2-2-group-membership-in-jwt-claims: backlog
+  2-3-view-my-groups: backlog
+  2-4-view-group-members: backlog
+  2-5-group-isolation-api-defense-in-depth: backlog
+  2-6-create-group-instance-admin: backlog
+  2-7-merged-multi-group-view: backlog
+  epic-2-retrospective: optional
+
+  # Epic 3: Core Idea Management & My List
+  epic-3: backlog
+  3-1-idea-visibility-schema: backlog
+  3-2-create-idea-for-self: backlog
+  3-3-create-idea-for-others: backlog
+  3-4-edit-idea: backlog
+  3-5-delete-idea-soft-delete: backlog
+  3-6-my-list-view: backlog
+  3-7-manage-visibility-from-my-list: backlog
+  3-8-orphaned-idea-handling: backlog
+  3-9-data-integrity-validation: backlog
+  3-10-expandable-idea-cards: backlog
+  epic-3-retrospective: optional
+
+  # Epic 4: Invite System & Onboarding
+  epic-4: backlog
+  4-1-invitation-entity-schema: backlog
+  4-2-generate-invite-link: backlog
+  4-3-view-revoke-invites: backlog
+  4-4-new-user-signup-via-invite: backlog
+  4-5-existing-user-login-via-invite: backlog
+  4-6-welcome-screen: backlog
+  4-7-bulk-share-existing-ideas: backlog
+  epic-4-retrospective: optional
+
+  # Epic 5: Gift Coordination
+  epic-5: backlog
+  5-1-mark-im-giving-this: backlog
+  5-2-comment-on-ideas: backlog
+  5-3-comment-schema-entity: backlog
+  5-4-edit-delete-comments: backlog
+  5-5-cross-group-comment-hints: backlog
+  5-6-filter-by-occasion: backlog
+  epic-5-retrospective: optional
+
+  # Epic 6: Group & User Administration
+  epic-6: backlog
+  6-1-archive-unarchive-groups: backlog
+  6-2-assign-revoke-group-admin-role: backlog
+  6-3-password-reset-admin: backlog
+  6-4-remove-member-from-group: backlog
+  6-5-admin-ui-instance-admin-view: backlog
+  6-6-admin-ui-group-admin-view: backlog
+  6-7-gdpr-user-deletion: backlog
+  epic-6-retrospective: optional
+
+  # Epic 7: Notifications
+  epic-7: backlog
+  7-1-idea-notifications: backlog
+  7-2-daily-digest: backlog
+  7-3-comment-notifications: backlog
+  7-4-account-admin-notifications: backlog
+  7-5-group-lifecycle-notifications: backlog
+  epic-7-retrospective: optional
+
+  # Epic 8: Occasions & Secret Santa
+  epic-8: backlog
+  8-1-associate-occasions-with-groups: backlog
+  8-2-create-edit-occasions: backlog
+  8-3-run-automatic-draw: backlog
+  8-4-view-draw-assignment: backlog
+  8-5-manual-draw-override: backlog
+  8-6-exclusions: backlog
+  8-7-cancel-occasion: backlog
+  8-8-occasion-ui-within-group-page: backlog
+  epic-8-retrospective: optional
+
+  # Epic 9: Data Migration & Cutover
+  epic-9: backlog
+  9-1-migration-console-command: backlog
+  9-2-user-migration: backlog
+  9-3-occasion-to-group-migration: backlog
+  9-4-idea-migration: backlog
+  9-5-draw-exclusion-migration: backlog
+  9-6-data-integrity-verification: backlog
+  9-7-cutover-rollback-plan: backlog
+  9-8-performance-regression-testing: backlog
+  epic-9-retrospective: optional
