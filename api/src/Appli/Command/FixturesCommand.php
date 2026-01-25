@@ -46,22 +46,33 @@ class FixturesCommand extends Command
                 null,
                 InputOption::VALUE_OPTIONAL,
                 'E-mail administrateur'
+            )
+            ->addOption(
+                'perf',
+                null,
+                InputOption::VALUE_NONE,
+                'Ajoute des données pour les tests de performance (10+ participants, 20+ idées)'
             );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $adminEmail = $input->hasOption('admin-email') ? $input->getOption('admin-email') : null;
-        
+        $perfMode = $input->getOption('perf') === true;
+
         $loader = new Loader();
-        $loader->addFixture($this->utilisateurFixture->setAdminEmail($adminEmail)->setOutput($output));
-        $loader->addFixture($this->exclusionFixture->setOutput($output));
-        $loader->addFixture($this->occasionFixture->setOutput($output));
-        $loader->addFixture($this->ideeFixture->setOutput($output));
-        $loader->addFixture($this->resultatFixture->setOutput($output));
+        $loader->addFixture($this->utilisateurFixture->setAdminEmail($adminEmail)->setPerfMode($perfMode)->setOutput($output));
+        $loader->addFixture($this->exclusionFixture->setPerfMode($perfMode)->setOutput($output));
+        $loader->addFixture($this->occasionFixture->setPerfMode($perfMode)->setOutput($output));
+        $loader->addFixture($this->ideeFixture->setPerfMode($perfMode)->setOutput($output));
+        $loader->addFixture($this->resultatFixture->setPerfMode($perfMode)->setOutput($output));
 
         $executor = new ORMExecutor($this->em, new ORMPurger());
-        $output->writeln(['Initialisation ou réinitialisation de la base de données (' . ($this->devMode ? 'dev' : 'production') . ')...']);
+        $mode = $this->devMode ? 'dev' : 'production';
+        if ($perfMode) {
+            $mode .= ' + perf';
+        }
+        $output->writeln(["Initialisation ou réinitialisation de la base de données ({$mode})..."]);
         $executor->execute($loader->getFixtures());
         $output->writeln(['OK']);
 

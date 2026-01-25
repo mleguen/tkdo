@@ -50,6 +50,21 @@ class IdeeFixture extends AppAbstractFixture
                 ->setDateProposition(new DateTime('1 day ago'))
             );
             $em->flush();
+
+            // Perf mode: create 20+ ideas for bob
+            if ($this->perfMode) {
+                $bob = $this->getReference('bob', UtilisateurAdaptor::class);
+                for ($i = 1; $i <= 22; $i++) {
+                    $em->persist(new IdeeAdaptor()
+                        ->setUtilisateur($bob)
+                        ->setDescription("Idée perf test {$i}")
+                        ->setAuteur($bob)
+                        ->setDateProposition(new DateTime("-{$i} hours"))
+                    );
+                }
+                $em->flush();
+                $this->output->writeln(['  + 22 idées perf pour bob créées.']);
+            }
         }
         $this->output->writeln(['Idées créées.']);
     }

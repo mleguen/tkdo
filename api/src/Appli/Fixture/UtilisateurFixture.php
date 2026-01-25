@@ -90,5 +90,22 @@ class UtilisateurFixture extends AppAbstractFixture
         }
         $em->flush();
         $this->output->writeln(['Utilisateurs créés.']);
+
+        // Perf mode: create additional users to reach 10+ participants
+        if ($this->devMode && $this->perfMode) {
+            for ($i = 1; $i <= 6; $i++) {
+                $user = new UtilisateurAdaptor();
+                $user->setEmail("perf{$i}@{$this->host}")
+                    ->setGenre($i % 2 === 0 ? Genre::Feminin : Genre::Masculin)
+                    ->setIdentifiant("perf{$i}")
+                    ->setNom("Perf User {$i}")
+                    ->setMdpClair("mdpperf{$i}")
+                    ->setDateDerniereNotifPeriodique(new DateTime('2 days ago'));
+                $em->persist($user);
+                $this->addReference("perf{$i}", $user);
+            }
+            $em->flush();
+            $this->output->writeln(['  + 6 utilisateurs perf créés.']);
+        }
    }
 }

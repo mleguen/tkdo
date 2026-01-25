@@ -14,11 +14,16 @@ k6 runs via Docker using the `./k6` wrapper script. No host installation require
 docker compose up -d front
 ```
 
-### 2. Load fixtures (if not already loaded)
+### 2. Load fixtures with perf data
 
 ```bash
-./console fixtures
+./console fixtures --perf
 ```
+
+The `--perf` option creates additional test data to meet baseline requirements:
+- 6 additional users (perf1-perf6) for 11 total
+- 1 occasion with 11 participants
+- 22 ideas for bob (the test user)
 
 ### 3. Run baseline capture
 

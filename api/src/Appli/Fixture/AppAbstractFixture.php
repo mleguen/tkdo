@@ -10,6 +10,7 @@ abstract class AppAbstractFixture extends AbstractFixture
 {
     protected OutputInterface $output;
     protected bool $devMode;
+    protected bool $perfMode = false;
 
     public function __construct(
         Bootstrap $bootstrap
@@ -20,6 +21,12 @@ abstract class AppAbstractFixture extends AbstractFixture
     public function setOutput(OutputInterface $output): self
     {
         $this->output = $output;
+        return $this;
+    }
+
+    public function setPerfMode(bool $perfMode): self
+    {
+        $this->perfMode = $perfMode;
         return $this;
     }
 }
