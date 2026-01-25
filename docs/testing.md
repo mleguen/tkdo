@@ -1716,12 +1716,54 @@ When adding new features:
 3. Update this documentation with new testing patterns
 4. Check test coverage and aim to maintain or improve it
 
+## Performance Testing
+
+Performance tests use [k6](https://k6.io/) to capture response time baselines and detect regressions.
+
+### Running Performance Tests
+
+k6 runs via Docker using the `./k6` wrapper. No host installation required.
+
+```bash
+# Ensure environment is running and fixtures loaded
+docker compose up -d front
+./console fixtures
+
+# Run baseline capture (saves to docs/performance-baseline.json)
+./k6 run perf/baseline.js
+
+# Fewer iterations (faster, less accurate)
+./k6 run -e ITERATIONS=25 perf/baseline.js
+```
+
+### Test Scenarios
+
+The baseline script tests key API operations:
+
+| Scenario | Endpoint | Purpose |
+|----------|----------|---------|
+| Login | POST /connexion | Authentication flow |
+| View Occasion | GET /occasion/{id} | Occasion with participants |
+| List Ideas | GET /idee | User's idea list |
+| Add Idea | POST /idee | Create operation |
+| Edit Idea | POST /idee (with id) | Update operation |
+| Delete Idea | POST /idee/{id}/suppression | Delete operation |
+| Admin List Users | GET /utilisateur | Admin listing |
+| Admin List Occasions | GET /occasion | Admin listing |
+
+### Output
+
+Results are saved to `docs/performance-baseline.json` with avg, p95, and p99 response times for each scenario.
+
+See `perf/README.md` for detailed documentation.
+
 ## Related Documentation
 
 - [Backend Development Guide](./backend-dev.md) - Backend architecture and patterns
 - [Frontend Development Guide](./frontend-dev.md) - Frontend architecture and patterns
 - [Database Documentation](./database.md) - Database schema and fixtures
 - [Development Setup](./dev-setup.md) - Setting up test environment
+- [Performance Testing](../perf/README.md) - k6 baseline scripts and usage
 
 ---
 
