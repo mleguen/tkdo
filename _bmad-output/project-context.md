@@ -203,10 +203,33 @@ public function __invoke(Request $request, Response $response): Response
 
 ### Development Workflow Rules
 
+**Docker-First Development (CRITICAL):**
+- **NEVER ask users to install tools on the host** - all tools run via Docker
+- **ALWAYS use wrapper scripts** for CLI tools: `./npm`, `./composer`, `./console`, `./doctrine`, `./ng`, `./cypress`, `./k6`
+- When adding new CLI tools, create a Docker wrapper following existing patterns (see `./npm` or `./k6` for examples)
+- Add new tool services to `docker-compose.yml` with `profiles: [tools]`
+
+**Documentation & Autonomy:**
+- **Read `docs/dev-setup.md` first** - contains all environment setup, Docker commands, fixture loading
+- **Read `docs/testing.md`** for test execution commands
+- **Don't ask the user** for commands that are documented - be autonomous
+- Key commands: `docker compose up -d front`, `./console fixtures`, `./composer test`, `./npm run int`
+
+**Story Commit Workflow (CRITICAL):**
+- **NEVER commit implementation before fully updating story status**
+- Before ANY commit at story completion:
+  1. Mark ALL task checkboxes [x] in story file
+  2. Add completion notes to Dev Agent Record
+  3. Update File List with all changed files
+  4. Set story status to "review"
+  5. Update sprint-status.yaml
+  6. THEN commit everything as ONE atomic unit
+- The commit must represent a complete, coherent state - not partial progress
+
 **Docker & Scripts:**
-- Wrappers: `./console`, `./doctrine`, `./composer`, `./ng`, `./npm`
-- `composer test`, `composer phpstan`, `composer rector`
-- `npm test`, `npm run build`, `npm run e2e`
+- Wrappers: `./console`, `./doctrine`, `./composer`, `./ng`, `./npm`, `./cypress`, `./k6`
+- `./composer test`, `./composer phpstan`, `./composer rector`
+- `./npm test`, `./npm run build`, `./npm run e2e`
 
 **Database:**
 - Doctrine migrations: version-based naming
@@ -226,6 +249,12 @@ public function __invoke(Request $request, Response $response): Response
 - ❌ NEVER skip `parent::__invoke()` in AuthController subclasses
 - ❌ NEVER use constructor injection in Angular - use `inject()`
 - ❌ NEVER create selectors without `app-` prefix
+
+**Development Environment:**
+- ❌ NEVER ask to install tools on the host - use Docker wrappers
+- ❌ NEVER ask the user how to start Docker or run tests - read the docs
+- ✅ ALWAYS use `./wrapper` scripts for CLI tools
+- ✅ ALWAYS read `docs/dev-setup.md` and `docs/testing.md` for commands
 
 **Architecture Boundaries:**
 - ❌ NEVER import `Appli\` or `Infra\` into `Dom\` layer
@@ -260,4 +289,4 @@ public function __invoke(Request $request, Response $response): Response
 - Update when technology stack changes
 - Review quarterly for outdated rules
 
-Last Updated: 2026-01-18
+Last Updated: 2026-01-25

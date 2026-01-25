@@ -1,0 +1,79 @@
+{
+  "captured": "2026-01-25",
+  "environment": {
+    "type": "docker-dev",
+    "base_url": "http://front/api",
+    "iterations_per_scenario": 100
+  },
+  "scenarios": {
+    "login": {
+      "iterations": 0,
+      "avg_ms": 336,
+      "p95_ms": 362,
+      "p99_ms": 378,
+      "min_ms": 303,
+      "max_ms": 386
+    },
+    "view_occasion": {
+      "iterations": 0,
+      "avg_ms": 87,
+      "p95_ms": 112,
+      "p99_ms": 124,
+      "min_ms": 67,
+      "max_ms": 142
+    },
+    "list_ideas": {
+      "iterations": 0,
+      "avg_ms": 61,
+      "p95_ms": 76,
+      "p99_ms": 94,
+      "min_ms": 46,
+      "max_ms": 110
+    },
+    "add_idea": {
+      "iterations": 0,
+      "avg_ms": 186,
+      "p95_ms": 354,
+      "p99_ms": 1412,
+      "min_ms": 68,
+      "max_ms": 1856
+    },
+    "edit_idea": {
+      "iterations": 0,
+      "avg_ms": 152,
+      "p95_ms": 258,
+      "p99_ms": 312,
+      "min_ms": 81,
+      "max_ms": 339
+    },
+    "delete_idea": {
+      "iterations": 0,
+      "avg_ms": 156,
+      "p95_ms": 254,
+      "p99_ms": 355,
+      "min_ms": 69,
+      "max_ms": 945
+    },
+    "admin_list_users": {
+      "iterations": 0,
+      "avg_ms": 86,
+      "p95_ms": 105,
+      "p99_ms": 124,
+      "min_ms": 65,
+      "max_ms": 125
+    },
+    "admin_list_occasions": {
+      "iterations": 0,
+      "avg_ms": 80,
+      "p95_ms": 97,
+      "p99_ms": 118,
+      "min_ms": 65,
+      "max_ms": 123
+    }
+  },
+  "summary": {
+    "total_requests": 900,
+    "total_errors": 0,
+    "duration_seconds": 158
+  }
+}
