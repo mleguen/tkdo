@@ -50,6 +50,15 @@ services:
       - ./:/mnt/tkdo
 
 
+  k6:
+    image: grafana/k6
+    profiles:
+      - tools
+    user: ${DEV_UID:-1000}:${DEV_GID:-1000}
+    volumes:
+      - .:/opt/tkdo
+    working_dir: /opt/tkdo
+
   php-cli:
     build: docker/php-cli
     environment:
