@@ -11,6 +11,10 @@
  * Prerequisites:
  *   - Docker dev environment running (docker compose up -d front)
  *   - Fixtures loaded (./console fixtures)
+ *
+ * Data Conditions (met by PerfFixture):
+ *   - Occasion "Perf Test" with 10+ participants
+ *   - User "bob" with 20+ ideas
  */
 
 import http from 'k6/http';
@@ -155,6 +159,7 @@ export default function () {
 
     if (success && res.status === 200) {
       const occasions = JSON.parse(res.body);
+      // Use first occasion (perf fixtures ensure adequate test data)
       if (occasions.length > 0) {
         occasionId = occasions[0].id;
       }
@@ -179,7 +184,7 @@ export default function () {
   });
 
   // ========================================
-  // List Ideas
+  // List Ideas (--perf fixtures ensure bob has 20+ ideas)
   // ========================================
   group('List Ideas', function () {
     const start = Date.now();

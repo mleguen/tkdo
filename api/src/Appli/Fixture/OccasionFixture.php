@@ -44,6 +44,29 @@ class OccasionFixture extends AppAbstractFixture
                 $this->addReference($nom, $occasion);
             }
             $em->flush();
+
+            // Perf mode: create occasion with 10+ participants
+            if ($this->perfMode) {
+                $participants = [
+                    $this->getReference('alice', UtilisateurAdaptor::class),
+                    $this->getReference('bob', UtilisateurAdaptor::class),
+                    $this->getReference('charlie', UtilisateurAdaptor::class),
+                    $this->getReference('david', UtilisateurAdaptor::class),
+                    $this->getReference('eve', UtilisateurAdaptor::class),
+                ];
+                for ($i = 1; $i <= 6; $i++) {
+                    $participants[] = $this->getReference("perf{$i}", UtilisateurAdaptor::class);
+                }
+
+                $perfOccasion = new OccasionAdaptor();
+                $perfOccasion->setDate(new DateTime('+6 months'))
+                    ->setTitre('Occasion Perf Test')
+                    ->setParticipants($participants);
+                $em->persist($perfOccasion);
+                $this->addReference('perfOccasion', $perfOccasion);
+                $em->flush();
+                $this->output->writeln(['  + 1 occasion perf avec 11 participants créée.']);
+            }
         }
         $this->output->writeln(['Occasions créées.']);
     }
