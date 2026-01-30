@@ -1,0 +1,268 @@
+<workflow>
+  <critical>The workflow execution engine is governed by: {project-root}/_bmad/core/tasks/workflow.xml</critical>
+  <critical>You MUST have already loaded and processed: {installed_path}/workflow.yaml</critical>
+  <critical>Communicate all responses in {communication_language} and language MUST be tailored to {user_skill_level}</critical>
+  <critical>Generate all documents in {document_output_language}</critical>
+
+  <objective>
+    This workflow runs AFTER implementing fixes for review action items.
+    It finds completed action items ([x]) with PR comment links, posts "Fixed" comments, and resolves the threads.
+  </objective>
+
+  <design-notes>
+    **Why no commit SHA in responses:**
+    - Gives operator flexibility about when to commit (before or after running this workflow)
+    - Avoids issues when commits are amended (SHA changes, references become invalid)
+    - The "Fixed" message is sufficient - reviewers can see the fix in the PR diff
+
+    **Thread resolution:**
+    - GitHub REST API does NOT support resolving review threads
+    - Must use GraphQL API with `resolveReviewThread` mutation
+    - Requires thread node ID (PRRT_...), not comment ID
+  </design-notes>
+
+  <step n="1" goal="Load story and find completed action items with PR links">
+    <action>Use provided {{story_path}} or ask user which story file to review</action>
+    <action>Read COMPLETE story file</action>
+    <action>Set {{story_key}} = extracted key from filename</action>
+
+    <action>Locate "Review Follow-ups (AI)" subsection under Tasks/Subtasks</action>
+
+    <check if="Review Follow-ups section does NOT exist">
+      <output>No "Review Follow-ups (AI)" section found in story.
+
+This workflow requires:
+- Story with "Review Follow-ups (AI)" section
+- Action items marked [x] as complete
+- PR comment links in action items
+
+Exiting.</output>
+      <action>Exit workflow</action>
+    </check>
+
+    <action>Parse all action items looking for:
+      - Checkbox status: [x] (completed) vs [ ] (pending)
+      - PR comment links (single): `[PR#123 comment](https://github.com/.../discussion_r...)`
+      - PR comment links (multiple/grouped): `[PR#123 comments: [Label1](url1), [Label2](url2), ...]`
+    </action>
+
+    <action>Filter to completed action items with PR links:
+      - Extract: checkbox status, severity, description, file reference, PR number
+      - Extract ALL comment URLs and IDs (may be multiple per action item)
+      - Store as {{completed_with_pr_links}} list, each entry containing:
+        - Action item details
+        - Array of {comment_url, comment_id} for all linked PR comments
+        - is_grouped: true if multiple PR comments, false if single
+    </action>
+
+    <check if="no completed action items with PR links">
+      <output>No completed action items with PR comment links found.
+
+Current status:
+- Total action items: {{total_action_items}}
+- Completed: {{completed_count}}
+- With PR links: {{pr_link_count}}
+- Completed WITH PR links: 0
+
+Either:
+1. No action items are marked [x] yet
+2. No action items have PR comment links
+3. All PR comments already resolved
+
+Nothing to do. Exiting.</output>
+      <action>Exit workflow</action>
+    </check>
+
+    <output>**Found {{completed_pr_count}} Completed Action Items with PR Links**
+
+Ready to mark these as resolved:
+{{#each completed_with_pr_links}}
+{{#if is_grouped}}
+- [x] [{{severity}}] {{description}} - PR#{{pr_number}} ({{comment_count}} grouped comments)
+{{else}}
+- [x] [{{severity}}] {{description}} - PR#{{pr_number}} comment {{comment_id}}
+{{/if}}
+{{/each}}
+
+Total PR comment threads to resolve: {{total_comment_threads}}
+
+Will post "Fixed" comments and resolve conversations...</output>
+  </step>
+
+  <step n="2" goal="Detect GitHub PR and verify access">
+    <action>Check if current directory is a Git repository with GitHub remote</action>
+    <action>Extract owner and repo from GitHub remote URL</action>
+
+    <check if="not a git repository OR no GitHub remote">
+      <output>Not a GitHub repository. This workflow requires:
+- Git repository
+- GitHub remote configured
+- GitHub CLI (gh) installed and authenticated
+
+Exiting.</output>
+      <action>Exit workflow</action>
+    </check>
+
+    <action>Extract PR number from first completed action item's PR link</action>
+    <action>Set {{pr_number}} from extracted number</action>
+
+    <action>Verify PR exists using: `gh pr view {{pr_number}} --json number,url,title,state`</action>
+
+    <check if="PR not found OR PR is closed">
+      <output>PR #{{pr_number}} is {{pr_state}}.
+
+Cannot resolve comments on a closed PR. The action items are complete in the story,
+but PR comment threads cannot be resolved.
+
+Exiting.</output>
+      <action>Exit workflow</action>
+    </check>
+
+    <output>**Found open PR #{{pr_number}}**
+
+Title: {{pr_title}}
+URL: {{pr_url}}
+
+Preparing to resolve {{completed_pr_count}} comment threads...</output>
+  </step>
+
+  <step n="3" goal="Post Fixed comments and resolve threads">
+    <critical>Follow .claude/README.md guidelines for PR comment responses</critical>
+    <critical>Do NOT include commit SHA in responses - this gives operator flexibility about when to commit</critical>
+
+    <action>Read {claude_readme} Pull Request Review Responses section</action>
+
+    <output>**Marking {{completed_pr_count}} PR Comments as Resolved**
+
+Following .claude/README.md guidelines:
+- Using /comments/COMMENT_ID/replies endpoint for threaded responses
+- Posting "Fixed" confirmation
+- Resolving threads via GraphQL API
+
+Processing each comment...</output>
+
+    <action>For EACH completed action item with PR link(s):
+      1. Extract all comment_ids from PR comment URL(s)
+
+      **If single PR comment (is_grouped == false):**
+      2. Build full "Fixed" response (see template below)
+      3. Post response to the comment thread
+      4. Resolve the thread via GraphQL
+
+      **If grouped PR comments (is_grouped == true):**
+      2. Post FULL "Fixed" response to FIRST comment in the group
+      3. Capture {{first_reply_url}} from response html_url field
+      4. Resolve the first thread via GraphQL
+      5. For EACH subsequent comment in the group:
+         - Post SHORT reference response (see template below)
+         - Resolve the thread via GraphQL
+      6. Track all successes/failures
+
+      **Full response template:**
+      ```
+      **FIXED**
+
+      **Action item resolved:**
+      - [x] [AI-Review][{{severity}}] {{description}} [{{file_reference}}]
+      - Story file: {{story_file}}
+
+      Changes implemented and verified.
+      ```
+
+      **Short reference template (for grouped comments after first):**
+      ```
+      **FIXED** - Related issue, resolved together with [this comment]({{first_reply_url}}).
+      ```
+
+      **Post reply using REST API:**
+      `gh api -X POST repos/{{owner}}/{{repo}}/pulls/{{pr_number}}/comments/{{comment_id}}/replies -f body="{{response}}"`
+
+      **Resolve thread using GraphQL API:**
+      1. First, get the thread node ID for the comment:
+         ```
+         gh api graphql -f query='
+           query($owner: String!, $repo: String!, $pr: Int!) {
+             repository(owner: $owner, name: $repo) {
+               pullRequest(number: $pr) {
+                 reviewThreads(first: 100) {
+                   nodes {
+                     id
+                     isResolved
+                     comments(first: 1) {
+                       nodes { databaseId }
+                     }
+                   }
+                 }
+               }
+             }
+           }
+         ' -f owner='{{owner}}' -f repo='{{repo}}' -F pr={{pr_number}}
+         ```
+      2. Find the thread where comments.nodes[0].databaseId matches {{comment_id}}
+      3. Resolve using the thread's node ID:
+         ```
+         gh api graphql -f query='
+           mutation($threadId: ID!) {
+             resolveReviewThread(input: {threadId: $threadId}) {
+               thread { isResolved }
+             }
+           }
+         ' -f threadId='{{thread_node_id}}'
+         ```
+
+      Track success/failure for summary
+    </action>
+
+    <output>**All Fixed Comments Posted**
+
+Results:
+- Action items resolved: {{completed_pr_count}}
+- PR comment threads processed: {{total_comment_threads}}
+  - Full responses: {{full_response_count}}
+  - Short references: {{short_reference_count}}
+- Threads resolved via GraphQL: {{resolved_count}}/{{total_comment_threads}}
+- Failures: {{failure_count}}
+
+{{#if failures}}
+Failed to process:
+{{#each failures}}
+- Comment {{comment_id}}: {{error}}
+{{/each}}
+{{/if}}
+
+All successfully posted comments are visible in PR #{{pr_number}}.</output>
+  </step>
+
+  <step n="4" goal="Update story with resolution notes">
+    <action>Add completion note to story's Dev Agent Record - Completion Notes List:
+
+**{{date}} - PR Comments Resolved:**
+- Resolved {{posted_count}} PR comment threads
+- Marked completed action items as fixed
+- PR: #{{pr_number}}
+    </action>
+
+    <action>Save story file</action>
+
+    <output>**Workflow Complete!**
+
+**Summary:**
+- Story: {{story_file}}
+- PR: #{{pr_number}} ({{pr_url}})
+- Completed action items: {{completed_pr_count}}
+- Fixed comments posted: {{posted_count}}
+- Threads resolved: {{resolved_count}}
+
+**Action Items Status:**
+{{#each completed_with_pr_links}}
+- [x] {{description}} - Resolved
+{{/each}}
+
+**Next Steps:**
+1. Commit your changes if not already committed
+2. Push to update the PR
+3. Review remaining [ ] action items in "Review Follow-ups (AI)" if any
+4. If all items complete: run /code-review to verify and mark story as done</output>
+  </step>
+
+</workflow>

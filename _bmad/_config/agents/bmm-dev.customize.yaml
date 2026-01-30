@@ -25,12 +25,10 @@ memories: []
 
 # Add custom menu items (appended to base menu)
 # Don't include * prefix or help/exit - auto-injected
-menu: []
-# Example:
-# menu:
-#   - trigger: my-workflow
-#     workflow: "{project-root}/custom/my.yaml"
-#     description: My custom workflow
+menu:
+  - trigger: resolve-pr-comments
+    workflow: "{project-root}/_bmad/_config/custom/workflows/resolve-pr-comments/workflow.yaml"
+    description: "Mark PR comments as resolved for completed action items (run after fixes are implemented)"
 
 # Add custom prompts (for action="#id" handlers)
 prompts: []
