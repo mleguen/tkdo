@@ -55,12 +55,12 @@ This will:
 |----------|----------|-------------|
 | Login | POST /api/connexion | User authentication |
 | View Occasion | GET /api/occasion/{id} | Occasion with participants |
-| List Ideas | GET /api/utilisateur/{id}/idees | User's idea list |
+| List Ideas | GET /api/idee | User's idea list (filtered by auth) |
 | Add Idea | POST /api/idee | Create new idea |
-| Edit Idea | PUT /api/idee/{id} | Update idea |
-| Delete Idea | DELETE /api/idee/{id} | Remove idea |
-| Admin List Users | GET /api/utilisateurs | Admin user listing |
-| Admin List Occasions | GET /api/occasions | Admin occasion listing |
+| Edit Idea | POST /api/idee (with id field) | Update existing idea |
+| Delete Idea | POST /api/idee/{id}/suppression | Soft-delete idea |
+| Admin List Users | GET /api/utilisateur | Admin user listing |
+| Admin List Occasions | GET /api/occasion | Admin occasion listing |
 
 ## Output
 

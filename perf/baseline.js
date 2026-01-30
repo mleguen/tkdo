@@ -10,7 +10,7 @@
  *
  * Prerequisites:
  *   - Docker dev environment running (docker compose up -d front)
- *   - Fixtures loaded (./console fixtures)
+ *   - Fixtures loaded with perf data (./console fixtures --perf)
  *
  * Data Conditions (met by PerfFixture):
  *   - Occasion "Perf Test" with 10+ participants
@@ -42,6 +42,10 @@ const ITERATIONS = __ENV.ITERATIONS ? parseInt(__ENV.ITERATIONS) : 100;
 const ADMIN_USER = { identifiant: 'alice', mdp: 'mdpalice' };
 const REGULAR_USER = { identifiant: 'bob', mdp: 'mdpbob' };
 
+// Minimum test data requirements for valid baseline
+const MIN_PARTICIPANTS = 10;
+const MIN_IDEAS = 20;
+
 export const options = {
   scenarios: {
     baseline_capture: {
@@ -65,6 +69,83 @@ export const options = {
     admin_list_occasions_duration: ['p(95)<2000', 'p(99)<3000'],
   },
 };
+
+/**
+ * Setup function - validates test data conditions once before running tests.
+ * Warns if fixtures don't meet baseline requirements (run ./console fixtures --perf).
+ */
+export function setup() {
+  console.log('Validating test data conditions...');
+
+  // Login as admin to check data
+  const adminRes = http.post(
+    `${BASE_URL}/connexion`,
+    `identifiant=${ADMIN_USER.identifiant}&mdp=${ADMIN_USER.mdp}`,
+    { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+  );
+
+  if (adminRes.status !== 200) {
+    console.error(`Setup failed: Cannot login as admin - ${adminRes.status}`);
+    return { valid: false };
+  }
+
+  const adminData = JSON.parse(adminRes.body);
+  const headers = {
+    headers: {
+      Authorization: `Bearer ${adminData.token}`,
+      'Content-Type': 'application/json',
+    },
+  };
+
+  // Check occasions for participant count
+  const occasionsRes = http.get(`${BASE_URL}/occasion`, headers);
+  if (occasionsRes.status === 200) {
+    const occasions = JSON.parse(occasionsRes.body);
+    const maxParticipants = Math.max(...occasions.map((o) => o.participants?.length || 0), 0);
+    if (maxParticipants < MIN_PARTICIPANTS) {
+      console.warn(
+        `⚠️  DATA CONDITION NOT MET: No occasion has ${MIN_PARTICIPANTS}+ participants (max found: ${maxParticipants}). ` +
+          `Run './console fixtures --perf' to create proper test data.`
+      );
+    } else {
+      console.log(`✓ Occasion with ${maxParticipants} participants found (requirement: ${MIN_PARTICIPANTS}+)`);
+    }
+  }
+
+  // Login as bob (the test user) to check their ideas
+  const bobRes = http.post(
+    `${BASE_URL}/connexion`,
+    `identifiant=${REGULAR_USER.identifiant}&mdp=${REGULAR_USER.mdp}`,
+    { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+  );
+
+  if (bobRes.status === 200) {
+    const bobData = JSON.parse(bobRes.body);
+    const bobHeaders = {
+      headers: {
+        Authorization: `Bearer ${bobData.token}`,
+        'Content-Type': 'application/json',
+      },
+    };
+
+    // Check bob's ideas count
+    const ideasRes = http.get(`${BASE_URL}/idee`, bobHeaders);
+    if (ideasRes.status === 200) {
+      const ideas = JSON.parse(ideasRes.body);
+      if (ideas.length < MIN_IDEAS) {
+        console.warn(
+          `⚠️  DATA CONDITION NOT MET: User 'bob' has only ${ideas.length} ideas (requirement: ${MIN_IDEAS}+). ` +
+            `Run './console fixtures --perf' to create proper test data.`
+        );
+      } else {
+        console.log(`✓ User 'bob' has ${ideas.length} ideas (requirement: ${MIN_IDEAS}+)`);
+      }
+    }
+  }
+
+  console.log('Setup complete. Starting baseline capture...\n');
+  return { valid: true };
+}
 
 /**
  * Login and get JWT token
@@ -296,7 +377,6 @@ export function handleSummary(data) {
     const metric = data.metrics[metricName];
     if (metric && metric.values) {
       scenarios[name] = {
-        iterations: metric.values.count || 0,
         avg_ms: Math.round(metric.values.avg || 0),
         p95_ms: Math.round(metric.values['p(95)'] || 0),
         p99_ms: Math.round(metric.values['p(99)'] || 0),

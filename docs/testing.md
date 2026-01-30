@@ -1725,9 +1725,9 @@ Performance tests use [k6](https://k6.io/) to capture response time baselines an
 k6 runs via Docker using the `./k6` wrapper. No host installation required.
 
 ```bash
-# Ensure environment is running and fixtures loaded
+# Ensure environment is running and fixtures loaded with perf data
 docker compose up -d front
-./console fixtures
+./console fixtures --perf
 
 # Run baseline capture (saves to docs/performance-baseline.json)
 ./k6 run perf/baseline.js
