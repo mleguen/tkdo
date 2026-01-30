@@ -1,6 +1,6 @@
 # Story 0.1: Performance Baseline Capture
 
-Status: review
+Status: done
 
 ## Story
 
@@ -67,6 +67,12 @@ So that I can compare post-rewrite performance against a known reference.
 - [x] [AI-Review][MEDIUM] perf/README.md documents incorrect endpoints - Table shows REST-style endpoints that don't match actual API routes. Fix: List Ideas is `GET /api/idee` (not `/utilisateur/{id}/idees`), Edit Idea is `POST /api/idee` with id field (not `PUT`), Delete Idea is `POST /api/idee/{id}/suppression` (not `DELETE`), Admin List Users is `GET /api/utilisateur` (singular), Admin List Occasions is `GET /api/occasion` (singular). [perf/README.md:58-63] [PR#89 comments: [List Ideas](https://github.com/mleguen/tkdo/pull/89#discussion_r2745071337), [Edit Idea](https://github.com/mleguen/tkdo/pull/89#discussion_r2745071318), [Delete Idea](https://github.com/mleguen/tkdo/pull/89#discussion_r2745071324), [Admin Users](https://github.com/mleguen/tkdo/pull/89#discussion_r2745071344), [Admin Occasions](https://github.com/mleguen/tkdo/pull/89#discussion_r2745071267)]
 - [x] [AI-Review][LOW] Missing perf fixture documentation - Fixture files have perfMode logic but no PHPDoc explaining what perfMode does or what data it creates. Add inline docs. [api/src/Appli/Fixture/OccasionFixture.php:47-68, IdeeFixture.php, UtilisateurFixture.php]
 
+### Review Follow-ups (AI) - Round 2
+
+- [x] [AI-Review][MEDIUM] Stale Output Format Documentation in Story - The story's "Dev Notes → Output Format" section (lines 127-154) documents an outdated JSON structure that doesn't match actual implementation. Documented format shows `php_version`, `database`, per-scenario `iterations` field (removed in CRITICAL fix), but actual output has different `environment` structure, `min_ms`/`max_ms` fields not documented, and `summary` section not documented. Future developers and Story 9.8 will reference wrong format. [_bmad-output/implementation-artifacts/0-1-performance-baseline-capture.md:127-154]
+- [x] [AI-Review][MEDIUM] Inconsistent base_url Documentation - Three different URLs documented: Story shows `http://localhost:8080`, perf/README.md shows `http://localhost:8080/api`, actual baseline.json has `http://front/api`. The actual URL is correct for Docker internal networking but documentation is confusing. Users following README might set wrong BASE_URL and get connection errors. [perf/README.md:74, docs/performance-baseline.json:5, story:133]
+- [x] [AI-Review][MEDIUM] Missing perf/README.md Output Format Fields - README example JSON (lines 69-87) shows per-scenario `iterations: 200` field that doesn't exist in actual output (correctly removed after CRITICAL fix), and is missing `min_ms`/`max_ms` fields and entire `summary` section that ARE in actual output. Documentation mismatch causes confusion about handleSummary() output format. [perf/README.md:69-87]
+
 ## Dev Notes
 
 ### Brownfield Context
@@ -127,30 +133,37 @@ const params = {
 Create `docs/performance-baseline.json`:
 ```json
 {
-  "captured": "2026-01-XX",
+  "captured": "2026-01-25",
   "environment": {
     "type": "docker-dev",
-    "php_version": "8.4",
-    "database": "mysql",
-    "base_url": "http://localhost:8080"
+    "base_url": "http://front/api",
+    "iterations_per_scenario": 100
   },
   "scenarios": {
     "login": {
-      "iterations": 100,
-      "avg_ms": 0,
-      "p95_ms": 0,
-      "p99_ms": 0
+      "avg_ms": 366,
+      "p95_ms": 428,
+      "p99_ms": 611,
+      "min_ms": 304,
+      "max_ms": 693
     },
-    "view_occasion": { ... },
-    "list_ideas": { ... },
-    "add_idea": { ... },
-    "edit_idea": { ... },
-    "delete_idea": { ... },
-    "admin_list_users": { ... },
-    "admin_list_occasions": { ... }
+    "view_occasion": { "..." },
+    "list_ideas": { "..." },
+    "add_idea": { "..." },
+    "edit_idea": { "..." },
+    "delete_idea": { "..." },
+    "admin_list_users": { "..." },
+    "admin_list_occasions": { "..." }
+  },
+  "summary": {
+    "total_requests": 900,
+    "total_errors": 0,
+    "duration_seconds": 227
   }
 }
 ```
+
+**Note:** `base_url` shows `http://front/api` because k6 runs inside Docker and connects to the front container directly. When running k6 from host, use `BASE_URL=http://localhost:8080/api`.
 
 ### Project Structure Notes
 
@@ -256,6 +269,22 @@ Claude Opus 4.5 (claude-opus-4-5-20251101)
 - Resolved 6 PR comment threads in PR #89
 - Posted "Fixed" replies to all comments with PR links
 - Fix commit: 9004be0
+
+**2026-01-30 - Adversarial Code Review Round 2 (Session 8):**
+- Comprehensive code review conducted against story claims and implementation
+- All major work validated: 8 scenarios implemented, baseline captured, all ACs satisfied
+- All 11 previous Review Follow-ups verified as properly resolved
+- PHPStan level 8 passes with no errors
+- Git repository clean (all changes committed)
+- Found 3 MEDIUM documentation inconsistency issues (no code issues)
+- Created 3 new action items in "Review Follow-ups (AI) - Round 2"
+- Story status remains "review" (new action items to address)
+
+**2026-01-30 - Round 2 Review Follow-ups Resolved (Session 9):**
+- ✅ Fixed story "Output Format" section to match actual JSON structure (added min_ms/max_ms, summary section, removed stale fields)
+- ✅ Added note explaining Docker internal URL (http://front/api) vs host URL (http://localhost:8080/api)
+- ✅ Fixed perf/README.md output example to match actual format (removed per-scenario iterations, added min_ms/max_ms, added summary section)
+- All 3 documentation inconsistencies resolved
 
 ### File List
 

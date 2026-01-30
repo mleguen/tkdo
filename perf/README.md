@@ -71,20 +71,28 @@ Results are saved to `docs/performance-baseline.json`:
   "captured": "2026-01-25",
   "environment": {
     "type": "docker-dev",
-    "base_url": "http://localhost:8080/api",
+    "base_url": "http://front/api",
     "iterations_per_scenario": 100
   },
   "scenarios": {
     "login": {
-      "iterations": 200,
-      "avg_ms": 45,
-      "p95_ms": 78,
-      "p99_ms": 120
+      "avg_ms": 366,
+      "p95_ms": 428,
+      "p99_ms": 611,
+      "min_ms": 304,
+      "max_ms": 693
     },
     ...
+  },
+  "summary": {
+    "total_requests": 900,
+    "total_errors": 0,
+    "duration_seconds": 227
   }
 }
 ```
+
+**Note:** `base_url` shows `http://front/api` because k6 runs inside Docker and connects to the front container directly. When running k6 from host, override with `BASE_URL=http://localhost:8080/api`.
 
 ## Usage in CI/Regression Testing
 
