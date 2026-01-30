@@ -1,0 +1,330 @@
+# Story 1.0: Test Infrastructure Setup
+
+Status: review
+
+## Story
+
+As a **developer**,
+I want test infrastructure configured for v2 development,
+So that all subsequent stories have consistent fixtures, coverage gates, and performance regression detection.
+
+## Acceptance Criteria
+
+1. **Given** the CI pipeline runs
+   **When** backend test coverage drops below 80%
+   **Then** the build fails with clear message indicating coverage gap
+
+2. **Given** v2 development begins
+   **When** I need to create test data for groups and visibility
+   **Then** PHPUnit builders exist: `$this->creeGroupeEnBase()`, `$this->creeListeEnBase()`
+   **And** Cypress fixtures exist: `groupes.json`, `listes.json`
+   **And** Backend fixtures exist: `GroupeFixture.php`, `ListeFixture.php`
+
+3. **Given** Story 0.1 baseline exists
+   **When** CI runs on v2 code
+   **Then** k6 performance tests execute against key endpoints
+   **And** results are compared to baseline
+   **And** regressions >20% are flagged (not blocking initially)
+
+4. **Given** a developer writes a new integration test
+   **When** they need group-scoped test data
+   **Then** builders support: group creation, user-group membership, idea visibility assignment
+
+## Tasks / Subtasks
+
+- [x] Task 1: Add coverage enforcement to CI (AC: #1)
+  - [x] 1.1 Configure PHPUnit to generate coverage reports (Xdebug or PCOV)
+  - [x] 1.2 Add coverage threshold check to `.github/workflows/test.yml`
+  - [x] 1.3 Set 80% minimum line coverage, fail build if below
+  - [x] 1.4 Document coverage reporting in `docs/testing.md`
+
+- [x] Task 2: Create PHPUnit builders for v2 entities (AC: #2, #4)
+  - [x] 2.1 Create `api/test/Builder/GroupeBuilder.php` following IdeeBuilder pattern
+  - [x] 2.2 Create `api/test/Builder/ListeBuilder.php` following IdeeBuilder pattern
+  - [x] 2.3 Add visibility assignment builder methods
+  - [x] 2.4 Update docs/testing.md with builder usage examples
+
+- [x] Task 3: Create backend fixtures for v2 entities (AC: #2)
+  - [x] 3.1 Create `api/src/Appli/Fixture/GroupeFixture.php` following existing fixture patterns
+  - [x] 3.2 Create `api/src/Appli/Fixture/ListeFixture.php` following existing fixture patterns
+  - [x] 3.3 Update fixture loading order in `FixturesCommand`
+  - [x] 3.4 Test fixtures with `./console -- fixtures`
+
+- [x] Task 4: Create Cypress fixtures for v2 entities (AC: #2)
+  - [x] 4.1 Create `front/cypress/fixtures/groupes.json` with test group data
+  - [x] 4.2 Create `front/cypress/fixtures/listes.json` with test list data
+  - [x] 4.3 Document Cypress fixture usage in docs/testing.md
+
+- [x] Task 5: Add k6 performance tests to CI (AC: #3)
+  - [x] 5.1 Add k6 job to `.github/workflows/perf.yml` (new workflow file)
+  - [x] 5.2 Load baseline from `docs/performance-baseline.json` for comparison
+  - [x] 5.3 Implement threshold comparison script (flag >20% regressions)
+  - [x] 5.4 Configure as non-blocking (warn only, don't fail build)
+  - [x] 5.5 Document performance CI in docs/testing.md
+
+- [x] Task 6: Update documentation (AC: all)
+  - [x] 6.1 Update docs/testing.md with new fixtures and builders
+  - [x] 6.2 Document coverage requirements and how to run locally
+  - [x] 6.3 Document performance regression detection
+
+## Dev Notes
+
+### Brownfield Context
+
+- **Existing test infrastructure is solid**: PHPUnit 11.5, Cypress 15.8, transaction rollback in IntTestCase
+- **Existing builders exist**: `api/test/Builder/` contains IdeeBuilder, UtilisateurBuilder, OccasionBuilder, ResultatBuilder
+- **Existing fixtures exist**: `api/src/Appli/Fixture/` with perfMode support added in Story 0.1
+- **Existing Cypress fixtures**: `front/cypress/fixtures/utilisateurs.json`, `idees.json`
+- **k6 infrastructure ready**: Docker wrapper `./k6`, baseline script in `perf/baseline.js`, baseline in `docs/performance-baseline.json`
+- **Gap: No coverage enforcement** in CI
+- **Gap: No v2 entity builders/fixtures** (Groupe, Liste not yet created - but entities don't exist yet either)
+
+### Important: v2 Entities Don't Exist Yet
+
+The v2 domain entities (`Groupe`, `Liste`) are defined in the architecture but **not yet implemented**. This story creates the **test infrastructure scaffolding** that will support these entities. The actual entity implementations come in Stories 1.1+ and 2.1.
+
+**Approach:**
+- Create builder/fixture files with placeholder structure
+- Use architecture.md entity naming: `Groupe` (table: `groupe`), `Liste` (table: `liste`)
+- Builders will need updating when actual entities are implemented
+- Or mark AC #2, #4 builders as "scaffold only" - full implementation when entities exist
+
+### Technical Requirements
+
+#### Coverage Enforcement
+
+**PHPUnit Coverage Options:**
+1. **Xdebug** - Full-featured but slower
+2. **PCOV** - Faster, coverage-only (recommended for CI)
+
+```yaml
+# .github/workflows/test.yml addition
+- name: Set up PHP
+  uses: shivammathur/setup-php@v2
+  with:
+    php-version: "8.4"
+    extensions: pdo_mysql, json, mbstring
+    coverage: pcov  # Add PCOV for coverage
+
+- name: Run unit tests with coverage
+  run: composer test -- --testsuite=Unit --coverage-clover coverage.xml
+
+- name: Check coverage threshold
+  run: |
+    COVERAGE=$(grep -oP 'line-rate="\K[^"]+' coverage.xml | head -1)
+    PERCENTAGE=$(echo "$COVERAGE * 100" | bc)
+    if (( $(echo "$PERCENTAGE < 80" | bc -l) )); then
+      echo "Coverage $PERCENTAGE% is below 80% threshold"
+      exit 1
+    fi
+```
+
+#### Builder Pattern (Follow Existing)
+
+Existing `IdeeBuilder.php` pattern:
+```php
+class GroupeBuilder
+{
+    private static int $counter = 0;
+    private string $nom;
+    // ... other fields
+
+    public static function unGroupe(): self { return new self(); }
+    public function withNom(string $nom): self { ... }
+    public function build(): GroupeAdaptor { ... }
+    public function persist(EntityManager $em): GroupeAdaptor { ... }
+}
+```
+
+#### Fixture Pattern (Follow Existing)
+
+Existing fixture pattern with perfMode:
+```php
+class GroupeFixture extends AppAbstractFixture
+{
+    #[\Override]
+    public function load(ObjectManager $manager): void
+    {
+        // Create groups
+        // Use $this->perfMode for additional data
+    }
+}
+```
+
+#### k6 CI Integration
+
+**Approach 1: New workflow file**
+```yaml
+# .github/workflows/perf.yml
+name: Performance Tests
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  performance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: grafana/k6-action@v0.3.0
+        with:
+          filename: perf/baseline.js
+```
+
+**Approach 2: Add to test.yml**
+- Run after integration tests
+- Use docker compose to spin up full environment
+- More complex but single workflow
+
+**Baseline Comparison Logic:**
+```javascript
+// Compare to docs/performance-baseline.json
+const baseline = JSON.parse(open('./docs/performance-baseline.json'));
+const current = results;
+
+for (const [scenario, metrics] of Object.entries(current.scenarios)) {
+  const baselineMetrics = baseline.scenarios[scenario];
+  const regression = (metrics.p95_ms - baselineMetrics.p95_ms) / baselineMetrics.p95_ms;
+  if (regression > 0.20) {
+    console.warn(`REGRESSION: ${scenario} p95 increased by ${(regression * 100).toFixed(1)}%`);
+  }
+}
+```
+
+### Previous Story Intelligence (Story 0.1)
+
+**Key Learnings:**
+- k6 Docker wrapper works well (`./k6`)
+- k6 runs inside Docker network, base URL is `http://front/api` (not localhost)
+- Use `--perf` fixtures flag for realistic test data (11 participants, 24 ideas)
+- PHPStan level 8 is strict - all methods need explicit return types
+- Fixtures need `#[\Override]` attribute on `load()` method
+
+**Files Created/Modified:**
+- `./k6` - Docker wrapper (works)
+- `perf/baseline.js` - Test script with setup() validation (works)
+- `docs/performance-baseline.json` - Baseline results (exists)
+- `docs/testing.md` - Has performance testing section
+
+**Review Lessons:**
+- Always validate test data conditions before running
+- Document all prerequisites clearly (e.g., `--perf` flag)
+- Keep output format documentation in sync with actual implementation
+
+### Architecture Compliance
+
+**From architecture.md:**
+- New entity naming: `Groupe` (table: `groupe`), `Liste` (table: `liste`)
+- French naming convention for domain models
+- Hexagonal architecture: fixtures in `Appli/Fixture/`, builders in `test/Builder/`
+- Test organization: unit tests in `api/test/Unit/`, integration in `api/test/Int/`
+
+**From project-context.md:**
+- PHP strict types mandatory: `declare(strict_types=1);`
+- All methods need explicit return types
+- Use `#[\Override]` on overridden methods
+- Docker wrapper scripts for all CLI tools
+- Follow existing builder/fixture patterns exactly
+
+### CI Workflow Considerations
+
+**Current CI structure (test.yml):**
+- `frontend-unit-tests` → `frontend-component-tests` → `frontend-integration-tests`
+- `backend-unit-tests` → `backend-integration-tests`
+- All skip draft PRs
+- Uses caching for npm, composer, cypress, firefox
+
+**Modifications needed:**
+- Add `coverage: pcov` to backend PHP setup
+- Add coverage check step after unit tests
+- Add new k6 job (can run in parallel with other tests)
+- k6 job needs full environment (like e2e.yml does)
+
+### BACKLOG Alignment
+
+This story fulfills:
+- **BACKLOG.md Task 21** (Test data builders)
+- **BACKLOG.md Task 23** (Coverage enforcement)
+
+### Project Structure Notes
+
+**Files to create:**
+- `api/test/Builder/GroupeBuilder.php` - PHPUnit builder
+- `api/test/Builder/ListeBuilder.php` - PHPUnit builder
+- `api/src/Appli/Fixture/GroupeFixture.php` - Backend fixture
+- `api/src/Appli/Fixture/ListeFixture.php` - Backend fixture
+- `front/cypress/fixtures/groupes.json` - Cypress fixture
+- `front/cypress/fixtures/listes.json` - Cypress fixture
+
+**Files to modify:**
+- `.github/workflows/test.yml` - Add coverage + k6 integration
+- `docs/testing.md` - Document new fixtures/builders/coverage
+- `api/phpunit.xml` - Configure coverage output
+
+### Dependency Note
+
+**This story depends on Story 0.1** (Performance Baseline) being complete.
+- Story 0.1 status: **done**
+- Baseline exists at `docs/performance-baseline.json`
+
+**Blocking note:** The v2 entity builders (Groupe, Liste) create scaffolding only. The actual domain entities (`GroupeAdaptor`, `ListeAdaptor`) don't exist yet - they're created in Stories 2.1 and later. Consider:
+1. Creating builder scaffolds that will be completed later, OR
+2. Deferring builder creation until entity stories, OR
+3. Creating minimal placeholder entities for test purposes only
+
+Recommend option 1: Create builder scaffolds with TODO markers for entity-dependent code.
+
+### References
+
+- [Source: _bmad-output/planning-artifacts/epics.md#Story-1.0]
+- [Source: _bmad-output/planning-artifacts/architecture.md#Testing-Framework]
+- [Source: _bmad-output/project-context.md#Testing-Rules]
+- [Source: docs/testing.md]
+- [Source: api/test/Builder/IdeeBuilder.php] - Builder pattern reference
+- [Source: api/src/Appli/Fixture/AppAbstractFixture.php] - Fixture pattern reference
+- [Source: .github/workflows/test.yml] - Current CI configuration
+
+## Dev Agent Record
+
+### Agent Model Used
+
+Claude Opus 4.5 (claude-opus-4-5-20251101)
+
+### Debug Log References
+
+None required - implementation proceeded smoothly.
+
+### Completion Notes List
+
+1. **Coverage Enforcement (AC #1)**: Configured CI to enforce 80% code coverage on backend unit tests using PCOV. Coverage runs via `shivammathur/setup-php` action which installs PCOV dynamically. Added exclusions for fixtures and migrations. Threshold check uses clover XML format to extract statement coverage.
+
+2. **v2 Builders (AC #2, #4)**: Created scaffold builders for `Groupe` and `Liste` entities. These throw `RuntimeException` on `build()`/`persist()` since the actual entities don't exist yet (Story 2.1+). Builders include `getValues()` method for testing the builder API without entities.
+
+3. **v2 Fixtures (AC #2)**: Created scaffold fixtures that output informational messages. When entities are implemented, the commented code patterns are ready for activation. Integrated into FixturesCommand with proper loading order (users → groups → lists → other entities).
+
+4. **Cypress Fixtures (AC #2)**: Created `groupes.json` and `listes.json` with test data aligned with planned backend fixtures. Ready for use when v2 features are implemented.
+
+5. **k6 CI Integration (AC #3)**: Created new `.github/workflows/perf.yml` workflow that runs k6 performance tests with 25 iterations. Uses non-blocking mode (`continue-on-error: true`) so performance regressions warn but don't fail builds. Compares against baseline stored in `docs/performance-baseline.json`.
+
+6. **Documentation (All ACs)**: Updated `docs/testing.md` with coverage enforcement section, v2 builder documentation, Cypress fixture table, and k6 CI integration details.
+
+### Change Log
+
+- 2026-01-30: Implemented all test infrastructure for v2 development (coverage enforcement, v2 builders/fixtures, k6 CI integration)
+
+### File List
+
+**Created:**
+- `api/test/Builder/GroupeBuilder.php` - v2 builder scaffold
+- `api/test/Builder/ListeBuilder.php` - v2 builder scaffold
+- `api/src/Appli/Fixture/GroupeFixture.php` - v2 fixture scaffold
+- `api/src/Appli/Fixture/ListeFixture.php` - v2 fixture scaffold
+- `front/cypress/fixtures/groupes.json` - Cypress test data
+- `front/cypress/fixtures/listes.json` - Cypress test data
+- `.github/workflows/perf.yml` - k6 CI workflow
+
+**Modified:**
+- `.github/workflows/test.yml` - Added PCOV coverage + threshold check
+- `api/phpunit.xml` - Added coverage exclusions
+- `api/src/Appli/Command/FixturesCommand.php` - Added v2 fixtures to loader
+- `docs/testing.md` - Added coverage, builder, and CI documentation

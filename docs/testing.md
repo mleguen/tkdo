@@ -376,12 +376,36 @@ export function etantDonneQue(...preconditions: (() => void)[]) {
 ```
 
 **Fixtures** (`cypress/fixtures/`):
+
+| File | Purpose |
+|------|---------|
+| `utilisateurs.json` | Test user credentials |
+| `idees.json` | Test gift ideas |
+| `groupes.json` | Test groups (v2) |
+| `listes.json` | Test visibility assignments (v2) |
+
 ```json
+// utilisateurs.json
 {
   "soi": {
     "identifiant": "alice",
     "mdp": "mdpalice",
     "nom": "Alice"
+  }
+}
+
+// groupes.json (v2 - for future use)
+{
+  "famille": {
+    "nom": "Famille",
+    "membres": ["alice", "bob", "charlie"]
+  }
+}
+
+// listes.json (v2 - for future use)
+{
+  "alice": {
+    "visiblePar": ["famille"]
   }
 }
 ```
@@ -1112,6 +1136,51 @@ $emails = $this->depileDerniersEmailsRecus();
 $this->assertMessageRecipientsContains('user@example.com', $emails[0]);
 ```
 
+#### Test Data Builders
+
+The `api/test/Builder/` directory contains fluent builders for creating test entities:
+
+**Available Builders:**
+- `UtilisateurBuilder` - Create test users
+- `IdeeBuilder` - Create test gift ideas
+- `OccasionBuilder` - Create test occasions
+- `ResultatBuilder` - Create draw results
+- `GroupeBuilder` - Create groups (v2, scaffold)
+- `ListeBuilder` - Create visibility assignments (v2, scaffold)
+
+**Builder Pattern:**
+```php
+// Create in-memory entity
+$user = UtilisateurBuilder::aUser()
+    ->withIdentifiant('testuser')
+    ->withAdmin(true)
+    ->build();
+
+// Create and persist to database
+$idea = IdeeBuilder::anIdee()
+    ->forUtilisateur($recipient)
+    ->byAuteur($author)
+    ->withDescription('A test gift idea')
+    ->persist($em);
+```
+
+**v2 Builders (Scaffold):**
+
+The `GroupeBuilder` and `ListeBuilder` are placeholders for v2 entity support. They will throw `RuntimeException` if `build()` or `persist()` is called until the entities are implemented:
+
+```php
+// Available now (for testing builder API):
+$groupe = GroupeBuilder::unGroupe()
+    ->withNom('Famille')
+    ->withMembres([$user1, $user2])
+    ->getValues(); // Returns array of configured values
+
+// After entity implementation (Story 2.1+):
+$groupe = GroupeBuilder::unGroupe()
+    ->withNom('Famille')
+    ->persist($em); // Will work when GroupeAdaptor exists
+```
+
 #### Key Patterns
 
 **Testing with curl Parameter:**
@@ -1623,6 +1692,29 @@ open http://localhost:8025
 - ⚠️  Validation edge cases
 - ⚠️  Concurrent access
 
+### Coverage Enforcement
+
+**CI enforces 80% code coverage** for backend unit tests. This ensures code quality is maintained as the codebase grows.
+
+**How it works:**
+1. CI runs unit tests with PCOV coverage driver
+2. Coverage report is generated in Clover XML format
+3. A threshold check script verifies coverage >= 80%
+4. Build fails if coverage drops below threshold
+
+**Local coverage check:**
+```bash
+# Note: Docker container doesn't have PCOV installed by default
+# Coverage runs in CI via shivammathur/setup-php action
+
+# To check coverage locally with Xdebug:
+./composer test -- --testsuite=Unit --coverage-text
+```
+
+**What's excluded from coverage:**
+- Fixtures (`src/Appli/Fixture/`) - test data, not production code
+- Migrations (`src/Infra/Migrations/`) - generated code
+
 ### Measuring Coverage
 
 **Frontend:**
@@ -1636,7 +1728,7 @@ open front/coverage/index.html
 
 **Backend:**
 ```bash
-# Run tests with coverage (requires xdebug)
+# Run tests with coverage (requires Xdebug in Docker)
 ./composer test -- --coverage-html coverage
 
 # View report
@@ -1754,6 +1846,22 @@ The baseline script tests key API operations:
 ### Output
 
 Results are saved to `docs/performance-baseline.json` with avg, p95, and p99 response times for each scenario.
+
+### CI Integration
+
+Performance tests run automatically in CI via `.github/workflows/perf.yml`:
+
+- **Trigger**: On PRs and pushes to master
+- **Mode**: Non-blocking (warns but doesn't fail builds)
+- **Threshold**: 20% regression flagged as warning
+- **Data**: Uses `--perf` fixtures for realistic test data
+
+The workflow:
+1. Sets up full backend environment with MySQL
+2. Loads fixtures with `--perf` flag
+3. Runs k6 with 25 iterations
+4. Compares results against baseline
+5. Flags regressions >20% (informational only)
 
 See `perf/README.md` for detailed documentation.
 

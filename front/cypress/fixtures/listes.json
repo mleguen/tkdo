@@ -1,0 +1,17 @@
+{
+  "alice": {
+    "visiblePar": ["famille"]
+  },
+  "bob": {
+    "visiblePar": ["famille", "amis"]
+  },
+  "charlie": {
+    "visiblePar": ["famille"]
+  },
+  "david": {
+    "visiblePar": ["amis"]
+  },
+  "eve": {
+    "visiblePar": ["amis"]
+  }
+}

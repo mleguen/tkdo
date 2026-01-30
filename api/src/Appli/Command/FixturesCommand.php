@@ -3,7 +3,9 @@
 namespace App\Appli\Command;
 
 use App\Appli\Fixture\ExclusionFixture;
+use App\Appli\Fixture\GroupeFixture;
 use App\Appli\Fixture\IdeeFixture;
+use App\Appli\Fixture\ListeFixture;
 use App\Appli\Fixture\OccasionFixture;
 use App\Appli\Fixture\ResultatFixture;
 use App\Appli\Fixture\UtilisateurFixture;
@@ -25,7 +27,9 @@ class FixturesCommand extends Command
         Bootstrap $bootstrap,
         private readonly EntityManager $em,
         private readonly ExclusionFixture $exclusionFixture,
+        private readonly GroupeFixture $groupeFixture,
         private readonly IdeeFixture $ideeFixture,
+        private readonly ListeFixture $listeFixture,
         private readonly OccasionFixture $occasionFixture,
         private readonly ResultatFixture $resultatFixture,
         private readonly UtilisateurFixture $utilisateurFixture
@@ -61,7 +65,10 @@ class FixturesCommand extends Command
         $perfMode = $input->getOption('perf') === true;
 
         $loader = new Loader();
+        // Loading order: users first, then groups (v2), then visibility (v2), then v1 entities
         $loader->addFixture($this->utilisateurFixture->setAdminEmail($adminEmail)->setPerfMode($perfMode)->setOutput($output));
+        $loader->addFixture($this->groupeFixture->setPerfMode($perfMode)->setOutput($output));
+        $loader->addFixture($this->listeFixture->setPerfMode($perfMode)->setOutput($output));
         $loader->addFixture($this->exclusionFixture->setPerfMode($perfMode)->setOutput($output));
         $loader->addFixture($this->occasionFixture->setPerfMode($perfMode)->setOutput($output));
         $loader->addFixture($this->ideeFixture->setPerfMode($perfMode)->setOutput($output));

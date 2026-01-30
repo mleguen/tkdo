@@ -44,8 +44,8 @@ development_status:
   0-1-performance-baseline-capture: done
 
   # Epic 1: Secure Authentication Foundation
-  epic-1: backlog
-  1-0-test-infrastructure-setup: backlog
+  epic-1: in-progress
+  1-0-test-infrastructure-setup: review
   1-1-jwt-token-exchange-system: backlog
   1-2-user-login: backlog
   1-3-user-logout: backlog

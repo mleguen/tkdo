@@ -1,0 +1,12 @@
+{
+  "famille": {
+    "nom": "Famille",
+    "description": "Groupe familial pour les fêtes",
+    "membres": ["alice", "bob", "charlie"]
+  },
+  "amis": {
+    "nom": "Amis",
+    "description": "Groupe d'amis proches",
+    "membres": ["bob", "david", "eve"]
+  }
+}

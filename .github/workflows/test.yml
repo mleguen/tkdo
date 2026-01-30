@@ -287,7 +287,7 @@ jobs:
         with:
           php-version: "8.4"
           extensions: pdo_mysql, json, mbstring
-          coverage: none
+          coverage: pcov
 
       - name: Get Composer cache directory
         id: composer-cache
@@ -310,9 +310,34 @@ jobs:
         run: composer phpstan
         working-directory: ./api
 
-      - name: Run unit tests
-        run: composer test -- --testsuite=Unit
+      - name: Run unit tests with coverage
+        run: composer test -- --testsuite=Unit --coverage-clover coverage.xml
         working-directory: ./api
+
+      - name: Check coverage threshold (80%)
+        working-directory: ./api
+        run: |
+          # Extract line coverage rate from clover report
+          COVERAGE=$(grep -oP 'metrics.*?statements="\K[^"]+' coverage.xml | head -1)
+          COVERED=$(grep -oP 'metrics.*?coveredstatements="\K[^"]+' coverage.xml | head -1)
+
+          if [ -z "$COVERAGE" ] || [ -z "$COVERED" ]; then
+            echo "❌ Could not extract coverage metrics from coverage.xml"
+            exit 1
+          fi
+
+          # Calculate percentage
+          PERCENTAGE=$(echo "scale=2; $COVERED * 100 / $COVERAGE" | bc)
+
+          echo "📊 Coverage: $COVERED / $COVERAGE statements ($PERCENTAGE%)"
+
+          # Compare with threshold (80%)
+          if (( $(echo "$PERCENTAGE < 80" | bc -l) )); then
+            echo "❌ Coverage $PERCENTAGE% is below 80% threshold"
+            exit 1
+          fi
+
+          echo "✅ Coverage $PERCENTAGE% meets 80% threshold"
 
   backend-integration-tests:
     name: Backend - Integration Tests
