@@ -1847,21 +1847,14 @@ The baseline script tests key API operations:
 
 Results are saved to `docs/performance-baseline.json` with avg, p95, and p99 response times for each scenario.
 
-### CI Integration
+### Important: Environment-Specific Baselines
 
-Performance tests run automatically in CI via `.github/workflows/perf.yml`:
+The baseline in `docs/performance-baseline.json` was captured on a specific development environment. Performance numbers are **environment-specific** - different hardware, Docker configurations, or CI runners will produce different results.
 
-- **Trigger**: On PRs and pushes to master
-- **Mode**: Non-blocking (warns but doesn't fail builds)
-- **Threshold**: 20% regression flagged as warning
-- **Data**: Uses `--perf` fixtures for realistic test data
-
-The workflow:
-1. Sets up full backend environment with MySQL
-2. Loads fixtures with `--perf` flag
-3. Runs k6 with 25 iterations
-4. Compares results against baseline
-5. Flags regressions >20% (informational only)
+**If you're on a different machine:**
+1. Run `./k6 run perf/baseline.js` to capture your own baseline
+2. Use that as your reference for detecting regressions
+3. Don't compare against baselines from other environments
 
 See `perf/README.md` for detailed documentation.
 

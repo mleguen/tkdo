@@ -6,7 +6,7 @@ Status: review
 
 As a **developer**,
 I want test infrastructure configured for v2 development,
-So that all subsequent stories have consistent fixtures, coverage gates, and performance regression detection.
+So that all subsequent stories have consistent fixtures and coverage gates.
 
 ## Acceptance Criteria
 
@@ -20,13 +20,7 @@ So that all subsequent stories have consistent fixtures, coverage gates, and per
    **And** Cypress fixtures exist: `groupes.json`, `listes.json`
    **And** Backend fixtures exist: `GroupeFixture.php`, `ListeFixture.php`
 
-3. **Given** Story 0.1 baseline exists
-   **When** CI runs on v2 code
-   **Then** k6 performance tests execute against key endpoints
-   **And** results are compared to baseline
-   **And** regressions >20% are flagged (not blocking initially)
-
-4. **Given** a developer writes a new integration test
+3. **Given** a developer writes a new integration test
    **When** they need group-scoped test data
    **Then** builders support: group creation, user-group membership, idea visibility assignment
 
@@ -38,7 +32,7 @@ So that all subsequent stories have consistent fixtures, coverage gates, and per
   - [x] 1.3 Set 80% minimum line coverage, fail build if below
   - [x] 1.4 Document coverage reporting in `docs/testing.md`
 
-- [x] Task 2: Create PHPUnit builders for v2 entities (AC: #2, #4)
+- [x] Task 2: Create PHPUnit builders for v2 entities (AC: #2, #3)
   - [x] 2.1 Create `api/test/Builder/GroupeBuilder.php` following IdeeBuilder pattern
   - [x] 2.2 Create `api/test/Builder/ListeBuilder.php` following IdeeBuilder pattern
   - [x] 2.3 Add visibility assignment builder methods
@@ -55,17 +49,9 @@ So that all subsequent stories have consistent fixtures, coverage gates, and per
   - [x] 4.2 Create `front/cypress/fixtures/listes.json` with test list data
   - [x] 4.3 Document Cypress fixture usage in docs/testing.md
 
-- [x] Task 5: Add k6 performance tests to CI (AC: #3)
-  - [x] 5.1 Add k6 job to `.github/workflows/perf.yml` (new workflow file)
-  - [x] 5.2 Load baseline from `docs/performance-baseline.json` for comparison
-  - [x] 5.3 Implement threshold comparison script (flag >20% regressions)
-  - [x] 5.4 Configure as non-blocking (warn only, don't fail build)
-  - [x] 5.5 Document performance CI in docs/testing.md
-
-- [x] Task 6: Update documentation (AC: all)
-  - [x] 6.1 Update docs/testing.md with new fixtures and builders
-  - [x] 6.2 Document coverage requirements and how to run locally
-  - [x] 6.3 Document performance regression detection
+- [x] Task 5: Update documentation (AC: #1, #2, #3)
+  - [x] 5.1 Update docs/testing.md with new fixtures and builders
+  - [x] 5.2 Document coverage requirements and how to run locally
 
 ## Dev Notes
 
@@ -296,21 +282,22 @@ None required - implementation proceeded smoothly.
 
 ### Completion Notes List
 
-1. **Coverage Enforcement (AC #1)**: Configured CI to enforce 80% code coverage on backend unit tests using PCOV. Coverage runs via `shivammathur/setup-php` action which installs PCOV dynamically. Added exclusions for fixtures and migrations. Threshold check uses clover XML format to extract statement coverage.
+1. **Coverage Enforcement (AC #1)**: Configured CI to enforce 80% code coverage on backend unit tests using PCOV. Coverage runs via `shivammathur/setup-php` action which installs PCOV dynamically. Added exclusions for fixtures and migrations. Threshold check uses coverage text output for reliable parsing.
 
-2. **v2 Builders (AC #2, #4)**: Created scaffold builders for `Groupe` and `Liste` entities. These throw `RuntimeException` on `build()`/`persist()` since the actual entities don't exist yet (Story 2.1+). Builders include `getValues()` method for testing the builder API without entities.
+2. **v2 Builders (AC #2, #3)**: Created scaffold builders for `Groupe` and `Liste` entities. These throw `RuntimeException` on `build()`/`persist()` since the actual entities don't exist yet (Story 2.1+). Builders include `getValues()` method for testing the builder API without entities.
 
 3. **v2 Fixtures (AC #2)**: Created scaffold fixtures that output informational messages. When entities are implemented, the commented code patterns are ready for activation. Integrated into FixturesCommand with proper loading order (users → groups → lists → other entities).
 
 4. **Cypress Fixtures (AC #2)**: Created `groupes.json` and `listes.json` with test data aligned with planned backend fixtures. Ready for use when v2 features are implemented.
 
-5. **k6 CI Integration (AC #3)**: Created new `.github/workflows/perf.yml` workflow that runs k6 performance tests with 25 iterations. Uses non-blocking mode (`continue-on-error: true`) so performance regressions warn but don't fail builds. Compares against baseline stored in `docs/performance-baseline.json`.
+5. **Documentation (AC #1, #2, #3)**: Updated `docs/testing.md` with coverage enforcement section, v2 builder documentation, and Cypress fixture table.
 
-6. **Documentation (All ACs)**: Updated `docs/testing.md` with coverage enforcement section, v2 builder documentation, Cypress fixture table, and k6 CI integration details.
+**Note:** k6 CI integration was initially implemented but removed after team discussion. Performance baselines captured locally don't provide meaningful comparison in CI due to environment differences. k6 remains available as a local developer tool (Story 0.1 infrastructure).
 
 ### Change Log
 
-- 2026-01-30: Implemented all test infrastructure for v2 development (coverage enforcement, v2 builders/fixtures, k6 CI integration)
+- 2026-01-30: Implemented test infrastructure for v2 development (coverage enforcement, v2 builders/fixtures)
+- 2026-01-30: Removed k6 CI integration - kept as local-only tool per team decision
 
 ### File List
 
@@ -321,10 +308,9 @@ None required - implementation proceeded smoothly.
 - `api/src/Appli/Fixture/ListeFixture.php` - v2 fixture scaffold
 - `front/cypress/fixtures/groupes.json` - Cypress test data
 - `front/cypress/fixtures/listes.json` - Cypress test data
-- `.github/workflows/perf.yml` - k6 CI workflow
 
 **Modified:**
 - `.github/workflows/test.yml` - Added PCOV coverage + threshold check
 - `api/phpunit.xml` - Added coverage exclusions
 - `api/src/Appli/Command/FixturesCommand.php` - Added v2 fixtures to loader
-- `docs/testing.md` - Added coverage, builder, and CI documentation
+- `docs/testing.md` - Added coverage, builder, and fixture documentation
