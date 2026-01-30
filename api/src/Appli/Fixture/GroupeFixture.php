@@ -56,24 +56,23 @@ class GroupeFixture extends AppAbstractFixture
             //
             // $em->flush();
 
-            $this->output->writeln(['Groupes: SCAFFOLD - en attente de l\'entité GroupeAdaptor (Story 2.1).']);
-        }
+            // Perf mode: create additional groups
+            if ($this->perfMode) {
+                // TODO: Implement when GroupeAdaptor entity is created
+                //
+                // Planned perf groups:
+                // for ($i = 1; $i <= 3; $i++) {
+                //     $groupe = new GroupeAdaptor()
+                //         ->setNom("Groupe Perf {$i}")
+                //         ->setDescription("Groupe de test de performance {$i}");
+                //     $em->persist($groupe);
+                //     $this->addReference("groupe-perf-{$i}", $groupe);
+                // }
+                // $em->flush();
 
-        // Perf mode: create additional groups
-        if ($this->devMode && $this->perfMode) {
-            // TODO: Implement when GroupeAdaptor entity is created
-            //
-            // Planned perf groups:
-            // for ($i = 1; $i <= 3; $i++) {
-            //     $groupe = new GroupeAdaptor()
-            //         ->setNom("Groupe Perf {$i}")
-            //         ->setDescription("Groupe de test de performance {$i}");
-            //     $em->persist($groupe);
-            //     $this->addReference("groupe-perf-{$i}", $groupe);
-            // }
-            // $em->flush();
-
-            $this->output->writeln(['  + Groupes perf: SCAFFOLD - en attente de l\'entité GroupeAdaptor.']);
+                $this->output->writeln(['  + Groupes perf: SCAFFOLD - en attente de l\'entité GroupeAdaptor.']);
+            }
         }
+        $this->output->writeln(['Groupes: SCAFFOLD - en attente de l\'entité GroupeAdaptor (Story 2.1).']);
     }
 }

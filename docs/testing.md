@@ -1166,20 +1166,33 @@ $idea = IdeeBuilder::anIdee()
 
 **v2 Builders (Scaffold):**
 
-The `GroupeBuilder` and `ListeBuilder` are placeholders for v2 entity support. They will throw `RuntimeException` if `build()` or `persist()` is called until the entities are implemented:
+The `GroupeBuilder` and `ListeBuilder` are **scaffold implementations** - the builder pattern API is complete and tested, but `build()` and `persist()` throw `RuntimeException` because the underlying entities (`GroupeAdaptor`, `ListeAdaptor`) don't exist yet. They will be implemented in Story 2.1+.
 
+**Why scaffolds?** This approach allows test infrastructure to be ready before entity implementation, enabling parallel development and ensuring consistent patterns when entities are added.
+
+**Current usage** (builder API is fully functional):
 ```php
-// Available now (for testing builder API):
+// Configure the builder and verify values (useful for testing builder logic):
 $groupe = GroupeBuilder::unGroupe()
     ->withNom('Famille')
+    ->withDescription('Groupe familial')
     ->withMembres([$user1, $user2])
-    ->getValues(); // Returns array of configured values
+    ->getValues(); // Returns ['nom' => 'Famille', 'description' => 'Groupe familial', 'membres' => [...]]
 
-// After entity implementation (Story 2.1+):
+// These will throw RuntimeException until entities exist:
+// $groupe->build();    // RuntimeException: scaffold
+// $groupe->persist($em); // RuntimeException: scaffold
+```
+
+**After entity implementation** (Story 2.1+):
+```php
+// Will work when GroupeAdaptor exists:
 $groupe = GroupeBuilder::unGroupe()
     ->withNom('Famille')
-    ->persist($em); // Will work when GroupeAdaptor exists
+    ->persist($em);
 ```
+
+**Unit tests:** Builder scaffolds have comprehensive unit tests in `api/test/Unit/Builder/` verifying the fluent API, default values, and exception behavior.
 
 #### Key Patterns
 

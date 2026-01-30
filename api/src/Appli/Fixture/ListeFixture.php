@@ -48,17 +48,16 @@ class ListeFixture extends AppAbstractFixture
             //
             // $em->flush();
 
-            $this->output->writeln(['Listes: SCAFFOLD - en attente des entités ListeAdaptor et GroupeAdaptor.']);
-        }
+            // Perf mode: create additional visibility assignments
+            if ($this->perfMode) {
+                // TODO: Implement when entities are created
+                //
+                // Planned perf data:
+                // Assign all perf users to perf groups with varying visibility
 
-        // Perf mode: create additional visibility assignments
-        if ($this->devMode && $this->perfMode) {
-            // TODO: Implement when entities are created
-            //
-            // Planned perf data:
-            // Assign all perf users to perf groups with varying visibility
-
-            $this->output->writeln(['  + Listes perf: SCAFFOLD - en attente des entités.']);
+                $this->output->writeln(['  + Listes perf: SCAFFOLD - en attente des entités.']);
+            }
         }
+        $this->output->writeln(['Listes: SCAFFOLD - en attente des entités ListeAdaptor et GroupeAdaptor.']);
     }
 }
