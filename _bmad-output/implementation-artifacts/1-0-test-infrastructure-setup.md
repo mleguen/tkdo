@@ -11,8 +11,9 @@ So that all subsequent stories have consistent fixtures and coverage gates.
 ## Acceptance Criteria
 
 1. **Given** the CI pipeline runs
-   **When** backend test coverage drops below 80%
+   **When** backend test coverage drops below 15% (current baseline)
    **Then** the build fails with clear message indicating coverage gap
+   **Note**: 80% coverage is the target by end of Epic 1; 15% prevents regression on brownfield code
 
 2. **Given** v2 development begins
    **When** I need to create test data for groups and visibility

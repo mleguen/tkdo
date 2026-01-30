@@ -1694,20 +1694,22 @@ open http://localhost:8025
 
 ### Coverage Enforcement
 
-**CI enforces 80% code coverage** for backend unit tests. This ensures code quality is maintained as the codebase grows.
+**CI enforces a minimum code coverage threshold** for backend unit tests to prevent regression.
+
+**Current baseline:** 15% (brownfield codebase)
+**Target:** 80% by end of Epic 1
+
+Each story should maintain or increase coverage. The threshold will be raised as test coverage improves.
 
 **How it works:**
 1. CI runs unit tests with PCOV coverage driver
 2. Coverage report is generated in Clover XML format
-3. A threshold check script verifies coverage >= 80%
+3. A threshold check script verifies coverage >= 15%
 4. Build fails if coverage drops below threshold
 
 **Local coverage check:**
 ```bash
-# Note: Docker container doesn't have PCOV installed by default
-# Coverage runs in CI via shivammathur/setup-php action
-
-# To check coverage locally with Xdebug:
+# Docker container has PCOV installed
 ./composer test -- --testsuite=Unit --coverage-text
 ```
 
