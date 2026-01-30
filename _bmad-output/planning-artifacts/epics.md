@@ -301,7 +301,7 @@ The following testing requirements apply to ALL stories:
 - [ ] Unit tests pass (PHPUnit + Karma)
 - [ ] Integration tests pass (PHPUnit)
 - [ ] Relevant E2E tests pass (Cypress)
-- [ ] Coverage threshold maintained (80% backend, 70% frontend)
+- [ ] Coverage threshold maintained (15% baseline, target 80% by Epic 1 end)
 - [ ] UI changes tested on mobile viewport (375x667) per UX1
 - [ ] No new flaky tests introduced
 
@@ -506,8 +506,9 @@ So that all subsequent stories have consistent fixtures, coverage gates, and per
 **Acceptance Criteria:**
 
 **Given** the CI pipeline runs
-**When** backend test coverage drops below 80%
+**When** backend test coverage drops below 15% (current baseline)
 **Then** the build fails with clear message indicating coverage gap
+**Note:** 80% coverage is the target by end of Epic 1; 15% prevents regression on brownfield code
 
 **Given** v2 development begins
 **When** I need to create test data for groups and visibility
@@ -516,10 +517,10 @@ So that all subsequent stories have consistent fixtures, coverage gates, and per
 **And** Backend fixtures exist: `GroupeFixture.php`, `ListeFixture.php`
 
 **Given** Story 0.1 baseline exists
-**When** CI runs on v2 code
-**Then** k6 performance tests execute against key endpoints
-**And** results are compared to baseline
-**And** regressions >20% are flagged (not blocking initially)
+**When** a developer wants to check for performance regressions
+**Then** k6 performance tests can be run locally via `./k6 run perf/baseline.js`
+**And** results can be compared to baseline in `docs/performance-baseline.json`
+**Note:** k6 is a local-only dev tool; CI environment differences make automated comparison unreliable
 
 **Given** a developer writes a new integration test
 **When** they need group-scoped test data
@@ -767,11 +768,45 @@ So that I receive emails at my preferred frequency.
 
 ---
 
-**Epic 1 Complete: 9 stories covering FR2-FR8, NFR6-12, ARCH5**
+### Story 1.9: Brownfield Test Coverage Improvement [NEW]
+
+**Brownfield Context:** Current backend test coverage is ~16%. Unit tests exist only for `Dom/Port/*` classes. Most of `Appli/` and `Infra/` layers are untested. This story adds tests for existing brownfield code to reach the 80% target.
+
+As a **developer**,
+I want comprehensive test coverage for existing backend code,
+So that refactoring and v2 changes don't introduce regressions.
+
+**Acceptance Criteria:**
+
+**Given** Epic 1 is nearing completion
+**When** I run the test suite with coverage
+**Then** backend unit test coverage is >= 80%
+
+**Given** I need to understand what code lacks coverage
+**When** I run `./composer test -- --testsuite=Unit --coverage-html coverage/`
+**Then** I can see a detailed HTML report highlighting uncovered lines
+
+**Deliverables:**
+- Unit tests for uncovered `Appli/` layer code (Commands, Services)
+- Unit tests for uncovered `Infra/` layer code (Adapters, Repositories)
+- Coverage threshold in CI raised from 15% to 80%
+
+**Notes:**
+- Focus on business logic, not generated code or trivial getters/setters
+- Prioritize code that will be modified in v2 development
+- May be split into multiple PRs for easier review
+
+---
+
+**Epic 1 Complete: 10 stories covering FR2-FR8, NFR6-12, ARCH5**
+
+**Completion Criteria:**
+- All 10 stories reach "done" status
+- Backend test coverage reaches 80% (verified by Story 1.9)
 
 **Brownfield Summary:**
 - 3 stories [MODIFY]: Token exchange, login, logout (security hardening)
-- 2 stories [NEW]: Test infrastructure setup, Rate limiting
+- 3 stories [NEW]: Test infrastructure setup, Rate limiting, Brownfield coverage
 - 4 stories [EXISTS]: Profile/password/notification management (minimal changes)
 
 ---

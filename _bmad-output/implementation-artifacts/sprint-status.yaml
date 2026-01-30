@@ -54,6 +54,7 @@ development_status:
   1-6-edit-profile: backlog
   1-7-change-password: backlog
   1-8-notification-preferences: backlog
+  1-9-brownfield-test-coverage: backlog
   epic-1-retrospective: optional
 
   # Epic 2: Groups & Membership
