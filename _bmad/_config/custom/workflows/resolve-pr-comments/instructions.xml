@@ -46,6 +46,31 @@ Exiting.</output>
       - PR comment links (multiple/grouped): `[PR#123 comments: [Label1](url1), [Label2](url2), ...]`
     </action>
 
+    <critical>PR Comment Link Pattern Matching Rules:
+
+      **Pattern Detection:**
+      1. **Single comment** (is_grouped = false):
+         - Link text contains "comment" (singular)
+         - Format: `[PR#123 comment](url)` OR `[PR#123 comment: description](url)`
+         - ONE action item → ONE PR comment link
+         - Result: Post FULL "Fixed" response to this comment
+
+      2. **Grouped comments** (is_grouped = true):
+         - Link text contains "comments:" (plural with colon)
+         - Format: `[PR#123 comments: [Label1](url1), [Label2](url2), ...]`
+         - ONE action item → MULTIPLE PR comment links embedded in the markdown
+         - Result: Post FULL response to FIRST comment, SHORT reference to rest
+
+      **Critical Rule:** Each action item is independent. Two separate action items with single PR links
+      are NOT grouped, even if they're similar issues. Only ONE action item with multiple embedded links
+      counts as grouped.
+
+      **Examples:**
+      - `[x] Fix bug [file.php] [PR#93 comment](url1)` → Single (full response)
+      - `[x] Fix bug [file.php] [PR#93 comment](url2)` → Single (full response)
+      - `[x] Fix bugs [PR#93 comments: [file1.php](url1), [file2.php](url2)]` → Grouped (1 full + 1 ref)
+    </critical>
+
     <action>Filter to completed action items with PR links:
       - Extract: checkbox status, severity, description, file reference, PR number
       - Extract ALL comment URLs and IDs (may be multiple per action item)
@@ -177,38 +202,34 @@ Processing each comment...</output>
       **Post reply using REST API:**
       `gh api -X POST repos/{{owner}}/{{repo}}/pulls/{{pr_number}}/comments/{{comment_id}}/replies -f body="{{response}}"`
 
-      **Resolve thread using GraphQL API:**
-      1. First, get the thread node ID for the comment:
+      Track success/failure for summary
+    </action>
+
+    <action>**Batch Resolve All Threads via GraphQL:**
+
+      After posting all comments, resolve all threads in a single batched GraphQL operation for efficiency.
+
+      1. Get ALL thread node IDs for all comment IDs in one query:
          ```
-         gh api graphql -f query='
-           query($owner: String!, $repo: String!, $pr: Int!) {
-             repository(owner: $owner, name: $repo) {
-               pullRequest(number: $pr) {
-                 reviewThreads(first: 100) {
-                   nodes {
-                     id
-                     isResolved
-                     comments(first: 1) {
-                       nodes { databaseId }
-                     }
-                   }
-                 }
-               }
-             }
-           }
-         ' -f owner='{{owner}}' -f repo='{{repo}}' -F pr={{pr_number}}
+         gh api graphql -f query='{ repository(owner: "{{owner}}", name: "{{repo}}") { pullRequest(number: {{pr_number}}) { reviewThreads(first: 100) { nodes { id isResolved comments(first: 1) { nodes { databaseId } } } } } } }' \
+           --jq '.data.repository.pullRequest.reviewThreads.nodes[] | select(.comments.nodes[0].databaseId == COMMENT_ID_1 or .comments.nodes[0].databaseId == COMMENT_ID_2 or ...) | {threadId: .id, commentId: .comments.nodes[0].databaseId, isResolved: .isResolved}'
          ```
-      2. Find the thread where comments.nodes[0].databaseId matches {{comment_id}}
-      3. Resolve using the thread's node ID:
+
+      2. Build a single batched mutation to resolve all threads at once:
          ```
-         gh api graphql -f query='
-           mutation($threadId: ID!) {
-             resolveReviewThread(input: {threadId: $threadId}) {
-               thread { isResolved }
-             }
-           }
-         ' -f threadId='{{thread_node_id}}'
+         gh api graphql -f query='mutation {
+           t1: resolveReviewThread(input: {threadId: "THREAD_ID_1"}) { thread { isResolved } }
+           t2: resolveReviewThread(input: {threadId: "THREAD_ID_2"}) { thread { isResolved } }
+           ...
+         }'
          ```
+
+      **Benefits:**
+      - Single API call instead of N calls
+      - Faster execution
+      - Reduced rate limiting risk
+
+      **Note:** If there are more than 10 threads, split into batches of 10 to avoid query complexity limits.
 
       Track success/failure for summary
     </action>

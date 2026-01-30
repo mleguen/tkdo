@@ -102,6 +102,17 @@ Example from `api/.claude/settings.json`:
 
 **CRITICAL WORKFLOW:** After addressing PR review comments with code changes, you MUST respond to each unresolved comment individually explaining what was fixed.
 
+**Automated Workflow (Preferred): `/resolve-pr-comments`**
+
+Use this workflow after implementing fixes and marking action items as [x] complete in the story file.
+```bash
+/resolve-pr-comments
+```
+
+See: `_bmad/_config/custom/workflows/resolve-pr-comments/README.md`
+
+**Manual Workflow:**
+
 **Step 1: List all unresolved review comments**
 ```bash
 gh api repos/OWNER/REPO/pulls/PR_NUMBER/comments --jq '.[] | {id: .id, path: .path, line: .line, body: .body | .[0:100]}'
@@ -110,7 +121,7 @@ gh api repos/OWNER/REPO/pulls/PR_NUMBER/comments --jq '.[] | {id: .id, path: .pa
 **Step 2: Reply to EACH unresolved comment in its individual thread**
 ```bash
 gh api -X POST repos/OWNER/REPO/pulls/PR_NUMBER/comments/COMMENT_ID/replies \
-  -f body="Fixed in commit COMMIT_SHA.
+  -f body="**FIXED**
 
 [Explanation of what was changed and how it addresses the comment]"
 ```
@@ -119,9 +130,8 @@ gh api -X POST repos/OWNER/REPO/pulls/PR_NUMBER/comments/COMMENT_ID/replies \
 1. **ALWAYS use the `/comments/COMMENT_ID/replies` endpoint** - This posts to the individual conversation thread
 2. **NEVER use `gh pr review` or `gh pr comment`** - These create general PR comments, not threaded replies
 3. **Reply to EVERY unresolved comment you addressed** - Never skip any, even if multiple comments have the same fix
-4. **Include the commit SHA** - Start each reply with "Fixed in commit COMMIT_SHA."
-5. **Explain the fix** - Don't just say "fixed", explain what changed
-6. **DON'T ping `@copilot`** - Copilot bots will open PRs instead of accepting your answer
+4. **Explain the fix** - Don't just say "fixed", explain what changed
+5. **DON'T ping `@copilot`** - Copilot bots will open PRs instead of accepting your answer
 
 **Example:**
 ```bash
@@ -130,7 +140,7 @@ gh api repos/mleguen/tkdo/pulls/64/comments --jq '.[] | {id: .id, body: .body | 
 
 # 2. Reply to comment ID 2651989539
 gh api -X POST repos/mleguen/tkdo/pulls/64/comments/2651989539/replies \
-  -f body="Fixed in commit a9212c1.
+  -f body="**FIXED**
 
 Updated CHANGELOG.md to clarify that AuthIntTest.php is an existing file, not a new addition in this PR."
 ```
