@@ -53,7 +53,9 @@ export interface Idee {
 }
 
 const URL_API = '/api';
-const URL_CONNEXION = `${URL_API}/connexion`;
+const URL_AUTH_LOGIN = `${URL_API}/auth/login`;
+const URL_AUTH_TOKEN = `${URL_API}/auth/token`;
+const URL_AUTH_LOGOUT = `${URL_API}/auth/logout`;
 const URL_LISTE_OCCASIONS = `${URL_API}/occasion`;
 const URL_OCCASION = (idOccasion: number) =>
   `${URL_API}/occasion/${idOccasion}`;
@@ -66,10 +68,12 @@ const URL_SUPPRESSION_IDEE = (idIdee: number) =>
 
 const CLE_ID_UTILISATEUR = 'id_utilisateur';
 const CLE_LISTE_OCCASIONS = 'occasions';
-const CLE_TOKEN = 'backend-token';
 
-interface PostConnexionDTO {
-  token: string;
+interface PostAuthLoginDTO {
+  code: string;
+}
+
+interface PostAuthTokenDTO {
   utilisateur: Pick<UtilisateurPrive, 'id' | 'nom' | 'admin'>;
 }
 
@@ -82,7 +86,6 @@ export class BackendService {
 
   erreur$ = new BehaviorSubject<string | undefined>(undefined);
   occasions$: Observable<Occasion[] | null>;
-  token = localStorage.getItem(CLE_TOKEN);
   utilisateurConnecte$: Observable<UtilisateurPrive | null>;
 
   protected idUtilisateurConnecte$: BehaviorSubject<number | null>;
@@ -122,22 +125,37 @@ export class BackendService {
   }
 
   async connecte(identifiant: string, mdp: string) {
-    const { token, utilisateur } = await firstValueFrom(
-      this.http.post<PostConnexionDTO>(URL_CONNEXION, { identifiant, mdp }),
+    // Step 1: POST /auth/login to get auth code
+    const { code } = await firstValueFrom(
+      this.http.post<PostAuthLoginDTO>(URL_AUTH_LOGIN, { identifiant, mdp }),
     );
+
+    // Step 2: POST /auth/token to exchange code for JWT cookie
+    // withCredentials required to receive HttpOnly cookie from response
+    const { utilisateur } = await firstValueFrom(
+      this.http.post<PostAuthTokenDTO>(
+        URL_AUTH_TOKEN,
+        { code },
+        { withCredentials: true },
+      ),
+    );
+
     localStorage.setItem(CLE_ID_UTILISATEUR, JSON.stringify(utilisateur.id));
-    localStorage.setItem(CLE_TOKEN, token);
-    // this.token doit être set avant de publier l'utilisateur sur l'observable
-    // (ce qui peut déclencher des appels réseaux nécessitant le token)
-    this.token = token;
     this.idUtilisateurConnecte$.next(utilisateur.id);
   }
 
   async deconnecte() {
-    this.token = null;
+    // Call logout endpoint to clear the HttpOnly cookie
+    // withCredentials required to send HttpOnly cookie with request
+    try {
+      await firstValueFrom(
+        this.http.post(URL_AUTH_LOGOUT, {}, { withCredentials: true }),
+      );
+    } catch {
+      // Ignore errors during logout - we still want to clear local state
+    }
     localStorage.removeItem(CLE_ID_UTILISATEUR);
     localStorage.removeItem(CLE_LISTE_OCCASIONS);
-    localStorage.removeItem(CLE_TOKEN);
     this.idUtilisateurConnecte$.next(null);
   }
 

@@ -168,6 +168,16 @@ jobs:
           # default would be 'latest' which is not compatible with tc.find() as not a semver
           firefox-version: "*"
 
+      # Generate self-signed certificate for HTTPS testing
+      - name: Generate self-signed certificate
+        run: |
+          mkdir -p /tmp/certs
+          openssl req -x509 -nodes -days 1 -newkey rsa:2048 \
+            -keyout /tmp/certs/localhost.key \
+            -out /tmp/certs/localhost.crt \
+            -subj "/CN=localhost"
+          echo "Self-signed certificate generated for HTTPS testing"
+
       # Start backend PHP server in background
       - name: Start PHP backend server
         env:
@@ -224,13 +234,37 @@ jobs:
           sleep 2
           echo "Frontend SPA server started on port 4200"
 
-      # Configure reverse proxy using nginx to combine frontend + API
+      # Configure reverse proxy using nginx to combine frontend + API (HTTP + HTTPS)
       - name: Configure nginx reverse proxy
         run: |
           sudo tee /etc/nginx/sites-available/tkdo-e2e > /dev/null <<'EOF'
+          # HTTP server on port 8080
           server {
               listen 8080;
               server_name localhost;
+
+              # API requests go to PHP backend
+              location /api/ {
+                  proxy_pass http://localhost:8000/;
+                  proxy_set_header Host $host;
+                  proxy_set_header X-Real-IP $remote_addr;
+              }
+
+              # Everything else goes to frontend
+              location / {
+                  proxy_pass http://localhost:4200/;
+                  proxy_set_header Host $host;
+                  proxy_set_header X-Real-IP $remote_addr;
+              }
+          }
+
+          # HTTPS server on port 8443 (for security testing with CYPRESS_HTTPS=true)
+          server {
+              listen 8443 ssl;
+              server_name localhost;
+
+              ssl_certificate /tmp/certs/localhost.crt;
+              ssl_certificate_key /tmp/certs/localhost.key;
 
               # API requests go to PHP backend
               location /api/ {
@@ -251,22 +285,28 @@ jobs:
           sudo rm -f /etc/nginx/sites-enabled/default
           sudo nginx -t
           sudo systemctl restart nginx
-          echo "Nginx proxy configured and started on port 8080"
+          echo "Nginx proxy configured on port 8080 (HTTP) and 8443 (HTTPS)"
 
       - name: Wait for services to be ready
         run: |
           until curl -s http://localhost:8080 > /dev/null; do
-            echo "Waiting for application to be ready..."
+            echo "Waiting for HTTP application to be ready..."
             sleep 2
           done
-          echo "Application is ready!"
+          echo "HTTP application is ready on port 8080"
+          until curl -sk https://localhost:8443 > /dev/null; do
+            echo "Waiting for HTTPS application to be ready..."
+            sleep 2
+          done
+          echo "HTTPS application is ready on port 8443"
 
-      # Run E2E tests
+      # Run E2E tests (uses baseUrl from cypress.config.ts, defaults to http://localhost:8080)
+      # Set CYPRESS_HTTPS=true to run tests over HTTPS on port 8443
       - name: Run E2E tests
         uses: cypress-io/github-action@v6
         with:
           working-directory: ./front
-          command: npx cypress run --config baseUrl=http://localhost:8080
+          command: npx cypress run
           browser: ${{ matrix.browser }}
           install: false
 

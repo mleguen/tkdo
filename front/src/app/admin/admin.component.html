@@ -1,18 +1,11 @@
 @if (utilisateurConnecte$ | async; as utilisateurConnecte) {
   <h1>Administration</h1>
   <h2>Connexion à l'API en ligne de commande</h2>
-  <h3>En utilisant le token courant</h3>
   <p>
     L'API est accessible en ligne de commande, avec la commande
-    <a href="https://curl.se/docs/manpage.html">curl</a>, en vous authentifiant
-    avec le token d'authentification ci-dessous (valable uniquement pour votre
-    session en cours) :
+    <a href="https://curl.se/docs/manpage.html">curl</a>. Pour vous
+    authentifier, commencez par obtenir un token :
   </p>
-  <pre>
-    {{ token }}
-  </pre>
-  <h3>En créant un nouveau token</h3>
-  <p>Vous pouvez également créer un nouveau token :</p>
   <pre><samp>
     curl \
     -d identifiant='utilisatrice01' \
@@ -30,10 +23,16 @@
     {{'}'}}
     {{'}'}}
   </samp></pre>
+  <div class="alert alert-primary" role="alert">
+    Notez la valeur de <code>token</code> dans la réponse. Vous pouvez
+    l'utiliser dans les commandes suivantes en la stockant dans une variable
+    d'environnement :
+    <pre>export TOKEN="eyJ0eXAi..."</pre>
+  </div>
   <h2>Utilisateurs</h2>
   <h3>Lister les utilisateurs</h3>
   <pre><samp>
-    curl -u {{token}}: \
+    curl -u $TOKEN: \
     {{urlApi}}/utilisateur
   </samp></pre>
   <p>Renvoie :</p>
@@ -52,7 +51,7 @@
   </samp></pre>
   <h3>Créer un nouvel utilisateur</h3>
   <pre><samp>
-    curl -u {{token}}: \
+    curl -u $TOKEN: \
     -d identifiant='utilisatrice01' \
     -d email='utilisatrice01{{'@'}}tkdo.org' \
     -d nom='Utilisatrice 1' \
@@ -79,7 +78,7 @@
   </div>
   <h3>Afficher un utilisateur</h3>
   <pre><samp>
-    curl -u {{token}}: \
+    curl -u $TOKEN: \
     {{urlApi}}/utilisateur/{{utilisateurConnecte.id}}
   </samp></pre>
   <p>Renvoie :</p>
@@ -96,7 +95,7 @@
   </samp></pre>
   <h3>Modifier un utilisateur</h3>
   <pre><samp>
-    curl -u {{token}}: \
+    curl -u $TOKEN: \
     -d identifiant='admin2' \
     -d email='admin2{{'@'}}tkdo.org' \
     -d mdp='Akjunz12' \
@@ -131,7 +130,7 @@
   </div>
   <h3>Réinitialiser le mot de passe d'un utilisateur</h3>
   <pre><samp>
-    curl -u {{token}}: \
+    curl -u $TOKEN: \
     -X POST {{urlApi}}/utilisateur/{{utilisateurConnecte.id}}/reinitmdp
   </samp></pre>
   <p>Renvoie :</p>
@@ -156,7 +155,7 @@
     de cadeaux (conjoint, etc.)
   </p>
   <pre><samp>
-    curl -u {{token}}: \
+    curl -u $TOKEN: \
     {{urlApi}}/utilisateur/{{utilisateurConnecte.id}}/exclusion
   </samp></pre>
   <p>Renvoie :</p>
@@ -173,7 +172,7 @@
   </samp></pre>
   <h3>Ajouter une nouvelle exclusion pour un utilisateur</h3>
   <pre><samp>
-    curl -u {{token}}: \
+    curl -u $TOKEN: \
     -d idQuiNeDoitPasRecevoir=71 \
     -X POST {{urlApi}}/utilisateur/{{utilisateurConnecte.id}}/exclusion
   </samp></pre>
@@ -190,7 +189,7 @@
   <h2>Occasions</h2>
   <h3>Lister les occasions</h3>
   <pre><samp>
-    curl -u {{token}}: \
+    curl -u $TOKEN: \
     {{urlApi}}/occasion
   </samp></pre>
   <p>Renvoie :</p>
@@ -208,7 +207,7 @@
   </samp></pre>
   <h3>Créer une nouvelle occasion</h3>
   <pre><samp>
-    curl -u {{token}}: \
+    curl -u $TOKEN: \
     -d titre='Nouvelle occasion' \
     -X POST {{urlApi}}/occasion
   </samp></pre>
@@ -221,7 +220,7 @@
   </samp></pre>
   <h3>Afficher une occasion</h3>
   <pre><samp>
-    curl -u {{token}}: \
+    curl -u $TOKEN: \
     {{urlApi}}/occasion/6
   </samp></pre>
   <p>Renvoie :</p>
@@ -264,7 +263,7 @@
   </samp></pre>
   <h3>Modifier une occasion</h3>
   <pre><samp>
-    curl -u {{token}}: \
+    curl -u $TOKEN: \
     -d titre='Titre modifié' \
     -X PUT {{urlApi}}/occasion/7
   </samp></pre>
@@ -281,7 +280,7 @@
   </div>
   <h3>Ajouter un participant à une occasion</h3>
   <pre><samp>
-    curl -u {{token}}: \
+    curl -u $TOKEN: \
     -d idParticipant={{utilisateurConnecte.id}} \
     -X POST {{urlApi}}/occasion/7/participant
   </samp></pre>
@@ -308,7 +307,7 @@
     </li>
   </ul>
   <pre><samp>
-    curl -u {{token}}: \
+    curl -u $TOKEN: \
     -d force=0 \
     -d nbMaxIter=10 \
     -X POST {{urlApi}}/occasion/6/tirage
@@ -382,7 +381,7 @@
     en dehors de l'application.
   </p>
   <pre><samp>
-    curl -u {{token}}: \
+    curl -u $TOKEN: \
     -d idQuiOffre={{utilisateurConnecte.id}} \
     -d idQuiRecoit={{utilisateurConnecte.id+1}} \
     -X POST {{urlApi}}/occasion/7/resultat

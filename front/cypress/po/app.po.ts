@@ -1,6 +1,9 @@
 export class AppPage {
   invaliderSession() {
-    cy.window().then((w) => w.localStorage.setItem('backend-token', 'invalid'));
+    // Clear the HttpOnly JWT cookie to simulate session invalidation
+    cy.clearCookie('tkdo_jwt');
+    // Also clear the user ID from localStorage
+    cy.window().then((w) => w.localStorage.removeItem('id_utilisateur'));
   }
 
   boutonSeDeconnecter() {

@@ -493,6 +493,12 @@ So that I can compare post-rewrite performance against a known reference.
 
 **FRs covered:** FR2-FR8, NFR6-12, ARCH5
 
+**OAuth2-Ready Architecture:** This epic implements authentication with clear separation between:
+- **Temporary Authorization Server** (`/oauth/authorize`, `/oauth/token`) - validates credentials, issues auth codes. Will be replaced by external IdP (Google, Auth0) post-MVP.
+- **Permanent BFF Layer** (`/api/auth/callback`, `/api/auth/logout`) - exchanges codes via `league/oauth2-client`, manages HttpOnly JWT cookies. Stays unchanged when switching IdPs.
+
+This separation ensures the MVP authentication works today while requiring only configuration changes for external IdP integration later.
+
 ---
 
 ### Story 1.0: Test Infrastructure Setup [NEW]
@@ -540,7 +546,7 @@ So that all subsequent stories have consistent fixtures, coverage gates, and per
 
 ---
 
-### Story 1.1: JWT Token Exchange System [MODIFY]
+### Story 1.1: JWT Token Exchange System [MODIFY] 🔍 REVIEW
 
 **Brownfield Context:** Current auth uses Bearer token in Authorization header, stored in localStorage. Must migrate to HttpOnly cookie-based storage with two-step exchange.
 
@@ -569,6 +575,36 @@ So that JWTs are stored in HttpOnly cookies and never exposed to JavaScript.
 **When** making any authenticated API request
 **Then** the JWT is automatically sent via cookie
 **And** the frontend code never reads or parses the JWT
+
+> **Technical Debt:** See Story 1.1b for OAuth2 standards alignment.
+
+---
+
+### Story 1.1b: OAuth2 Standards Alignment [NEW]
+
+**Context:** Story 1.1 delivered working JWT cookie auth but with non-standard naming and combined auth server/BFF responsibilities. This story refactors to OAuth2-compliant architecture.
+
+As a **developer**,
+I want the authentication system to follow OAuth2 standards with proper separation between authorization server and BFF,
+So that switching to external Identity Providers requires only configuration changes.
+
+**Acceptance Criteria:**
+
+**Given** the OAuth2 authorization server is deployed
+**When** the frontend redirects to `/oauth/authorize` with proper OAuth2 parameters
+**Then** the user sees a login form
+**And** successful authentication redirects back with `?code=xxx`
+
+**Given** a valid authorization code
+**When** the BFF endpoint receives it
+**Then** it uses `league/oauth2-client` to exchange the code via back-channel call to `/oauth/token`
+**And** the BFF creates an application JWT and sets an HttpOnly cookie
+
+**Given** the system is configured for our temporary auth server
+**When** I change only the OAuth2 provider URLs in configuration
+**Then** the BFF works with an external IdP without code changes
+
+**Dependencies:** Story 1.1 (provides base cookie mechanism)
 
 ---
 
