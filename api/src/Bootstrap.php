@@ -3,6 +3,9 @@ declare(strict_types=1);
 
 namespace App;
 
+use App\Appli\Controller\AuthLoginController;
+use App\Appli\Controller\AuthLogoutController;
+use App\Appli\Controller\AuthTokenController;
 use App\Appli\Controller\CreateConnexionController;
 use App\Appli\Controller\CreateExclusionUtilisateurController;
 use App\Appli\Controller\CreateIdeeController;
@@ -27,6 +30,7 @@ use App\Appli\Handler\AppPlainTextErrorRenderer;
 use App\Appli\Middleware\AuthMiddleware;
 use App\Appli\PluginAdaptor\MailPluginAdaptor;
 use App\Appli\PluginAdaptor\PasswordPluginAdaptor;
+use App\Appli\RepositoryAdaptor\AuthCodeRepositoryAdaptor;
 use App\Appli\RepositoryAdaptor\ExclusionRepositoryAdaptor;
 use App\Appli\RepositoryAdaptor\IdeeRepositoryAdaptor;
 use App\Appli\RepositoryAdaptor\OccasionRepositoryAdaptor;
@@ -35,6 +39,7 @@ use App\Appli\RepositoryAdaptor\UtilisateurRepositoryAdaptor;
 use App\Appli\Settings\DoctrineSettings;
 use App\Dom\Plugin\MailPlugin;
 use App\Dom\Plugin\PasswordPlugin;
+use App\Dom\Repository\AuthCodeRepository;
 use App\Dom\Repository\IdeeRepository;
 use App\Dom\Repository\OccasionRepository;
 use App\Dom\Repository\ResultatRepository;
@@ -93,6 +98,7 @@ class Bootstrap
                 $settings->config
             ),
 
+            AuthCodeRepository::class => \DI\autowire(AuthCodeRepositoryAdaptor::class),
             ExclusionRepository::class => \DI\autowire(ExclusionRepositoryAdaptor::class),
             IdeeRepository::class => \DI\autowire(IdeeRepositoryAdaptor::class),
             LoggerInterface::class => \DI\autowire(AppLogger::class),
@@ -136,6 +142,11 @@ class Bootstrap
             $response);
 
         $this->slimApp->post('/connexion', CreateConnexionController::class);
+        $this->slimApp->group('/auth', function (RouteCollectorProxyInterface $group) {
+            $group->post('/login', AuthLoginController::class);
+            $group->post('/token', AuthTokenController::class);
+            $group->post('/logout', AuthLogoutController::class);
+        });
         $this->slimApp->group('/idee', function (RouteCollectorProxyInterface $group) {
             $group->get('', ListIdeeController::class);
             $group->post('', CreateIdeeController::class);

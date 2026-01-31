@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Test\Int;
 
+use App\Appli\ModelAdaptor\AuthCodeAdaptor;
 use App\Appli\ModelAdaptor\ExclusionAdaptor;
 use App\Appli\ModelAdaptor\IdeeAdaptor;
 use App\Appli\ModelAdaptor\OccasionAdaptor;
@@ -67,6 +68,7 @@ class IntTestCase extends TestCase
     public function tearDown(): void
     {
         foreach ([
+            AuthCodeAdaptor::class,
             IdeeAdaptor::class,
             ResultatAdaptor::class,
             OccasionAdaptor::class,

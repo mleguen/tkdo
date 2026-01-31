@@ -66,38 +66,65 @@ describe('BackendService', () => {
   });
 
   describe('Authentication', () => {
-    it('should connect and store token and user ID', async () => {
+    it('should connect using two-step auth flow and store user ID', async () => {
       const connectPromise = service.connecte('testuser', 'password');
 
-      const req = httpMock.expectOne('/api/connexion');
-      expect(req.request.method).toBe('POST');
-      expect(req.request.body).toEqual({
+      // Step 1: Login request
+      const loginReq = httpMock.expectOne('/api/auth/login');
+      expect(loginReq.request.method).toBe('POST');
+      expect(loginReq.request.body).toEqual({
         identifiant: 'testuser',
         mdp: 'password',
       });
+      loginReq.flush({ code: 'auth-code-123' });
 
-      req.flush({
-        token: 'test-token-123',
+      // Wait for micro-task to process the response and trigger the next request
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      // Step 2: Token exchange request
+      const tokenReq = httpMock.expectOne('/api/auth/token');
+      expect(tokenReq.request.method).toBe('POST');
+      expect(tokenReq.request.body).toEqual({ code: 'auth-code-123' });
+      expect(tokenReq.request.withCredentials).toBe(true);
+      tokenReq.flush({
         utilisateur: { id: 1, nom: 'Test User', admin: false },
       });
 
       await connectPromise;
 
-      expect(service.token).toBe('test-token-123');
-      expect(localStorage.getItem('backend-token')).toBe('test-token-123');
       expect(localStorage.getItem('id_utilisateur')).toBe('1');
     });
 
-    it('should disconnect and clear token and user ID', async () => {
-      localStorage.setItem('backend-token', 'test-token');
+    it('should disconnect and clear local state', async () => {
       localStorage.setItem('id_utilisateur', '1');
       localStorage.setItem('occasions', '[]');
-      service.token = 'test-token';
 
-      await service.deconnecte();
+      const deconnectePromise = service.deconnecte();
 
-      expect(service.token).toBeNull();
-      expect(localStorage.getItem('backend-token')).toBeNull();
+      // Logout request
+      const logoutReq = httpMock.expectOne('/api/auth/logout');
+      expect(logoutReq.request.method).toBe('POST');
+      expect(logoutReq.request.withCredentials).toBe(true);
+      logoutReq.flush({});
+
+      await deconnectePromise;
+
+      expect(localStorage.getItem('id_utilisateur')).toBeNull();
+      expect(localStorage.getItem('occasions')).toBeNull();
+    });
+
+    it('should clear local state even if logout request fails', async () => {
+      localStorage.setItem('id_utilisateur', '1');
+      localStorage.setItem('occasions', '[]');
+
+      const deconnectePromise = service.deconnecte();
+
+      // Logout request fails
+      const logoutReq = httpMock.expectOne('/api/auth/logout');
+      logoutReq.error(new ProgressEvent('error'), { status: 500 });
+
+      await deconnectePromise;
+
       expect(localStorage.getItem('id_utilisateur')).toBeNull();
       expect(localStorage.getItem('occasions')).toBeNull();
     });

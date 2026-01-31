@@ -13,6 +13,5 @@ export class AdminComponent {
   private readonly backend = inject(BackendService);
 
   utilisateurConnecte$ = this.backend.utilisateurConnecte$;
-  token = this.backend.token;
   urlApi = this.backend.getAbsUrlApi();
 }

@@ -312,6 +312,76 @@ For development environment troubleshooting (port conflicts, permission errors, 
 
 ---
 
+## HTTPS Development (for Security Testing)
+
+For testing security-sensitive features like HttpOnly cookies, you need to run the application over HTTPS with a self-signed certificate.
+
+### Generate Self-Signed Certificate (One-Time Setup)
+
+```bash
+# Create the certs directory (already in .gitignore)
+mkdir -p docker/certs
+
+# Generate self-signed certificate valid for 365 days
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+  -keyout docker/certs/localhost.key \
+  -out docker/certs/localhost.crt \
+  -subj "/CN=localhost"
+```
+
+### Start HTTPS Frontend
+
+```bash
+# Start with HTTPS profile (in addition to regular services)
+docker compose --profile https up -d front-https
+
+# Or start everything including HTTPS
+docker compose --profile https up -d front front-https
+```
+
+**Access the HTTPS application:**
+- HTTPS: https://localhost:8443
+- HTTP (normal): http://localhost:8080
+
+### Running E2E Tests
+
+By default, Cypress tests use `http://localhost:8080` (nginx proxy). This matches both local Docker environment and CI.
+
+```bash
+# Run E2E tests (default: HTTP on port 8080)
+./npm run e2e
+```
+
+To run against the Angular dev server directly (without nginx proxy):
+
+```bash
+FRONT_DEV_PORT=4200 ./npm run e2e
+```
+
+### Running E2E Tests with HTTPS
+
+To run Cypress tests against the HTTPS frontend:
+
+```bash
+# Set environment variable before running tests
+CYPRESS_HTTPS=true ./npm run e2e
+```
+
+This configures Cypress to:
+- Use `https://localhost:8443` as the base URL
+- Accept self-signed certificates
+
+**Note:** Your browser will show a security warning for the self-signed certificate. This is expected for local development.
+
+### Why HTTPS for Development?
+
+Certain security features only work correctly over HTTPS:
+- **Secure cookies** (`Secure` flag) are only sent over HTTPS
+- **SameSite=Strict cookies** require HTTPS for cross-site context
+- Testing the actual production security model ensures no surprises in deployment
+
+---
+
 ## Next Steps
 
 Now that your development environment is running:

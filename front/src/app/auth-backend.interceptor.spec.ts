@@ -46,13 +46,8 @@ describe('AuthBackendInterceptor', () => {
   });
 
   describe('intercept', () => {
-    it('should add Authorization header with Bearer token for backend requests when token exists', () => {
+    it('should add withCredentials for backend requests', () => {
       // Arrange
-      const token = 'test-token-123';
-      Object.defineProperty(backendService, 'token', {
-        get: () => token,
-        configurable: true,
-      });
       backendService.estUrlBackend.and.returnValue(true);
 
       const request = new HttpRequest('GET', '/api/utilisateur/1');
@@ -65,38 +60,11 @@ describe('AuthBackendInterceptor', () => {
       // Assert
       expect(httpHandler.handle).toHaveBeenCalledTimes(1);
       const modifiedRequest = httpHandler.handle.calls.argsFor(0)[0];
-      expect(modifiedRequest.headers.has('Authorization')).toBe(true);
-      expect(modifiedRequest.headers.get('Authorization')).toBe(
-        `Bearer ${token}`,
-      );
+      expect(modifiedRequest.withCredentials).toBe(true);
     });
 
-    it('should not modify request when no token exists', () => {
+    it('should not modify request when URL is not a backend URL', () => {
       // Arrange
-      Object.defineProperty(backendService, 'token', {
-        get: () => null,
-        configurable: true,
-      });
-
-      const request = new HttpRequest('GET', '/api/utilisateur/1');
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      httpHandler.handle.and.returnValue(of({} as any));
-
-      // Act
-      interceptor.intercept(request, httpHandler).subscribe();
-
-      // Assert
-      expect(httpHandler.handle).toHaveBeenCalledWith(request);
-      expect(backendService.estUrlBackend).not.toHaveBeenCalled();
-    });
-
-    it('should not add Authorization header when URL is not a backend URL', () => {
-      // Arrange
-      const token = 'test-token-123';
-      Object.defineProperty(backendService, 'token', {
-        get: () => token,
-        configurable: true,
-      });
       backendService.estUrlBackend.and.returnValue(false);
 
       const request = new HttpRequest('GET', 'https://external-api.com/data');
@@ -113,13 +81,8 @@ describe('AuthBackendInterceptor', () => {
       );
     });
 
-    it('should preserve existing headers when adding Authorization header', () => {
+    it('should preserve existing headers when adding withCredentials', () => {
       // Arrange
-      const token = 'test-token-123';
-      Object.defineProperty(backendService, 'token', {
-        get: () => token,
-        configurable: true,
-      });
       backendService.estUrlBackend.and.returnValue(true);
 
       const baseRequest = new HttpRequest('POST', '/api/idee', {
@@ -139,18 +102,11 @@ describe('AuthBackendInterceptor', () => {
       expect(modifiedRequest.headers.get('Content-Type')).toBe(
         'application/json',
       );
-      expect(modifiedRequest.headers.get('Authorization')).toBe(
-        `Bearer ${token}`,
-      );
+      expect(modifiedRequest.withCredentials).toBe(true);
     });
 
-    it('should not modify request body when adding Authorization header', () => {
+    it('should not modify request body when adding withCredentials', () => {
       // Arrange
-      const token = 'test-token-123';
-      Object.defineProperty(backendService, 'token', {
-        get: () => token,
-        configurable: true,
-      });
       backendService.estUrlBackend.and.returnValue(true);
 
       const requestBody = { description: 'test idea' };
@@ -164,25 +120,6 @@ describe('AuthBackendInterceptor', () => {
       // Assert
       const modifiedRequest = httpHandler.handle.calls.argsFor(0)[0];
       expect(modifiedRequest.body).toEqual(requestBody);
-    });
-
-    it('should handle empty string token as falsy value', () => {
-      // Arrange
-      Object.defineProperty(backendService, 'token', {
-        get: () => '',
-        configurable: true,
-      });
-
-      const request = new HttpRequest('GET', '/api/utilisateur/1');
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      httpHandler.handle.and.returnValue(of({} as any));
-
-      // Act
-      interceptor.intercept(request, httpHandler).subscribe();
-
-      // Assert
-      expect(httpHandler.handle).toHaveBeenCalledWith(request);
-      expect(backendService.estUrlBackend).not.toHaveBeenCalled();
     });
   });
 });

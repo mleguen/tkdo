@@ -46,7 +46,8 @@ development_status:
   # Epic 1: Secure Authentication Foundation
   epic-1: in-progress
   1-0-test-infrastructure-setup: done
-  1-1-jwt-token-exchange-system: backlog
+  1-1-jwt-token-exchange-system: review
+  1-1b-oauth2-standards-alignment: backlog
   1-2-user-login: backlog
   1-3-user-logout: backlog
   1-4-login-rate-limiting: backlog

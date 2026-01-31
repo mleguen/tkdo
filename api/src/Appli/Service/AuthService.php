@@ -33,7 +33,7 @@ class AuthService
 
     /**
      * Decode un bearer token et retourne une authentification
-     * 
+     *
      * @throws AuthTokenInvalideException
      */
     public function decode(string $token): AuthAdaptor
@@ -41,9 +41,12 @@ class AuthService
         try {
             $key = new Key($this->clePublique, $this->settings->algo);
             $payload = JWT::decode($token, $key);
+            /** @var int[] $groupeIds */
+            $groupeIds = isset($payload->groupe_ids) ? (array) $payload->groupe_ids : [];
             return new AuthAdaptor(
                 intval($payload->sub),
-                isset($payload->adm) && $payload->adm
+                isset($payload->adm) && $payload->adm,
+                $groupeIds
             );
         }
         catch (Exception) {
@@ -60,7 +63,16 @@ class AuthService
             "sub" => $auth->getIdUtilisateur(),
             "exp" => \time() + $this->settings->validite,
             "adm" => $auth->estAdmin(),
+            "groupe_ids" => $auth->getGroupeIds(),
         ];
         return JWT::encode($payload, $this->clePrivee, $this->settings->algo);
+    }
+
+    /**
+     * Get JWT validity in seconds
+     */
+    public function getValidite(): int
+    {
+        return $this->settings->validite;
     }
 }

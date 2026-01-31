@@ -17,15 +17,13 @@ export class AuthBackendInterceptor implements HttpInterceptor {
     request: HttpRequest<unknown>,
     next: HttpHandler,
   ): Observable<HttpEvent<unknown>> {
-    const token = this.backend.token;
-    if (!token) return next.handle(request);
-
     const { url } = request;
     if (!this.backend.estUrlBackend(url)) return next.handle(request);
 
+    // Add withCredentials to send HttpOnly cookies with requests
     return next.handle(
       request.clone({
-        headers: request.headers.set('Authorization', `Bearer ${token}`),
+        withCredentials: true,
       }),
     );
   }
