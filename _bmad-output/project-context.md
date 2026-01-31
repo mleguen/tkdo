@@ -227,6 +227,17 @@ public function __invoke(Request $request, Response $response): Response
   6. THEN commit everything as ONE atomic unit
 - The commit must represent a complete, coherent state - not partial progress
 
+**Story Implementation Testing (CRITICAL):**
+- **After EACH task**: Run quick, targeted tests (unit tests, component tests) for impacted areas only (fast feedback)
+  - Backend changes: `./composer test -- --testsuite=Unit`
+  - Frontend changes: `./npm test -- --watch=false --browsers=ChromeHeadless`
+- **Before story completion**: Run full test suite (integration + E2E) - skip if story has no code changes (e.g., documentation-only)
+  - Backend: `./composer test` (unit + integration)
+  - E2E: `./composer run install-fixtures && ./npm run e2e` (fixtures must be reinstalled before EVERY run - tests modify data)
+- **CI-only changes**: When story includes changes that cannot be tested locally (CI workflow changes, etc.), commit, push, and verify CI passes before marking story for review
+- Exception: Tests may legitimately fail at end of one task if another task in the same story is designed to fix them
+- **Failing tests block progress** - fix or explain before proceeding to the next task
+
 **Docker & Scripts:**
 - Wrappers: `./console`, `./doctrine`, `./composer`, `./ng`, `./npm`, `./cypress`, `./k6`
 - `./composer test`, `./composer phpstan`, `./composer rector`
@@ -290,4 +301,4 @@ public function __invoke(Request $request, Response $response): Response
 - Update when technology stack changes
 - Review quarterly for outdated rules
 
-Last Updated: 2026-01-25
+Last Updated: 2026-01-31
