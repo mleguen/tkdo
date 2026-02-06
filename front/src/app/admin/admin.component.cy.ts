@@ -33,7 +33,6 @@ describe('AdminComponent', () => {
 
       const mockBackendService = {
         utilisateurConnecte$: utilisateurConnecte$.asObservable(),
-        token: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.test.token',
         getAbsUrlApi: () => 'https://api.tkdo.org',
       };
 
@@ -61,8 +60,13 @@ describe('AdminComponent', () => {
     });
 
     describe('Display Real Life Examples', () => {
-      it('should display the authentication token', () => {
-        cy.contains('pre', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.test.token')
+      it('should display the example authentication token in documentation', () => {
+        // The admin page shows a hardcoded example token in the documentation,
+        // not the real token (which is now stored in an HttpOnly cookie)
+        cy.contains(
+          'pre',
+          'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOjczLCJleHAiOjE2MDYwODM0MjIsImFkbSI6dHJ1ZX0',
+        )
           .should('exist')
           .should('be.visible');
       });
@@ -110,7 +114,6 @@ describe('AdminComponent', () => {
 
       const mockBackendService = {
         utilisateurConnecte$: utilisateurConnecte$.asObservable(),
-        token: '',
         getAbsUrlApi: () => 'https://api.tkdo.org',
       };
 

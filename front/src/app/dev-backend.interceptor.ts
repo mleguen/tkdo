@@ -81,6 +81,49 @@ const eve: UtilisateurAvecMdp = {
 
 const utilisateursAvecMdp = [alice, bob, charlie, david, eve];
 
+// Auth codes storage for two-step auth flow simulation
+const authCodes: Map<string, { userId: number; expiresAt: number }> = new Map();
+
+/**
+ * SessionStorage key used to simulate the HttpOnly `tkdo_jwt` cookie.
+ *
+ * Real HttpOnly cookies are invisible to JavaScript (`document.cookie` cannot
+ * read them). During integration tests the DevBackendInterceptor replaces the
+ * real backend, so no actual HTTP cookie is ever set. We therefore store the
+ * authenticated user ID in sessionStorage under a clearly-prefixed key to
+ * simulate the cookie's presence. The `authGuard()` function only reads this
+ * value when the request has `withCredentials: true`, mirroring real browser
+ * behaviour where cookies are only sent with credentialed requests.
+ */
+const SIMULATED_COOKIE_KEY = '__dev_simulated_cookie_tkdo_jwt';
+
+/**
+ * Read the simulated HttpOnly cookie value (authenticated user ID).
+ * Returns `null` when no simulated cookie is set (i.e. user is logged out).
+ */
+function getSimulatedCookie(): number | null {
+  const stored = sessionStorage.getItem(SIMULATED_COOKIE_KEY);
+  return stored ? JSON.parse(stored) : null;
+}
+
+/**
+ * Set the simulated HttpOnly cookie to the given user ID.
+ * Called by `postAuthToken()` after a successful code exchange, mirroring the
+ * real backend's `Set-Cookie: tkdo_jwt=…; HttpOnly` response header.
+ */
+function simulateCookieSet(userId: number): void {
+  sessionStorage.setItem(SIMULATED_COOKIE_KEY, JSON.stringify(userId));
+}
+
+/**
+ * Clear the simulated HttpOnly cookie.
+ * Called by `postAuthLogout()`, mirroring the real backend's
+ * `Set-Cookie: tkdo_jwt=; Max-Age=0` response header.
+ */
+function simulateCookieClear(): void {
+  sessionStorage.removeItem(SIMULATED_COOKIE_KEY);
+}
+
 const occasions: Occasion[] = [
   {
     id: 0,
@@ -131,55 +174,77 @@ const occasions: Occasion[] = [
   return o;
 });
 
-const idees: {
+/**
+ * SessionStorage key used to persist the mock "idees" database across
+ * within-test page reloads (e.g. caused by form submissions).
+ * Using sessionStorage (not localStorage) so the data resets between
+ * Cypress tests, just like the simulated cookie.
+ */
+const MOCK_IDEES_KEY = '__dev_mock_idees';
+
+type MockIdee = {
   idee: Idee & { dateSuppression?: string };
   utilisateur: Utilisateur;
-}[] = [
-  {
-    idee: {
-      id: 0,
-      description: 'un gauffrier',
-      auteur: alice,
-      dateProposition: '2020-04-19',
+};
+
+function createInitialIdees(): MockIdee[] {
+  return [
+    {
+      idee: {
+        id: 0,
+        description: 'un gauffrier',
+        auteur: alice,
+        dateProposition: '2020-04-19',
+      },
+      utilisateur: alice,
     },
-    utilisateur: alice,
-  },
-  {
-    idee: {
-      id: 1,
-      description: 'une cravate',
-      auteur: alice,
-      dateProposition: '2020-06-19',
-      dateSuppression: '2020-07-08',
+    {
+      idee: {
+        id: 1,
+        description: 'une cravate',
+        auteur: alice,
+        dateProposition: '2020-06-19',
+        dateSuppression: '2020-07-08',
+      },
+      utilisateur: alice,
     },
-    utilisateur: alice,
-  },
-  {
-    idee: {
-      id: 2,
-      description: 'une canne à pêche',
-      auteur: alice,
-      dateProposition: '2020-04-19',
+    {
+      idee: {
+        id: 2,
+        description: 'une canne à pêche',
+        auteur: alice,
+        dateProposition: '2020-04-19',
+      },
+      utilisateur: bob,
     },
-    utilisateur: bob,
-  },
-  {
-    idee: {
-      id: 3,
-      description: 'des gants de boxe',
-      auteur: bob,
-      dateProposition: '2020-04-07',
+    {
+      idee: {
+        id: 3,
+        description: 'des gants de boxe',
+        auteur: bob,
+        dateProposition: '2020-04-07',
+      },
+      utilisateur: bob,
     },
-    utilisateur: bob,
-  },
-].map((i) => {
-  i.idee.dateProposition = new Date(i.idee.dateProposition).toJSON();
-  if (i.idee.dateSuppression)
-    i.idee.dateSuppression = new Date(i.idee.dateSuppression).toJSON();
-  (i.idee as Idee).auteur = enleveDonneesPrivees(i.idee.auteur);
-  (i.utilisateur as Utilisateur) = enleveDonneesPrivees(i.utilisateur);
-  return i;
-});
+  ].map((i) => {
+    i.idee.dateProposition = new Date(i.idee.dateProposition).toJSON();
+    if (i.idee.dateSuppression)
+      i.idee.dateSuppression = new Date(i.idee.dateSuppression).toJSON();
+    (i.idee as Idee).auteur = enleveDonneesPrivees(i.idee.auteur);
+    (i.utilisateur as Utilisateur) = enleveDonneesPrivees(i.utilisateur);
+    return i;
+  });
+}
+
+/** Persist idees to sessionStorage after mutations. */
+function saveIdees(): void {
+  sessionStorage.setItem(MOCK_IDEES_KEY, JSON.stringify(idees));
+}
+
+const idees: MockIdee[] = (() => {
+  const stored = sessionStorage.getItem(MOCK_IDEES_KEY);
+  return stored ? JSON.parse(stored) : createInitialIdees();
+})();
 
 // inspired from: https://jasonwatmore.com/post/2019/05/02/angular-7-mock-backend-example-for-backendless-development
 
@@ -205,7 +270,14 @@ export class DevBackendInterceptor implements HttpInterceptor {
       if ((match = url.match(/^\/api(\/.+)?$/))) {
         const [, urlApi] = match;
 
-        if (urlApi === '/connexion') {
+        if (urlApi === '/auth/login') {
+          if (method === 'POST') return postAuthLogin();
+        } else if (urlApi === '/auth/token') {
+          if (method === 'POST') return postAuthToken();
+        } else if (urlApi === '/auth/logout') {
+          if (method === 'POST') return postAuthLogout();
+        } else if (urlApi === '/connexion') {
+          // Legacy endpoint for backward compatibility
           if (method === 'POST') return postConnexion();
         } else if ((match = urlApi.match(/\/utilisateur\/(\d+)$/))) {
           const [, idUtilisateur] = match;
@@ -237,7 +309,57 @@ export class DevBackendInterceptor implements HttpInterceptor {
       return next.handle(request);
     }
 
+    function postAuthLogin() {
+      const { identifiant, mdp } = body as { identifiant: string; mdp: string };
+
+      const utilisateur = utilisateursAvecMdp.find(
+        (u) => u.identifiant === identifiant && u.mdp === mdp,
+      );
+      if (!utilisateur) return badRequest('identifiants invalides');
+
+      // Generate a one-time auth code
+      const code = Math.random().toString(36).substring(2) + Date.now();
+      authCodes.set(code, {
+        userId: utilisateur.id,
+        expiresAt: Date.now() + 60000, // 60 seconds
+      });
+
+      return ok({ code });
+    }
+
+    function postAuthToken() {
+      const { code } = body as { code: string };
+
+      const authCode = authCodes.get(code);
+      if (!authCode) {
+        return ko(401, 'Unauthorized', { message: 'Code invalide ou expiré' });
+      }
+
+      if (authCode.expiresAt < Date.now()) {
+        authCodes.delete(code);
+        return ko(401, 'Unauthorized', { message: 'Code invalide ou expiré' });
+      }
+
+      // Mark code as used
+      authCodes.delete(code);
+
+      // Set the simulated HttpOnly cookie for this user
+      simulateCookieSet(authCode.userId);
+
+      const utilisateur = utilisateursAvecMdp.find(
+        (u) => u.id === authCode.userId,
+      )!;
+      const { id, nom, admin } = utilisateur;
+      return ok({ utilisateur: { id, nom, admin } });
+    }
+
+    function postAuthLogout() {
+      simulateCookieClear();
+      return okNoContent();
+    }
+
     function postConnexion() {
+      // Legacy endpoint - still works for backward compatibility with old tests
       const { identifiant, mdp } = body as { identifiant: string; mdp: string };
 
       const utilisateur = utilisateursAvecMdp.find(
@@ -250,7 +372,10 @@ export class DevBackendInterceptor implements HttpInterceptor {
     }
 
     function getUtilisateur(idUtilisateur: number) {
-      return authGuard(() => ok(enleveMdp(utilisateursAvecMdp[idUtilisateur])));
+      return authGuard(() => {
+        const user = utilisateursAvecMdp[idUtilisateur];
+        return ok(user ? enleveMdp(user) : undefined);
+      });
     }
 
     function putUtilisateur(idUtilisateur: number) {
@@ -325,6 +450,7 @@ export class DevBackendInterceptor implements HttpInterceptor {
               .format('YYYY-MM-DDTHH:mm:ssZ'),
           },
         });
+        saveIdees();
 
         return ok();
       });
@@ -338,6 +464,7 @@ export class DevBackendInterceptor implements HttpInterceptor {
       return authGuard(() => {
         const idee = idees.find((i) => i.idee.id === idIdee);
         idee!.idee.dateSuppression = new Date().toJSON();
+        saveIdees();
 
         return ok();
       });
@@ -348,6 +475,18 @@ export class DevBackendInterceptor implements HttpInterceptor {
     function authGuard(
       next: (utilisateur: UtilisateurAvecMdp) => Observable<HttpEvent<unknown>>,
     ) {
+      // Check simulated cookie auth (JWT cookie flow).
+      // Only accept the simulated cookie when the request has withCredentials: true,
+      // mirroring real browser behaviour where cookies are only sent with credentialed requests.
+      if (request.withCredentials) {
+        const simulatedUserId = getSimulatedCookie();
+        if (simulatedUserId !== null) {
+          const u = utilisateursAvecMdp.find((u) => u.id === simulatedUserId);
+          if (u) return next(u);
+        }
+      }
+
+      // Fall back to Bearer token for backward compatibility with old tests
       const authorizationHeader = headers.get('Authorization');
       if (!authorizationHeader) return forbidden();
       const match = authorizationHeader.match(/Bearer (.*)/);
@@ -361,6 +500,11 @@ export class DevBackendInterceptor implements HttpInterceptor {
     function ok(body?: object) {
       console.log(`DevBackendInterceptor: ${method} ${url} 200 OK`);
       return of(new HttpResponse({ url, status: 200, body }));
+    }
+
+    function okNoContent() {
+      console.log(`DevBackendInterceptor: ${method} ${url} 204 No Content`);
+      return of(new HttpResponse({ url, status: 204 }));
     }
 
     function ko(status: number, statusText: string, error?: object) {

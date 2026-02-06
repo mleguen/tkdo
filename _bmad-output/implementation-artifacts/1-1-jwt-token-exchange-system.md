@@ -92,6 +92,19 @@ So that JWTs are stored in HttpOnly cookies and never exposed to JavaScript.
   - [x] 6.2 Clear cookie: `Set-Cookie: tkdo_jwt=; HttpOnly; Secure; SameSite=Strict; Path=/api; Max-Age=0`
   - [x] 6.3 Add integration test for logout endpoint
 
+- [x] Task 7: Fix CI failures and complete DevBackendInterceptor cookie simulation (AC: #4)
+  - [x] 7.1 Fix `admin.component.cy.ts`: remove `token` from mock, update test to match hardcoded example token in documentation (not a real token)
+  - [x] 7.2 Implement cookie simulation layer in `DevBackendInterceptor` with clear documentation:
+    - Isolate simulation logic into well-named methods (e.g., `simulateCookieSet()`, `simulateCookieClear()`, `getSimulatedCookie()`)
+    - Use a sessionStorage key that clearly identifies it as a simulated cookie (e.g., `__dev_simulated_cookie_tkdo_jwt`)
+    - Add JSDoc comments explaining why sessionStorage simulates HttpOnly cookies (JS can't read real HttpOnly cookies, so integration tests need a simulation layer)
+    - In `authGuard()`, only accept the simulated cookie when the request has `withCredentials: true` (mirrors real browser behavior where cookies are only sent with credentialed requests)
+  - [x] 7.3 Add `/api/auth/login`, `/api/auth/token`, `/api/auth/logout` handlers to the interceptor dispatch
+  - [x] 7.4 Update `app.po.ts` `invaliderSession()` to also clear the simulated cookie from sessionStorage
+  - [x] 7.5 Verify all Cypress integration tests pass (`./npm run int`)
+  - [x] 7.6 Verify all Cypress component tests pass (`./npm run ct`)
+  - [x] 7.7 Verify all frontend unit tests pass (`./npm test`)
+
 ## Dev Notes
 
 ### Brownfield Context
@@ -497,6 +510,11 @@ Claude Opus 4.5 (claude-opus-4-5-20251101)
 
 ### Debug Log References
 
+- CI run 21753112121 (2026-02-06): Component tests failed on both Chrome and Firefox (shard 1/2). `admin.component.cy.ts` test "should display the authentication token" expected a `token` property on the BackendService mock, but this property was removed in Task 5. Backend tests, unit tests, and E2E tests all passed in CI.
+- CI run 21753112121: Integration tests were skipped because they depend on component tests passing first (`needs: [frontend-component-tests]` in test.yml).
+- Local integration test failures (2026-02-06): `connexion.cy.ts` "se déconnecter et se reconnecter" and `liste-idees.cy.ts` "un tiers voit les idées" fail because the `DevBackendInterceptor` authGuard accepts the simulated cookie regardless of `withCredentials`, causing auth state leakage between logout/re-login.
+- Task 7 session (2026-02-06, Opus 4.6): Root-caused the 2 remaining integration test failures. The `withCredentials` gate in `authGuard()` is necessary but not sufficient. The real bug is a **race condition in `deconnecte()`**: it awaits the POST `/api/auth/logout` before clearing local state (`localStorage.removeItem` + `idUtilisateurConnecte$.next(null)`). If the user navigates to the login page and re-logs in before the POST completes, `connecte()`'s `next(newUserId)` fires first, then `deconnecte()`'s deferred `next(null)` overwrites it. With the real backend this is even worse: the logout response's `Set-Cookie: Max-Age=0` would clear the freshly set JWT cookie. **Fix required in `deconnexion.component.ts`**: gate the "Se reconnecter" button on `deconnecte()` completion (e.g., expose a `logoutComplete` boolean and bind it to the button's visibility/disabled state). The Cypress precondition `connexion.pre.ts` already waits for `#btnSeReconnecter` to exist, so gating the button will naturally fix both tests without test changes.
+
 ### Completion Notes List
 
 **Task 5 Notes:**
@@ -515,9 +533,36 @@ Claude Opus 4.5 (claude-opus-4-5-20251101)
 - Added logout test in `AuthCookieIntTest.php`
 - All 239 backend tests pass
 
+**Task 7 Notes (completed — sessions 2026-02-06 Opus 4.6):**
+
+Subtasks 7.1–7.4 (committed in 7596665):
+1. `front/src/app/admin/admin.component.cy.ts` — Removed `token` from mocks, updated test assertion
+2. `front/src/app/dev-backend.interceptor.ts` — Cookie simulation layer + auth endpoint handlers
+3. `front/cypress/po/app.po.ts` — `invaliderSession()` clears simulated cookie
+
+Subtask 7.5 fixes (3 bugs found and resolved):
+
+**Bug 1 — Logout race condition:**
+- `deconnexion.component.ts`: Added `logoutComplete = false` flag, set to `true` after `await deconnecte()`
+- `deconnexion.component.html`: Gated "Se reconnecter" button on `@if (logoutComplete)`
+- Without this fix, the real backend's `Set-Cookie: Max-Age=0` from logout could clear a freshly set JWT cookie
+
+**Bug 2 — Stale localStorage causing dead observable:**
+- When Cypress clears sessionStorage between tests but leaves localStorage, a stale `id_utilisateur` triggers a 403 from the authGuard (no simulated cookie). The 403 error killed `utilisateurConnecte$`'s `shareReplay(1)` pipeline permanently.
+- `backend.service.ts`: Added `catchError` for 401/403 in `utilisateurConnecte$` and `occasions$` pipelines. On session expiry, calls `effaceEtatLocal()` to clear localStorage and emit `null`.
+- Refactored shared cleanup into `private effaceEtatLocal()` (used by `catchError` and `deconnecte()`)
+
+**Bug 3 — Mock database reset on page reload:**
+- The `#btnSeDeconnecter` button inside a `<form>` (without `type="button"`) triggers a form submission causing a full page reload. This resets the DevBackendInterceptor's module-level in-memory mock data, losing precondition mutations.
+- `dev-backend.interceptor.ts`: Persisted `idees` mock database to sessionStorage (key `__dev_mock_idees`). Survives within-test page reloads; cleared between tests by Cypress.
+
+All tests pass: 10/10 integration, 227/227 component, 64/64 unit.
+
 ### Change Log
 
-- Tasks 5 & 6 completed: Frontend auth flow updated and logout endpoint added
+- Tasks 0–6 completed: Full JWT token exchange system implemented (backend + frontend + HTTPS setup + logout)
+- Reverted to in-progress: CI component test failure discovered + DevBackendInterceptor cookie simulation incomplete (Task 7 added)
+- Task 7 completed: Fixed CI failures, implemented cookie simulation layer, fixed logout race condition, stale localStorage handling, and mock database persistence. All frontend tests pass (10 int + 227 ct + 64 unit). Story moved to review.
 
 ### File List
 
@@ -540,12 +585,16 @@ Claude Opus 4.5 (claude-opus-4-5-20251101)
 - `api/src/Appli/ModelAdaptor/AuthAdaptor.php` - Added groupe_ids support
 - `api/src/Appli/Service/AuthService.php` - Added groupe_ids to JWT, added getValidite()
 - `api/src/Appli/Middleware/AuthMiddleware.php` - Added cookie auth (priority over Bearer)
-- `front/src/app/backend.service.ts` - Two-step auth flow, removed token storage
+- `front/src/app/backend.service.ts` - Two-step auth flow, removed token storage, session expiry catchError
 - `front/src/app/auth-backend.interceptor.ts` - withCredentials instead of Bearer
 - `front/src/app/backend.service.spec.ts` - Updated auth tests
 - `front/src/app/auth-backend.interceptor.spec.ts` - Updated interceptor tests
 - `front/src/app/admin/admin.component.ts` - Removed token property
 - `front/src/app/admin/admin.component.html` - Updated CLI usage docs
+- `front/src/app/admin/admin.component.cy.ts` - Removed token from mocks
+- `front/src/app/dev-backend.interceptor.ts` - Cookie simulation layer, auth endpoints, mock DB persistence
+- `front/src/app/deconnexion/deconnexion.component.ts` - Logout completion gate
+- `front/src/app/deconnexion/deconnexion.component.html` - Conditional rendering on logoutComplete
 - `front/cypress/po/app.po.ts` - Updated invaliderSession() for cookie auth
 - `docker-compose.yml` - Added front-https service
 - `front/cypress.config.ts` - HTTPS support (optional)

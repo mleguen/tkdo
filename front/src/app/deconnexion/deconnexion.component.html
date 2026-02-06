@@ -1,10 +1,14 @@
-<h1>Vous êtes déconnecté(e)</h1>
+@if (logoutComplete) {
+  <h1>Vous êtes déconnecté(e)</h1>
 
-<a
-  id="btnSeReconnecter"
-  class="nav-link"
-  [routerLink]="['/connexion']"
-  data-toggle="collapse"
-  data-target=".navbar-collapse.show"
-  >Se reconnecter</a
->
+  <a
+    id="btnSeReconnecter"
+    class="nav-link"
+    [routerLink]="['/connexion']"
+    data-toggle="collapse"
+    data-target=".navbar-collapse.show"
+    >Se reconnecter</a
+  >
+} @else {
+  <h1>Déconnexion en cours...</h1>
+}

@@ -265,7 +265,8 @@ public function __invoke(Request $request, Response $response): Response
 **Development Environment:**
 - ❌ NEVER ask to install tools on the host - use Docker wrappers
 - ❌ NEVER ask the user how to start Docker or run tests - read the docs
-- ✅ ALWAYS use `./wrapper` scripts for CLI tools
+- ❌ NEVER run `npm`, `composer`, `ng`, `cypress` directly - ALWAYS use `./npm`, `./composer`, etc.
+- ✅ ALWAYS use `./wrapper` scripts for CLI tools (they run in Docker containers)
 - ✅ ALWAYS read `docs/dev-setup.md` and `docs/testing.md` for commands
 
 **Architecture Boundaries:**

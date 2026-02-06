@@ -1,7 +1,13 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable, DOCUMENT, inject } from '@angular/core';
-import { BehaviorSubject, Observable, firstValueFrom, of } from 'rxjs';
-import { first, map, shareReplay, switchMap } from 'rxjs/operators';
+import {
+  BehaviorSubject,
+  Observable,
+  firstValueFrom,
+  of,
+  throwError,
+} from 'rxjs';
+import { catchError, first, map, shareReplay, switchMap } from 'rxjs/operators';
 
 export interface Occasion {
   id: number;
@@ -98,7 +104,18 @@ export class BackendService {
       switchMap((idUtilisateur) =>
         idUtilisateur === null
           ? of(null)
-          : this.http.get<UtilisateurPrive>(URL_UTILISATEUR(idUtilisateur)),
+          : this.http
+              .get<UtilisateurPrive>(URL_UTILISATEUR(idUtilisateur))
+              .pipe(
+                catchError((err: HttpErrorResponse) => {
+                  if (err.status === 401 || err.status === 403) {
+                    // Session expired: clear stale local state and treat as logged out
+                    this.effaceEtatLocal();
+                    return of(null);
+                  }
+                  return throwError(() => err);
+                }),
+              ),
       ),
       shareReplay(1),
     );
@@ -106,9 +123,18 @@ export class BackendService {
       switchMap((idUtilisateur) =>
         idUtilisateur === null
           ? of(null)
-          : this.http.get<Occasion[]>(
-              `${URL_LISTE_OCCASIONS}?idParticipant=${idUtilisateur}`,
-            ),
+          : this.http
+              .get<
+                Occasion[]
+              >(`${URL_LISTE_OCCASIONS}?idParticipant=${idUtilisateur}`)
+              .pipe(
+                catchError((err: HttpErrorResponse) => {
+                  if (err.status === 401 || err.status === 403) {
+                    return of(null);
+                  }
+                  return throwError(() => err);
+                }),
+              ),
       ),
       shareReplay(1),
     );
@@ -154,6 +180,10 @@ export class BackendService {
     } catch {
       // Ignore errors during logout - we still want to clear local state
     }
+    this.effaceEtatLocal();
+  }
+
+  private effaceEtatLocal() {
     localStorage.removeItem(CLE_ID_UTILISATEUR);
     localStorage.removeItem(CLE_LISTE_OCCASIONS);
     this.idUtilisateurConnecte$.next(null);
