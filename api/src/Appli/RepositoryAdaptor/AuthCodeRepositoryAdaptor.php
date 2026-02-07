@@ -94,4 +94,18 @@ class AuthCodeRepositoryAdaptor implements AuthCodeRepository
 
         return $affected === 1;  // True only if we marked it
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    #[\Override]
+    public function purgeExpired(\DateTimeInterface $olderThan): int
+    {
+        $qb = $this->em->createQueryBuilder();
+        return (int) $qb->delete(AuthCodeAdaptor::class, 'c')
+            ->where('c.expiresAt < :threshold')
+            ->setParameter('threshold', $olderThan)
+            ->getQuery()
+            ->execute();
+    }
 }

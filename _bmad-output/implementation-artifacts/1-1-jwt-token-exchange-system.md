@@ -105,6 +105,22 @@ So that JWTs are stored in HttpOnly cookies and never exposed to JavaScript.
   - [x] 7.6 Verify all Cypress component tests pass (`./npm run ct`)
   - [x] 7.7 Verify all frontend unit tests pass (`./npm test`)
 
+### Review Follow-ups (AI)
+
+- [x] [AI-Review][CRITICAL] Secure cookie flag disabled by default - code defaults to dev mode when TKDO_DEV_MODE is unset, contradicting story requirement to test actual production security config [api/src/Appli/Controller/AuthTokenController.php:109-111, AuthLogoutController.php:26-28]
+- [x] [AI-Review][CRITICAL] Missing true concurrent race condition test - Task 3.9 only tests sequential reuse, not simultaneous requests; need parallel HTTP requests to verify atomic UPDATE prevents race conditions [api/test/Int/AuthTokenControllerTest.php:89-135]
+- [x] [AI-Review][HIGH] Git vs Story File List - 10 files in git not documented in File List: .github/workflows/e2e.yml, .gitignore, 1-1b-oauth2-standards-alignment.md, sprint-status.yaml, epics.md, AuthTokenControllerTest.php (named AuthLoginIntTest in story), IntTestCase.php, AuthCodeAdaptorTest.php, package-lock.json, front-https/Dockerfile [Dev Agent Record → File List]
+- [x] [AI-Review][HIGH] Missing E2E security verification - Story Dev Notes (lines 462-466) require Cypress tests to verify JWT inaccessible via document.cookie and localStorage, but no such tests exist [front/cypress/e2e/]
+- [x] [AI-Review][HIGH] CI E2E tests run over HTTP instead of HTTPS - .github/workflows/e2e.yml does not set CYPRESS_HTTPS=true environment variable, so tests run on port 8080 (HTTP) instead of 8443 (HTTPS) defeating the purpose of testing actual production security configuration [.github/workflows/e2e.yml:311] [PR#94 comment](https://github.com/mleguen/tkdo/pull/94#discussion_r2749768481)
+- [x] [AI-Review][MEDIUM] Code duplication in cookie configuration - cookie setup logic (dev mode flag, API base path, cookie string building) duplicated between AuthTokenController and AuthLogoutController; violates DRY [api/src/Appli/Controller/AuthTokenController.php:103-128, AuthLogoutController.php:23-42]
+- [x] [AI-Review][MEDIUM] No technical debt tracking for auth code cleanup - Story Dev Notes line 231 mentions purging expired/used codes but no TODO comment in code or tracking issue created; table will grow indefinitely; performance concern with findValidAuthCode fetching all non-expired codes [api/src/Dom/Repository/AuthCodeRepository.php] [PR#94 comment](https://github.com/mleguen/tkdo/pull/94#discussion_r2749768474)
+- [x] [AI-Review][MEDIUM] HTTPS not enforced by default - front-https service uses profile:https requiring manual --profile https flag; developers may forget and test in HTTP mode with Secure flag disabled [docker-compose.yml:24]
+- [x] [AI-Review][LOW] Inconsistent error message capitalization - AuthLoginController uses lowercase "identifiants invalides" while AuthTokenController uses uppercase "Code invalide ou expiré" [api/src/Appli/Controller/AuthLoginController.php:49, AuthTokenController.php:44]
+- [x] [AI-Review][LOW] Missing database index on code_hash column - migration indexes expires_at and utilisateur_id but not code_hash; findValidAuthCode queries all non-expired codes causing table scan (low impact due to short TTL) [api/src/Infra/Migrations/Version20260131120000.php:24-34]
+- [x] [AI-Review][LOW] File List naming mismatch - story lists "AuthLoginIntTest.php" but actual file is "AuthLoginControllerTest.php" [Dev Agent Record → File List]
+- [x] [AI-Review][LOW] Missing ON DELETE CASCADE in auth_code foreign key - if user is deleted, auth codes remain in database due to FK constraint; should add ON DELETE CASCADE for automatic cleanup [api/src/Infra/Migrations/Version20260131120000.php:36] [PR#94 comment](https://github.com/mleguen/tkdo/pull/94#discussion_r2749768491)
+- [x] [AI-Review][LOW] Weak SSL configuration in dev HTTPS proxy - SSLProtocol allows TLSv1/TLSv1.1 and cipher suite includes MEDIUM strength ciphers; acceptable for local dev with self-signed certs but should be documented as dev-only limitation [docker/front-https/Dockerfile:13-14] [PR#94 comment](https://github.com/mleguen/tkdo/pull/94#discussion_r2749768502)
+
 ## Dev Notes
 
 ### Brownfield Context
@@ -558,33 +574,62 @@ Subtask 7.5 fixes (3 bugs found and resolved):
 
 All tests pass: 10/10 integration, 227/227 component, 64/64 unit.
 
+**2026-02-06 - PR Comments Reviewed (Sonnet 4.5):**
+- Reviewed 4 unresolved GitHub PR comments from PR #94
+- Validated: 3 valid, 1 duplicate (already covered by existing finding)
+- Updated Review Follow-ups section with 13 action items (10 from initial review + 3 new from PR)
+- Responded to all comments in PR #94 with threaded replies explaining action item tracking
+
+**2026-02-06 - Review Follow-ups Resolved (Opus 4.6):**
+- ✅ Resolved review finding [CRITICAL]: Cookie Secure flag now defaults to ON (production mode). `boolval(getenv('TKDO_DEV_MODE'))` replaces the old ternary that defaulted to dev mode. Added TKDO_DEV_MODE=1 to docker-compose.yml, test.yml, and e2e.yml CI environments.
+- ✅ Resolved review finding [CRITICAL]: Added `testConcurrentCodeExchangeOnlyOneSucceeds()` using `curl_multi` to send 5 parallel requests with the same auth code, verifying exactly 1 succeeds and 4 get 401.
+- ✅ Resolved review finding [HIGH]: File List fully updated to match git reality (16 new files, 28 modified files).
+- ✅ Resolved review finding [HIGH]: Added E2E security verification test in `connexion.cy.ts` checking `localStorage.getItem('backend-token') === null` and `document.cookie` doesn't contain `tkdo_jwt`.
+- ✅ Resolved review finding [HIGH]: E2E CI workflow now sets `CYPRESS_HTTPS=true` and `TKDO_API_BASE_PATH=/api` to test production security config over HTTPS.
+- ✅ Resolved review finding [MEDIUM]: Extracted `CookieConfigTrait` with `isDevMode()`, `getCookiePath()`, `getSecureFlag()` methods. Both controllers now use the trait.
+- ✅ Resolved review finding [MEDIUM]: Added `purgeExpired()` method to `AuthCodeRepository` interface and implementation with TODO comment for cron/scheduled task integration.
+- ✅ Resolved review finding [MEDIUM]: Added security testing note in dev-setup.md initial setup section directing developers to HTTPS setup.
+- ✅ Resolved review finding [LOW]: Standardized error messages to lowercase (`code invalide ou expiré`). Updated backend, tests, and DevBackendInterceptor.
+- ✅ Resolved review finding [LOW]: Created new migration `Version20260206120000` adding composite index `idx_valid_codes(used_at, expires_at)` for the findValidAuthCode query.
+- ✅ Resolved review finding [LOW]: Fixed File List naming — corrected `AuthLoginIntTest.php` to `AuthLoginControllerTest.php`.
+- ✅ Resolved review finding [LOW]: Migration `Version20260206120000` adds `ON DELETE CASCADE` to the utilisateur_id foreign key.
+- ✅ Resolved review finding [LOW]: Tightened SSL config in `docker/front-https/Dockerfile` — disabled TLSv1/TLSv1.1, removed MEDIUM ciphers, added dev-only comment.
+
 ### Change Log
 
 - Tasks 0–6 completed: Full JWT token exchange system implemented (backend + frontend + HTTPS setup + logout)
 - Reverted to in-progress: CI component test failure discovered + DevBackendInterceptor cookie simulation incomplete (Task 7 added)
 - Task 7 completed: Fixed CI failures, implemented cookie simulation layer, fixed logout race condition, stale localStorage handling, and mock database persistence. All frontend tests pass (10 int + 227 ct + 64 unit). Story moved to review.
+- Addressed code review findings — 13 items resolved (Date: 2026-02-06)
+- 2026-02-07 - PR Comments Resolved: Resolved 4 PR comment threads, marked completed action items as fixed, PR: #94
 
 ### File List
 
-**New Files (all tasks):**
+**New Files:**
 - `api/src/Dom/Model/AuthCode.php` - Domain model interface
+- `api/src/Dom/Repository/AuthCodeRepository.php` - Repository interface (with purgeExpired for tech debt tracking)
 - `api/src/Appli/ModelAdaptor/AuthCodeAdaptor.php` - Doctrine entity
-- `api/src/Dom/Repository/AuthCodeRepository.php` - Repository interface
 - `api/src/Appli/RepositoryAdaptor/AuthCodeRepositoryAdaptor.php` - Repository implementation
-- `api/src/Infra/Migrations/Version20260131120000.php` - Auth code table migration
 - `api/src/Appli/Controller/AuthLoginController.php` - Login endpoint returning auth code
 - `api/src/Appli/Controller/AuthTokenController.php` - Token exchange endpoint setting JWT cookie
 - `api/src/Appli/Controller/AuthLogoutController.php` - Logout endpoint clearing JWT cookie
-- `api/test/Int/AuthLoginIntTest.php` - Login endpoint integration tests
+- `api/src/Appli/Controller/CookieConfigTrait.php` - Shared cookie configuration (DRY)
+- `api/src/Infra/Migrations/Version20260131120000.php` - Auth code table migration
+- `api/src/Infra/Migrations/Version20260206120000.php` - Add composite index and ON DELETE CASCADE
+- `api/test/Int/AuthLoginControllerTest.php` - Login endpoint integration tests
+- `api/test/Int/AuthTokenControllerTest.php` - Token exchange integration tests (incl. concurrent race condition test)
 - `api/test/Int/AuthCookieIntTest.php` - Cookie auth and logout integration tests
-- `docker/front-https/Dockerfile` - HTTPS proxy for dev (optional)
+- `api/test/Unit/Appli/ModelAdaptor/AuthCodeAdaptorTest.php` - Auth code adaptor unit tests
+- `docker/front-https/Dockerfile` - HTTPS proxy for dev (TLSv1.2+ only)
+- `_bmad-output/implementation-artifacts/1-1b-oauth2-standards-alignment.md` - Story 1.1b (created during sprint)
 
-**Modified Files (all tasks):**
+**Modified Files:**
 - `api/src/Bootstrap.php` - Added auth routes and AuthCodeRepository DI
 - `api/src/Dom/Model/Auth.php` - Added getIdUtilisateur() and getGroupeIds()
 - `api/src/Appli/ModelAdaptor/AuthAdaptor.php` - Added groupe_ids support
 - `api/src/Appli/Service/AuthService.php` - Added groupe_ids to JWT, added getValidite()
 - `api/src/Appli/Middleware/AuthMiddleware.php` - Added cookie auth (priority over Bearer)
+- `api/test/Int/IntTestCase.php` - Added AuthCodeAdaptor to tearDown cleanup
 - `front/src/app/backend.service.ts` - Two-step auth flow, removed token storage, session expiry catchError
 - `front/src/app/auth-backend.interceptor.ts` - withCredentials instead of Bearer
 - `front/src/app/backend.service.spec.ts` - Updated auth tests
@@ -596,7 +641,14 @@ All tests pass: 10/10 integration, 227/227 component, 64/64 unit.
 - `front/src/app/deconnexion/deconnexion.component.ts` - Logout completion gate
 - `front/src/app/deconnexion/deconnexion.component.html` - Conditional rendering on logoutComplete
 - `front/cypress/po/app.po.ts` - Updated invaliderSession() for cookie auth
-- `docker-compose.yml` - Added front-https service
+- `front/cypress/e2e/connexion.cy.ts` - Added JWT security verification E2E test
 - `front/cypress.config.ts` - HTTPS support (optional)
-- `docs/dev-setup.md` - Added HTTPS section
+- `front/package-lock.json` - Dependency lockfile updates
+- `docker-compose.yml` - Added front-https service, TKDO_DEV_MODE for slim-fpm
+- `.github/workflows/e2e.yml` - HTTPS E2E testing, TKDO_API_BASE_PATH
+- `.github/workflows/test.yml` - Added TKDO_DEV_MODE to backend integration test env
+- `.gitignore` - Added docker/certs/
+- `docs/dev-setup.md` - Added HTTPS section and security testing note
 - `_bmad-output/project-context.md` - Added testing requirements
+- `_bmad-output/implementation-artifacts/sprint-status.yaml` - Story status tracking
+- `_bmad-output/planning-artifacts/epics.md` - Epic updates

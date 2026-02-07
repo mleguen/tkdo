@@ -34,4 +34,15 @@ interface AuthCodeRepository
      * Returns false if the code was already used (race condition protection).
      */
     public function marqueUtilise(int $codeId): bool;
+
+    /**
+     * Delete expired and used auth codes older than the given threshold.
+     *
+     * TODO: Tech debt — call this via a cron job or scheduled task to prevent
+     * unbounded growth of the auth_code table. Codes expire after 60s but rows
+     * remain until purged. See Story 1.1 Dev Notes "Cleanup Strategy".
+     *
+     * @return int Number of rows deleted
+     */
+    public function purgeExpired(\DateTimeInterface $olderThan): int;
 }

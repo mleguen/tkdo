@@ -82,7 +82,7 @@ class AuthTokenControllerTest extends IntTestCase
         );
 
         $this->assertEquals(401, $statusCode);
-        $this->assertEquals(['message' => 'Code invalide ou expiré'], $body ?: []);
+        $this->assertEquals(['message' => 'code invalide ou expiré'], $body ?: []);
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
@@ -131,7 +131,7 @@ class AuthTokenControllerTest extends IntTestCase
         );
 
         $this->assertEquals(401, $secondStatusCode);
-        $this->assertEquals(['message' => 'Code invalide ou expiré'], $secondBody ?: []);
+        $this->assertEquals(['message' => 'code invalide ou expiré'], $secondBody ?: []);
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
@@ -148,7 +148,7 @@ class AuthTokenControllerTest extends IntTestCase
         );
 
         $this->assertEquals(401, $statusCode);
-        $this->assertEquals(['message' => 'Code invalide ou expiré'], $body ?: []);
+        $this->assertEquals(['message' => 'code invalide ou expiré'], $body ?: []);
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
@@ -165,5 +165,71 @@ class AuthTokenControllerTest extends IntTestCase
         );
 
         $this->assertEquals(400, $statusCode);
+    }
+
+    /**
+     * Test that concurrent requests with the same code result in exactly one success.
+     * Verifies the atomic UPDATE prevents race conditions.
+     */
+    public function testConcurrentCodeExchangeOnlyOneSucceeds(): void
+    {
+        $utilisateur = $this->utilisateur()->withIdentifiant('utilisateur')->persist(self::$em);
+
+        // Get an auth code
+        $this->requestApi(
+            false,
+            'POST',
+            '/auth/login',
+            $loginStatusCode,
+            $loginBody,
+            '',
+            [
+                'identifiant' => $utilisateur->getIdentifiant(),
+                'mdp' => $utilisateur->getMdpClair(),
+            ]
+        );
+        $this->assertEquals(200, $loginStatusCode);
+        $code = $loginBody['code'];
+
+        // Send 5 parallel requests with the same code using curl_multi
+        $baseUri = getenv('TKDO_BASE_URI');
+        $jsonPayload = json_encode(['code' => $code]);
+        $concurrency = 5;
+        $handles = [];
+        $multiHandle = curl_multi_init();
+
+        for ($i = 0; $i < $concurrency; $i++) {
+            $ch = curl_init($baseUri . '/auth/token');
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonPayload);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            $handles[] = $ch;
+            curl_multi_add_handle($multiHandle, $ch);
+        }
+
+        // Execute all requests concurrently
+        do {
+            $status = curl_multi_exec($multiHandle, $active);
+            if ($active) {
+                curl_multi_select($multiHandle);
+            }
+        } while ($active && $status === CURLM_OK);
+
+        // Collect results
+        $statusCodes = [];
+        foreach ($handles as $ch) {
+            $statusCodes[] = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_multi_remove_handle($multiHandle, $ch);
+            curl_close($ch);
+        }
+        curl_multi_close($multiHandle);
+
+        // Exactly one should succeed (200), the rest should be 401
+        $successes = array_filter($statusCodes, fn(int $code) => $code === 200);
+        $failures = array_filter($statusCodes, fn(int $code) => $code === 401);
+
+        $this->assertCount(1, $successes, 'Exactly one concurrent request should succeed');
+        $this->assertCount($concurrency - 1, $failures, 'All other concurrent requests should get 401');
     }
 }

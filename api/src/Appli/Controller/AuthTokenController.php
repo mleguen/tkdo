@@ -18,6 +18,8 @@ use Slim\Exception\HttpUnauthorizedException;
 
 class AuthTokenController
 {
+    use CookieConfigTrait;
+
     public function __construct(
         private readonly AuthCodeRepository $authCodeRepository,
         private readonly AuthService $authService,
@@ -41,14 +43,14 @@ class AuthTokenController
         $authCode = $this->findValidAuthCode($codeClair);
 
         if ($authCode === null) {
-            throw new HttpUnauthorizedException($request, 'Code invalide ou expiré');
+            throw new HttpUnauthorizedException($request, 'code invalide ou expiré');
         }
 
         // Atomically mark as used - prevents race conditions
         $marked = $this->authCodeRepository->marqueUtilise($authCode->getId());
         if (!$marked) {
             // Another request already used this code
-            throw new HttpUnauthorizedException($request, 'Code invalide ou expiré');
+            throw new HttpUnauthorizedException($request, 'code invalide ou expiré');
         }
 
         // Load the user
@@ -105,23 +107,12 @@ class AuthTokenController
         $expires = time() + $this->authService->getValidite();
         $expiresGmt = gmdate('D, d M Y H:i:s', $expires) . ' GMT';
 
-        // In production, use Secure flag; in dev mode, skip it for HTTP testing
-        $devModeEnv = getenv('TKDO_DEV_MODE');
-        $devMode = $devModeEnv !== false ? boolval($devModeEnv) : true;
-        $secureFlag = $devMode ? '' : 'Secure; ';
-
-        // Cookie path: Use /api in production (behind nginx), / in dev (direct API access)
-        $apiBasePathEnv = getenv('TKDO_API_BASE_PATH');
-        $apiBasePath = $apiBasePathEnv !== false ? $apiBasePathEnv : '/';
-
-        // Build cookie string with security attributes
-        // Note: Secure flag is omitted in dev mode to allow HTTP testing
         $cookie = sprintf(
             'tkdo_jwt=%s; Expires=%s; Path=%s; %sHttpOnly; SameSite=Strict',
             $jwt,
             $expiresGmt,
-            $apiBasePath,
-            $secureFlag
+            $this->getCookiePath(),
+            $this->getSecureFlag()
         );
 
         return $response->withHeader('Set-Cookie', $cookie);

@@ -137,6 +137,7 @@ jobs:
           MYSQL_PASSWORD: mdptkdo
           MAILHOG_BASE_URI: http://127.0.0.1:8025/
           TKDO_BASE_URI: http://localhost:8080
+          TKDO_DEV_MODE: "1"
           TKDO_MAILER_FROM: noreply@ci
         run: |
           php bin/doctrine.php orm:generate-proxies
@@ -179,6 +180,8 @@ jobs:
           echo "Self-signed certificate generated for HTTPS testing"
 
       # Start backend PHP server in background
+      # No TKDO_DEV_MODE → defaults to production mode (Secure cookie flag ON)
+      # TKDO_API_BASE_PATH=/api → cookie path matches nginx proxy prefix
       - name: Start PHP backend server
         env:
           MYSQL_HOST: 127.0.0.1
@@ -187,6 +190,7 @@ jobs:
           MYSQL_USER: tkdo
           MYSQL_PASSWORD: mdptkdo
           MAILHOG_BASE_URI: http://127.0.0.1:8025/
+          TKDO_API_BASE_PATH: /api
           TKDO_BASE_URI: http://localhost:8080
           TKDO_MAILER_FROM: noreply@ci
         run: |
@@ -300,8 +304,8 @@ jobs:
           done
           echo "HTTPS application is ready on port 8443"
 
-      # Run E2E tests (uses baseUrl from cypress.config.ts, defaults to http://localhost:8080)
-      # Set CYPRESS_HTTPS=true to run tests over HTTPS on port 8443
+      # Run E2E tests over HTTPS to test actual production security configuration
+      # (Secure cookies, HttpOnly flags, SameSite=Strict)
       - name: Run E2E tests
         uses: cypress-io/github-action@v6
         with:
@@ -309,6 +313,8 @@ jobs:
           command: npx cypress run
           browser: ${{ matrix.browser }}
           install: false
+        env:
+          CYPRESS_HTTPS: 'true'
 
       - name: Stop servers
         if: always()

@@ -123,6 +123,8 @@ docker compose up -d front
 
 The `-d` flag runs containers in detached mode (background).
 
+> **Security testing:** When working on authentication features, also start the HTTPS proxy with `docker compose --profile https up -d front front-https` and use `https://localhost:8443`. See [HTTPS Development](#https-development-for-security-testing) for details.
+
 **2. Install frontend dependencies:**
 
 ```bash

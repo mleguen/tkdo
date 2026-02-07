@@ -332,12 +332,12 @@ export class DevBackendInterceptor implements HttpInterceptor {
 
       const authCode = authCodes.get(code);
       if (!authCode) {
-        return ko(401, 'Unauthorized', { message: 'Code invalide ou expiré' });
+        return ko(401, 'Unauthorized', { message: 'code invalide ou expiré' });
       }
 
       if (authCode.expiresAt < Date.now()) {
         authCodes.delete(code);
-        return ko(401, 'Unauthorized', { message: 'Code invalide ou expiré' });
+        return ko(401, 'Unauthorized', { message: 'code invalide ou expiré' });
       }
 
       // Mark code as used

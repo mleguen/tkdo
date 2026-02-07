@@ -413,6 +413,7 @@ jobs:
           MYSQL_PASSWORD: mdptkdo
           MAILHOG_BASE_URI: http://127.0.0.1:8025/
           TKDO_BASE_URI: http://localhost:8000
+          TKDO_DEV_MODE: "1"
           TKDO_MAILER_FROM: noreply@ci
         run: |
           php bin/doctrine.php orm:generate-proxies
@@ -451,6 +452,7 @@ jobs:
           MYSQL_PASSWORD: mdptkdo
           MAILHOG_BASE_URI: http://127.0.0.1:8025/
           TKDO_BASE_URI: http://localhost:8000
+          TKDO_DEV_MODE: "1"
           TKDO_MAILER_FROM: noreply@ci
         run: |
           cd api/public
@@ -468,6 +470,7 @@ jobs:
           MYSQL_PASSWORD: mdptkdo
           MAILHOG_BASE_URI: http://127.0.0.1:8025/
           TKDO_BASE_URI: http://localhost:8000
+          TKDO_DEV_MODE: "1"
           TKDO_MAILER_FROM: noreply@ci
         run: composer test -- --testsuite=Int
         working-directory: ./api
