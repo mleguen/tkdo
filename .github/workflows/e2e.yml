@@ -137,6 +137,7 @@ jobs:
           MYSQL_PASSWORD: mdptkdo
           MAILHOG_BASE_URI: http://127.0.0.1:8025/
           TKDO_BASE_URI: http://localhost:8080
+          TKDO_DEV_MODE: "1"
           TKDO_MAILER_FROM: noreply@ci
         run: |
           php bin/doctrine.php orm:generate-proxies
@@ -169,6 +170,10 @@ jobs:
           firefox-version: "*"
 
       # Start backend PHP server in background
+      # TKDO_DEV_MODE=1: disable Secure cookie flag (CI runs over HTTP)
+      # No TKDO_API_BASE_PATH: nginx strips /api prefix before forwarding,
+      # so Slim sees bare routes (/auth/login, not /api/auth/login).
+      # Cookie Path defaults to "/" which works for all requests.
       - name: Start PHP backend server
         env:
           MYSQL_HOST: 127.0.0.1
@@ -177,6 +182,7 @@ jobs:
           MYSQL_USER: tkdo
           MYSQL_PASSWORD: mdptkdo
           MAILHOG_BASE_URI: http://127.0.0.1:8025/
+          TKDO_DEV_MODE: "1"
           TKDO_BASE_URI: http://localhost:8080
           TKDO_MAILER_FROM: noreply@ci
         run: |
@@ -251,7 +257,7 @@ jobs:
           sudo rm -f /etc/nginx/sites-enabled/default
           sudo nginx -t
           sudo systemctl restart nginx
-          echo "Nginx proxy configured and started on port 8080"
+          echo "Nginx proxy configured on port 8080 (HTTP)"
 
       - name: Wait for services to be ready
         run: |
@@ -259,14 +265,18 @@ jobs:
             echo "Waiting for application to be ready..."
             sleep 2
           done
-          echo "Application is ready!"
+          echo "Application is ready on port 8080"
 
-      # Run E2E tests
+      # E2E tests run over HTTP with TKDO_DEV_MODE=1 (Secure cookie flag off).
+      # Self-signed certs in CI can't test Secure cookies: browsers reject them
+      # on untrusted HTTPS regardless of --ignore-certificate-errors.
+      # Instead, cookie security is verified by:
+      #   - E2E test: asserts HttpOnly prevents document.cookie access (XSS protection)
+      #   - Backend test: asserts Set-Cookie includes Secure in production mode (MITM protection)
       - name: Run E2E tests
         uses: cypress-io/github-action@v6
         with:
           working-directory: ./front
-          command: npx cypress run --config baseUrl=http://localhost:8080
           browser: ${{ matrix.browser }}
           install: false
 

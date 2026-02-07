@@ -12,7 +12,10 @@ import { BackendService } from '../backend.service';
 export class DeconnexionComponent implements OnInit {
   private readonly backend = inject(BackendService);
 
+  logoutComplete = false;
+
   async ngOnInit() {
     await this.backend.deconnecte();
+    this.logoutComplete = true;
   }
 }

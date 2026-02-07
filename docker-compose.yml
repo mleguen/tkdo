@@ -12,6 +12,18 @@ services:
     ports:
       - ${FRONT_DEV_PORT:-8080}:80
 
+  front-https:
+    build: ./docker/front-https
+    depends_on:
+      - angular
+      - slim-web
+    ports:
+      - ${FRONT_HTTPS_DEV_PORT:-8443}:443
+    volumes:
+      - ./docker/certs:/usr/local/apache2/conf/certs:ro
+    profiles:
+      - https
+
   mailhog:
     image: mailhog/mailhog
     ports:
@@ -44,8 +56,11 @@ services:
       - SYS_ADMIN
     environment:
       - CYPRESS_CACHE_FOLDER=/mnt/tkdo/.cache/Cypress
+      - CYPRESS_HTTPS=${CYPRESS_HTTPS:-false}
+      - FRONT_HTTPS_DEV_PORT=${FRONT_HTTPS_DEV_PORT:-8443}
       - NG_CLI_ANALYTICS=false
       - NPM_CONFIG_CACHE=/mnt/tkdo/.cache/npm
+      - NPM_DEV_PORT=${NPM_DEV_PORT:-4200}
     volumes:
       - ./:/mnt/tkdo
 
@@ -97,6 +112,7 @@ services:
       MYSQL_PORT: 3306
       MYSQL_USER: tkdo
       TKDO_BASE_URI: http://slim-web
+      TKDO_DEV_MODE: "1"
       TKDO_MAILER_FROM: noreply@slim
       WWW_GID: ${GID:-1000}
       WWW_UID: ${UID:-1000}

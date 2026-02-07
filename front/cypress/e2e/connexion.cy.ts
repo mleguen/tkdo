@@ -73,6 +73,39 @@ describe('connexion/déconnexion/reconnexion', () => {
     });
   });
 
+  it('ne pas exposer le JWT au JavaScript après connexion', () => {
+    cy.visit('/');
+
+    const connexionPage = new ConnexionPage();
+
+    cy.fixture('utilisateurs').then((utilisateurs) => {
+      connexionPage.identifiant().type(utilisateurs.soi.identifiant);
+      connexionPage.motDePasse().type(utilisateurs.soi.mdp);
+      connexionPage.boutonSeConnecter().click();
+      connexionPage.nomUtilisateur().should('have.text', utilisateurs.soi.nom);
+
+      // JWT must NOT be in localStorage (was removed in Story 1.1)
+      cy.window().then((win) => {
+        expect(win.localStorage.getItem('backend-token')).to.be.null;
+      });
+
+      // JWT cookie must NOT be readable by JavaScript (HttpOnly)
+      cy.window().then((win) => {
+        expect(win.document.cookie).to.not.include('tkdo_jwt');
+      });
+
+      // When running against a real backend (E2E), also verify the cookie
+      // exists with HttpOnly flag via devtools protocol (bypasses HttpOnly).
+      // Integration tests use a mock interceptor that cannot set real cookies.
+      cy.getCookies().then((cookies) => {
+        const jwtCookie = cookies.find((c) => c.name === 'tkdo_jwt');
+        if (jwtCookie) {
+          expect(jwtCookie.httpOnly, 'tkdo_jwt cookie should be HttpOnly').to.be.true;
+        }
+      });
+    });
+  });
+
   it('se déconnecter et se reconnecter avec un autre identifiant', () => {
     cy.fixture('utilisateurs').then((utilisateurs) => {
       etantDonneQue(jeSuisConnecteEnTantQue(utilisateurs.soi));
