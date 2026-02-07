@@ -306,15 +306,16 @@ jobs:
 
       # Run E2E tests over HTTPS to test actual production security configuration
       # (Secure cookies, HttpOnly flags, SameSite=Strict)
+      # NODE_TLS_REJECT_UNAUTHORIZED=0: Cypress Node.js proxy must accept the self-signed cert
       - name: Run E2E tests
         uses: cypress-io/github-action@v6
         with:
           working-directory: ./front
-          command: npx cypress run
           browser: ${{ matrix.browser }}
           install: false
         env:
           CYPRESS_HTTPS: 'true'
+          NODE_TLS_REJECT_UNAUTHORIZED: '0'
 
       - name: Stop servers
         if: always()

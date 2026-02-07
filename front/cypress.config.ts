@@ -15,10 +15,20 @@ export default defineConfig({
   e2e: {
     baseUrl,
     specPattern: 'cypress/e2e/**/*.cy.ts',
-    // When using HTTPS with self-signed certs, we need to:
-    // 1. Disable Chrome web security to avoid certificate errors
-    // 2. This is acceptable for local development testing only
+    // When using HTTPS with self-signed certs, disable Chrome web security
+    // and add --ignore-certificate-errors for Chromium-based browsers
     ...(useHttps && { chromeWebSecurity: false }),
+    setupNodeEvents(on, config) {
+      if (useHttps) {
+        on('before:browser:launch', (browser, launchOptions) => {
+          if (browser.family === 'chromium') {
+            launchOptions.args.push('--ignore-certificate-errors');
+          }
+          return launchOptions;
+        });
+      }
+      return config;
+    },
   },
 
   component: {
