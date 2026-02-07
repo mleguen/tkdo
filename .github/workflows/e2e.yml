@@ -171,7 +171,9 @@ jobs:
 
       # Start backend PHP server in background
       # TKDO_DEV_MODE=1: disable Secure cookie flag (CI runs over HTTP)
-      # TKDO_API_BASE_PATH=/api: cookie path matches nginx proxy prefix
+      # No TKDO_API_BASE_PATH: nginx strips /api prefix before forwarding,
+      # so Slim sees bare routes (/auth/login, not /api/auth/login).
+      # Cookie Path defaults to "/" which works for all requests.
       - name: Start PHP backend server
         env:
           MYSQL_HOST: 127.0.0.1
@@ -181,7 +183,6 @@ jobs:
           MYSQL_PASSWORD: mdptkdo
           MAILHOG_BASE_URI: http://127.0.0.1:8025/
           TKDO_DEV_MODE: "1"
-          TKDO_API_BASE_PATH: /api
           TKDO_BASE_URI: http://localhost:8080
           TKDO_MAILER_FROM: noreply@ci
         run: |
