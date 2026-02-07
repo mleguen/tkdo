@@ -169,19 +169,9 @@ jobs:
           # default would be 'latest' which is not compatible with tc.find() as not a semver
           firefox-version: "*"
 
-      # Generate self-signed certificate for HTTPS testing
-      - name: Generate self-signed certificate
-        run: |
-          mkdir -p /tmp/certs
-          openssl req -x509 -nodes -days 1 -newkey rsa:2048 \
-            -keyout /tmp/certs/localhost.key \
-            -out /tmp/certs/localhost.crt \
-            -subj "/CN=localhost"
-          echo "Self-signed certificate generated for HTTPS testing"
-
       # Start backend PHP server in background
-      # No TKDO_DEV_MODE → defaults to production mode (Secure cookie flag ON)
-      # TKDO_API_BASE_PATH=/api → cookie path matches nginx proxy prefix
+      # TKDO_DEV_MODE=1: disable Secure cookie flag (CI runs over HTTP)
+      # TKDO_API_BASE_PATH=/api: cookie path matches nginx proxy prefix
       - name: Start PHP backend server
         env:
           MYSQL_HOST: 127.0.0.1
@@ -190,6 +180,7 @@ jobs:
           MYSQL_USER: tkdo
           MYSQL_PASSWORD: mdptkdo
           MAILHOG_BASE_URI: http://127.0.0.1:8025/
+          TKDO_DEV_MODE: "1"
           TKDO_API_BASE_PATH: /api
           TKDO_BASE_URI: http://localhost:8080
           TKDO_MAILER_FROM: noreply@ci
@@ -238,37 +229,13 @@ jobs:
           sleep 2
           echo "Frontend SPA server started on port 4200"
 
-      # Configure reverse proxy using nginx to combine frontend + API (HTTP + HTTPS)
+      # Configure reverse proxy using nginx to combine frontend + API
       - name: Configure nginx reverse proxy
         run: |
           sudo tee /etc/nginx/sites-available/tkdo-e2e > /dev/null <<'EOF'
-          # HTTP server on port 8080
           server {
               listen 8080;
               server_name localhost;
-
-              # API requests go to PHP backend
-              location /api/ {
-                  proxy_pass http://localhost:8000/;
-                  proxy_set_header Host $host;
-                  proxy_set_header X-Real-IP $remote_addr;
-              }
-
-              # Everything else goes to frontend
-              location / {
-                  proxy_pass http://localhost:4200/;
-                  proxy_set_header Host $host;
-                  proxy_set_header X-Real-IP $remote_addr;
-              }
-          }
-
-          # HTTPS server on port 8443 (for security testing with CYPRESS_HTTPS=true)
-          server {
-              listen 8443 ssl;
-              server_name localhost;
-
-              ssl_certificate /tmp/certs/localhost.crt;
-              ssl_certificate_key /tmp/certs/localhost.key;
 
               # API requests go to PHP backend
               location /api/ {
@@ -289,33 +256,28 @@ jobs:
           sudo rm -f /etc/nginx/sites-enabled/default
           sudo nginx -t
           sudo systemctl restart nginx
-          echo "Nginx proxy configured on port 8080 (HTTP) and 8443 (HTTPS)"
+          echo "Nginx proxy configured on port 8080 (HTTP)"
 
       - name: Wait for services to be ready
         run: |
           until curl -s http://localhost:8080 > /dev/null; do
-            echo "Waiting for HTTP application to be ready..."
+            echo "Waiting for application to be ready..."
             sleep 2
           done
-          echo "HTTP application is ready on port 8080"
-          until curl -sk https://localhost:8443 > /dev/null; do
-            echo "Waiting for HTTPS application to be ready..."
-            sleep 2
-          done
-          echo "HTTPS application is ready on port 8443"
+          echo "Application is ready on port 8080"
 
-      # Run E2E tests over HTTPS to test actual production security configuration
-      # (Secure cookies, HttpOnly flags, SameSite=Strict)
-      # NODE_TLS_REJECT_UNAUTHORIZED=0: Cypress Node.js proxy must accept the self-signed cert
+      # E2E tests run over HTTP with TKDO_DEV_MODE=1 (Secure cookie flag off).
+      # Self-signed certs in CI can't test Secure cookies: browsers reject them
+      # on untrusted HTTPS regardless of --ignore-certificate-errors.
+      # Instead, cookie security is verified by:
+      #   - E2E test: asserts HttpOnly prevents document.cookie access (XSS protection)
+      #   - Backend test: asserts Set-Cookie includes Secure in production mode (MITM protection)
       - name: Run E2E tests
         uses: cypress-io/github-action@v6
         with:
           working-directory: ./front
           browser: ${{ matrix.browser }}
           install: false
-        env:
-          CYPRESS_HTTPS: 'true'
-          NODE_TLS_REJECT_UNAUTHORIZED: '0'
 
       - name: Stop servers
         if: always()

@@ -228,6 +228,20 @@ Rationale:
 
 This ensures we test the ACTUAL security model, not a weakened dev version.
 
+**CI limitation: self-signed certs cannot test Secure cookie flag.**
+Browsers reject `Secure` cookies on untrusted HTTPS connections (self-signed certs),
+regardless of `--ignore-certificate-errors` or `chromeWebSecurity: false` — those flags
+only suppress navigation warnings, not the cookie security policy. This means CI cannot
+run the full production security config end-to-end. Instead, cookie security is split
+into two targeted tests:
+- **E2E test** (`connexion.cy.ts`): asserts `HttpOnly` prevents `document.cookie` access
+  (protects against XSS-based session theft)
+- **Backend test** (`AuthTokenControllerTest`): asserts `Set-Cookie` header includes
+  `Secure` when `TKDO_DEV_MODE` is not set (protects against MITM session theft)
+
+CI runs E2E over HTTP with `TKDO_DEV_MODE=1` to disable the Secure flag. Local dev
+uses HTTPS via `docker compose --profile https` for full production-equivalent testing.
+
 #### Database Schema for auth_code
 
 ```sql
@@ -585,7 +599,7 @@ All tests pass: 10/10 integration, 227/227 component, 64/64 unit.
 - ✅ Resolved review finding [CRITICAL]: Added `testConcurrentCodeExchangeOnlyOneSucceeds()` using `curl_multi` to send 5 parallel requests with the same auth code, verifying exactly 1 succeeds and 4 get 401.
 - ✅ Resolved review finding [HIGH]: File List fully updated to match git reality (16 new files, 28 modified files).
 - ✅ Resolved review finding [HIGH]: Added E2E security verification test in `connexion.cy.ts` checking `localStorage.getItem('backend-token') === null` and `document.cookie` doesn't contain `tkdo_jwt`.
-- ✅ Resolved review finding [HIGH]: E2E CI workflow now sets `CYPRESS_HTTPS=true` and `TKDO_API_BASE_PATH=/api` to test production security config over HTTPS.
+- ✅ Resolved review finding [HIGH]: E2E CI workflow sets `TKDO_API_BASE_PATH=/api` and `TKDO_DEV_MODE=1`. CI runs over HTTP because self-signed certs cannot test `Secure` cookies (browsers reject them on untrusted HTTPS). Cookie security is instead verified by: (1) E2E test asserting HttpOnly prevents `document.cookie` access, (2) backend test asserting `Set-Cookie` includes `Secure` in production mode.
 - ✅ Resolved review finding [MEDIUM]: Extracted `CookieConfigTrait` with `isDevMode()`, `getCookiePath()`, `getSecureFlag()` methods. Both controllers now use the trait.
 - ✅ Resolved review finding [MEDIUM]: Added `purgeExpired()` method to `AuthCodeRepository` interface and implementation with TODO comment for cron/scheduled task integration.
 - ✅ Resolved review finding [MEDIUM]: Added security testing note in dev-setup.md initial setup section directing developers to HTTPS setup.
@@ -602,6 +616,7 @@ All tests pass: 10/10 integration, 227/227 component, 64/64 unit.
 - Task 7 completed: Fixed CI failures, implemented cookie simulation layer, fixed logout race condition, stale localStorage handling, and mock database persistence. All frontend tests pass (10 int + 227 ct + 64 unit). Story moved to review.
 - Addressed code review findings — 13 items resolved (Date: 2026-02-06)
 - 2026-02-07 - PR Comments Resolved: Resolved 4 PR comment threads, marked completed action items as fixed, PR: #94
+- 2026-02-07 - CI E2E fix: Reverted from HTTPS to HTTP (self-signed certs can't test Secure cookies). Added TKDO_DEV_MODE=1 to PHP server. Fixed browser matrix (was running Electron instead of Chrome/Firefox). Documented security testing approach split between E2E (HttpOnly) and backend (Secure flag) tests.
 
 ### File List
 
