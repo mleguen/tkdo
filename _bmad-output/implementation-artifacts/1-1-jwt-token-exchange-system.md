@@ -1,6 +1,6 @@
 # Story 1.1: JWT Token Exchange System
 
-Status: review
+Status: done
 
 > **Technical Debt Note:** This implementation uses non-standard endpoint naming (`/auth/login`, `/auth/token`) and combines authorization server + BFF responsibilities. Story 1.1b addresses this by refactoring to OAuth2-compliant architecture with `league/oauth2-client` integration, preparing for future external IdP adoption.
 
@@ -107,6 +107,7 @@ So that JWTs are stored in HttpOnly cookies and never exposed to JavaScript.
 
 ### Review Follow-ups (AI)
 
+- [x] [AI-Review][INFO] Pre-existing test warnings not introduced by Story 1.1 - Test suite shows 1 deprecation + 1 notice in WorkflowGiftExchangeIntTest.php:27 (unrelated to this story's changes); tracked in Story 0.2 for future cleanup [Test suite baseline]
 - [x] [AI-Review][CRITICAL] Secure cookie flag disabled by default - code defaults to dev mode when TKDO_DEV_MODE is unset, contradicting story requirement to test actual production security config [api/src/Appli/Controller/AuthTokenController.php:109-111, AuthLogoutController.php:26-28]
 - [x] [AI-Review][CRITICAL] Missing true concurrent race condition test - Task 3.9 only tests sequential reuse, not simultaneous requests; need parallel HTTP requests to verify atomic UPDATE prevents race conditions [api/test/Int/AuthTokenControllerTest.php:89-135]
 - [x] [AI-Review][HIGH] Git vs Story File List - 10 files in git not documented in File List: .github/workflows/e2e.yml, .gitignore, 1-1b-oauth2-standards-alignment.md, sprint-status.yaml, epics.md, AuthTokenControllerTest.php (named AuthLoginIntTest in story), IntTestCase.php, AuthCodeAdaptorTest.php, package-lock.json, front-https/Dockerfile [Dev Agent Record → File List]
@@ -645,6 +646,7 @@ All tests pass: 10/10 integration, 227/227 component, 64/64 unit.
 - 2026-02-07 - CI E2E fix: Reverted from HTTPS to HTTP (self-signed certs can't test Secure cookies). Added TKDO_DEV_MODE=1 to PHP server. Fixed browser matrix (was running Electron instead of Chrome/Firefox). Documented security testing approach split between E2E (HttpOnly) and backend (Secure flag) tests.
 - 2026-02-13 - Verified and marked remaining 8 review follow-up items as complete (1 HIGH, 1 MEDIUM, 6 LOW). All fixes were already implemented in working copy. Full test suite validated: 557 tests pass (142 backend unit + 102 backend int + 64 frontend unit + 227 component + 11 integration + 11 E2E).
 - 2026-02-13 - PR Comments Resolved: Resolved 13 PR comment threads (11 full responses + 2 short references), marked completed action items as fixed, PR: #94
+- 2026-02-13 - Code Review Complete: Adversarial review found ZERO critical/high/medium issues. All 4 ACs implemented, all 7 tasks complete, all 21 review follow-ups resolved, 244 tests pass. Pre-existing test warnings (1 deprecation, 1 notice) documented in Story 0.2 for future cleanup. Story marked DONE.
 
 ### File List
 

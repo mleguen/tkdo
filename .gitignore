@@ -1,6 +1,7 @@
 /.cache
 /api/src/Appli/Fixture/*.data.php
 /docker/certs/
+/_bmad-output/implementation-artifacts/.baseline-*
 node_modules
 /front/cypress/screenshots
 /init-ng.sh

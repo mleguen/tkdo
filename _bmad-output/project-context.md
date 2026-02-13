@@ -289,6 +289,81 @@ public function __invoke(Request $request, Response $response): Response
 
 ---
 
+## Known Technical Debt
+
+**Test Suite Warnings (Non-Blocking):**
+- **1 Deprecation** in `api/test/Int/WorkflowGiftExchangeIntTest.php:27`
+- **1 Notice** in `api/test/Int/WorkflowGiftExchangeIntTest.php:27`
+- **Status:** Pre-existing (not introduced by Story 1.1)
+- **Impact:** None - all 244 tests pass successfully
+- **Tracked in:** Story 0.2: Clean Up Test Warnings (backlog)
+
+**CRITICAL: AI Agent Test Baseline Process**
+
+This process prevents wasting time investigating pre-existing technical debt during code reviews.
+
+**Dev Agent - MANDATORY Step at Story Start:**
+
+Before implementing ANY code for a story, you MUST capture the test baseline:
+
+```bash
+# Extract story key from filename (e.g., "1-2-user-login.md" → "1-2-user-login")
+STORY_KEY="<extract-from-filename>"
+
+# Capture baseline
+./composer test 2>&1 | grep -E "Tests:|Assertions:|Deprecations:|Notices:" > \
+  _bmad-output/implementation-artifacts/.baseline-${STORY_KEY}.txt
+
+# Display to user
+echo "📊 Test Baseline Captured: .baseline-${STORY_KEY}.txt"
+cat _bmad-output/implementation-artifacts/.baseline-${STORY_KEY}.txt
+```
+
+**File naming examples:**
+- Story 1.2 → `.baseline-1-2-user-login.txt`
+- Story 0.2 → `.baseline-0-2-clean-test-warnings.txt`
+- Story 1.1b → `.baseline-1-1b-oauth2-standards-alignment.txt`
+
+**Review Agent - MANDATORY Step Before Investigation:**
+
+Before investigating ANY test warnings during code review:
+
+```bash
+# 1. Load story-specific baseline
+BASELINE_FILE="_bmad-output/implementation-artifacts/.baseline-${STORY_KEY}.txt"
+
+# 2. Read baseline (or use global baseline below if file missing)
+if [ -f "$BASELINE_FILE" ]; then
+  echo "Using story baseline: $BASELINE_FILE"
+  cat "$BASELINE_FILE"
+else
+  echo "⚠️ No story baseline found. Using global baseline from project-context.md"
+  echo "Tests: 244, Assertions: 1011, Deprecations: 1, Notices: 1"
+fi
+
+# 3. Run current tests and compare
+./composer test 2>&1 | grep -E "Tests:|Assertions:|Deprecations:|Notices:"
+
+# 4. ONLY investigate NEW warnings beyond baseline
+```
+
+**Decision Tree for Review Agent:**
+- Baseline shows 1 deprecation → Current shows 1 deprecation → ✅ **IGNORE** (pre-existing)
+- Baseline shows 1 deprecation → Current shows 2 deprecations → 🔴 **INVESTIGATE** (new issue!)
+- Baseline missing → Use global baseline → Only investigate warnings beyond global baseline
+
+**Why This Matters:**
+- Story 1.1 review wasted time investigating pre-existing warnings in WorkflowGiftExchangeIntTest.php
+- Without baselines, EVERY review will waste the same time
+- Baselines enable focusing ONLY on issues introduced by current story
+
+**Test Baseline (as of 2026-02-13):**
+```
+Tests: 244, Assertions: 1011, Deprecations: 1, Notices: 1
+```
+
+---
+
 ## Usage Guidelines
 
 **For AI Agents:**
