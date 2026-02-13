@@ -36,7 +36,9 @@ interface AuthCodeRepository
     public function marqueUtilise(int $codeId): bool;
 
     /**
-     * Delete expired and used auth codes older than the given threshold.
+     * Delete auth codes that expired before the given threshold.
+     * Removes all expired codes regardless of whether they were used,
+     * since expired codes are no longer valid for exchange.
      *
      * TODO: Tech debt — call this via a cron job or scheduled task to prevent
      * unbounded growth of the auth_code table. Codes expire after 60s but rows

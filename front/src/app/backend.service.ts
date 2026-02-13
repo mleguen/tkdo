@@ -130,6 +130,7 @@ export class BackendService {
               .pipe(
                 catchError((err: HttpErrorResponse) => {
                   if (err.status === 401 || err.status === 403) {
+                    this.effaceEtatLocal();
                     return of(null);
                   }
                   return throwError(() => err);

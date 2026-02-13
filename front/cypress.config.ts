@@ -15,8 +15,9 @@ export default defineConfig({
   e2e: {
     baseUrl,
     specPattern: 'cypress/e2e/**/*.cy.ts',
-    // When using HTTPS with self-signed certs, disable Chrome web security
-    // and add --ignore-certificate-errors for Chromium-based browsers
+    // When using HTTPS with self-signed certs, disable same-origin policy
+    // (chromeWebSecurity: false) and add --ignore-certificate-errors for
+    // Chromium-based browsers to allow navigation to self-signed HTTPS sites
     ...(useHttps && { chromeWebSecurity: false }),
     setupNodeEvents(on, config) {
       if (useHttps) {

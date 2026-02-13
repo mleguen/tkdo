@@ -14,6 +14,7 @@ use Doctrine\ORM\EntityManager;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
+use App\Dom\Exception\UtilisateurInconnuException;
 use Slim\Exception\HttpUnauthorizedException;
 
 class AuthTokenController
@@ -53,8 +54,12 @@ class AuthTokenController
             throw new HttpUnauthorizedException($request, 'code invalide ou expiré');
         }
 
-        // Load the user
-        $utilisateur = $this->utilisateurRepository->read($authCode->getUtilisateurId());
+        // Load the user (may have been deleted between login and token exchange)
+        try {
+            $utilisateur = $this->utilisateurRepository->read($authCode->getUtilisateurId());
+        } catch (UtilisateurInconnuException) {
+            throw new HttpUnauthorizedException($request, 'code invalide ou expiré');
+        }
 
         // Create auth and generate JWT
         // groupe_ids will be populated in Story 2.2+, empty for now

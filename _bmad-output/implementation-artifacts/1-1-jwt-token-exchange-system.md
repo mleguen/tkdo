@@ -113,13 +113,21 @@ So that JWTs are stored in HttpOnly cookies and never exposed to JavaScript.
 - [x] [AI-Review][HIGH] Missing E2E security verification - Story Dev Notes (lines 462-466) require Cypress tests to verify JWT inaccessible via document.cookie and localStorage, but no such tests exist [front/cypress/e2e/]
 - [x] [AI-Review][HIGH] CI E2E tests run over HTTP instead of HTTPS - .github/workflows/e2e.yml does not set CYPRESS_HTTPS=true environment variable, so tests run on port 8080 (HTTP) instead of 8443 (HTTPS) defeating the purpose of testing actual production security configuration [.github/workflows/e2e.yml:311] [PR#94 comment](https://github.com/mleguen/tkdo/pull/94#discussion_r2749768481)
 - [x] [AI-Review][MEDIUM] Code duplication in cookie configuration - cookie setup logic (dev mode flag, API base path, cookie string building) duplicated between AuthTokenController and AuthLogoutController; violates DRY [api/src/Appli/Controller/AuthTokenController.php:103-128, AuthLogoutController.php:23-42]
-- [x] [AI-Review][MEDIUM] No technical debt tracking for auth code cleanup - Story Dev Notes line 231 mentions purging expired/used codes but no TODO comment in code or tracking issue created; table will grow indefinitely; performance concern with findValidAuthCode fetching all non-expired codes [api/src/Dom/Repository/AuthCodeRepository.php] [PR#94 comment](https://github.com/mleguen/tkdo/pull/94#discussion_r2749768474)
+- [x] [AI-Review][MEDIUM] No technical debt tracking for auth code cleanup - Story Dev Notes line 231 mentions purging expired/used codes but no TODO comment in code or tracking issue created; table will grow indefinitely; performance concern with findValidAuthCode fetching all non-expired codes [api/src/Dom/Repository/AuthCodeRepository.php] [PR#94 comments: [perf](https://github.com/mleguen/tkdo/pull/94#discussion_r2749768474), [scale](https://github.com/mleguen/tkdo/pull/94#discussion_r2777669928)]
 - [x] [AI-Review][MEDIUM] HTTPS not enforced by default - front-https service uses profile:https requiring manual --profile https flag; developers may forget and test in HTTP mode with Secure flag disabled [docker-compose.yml:24]
 - [x] [AI-Review][LOW] Inconsistent error message capitalization - AuthLoginController uses lowercase "identifiants invalides" while AuthTokenController uses uppercase "Code invalide ou expiré" [api/src/Appli/Controller/AuthLoginController.php:49, AuthTokenController.php:44]
 - [x] [AI-Review][LOW] Missing database index on code_hash column - migration indexes expires_at and utilisateur_id but not code_hash; findValidAuthCode queries all non-expired codes causing table scan (low impact due to short TTL) [api/src/Infra/Migrations/Version20260131120000.php:24-34]
 - [x] [AI-Review][LOW] File List naming mismatch - story lists "AuthLoginIntTest.php" but actual file is "AuthLoginControllerTest.php" [Dev Agent Record → File List]
 - [x] [AI-Review][LOW] Missing ON DELETE CASCADE in auth_code foreign key - if user is deleted, auth codes remain in database due to FK constraint; should add ON DELETE CASCADE for automatic cleanup [api/src/Infra/Migrations/Version20260131120000.php:36] [PR#94 comment](https://github.com/mleguen/tkdo/pull/94#discussion_r2749768491)
 - [x] [AI-Review][LOW] Weak SSL configuration in dev HTTPS proxy - SSLProtocol allows TLSv1/TLSv1.1 and cipher suite includes MEDIUM strength ciphers; acceptable for local dev with self-signed certs but should be documented as dev-only limitation [docker/front-https/Dockerfile:13-14] [PR#94 comment](https://github.com/mleguen/tkdo/pull/94#discussion_r2749768502)
+- [x] [AI-Review][HIGH] php-cli service missing TKDO_DEV_MODE environment variable - testCookieAuthWorksForProtectedEndpoints fails with 401 because cookies get Secure flag but tests run over HTTP; php-cli needs TKDO_DEV_MODE: "1" added to match slim-fpm config; tests only pass in CI because test.yml sets env var explicitly [docker-compose.yml php-cli service environment section]
+- [x] [AI-Review][MEDIUM] UtilisateurInconnuException not caught in token exchange - user deleted between login and token exchange causes 500 instead of 401; catch exception and return unauthorized [api/src/Appli/Controller/AuthTokenController.php:58] [PR#94 comment](https://github.com/mleguen/tkdo/pull/94#discussion_r2777669926)
+- [x] [AI-Review][LOW] getUtilisateur mock returns 200/undefined instead of 404 - dev mock inconsistent with real backend (ViewUtilisateurController returns 404); should return notFound() to match real API behavior and avoid hiding bugs in tests [front/src/app/dev-backend.interceptor.ts:377] [PR#94 comment](https://github.com/mleguen/tkdo/pull/94#discussion_r2777266623)
+- [x] [AI-Review][LOW] occasions$ catchError doesn't clear local state - on 401/403, returns null but doesn't call effaceEtatLocal(); minor inconsistency with utilisateurConnecte$ behavior [front/src/app/backend.service.ts:136] [PR#94 comment](https://github.com/mleguen/tkdo/pull/94#discussion_r2777266625)
+- [x] [AI-Review][LOW] purgeExpired() doc/implementation mismatch - interface says "expired and used" but implementation only deletes by expiresAt; clarify contract or update query [api/src/Dom/Repository/AuthCodeRepository.php:47, api/src/Appli/RepositoryAdaptor/AuthCodeRepositoryAdaptor.php:106] [PR#94 comments: [interface](https://github.com/mleguen/tkdo/pull/94#discussion_r2777266634), [impl](https://github.com/mleguen/tkdo/pull/94#discussion_r2777266639)]
+- [x] [AI-Review][LOW] chromeWebSecurity comment misleading - comment claims it addresses certificate errors but it disables same-origin policy instead; correct or remove comment [front/cypress.config.ts] [PR#94 comment](https://github.com/mleguen/tkdo/pull/94#discussion_r2777266642)
+- [x] [AI-Review][LOW] NPM_DEV_PORT dead configuration - exported to npm container but no longer used by Cypress config; remove or wire it back [docker-compose.yml:63] [PR#94 comment](https://github.com/mleguen/tkdo/pull/94#discussion_r2777266643)
+- [x] [AI-Review][LOW] HttpOnly assertion conditional in E2E test - only asserts cookie.HttpOnly if cookie exists; should assert cookie exists AND is HttpOnly to catch regressions [front/cypress/e2e/connexion.cy.ts:105] [PR#94 comment](https://github.com/mleguen/tkdo/pull/94#discussion_r2777669923)
 
 ## Dev Notes
 
@@ -609,6 +617,24 @@ All tests pass: 10/10 integration, 227/227 component, 64/64 unit.
 - ✅ Resolved review finding [LOW]: Migration `Version20260206120000` adds `ON DELETE CASCADE` to the utilisateur_id foreign key.
 - ✅ Resolved review finding [LOW]: Tightened SSL config in `docker/front-https/Dockerfile` — disabled TLSv1/TLSv1.1, removed MEDIUM ciphers, added dev-only comment.
 
+**2026-02-07 - PR Comments Reviewed (Sonnet 4.5):**
+- Reviewed 9 unresolved GitHub PR comments from PR #94
+- Validated: 7 valid (including 1 reclassified after backend verification), 1 consolidated pair, 0 invalid
+- Added 7 new action items from PR comments (1 MEDIUM, 6 LOW)
+- Updated Review Follow-ups section: now 21 total action items (14 resolved, 7 open)
+- Responded to all 9 comments in PR #94 with threaded replies explaining action item tracking
+
+**2026-02-13 - Final Review Follow-ups Verified (Opus 4.6):**
+- ✅ Verified review finding [HIGH]: php-cli TKDO_DEV_MODE already added to docker-compose.yml (line 81)
+- ✅ Verified review finding [MEDIUM]: UtilisateurInconnuException already caught in AuthTokenController (lines 57-62) with proper 401 response
+- ✅ Verified review finding [LOW]: getUtilisateur mock already returns notFound() for unknown users (dev-backend.interceptor.ts line 388)
+- ✅ Verified review finding [LOW]: occasions$ catchError already calls effaceEtatLocal() (backend.service.ts lines 131-136)
+- ✅ Verified review finding [LOW]: purgeExpired() interface doc already updated to match implementation — deletes all expired codes regardless of used status
+- ✅ Verified review finding [LOW]: chromeWebSecurity comment already corrected — accurately describes disabling same-origin policy separately from certificate errors
+- ✅ Verified review finding [LOW]: NPM_DEV_PORT already removed from docker-compose.yml
+- ✅ Verified review finding [LOW]: HttpOnly assertion already unconditional — asserts cookie exists AND is HttpOnly
+- Full regression suite: 557 tests pass (142 backend unit + 102 backend int + 64 frontend unit + 227 component + 11 integration + 11 E2E)
+
 ### Change Log
 
 - Tasks 0–6 completed: Full JWT token exchange system implemented (backend + frontend + HTTPS setup + logout)
@@ -617,6 +643,8 @@ All tests pass: 10/10 integration, 227/227 component, 64/64 unit.
 - Addressed code review findings — 13 items resolved (Date: 2026-02-06)
 - 2026-02-07 - PR Comments Resolved: Resolved 4 PR comment threads, marked completed action items as fixed, PR: #94
 - 2026-02-07 - CI E2E fix: Reverted from HTTPS to HTTP (self-signed certs can't test Secure cookies). Added TKDO_DEV_MODE=1 to PHP server. Fixed browser matrix (was running Electron instead of Chrome/Firefox). Documented security testing approach split between E2E (HttpOnly) and backend (Secure flag) tests.
+- 2026-02-13 - Verified and marked remaining 8 review follow-up items as complete (1 HIGH, 1 MEDIUM, 6 LOW). All fixes were already implemented in working copy. Full test suite validated: 557 tests pass (142 backend unit + 102 backend int + 64 frontend unit + 227 component + 11 integration + 11 E2E).
+- 2026-02-13 - PR Comments Resolved: Resolved 13 PR comment threads (11 full responses + 2 short references), marked completed action items as fixed, PR: #94
 
 ### File List
 

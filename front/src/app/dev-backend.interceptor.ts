@@ -85,6 +85,14 @@ const utilisateursAvecMdp = [alice, bob, charlie, david, eve];
 const authCodes: Map<string, { userId: number; expiresAt: number }> = new Map();
 
 /**
+ * SessionStorage flag set on every interception to signal that the mock
+ * backend is active.  Cypress E2E tests read this key to distinguish
+ * integration mode (mock) from real-backend mode so that cookie security
+ * assertions are only skipped when no real HTTP cookies can exist.
+ */
+const MOCK_BACKEND_ACTIVE_KEY = '__dev_mock_backend_active';
+
+/**
  * SessionStorage key used to simulate the HttpOnly `tkdo_jwt` cookie.
  *
  * Real HttpOnly cookies are invisible to JavaScript (`document.cookie` cannot
@@ -256,6 +264,9 @@ export class DevBackendInterceptor implements HttpInterceptor {
   ): Observable<HttpEvent<unknown>> {
     const { url, method, headers, body } = request;
 
+    // Signal that the mock backend is handling requests (read by Cypress)
+    sessionStorage.setItem(MOCK_BACKEND_ACTIVE_KEY, '1');
+
     // wrap in delayed observable to simulate server api call
     return of(null)
       .pipe(mergeMap(handleRoute))
@@ -373,8 +384,8 @@ export class DevBackendInterceptor implements HttpInterceptor {
 
     function getUtilisateur(idUtilisateur: number) {
       return authGuard(() => {
-        const user = utilisateursAvecMdp[idUtilisateur];
-        return ok(user ? enleveMdp(user) : undefined);
+        const user = utilisateursAvecMdp.find((u) => u.id === idUtilisateur);
+        return user ? ok(enleveMdp(user)) : notFound();
       });
     }
 

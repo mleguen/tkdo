@@ -9,6 +9,34 @@
     It merges GitHub PR comments into the existing review action items and responds to all unresolved PR comments.
   </objective>
 
+  <critical_principle name="Reviewer Responsibility: No Premature Judgments">
+    A reviewer's credibility depends on thorough investigation BEFORE classification.
+
+    **Anti-patterns to avoid:**
+    - ❌ "This looks like X, so INVALID"
+    - ❌ "I don't immediately see the problem, so INVALID"
+    - ❌ "This is [category], typically out of scope"
+    - ❌ Quick dismissals without code reading
+    - ❌ Assumptions based on first impression
+
+    **Required approach:**
+    1. ✅ Read the questioned code thoroughly
+    2. ✅ Understand its context and intent (why it exists)
+    3. ✅ Check related code, tests, documentation
+    4. ✅ Form hypothesis about validity
+    5. ✅ Gather evidence to confirm/refute hypothesis
+    6. ✅ Make classification with documented reasoning showing evidence
+
+    **Before classifying ANY comment as VALID or INVALID, ask yourself:**
+    - "Have I read all the relevant code files?"
+    - "Do I understand WHY it was implemented this way?"
+    - "What concrete evidence am I basing this decision on?"
+    - "Can I explain both what the code does AND why the author might have chosen this approach?"
+
+    **Remember**: Saying "I need to investigate this further before deciding" is better than
+    making an uninformed classification. The user expects rigor and evidence, not speed.
+  </critical_principle>
+
   <step n="1" goal="Load story and existing review findings">
     <action>Use provided {{story_path}} or ask user which story file to review</action>
     <action>Read COMPLETE story file</action>
@@ -86,7 +114,25 @@ Retrieving unresolved review comments...</output>
 
     <action>Retrieve all review comments using: `gh api repos/OWNER/REPO/pulls/{{pr_number}}/comments --jq '.[] | {id: .id, path: .path, line: .line, body: .body, user: .user.login, html_url: .html_url, in_reply_to_id: .in_reply_to_id}'`</action>
 
-    <action>Filter to only unresolved comments (those without in_reply_to_id OR where no replies exist yet)</action>
+    <action>Filter to only root-level comments (where in_reply_to_id is null) - these are the original review comments, not replies</action>
+
+    <action>For each root-level comment, check if it already has resolution replies:
+      1. Fetch all comments for this PR again
+      2. For each root comment, find any replies (where in_reply_to_id == root comment id)
+      3. Check if ANY reply contains resolution markers:
+         - "✓ Classification: RESOLVED"
+         - "✅ **VALID**" or "⚪ **OUT OF SCOPE**" or "⚪ **INVALID**"
+         - Pattern indicating prior review workflow response
+      4. Mark comment as already_resolved=true if resolution reply found
+      5. Filter out all comments where already_resolved=true
+    </action>
+
+    <output>**📊 Comment Status:**
+- {{total_root_comments}} total root-level review comments
+- {{already_resolved_count}} already resolved (have review responses)
+- {{unresolved_count}} unresolved (need processing)
+
+Proceeding with {{unresolved_count}} unresolved comments...</output>
 
     <check if="no unresolved comments">
       <output>ℹ️ No unresolved PR review comments found.
@@ -104,36 +150,103 @@ From reviewers: {{reviewer_list}}
 Processing each comment...</output>
   </step>
 
-  <step n="3" goal="Validate and categorize PR comments">
-    <critical>For each PR comment, verify accuracy and determine validity</critical>
+  <step n="3" goal="Investigate and validate PR comments with evidence">
+    <critical>INVESTIGATION BEFORE CLASSIFICATION - No premature judgments allowed</critical>
 
-    <action>For EACH unresolved PR comment:
+    <action>For EACH unresolved PR comment, follow this investigation-first process:
+
+      **Phase 1: Gather Context**
       1. Read comment body, file path, and line number
-      2. Read the actual code at that location to verify context
-      3. Determine validation status:
-         - **VALID**: Real issue that should be addressed
-         - **INVALID**: False positive, out of scope, or already addressed
-         - **DUPLICATE**: Already covered by existing finding from adversarial review
-         - **CONSOLIDATED**: Valid issue that shares root cause with another VALID PR comment (will be merged into single action item)
+      2. Identify what the comment claims or questions
+      3. Note the reviewer's concern or suggestion
 
-      4. If VALID, DUPLICATE, or CONSOLIDATED:
-         a. Extract severity from comment or infer (CRITICAL/HIGH/MEDIUM/LOW)
-         b. Check if already in {{existing_findings}} (→ DUPLICATE)
-         c. Check if same root cause as another VALID PR comment (→ CONSOLIDATED, group together)
-         d. If standalone new issue: Prepare as new finding
+      **Phase 2: Mandatory Investigation Checklist**
+      Before making ANY classification decision, verify ALL of the following:
 
-      5. Store validation result with:
-         - comment_id
-         - validation_status (VALID/INVALID/DUPLICATE/CONSOLIDATED)
-         - severity (if VALID or CONSOLIDATED)
-         - finding_description
-         - file_reference (file:line)
-         - linked_finding_index (if DUPLICATE)
-         - consolidated_group_id (if CONSOLIDATED - matches other comments in same group)
-         - comment_thread_url (html_url from PR comment)
+      □ Read all relevant code files mentioned or implied by the comment
+      □ Read the specific lines questioned (with surrounding context, not just the exact line)
+      □ Understand the intent/purpose of the questioned code (why it exists, what problem it solves)
+      □ Check for related tests that cover this code
+      □ Check for related documentation or code comments explaining the behavior
+      □ Identify any related files or modules that provide context
+      □ Can explain WHY the code works this way (even if it might be wrong)
+      □ Can articulate the actual impact of the concern (not just theoretical)
+
+      **If ANY checkbox above is unchecked → investigate more before proceeding to Phase 3**
+
+      **Phase 3: Evidence-Based Classification**
+
+      Only after completing Phase 2, determine validation status with documented evidence:
+
+      Build classification record in this format:
+
+      ```
+      **Comment {{comment_id}}**: {{file_path}}:{{line}}
+
+      **What the comment claims:**
+      {{concise_summary_of_reviewer_concern}}
+
+      **Investigation Evidence:**
+      - Read: {{list_all_files_read}} (specific lines: {{line_ranges}})
+      - Code purpose: {{why_this_code_exists_and_what_it_does}}
+      - Related context: {{tests_docs_related_code_found}}
+      - Current behavior: {{what_actually_happens_now}}
+      - Expected behavior (per comment): {{what_reviewer_expects}}
+
+      **Impact Analysis:**
+      - Actual risk: {{concrete_impact_if_comment_is_correct}}
+      - Theoretical vs real: {{is_this_a_real_problem_or_edge_case}}
+      - Scope: {{what_would_break_or_be_affected}}
+
+      **Classification Decision:** [VALID/INVALID/DUPLICATE/CONSOLIDATED]
+
+      **Reasoning:**
+      {{clear_explanation_of_why_you_chose_this_classification_based_on_evidence_above}}
+
+      {{if_VALID_or_CONSOLIDATED}}**Severity:** [CRITICAL/HIGH/MEDIUM/LOW]
+      **Severity Justification:** {{why_this_severity_level}}{{endif}}
+
+      {{if_DUPLICATE}}**Covered by existing finding:** [AI-Review][{{severity}}] {{existing_finding_description}}{{endif}}
+
+      {{if_CONSOLIDATED}}**Root cause shared with comments:** {{list_other_comment_ids_in_group}}{{endif}}
+      ```
+
+      **Classification Types:**
+      - **VALID**: Real issue that should be addressed (backed by evidence from investigation)
+      - **INVALID**: False positive, out of scope, or already addressed (backed by evidence showing why not applicable)
+      - **DUPLICATE**: Already covered by existing finding from adversarial review (match existing action item)
+      - **CONSOLIDATED**: Valid issue that shares root cause with another VALID PR comment (will be merged into single action item)
+
+      **Phase 4: Store Classification**
+      Store validation result with:
+      - comment_id
+      - validation_status (VALID/INVALID/DUPLICATE/CONSOLIDATED)
+      - severity (if VALID or CONSOLIDATED)
+      - finding_description
+      - file_reference (file:line)
+      - investigation_evidence (all files read, evidence gathered)
+      - decision_reasoning (why this classification)
+      - linked_finding_index (if DUPLICATE)
+      - consolidated_group_id (if CONSOLIDATED)
+      - comment_thread_url (html_url from PR comment)
     </action>
 
-    <output>**✅ PR Comment Validation Complete**
+    <check critical="true" title="Self-Review: Did I investigate thoroughly?">
+      <action>Before presenting results, verify for EACH comment:
+        - ✓ I read the actual code, not just the comment
+        - ✓ I understand why the code exists this way
+        - ✓ My classification is based on evidence, not assumptions
+        - ✓ I can defend my reasoning with specific file:line references
+        - ✓ If I classified as INVALID, I have concrete evidence it's not an issue
+      </action>
+
+      <check if="any verification fails">
+        <output>⚠️ Investigation incomplete for some comments. Continuing investigation...</output>
+        <action>Return to Phase 2 for incomplete comments</action>
+      </check>
+    </check>
+
+    <output>**✅ PR Comment Validation Complete (Evidence-Based)**
 
 Results:
 - {{valid_count}} VALID comments (will add as standalone action items)
@@ -146,6 +259,10 @@ Breakdown by severity:
 - HIGH: {{high_count}}
 - MEDIUM: {{medium_count}}
 - LOW: {{low_count}}
+
+**Investigation Stats:**
+- Total files read: {{files_read_count}}
+- Average investigation depth: {{avg_context_lines_read}} lines per comment
 
 **PR URLs to track:** {{valid_count + consolidated_count + duplicate_count}} (all must appear in action items)
     </output>
@@ -216,13 +333,16 @@ Following .claude/README.md guidelines:
 Posting individual responses...</output>
 
     <action>For EACH unresolved PR comment:
-      1. Build response based on validation status:
+      1. Build response based on validation status, INCLUDING INVESTIGATION EVIDENCE:
 
       **If VALID (standalone - new finding added):**
       ```
       ✅ **VALID** - Confirmed this is {{issue_summary}}.
 
-      {{explanation_with_file_line_details}}
+      **Investigation:**
+      {{brief_summary_of_evidence_gathered}}
+      - Verified: {{what_was_checked}}
+      - Impact: {{actual_impact_found}}
 
       **Added to story action items:**
       - Action Item: [AI-Review][{{severity}}] {{finding_description}} [{{file_reference}}]
@@ -236,7 +356,10 @@ Posting individual responses...</output>
       ```
       ✅ **VALID** - Confirmed this is {{issue_summary}}.
 
-      {{explanation_with_file_line_details}}
+      **Investigation:**
+      {{brief_summary_of_evidence_gathered}}
+      - Verified: {{what_was_checked}}
+      - Impact: {{actual_impact_found}}
 
       **Added to story action items:**
       - Action Item: [AI-Review][{{severity}}] {{finding_description}} [{{file_reference}}]
@@ -255,6 +378,9 @@ Posting individual responses...</output>
       ```
       ✅ **VALID** - Confirmed {{issue_summary}}.
 
+      **Investigation:**
+      {{brief_summary_showing_this_matches_existing_finding}}
+
       **Already covered in existing action item:**
       - Action Item: [AI-Review][{{severity}}] {{existing_finding_description}} [{{file_reference}}]
       - Story file: {{story_file}}
@@ -265,16 +391,21 @@ Posting individual responses...</output>
 
       **If INVALID/OUT-OF-SCOPE:**
       ```
-      ⚪ **OUT OF SCOPE** - {{reason}}
+      ⚪ **OUT OF SCOPE** - {{concise_reason}}
 
-      {{explanation_why_invalid_or_out_of_scope}}
+      **Investigation:**
+      {{show_what_was_checked_to_reach_this_conclusion}}
+      - Verified: {{files_read_and_checked}}
+      - Current behavior: {{what_code_actually_does}}
+      - Reasoning: {{why_this_is_not_an_issue_or_out_of_scope}}
       ```
 
       2. CRITICAL: Never use "#X" - write "Action Item: [AI-Review][SEVERITY]" instead
       3. CRITICAL: Give full context - readers don't know the action item numbering
-      4. CRITICAL: For CONSOLIDATED groups, post to FIRST comment first, capture reply URL, then use it for subsequent comments
-      5. Post using: `gh api -X POST repos/OWNER/REPO/pulls/{{pr_number}}/comments/{{comment_id}}/replies -f body="{{response}}"`
-      6. Verify successful posting and capture {{reply_url}} from response html_url field
+      4. CRITICAL: Show investigation evidence - demonstrates thorough review, not quick dismissal
+      5. CRITICAL: For CONSOLIDATED groups, post to FIRST comment first, capture reply URL, then use it for subsequent comments
+      6. Post using: `gh api -X POST repos/OWNER/REPO/pulls/{{pr_number}}/comments/{{comment_id}}/replies -f body="{{response}}"`
+      7. Verify successful posting and capture {{reply_url}} from response html_url field
     </action>
 
     <output>**✅ All PR Comments Responded**
@@ -287,11 +418,12 @@ All responses are visible in the Files Changed review tab under their respective
   <step n="6" goal="Update story status and summary">
     <action>Add completion note to story's Dev Agent Record → Completion Notes List:
 
-**{{date}} - PR Comments Reviewed:**
-- Reviewed {{comment_count}} unresolved GitHub PR comments
+**{{date}} - PR Comments Reviewed (Evidence-Based Investigation):**
+- Reviewed {{comment_count}} unresolved GitHub PR comments ({{already_resolved_count}} already resolved, filtered out)
+- Investigation: Read {{files_read_count}} files with {{avg_context_lines_read}} avg lines per comment
 - Validated: {{valid_count}} valid, {{duplicate_count}} duplicate, {{invalid_count}} invalid
 - Updated Review Follow-ups section with {{total_findings}} action items
-- Responded to all comments in PR #{{pr_number}}
+- Responded to all comments in PR #{{pr_number}} with investigation evidence
     </action>
 
     <action>Ensure story Status remains "in-progress" (since action items exist)</action>

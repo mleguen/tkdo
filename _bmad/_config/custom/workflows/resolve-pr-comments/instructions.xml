@@ -80,19 +80,31 @@ Exiting.</output>
         - is_grouped: true if multiple PR comments, false if single
     </action>
 
-    <check if="no completed action items with PR links">
-      <output>No completed action items with PR comment links found.
+    <action>**Check Change Log for previously resolved comment IDs:**
+
+      Scan the Change Log section for previous "PR Comments Resolved" entries.
+      These entries include a `comment_ids:` field listing the specific comment IDs
+      that were already posted to and resolved in a prior run.
+
+      Collect all previously resolved comment IDs into {{previously_resolved_ids}}.
+
+      Remove from {{completed_with_pr_links}} any action item where ALL its comment IDs
+      appear in {{previously_resolved_ids}}.
+      For grouped action items, remove only the individual comment IDs that were previously
+      resolved; keep the action item if at least one comment ID is new.
+
+      Store removed items as {{already_resolved_locally}} for reporting.
+    </action>
+
+    <check if="no completed action items with PR links (after filtering)">
+      <output>No new PR comment threads to resolve.
 
 Current status:
 - Total action items: {{total_action_items}}
 - Completed: {{completed_count}}
 - With PR links: {{pr_link_count}}
-- Completed WITH PR links: 0
-
-Either:
-1. No action items are marked [x] yet
-2. No action items have PR comment links
-3. All PR comments already resolved
+- Already resolved (from Change Log): {{already_resolved_locally_count}}
+- Remaining to resolve: 0
 
 Nothing to do. Exiting.</output>
       <action>Exit workflow</action>
@@ -151,22 +163,48 @@ URL: {{pr_url}}
 Preparing to resolve {{completed_pr_count}} comment threads...</output>
   </step>
 
-  <step n="3" goal="Post Fixed comments and resolve threads">
+  <step n="3" goal="Filter out already-resolved threads, post Fixed comments, and resolve remaining">
     <critical>Follow .claude/README.md guidelines for PR comment responses</critical>
     <critical>Do NOT include commit SHA in responses - this gives operator flexibility about when to commit</critical>
 
     <action>Read {claude_readme} Pull Request Review Responses section</action>
 
-    <output>**Marking {{completed_pr_count}} PR Comments as Resolved**
+    <action>**Fetch thread IDs and filter out any externally resolved threads (fallback):**
+
+      The Change Log check in Step 1 already removed threads resolved by previous runs of
+      this workflow. This GraphQL query serves as a fallback to also catch threads that were
+      resolved externally (e.g. manually by a reviewer on GitHub).
+
+      Query review threads for the remaining comment IDs to get their thread node IDs
+      and resolution status:
+      ```
+      gh api graphql -f query='{ repository(owner: "{{owner}}", name: "{{repo}}") { pullRequest(number: {{pr_number}}) { reviewThreads(first: 100) { nodes { id isResolved comments(first: 1) { nodes { databaseId } } } } } } }' \
+        --jq '.data.repository.pullRequest.reviewThreads.nodes[] | select(.comments.nodes[0].databaseId == COMMENT_ID_1 or ...) | {threadId: .id, commentId: .comments.nodes[0].databaseId, isResolved: .isResolved}'
+      ```
+
+      Store the thread node IDs for the resolve mutation later.
+      Remove any remaining threads that are already resolved. Append to {{already_resolved}} for reporting.
+    </action>
+
+    <check if="all remaining threads are already resolved">
+      <output>All PR comment threads are already resolved ({{already_resolved_locally_count}} from Change Log, {{already_resolved_externally_count}} resolved externally).
+
+Nothing to do. Exiting.</output>
+      <action>Exit workflow</action>
+    </check>
+
+    <output>**Marking {{unresolved_count}} PR Comments as Resolved**
+{{#if already_resolved_locally_count}}  (skipping {{already_resolved_locally_count}} from previous run){{/if}}
+{{#if already_resolved_externally_count}}  (skipping {{already_resolved_externally_count}} resolved externally){{/if}}
 
 Following .claude/README.md guidelines:
 - Using /comments/COMMENT_ID/replies endpoint for threaded responses
 - Posting "Fixed" confirmation
 - Resolving threads via GraphQL API
 
-Processing each comment...</output>
+Processing each unresolved comment...</output>
 
-    <action>For EACH completed action item with PR link(s):
+    <action>For EACH completed action item with UNRESOLVED PR link(s):
       1. Extract all comment_ids from PR comment URL(s)
 
       **If single PR comment (is_grouped == false):**
@@ -205,29 +243,19 @@ Processing each comment...</output>
       Track success/failure for summary
     </action>
 
-    <action>**Batch Resolve All Threads via GraphQL:**
+    <action>**Batch Resolve Unresolved Threads via GraphQL:**
 
-      After posting all comments, resolve all threads in a single batched GraphQL operation for efficiency.
+      After posting all comments, resolve all unresolved threads in a single batched GraphQL mutation.
+      Thread IDs were already retrieved during the filtering step above — reuse them.
 
-      1. Get ALL thread node IDs for all comment IDs in one query:
-         ```
-         gh api graphql -f query='{ repository(owner: "{{owner}}", name: "{{repo}}") { pullRequest(number: {{pr_number}}) { reviewThreads(first: 100) { nodes { id isResolved comments(first: 1) { nodes { databaseId } } } } } } }' \
-           --jq '.data.repository.pullRequest.reviewThreads.nodes[] | select(.comments.nodes[0].databaseId == COMMENT_ID_1 or .comments.nodes[0].databaseId == COMMENT_ID_2 or ...) | {threadId: .id, commentId: .comments.nodes[0].databaseId, isResolved: .isResolved}'
-         ```
-
-      2. Build a single batched mutation to resolve all threads at once:
-         ```
-         gh api graphql -f query='mutation {
-           t1: resolveReviewThread(input: {threadId: "THREAD_ID_1"}) { thread { isResolved } }
-           t2: resolveReviewThread(input: {threadId: "THREAD_ID_2"}) { thread { isResolved } }
-           ...
-         }'
-         ```
-
-      **Benefits:**
-      - Single API call instead of N calls
-      - Faster execution
-      - Reduced rate limiting risk
+      Build a single batched mutation for all unresolved threads:
+      ```
+      gh api graphql -f query='mutation {
+        t1: resolveReviewThread(input: {threadId: "THREAD_ID_1"}) { thread { isResolved } }
+        t2: resolveReviewThread(input: {threadId: "THREAD_ID_2"}) { thread { isResolved } }
+        ...
+      }'
+      ```
 
       **Note:** If there are more than 10 threads, split into batches of 10 to avoid query complexity limits.
 
@@ -237,11 +265,13 @@ Processing each comment...</output>
     <output>**All Fixed Comments Posted**
 
 Results:
-- Action items resolved: {{completed_pr_count}}
-- PR comment threads processed: {{total_comment_threads}}
+- Action items with PR links: {{completed_pr_count}}
+- Skipped (previous run, from Change Log): {{already_resolved_locally_count}}
+- Skipped (resolved externally): {{already_resolved_externally_count}}
+- PR comment threads posted to: {{posted_thread_count}}
   - Full responses: {{full_response_count}}
   - Short references: {{short_reference_count}}
-- Threads resolved via GraphQL: {{resolved_count}}/{{total_comment_threads}}
+- Threads resolved via GraphQL: {{resolved_count}}
 - Failures: {{failure_count}}
 
 {{#if failures}}
@@ -255,13 +285,14 @@ All successfully posted comments are visible in PR #{{pr_number}}.</output>
   </step>
 
   <step n="4" goal="Update story with resolution notes">
-    <action>Add completion note to story's Dev Agent Record - Completion Notes List:
+    <action>Add Change Log entry to story (MUST include comment_ids for future runs):
 
-**{{date}} - PR Comments Resolved:**
-- Resolved {{posted_count}} PR comment threads
-- Marked completed action items as fixed
-- PR: #{{pr_number}}
+- {{date}} - PR Comments Resolved: Resolved {{posted_count}} PR comment threads, marked completed action items as fixed, PR: #{{pr_number}}, comment_ids: {{comma_separated_list_of_all_resolved_comment_ids}}
     </action>
+
+    <critical>The `comment_ids:` field is REQUIRED in the Change Log entry.
+      Future runs of this workflow use it to skip already-resolved threads without API calls.
+      List ALL comment IDs that were posted to in this run, comma-separated.</critical>
 
     <action>Save story file</action>
 
