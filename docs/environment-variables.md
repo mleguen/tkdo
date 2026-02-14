@@ -430,6 +430,129 @@ TKDO_DEV_MODE=1     # Development
 
 **Production deployment:** Always set to `0`
 
+## OAuth2 Configuration
+
+These variables configure OAuth2 authentication settings. Critical for switching between the temporary built-in authorization server and external Identity Providers (Google, Auth0, etc.).
+
+### OAUTH2_CLIENT_ID
+
+**Description:** OAuth2 client identifier for the application
+
+**Type:** String
+
+**Required:** No
+
+**Default:** `tkdo`
+
+**Examples:**
+
+```bash
+OAUTH2_CLIENT_ID=tkdo                          # Default (temporary auth server)
+OAUTH2_CLIENT_ID=your-google-client-id         # Google OAuth2
+OAUTH2_CLIENT_ID=AbC123XyZ                     # Auth0 client ID
+```
+
+**Usage:**
+
+- Used in OAuth2 authorization requests to identify the application
+- For temporary auth server: leave as default `tkdo`
+- For external IdP: use the client ID provided by your IdP
+- Must match the client ID registered with your OAuth2 provider
+
+### OAUTH2_CLIENT_SECRET
+
+**Description:** OAuth2 client secret for secure back-channel token exchange
+
+**Type:** String
+
+**Required:** No
+
+**Default:** `dev-secret`
+
+**Security:** 🔒 **SENSITIVE** - Never commit to version control
+
+**Examples:**
+
+```bash
+OAUTH2_CLIENT_SECRET=dev-secret                           # Development only
+OAUTH2_CLIENT_SECRET=your-production-secret-here          # Production
+```
+
+**Usage:**
+
+- Used by the BFF to authenticate with the OAuth2 token endpoint
+- **CRITICAL:** Change from default in production
+- For temporary auth server: use a strong random secret in production
+- For external IdP: use the client secret provided by your IdP
+- Validated on `/oauth/token` endpoint to prevent auth code theft
+
+**Best practices:**
+
+- Use strong, randomly generated secrets (minimum 32 characters)
+- Different secret for each environment
+- Rotate regularly in production
+
+### OAUTH2_REDIRECT_URI
+
+**Description:** OAuth2 callback URL where users are redirected after authentication
+
+**Type:** String (URL)
+
+**Required:** No
+
+**Default:** `http://localhost:4200/auth/callback`
+
+**Examples:**
+
+```bash
+OAUTH2_REDIRECT_URI=http://localhost:4200/auth/callback      # Development
+OAUTH2_REDIRECT_URI=https://tkdo.example.com/auth/callback   # Production
+```
+
+**Usage:**
+
+- Must match the URL registered with your OAuth2 provider
+- Used for redirect_uri validation (open redirect protection)
+- Must include protocol (`http://` or `https://`)
+- Path must be `/auth/callback` (handled by Angular AuthCallbackComponent)
+
+**Impact:**
+
+- Authorization flow redirects here with the authorization code
+- Path-based validation prevents open redirect attacks
+- Must be configured as allowed redirect URI in external IdP settings
+
+### Switching to External Identity Provider
+
+To switch from the temporary auth server to an external IdP (Google, Auth0, etc.):
+
+**1. Register your application with the IdP**
+
+- Obtain `OAUTH2_CLIENT_ID` and `OAUTH2_CLIENT_SECRET`
+- Register `OAUTH2_REDIRECT_URI` as an allowed callback URL
+
+**2. Update environment variables**
+
+```bash
+# Example: Auth0
+OAUTH2_CLIENT_ID=AbC123XyZ
+OAUTH2_CLIENT_SECRET=your-auth0-client-secret
+OAUTH2_REDIRECT_URI=https://tkdo.example.com/auth/callback
+```
+
+**3. Update OAuth2Settings.php** (one-time code change)
+
+Modify the URL construction in `api/src/Appli/Settings/OAuth2Settings.php`:
+
+```php
+// Change from temporary auth server URLs:
+$this->urlAuthorize = 'https://your-tenant.auth0.com/authorize';
+$this->urlAccessToken = 'https://your-tenant.auth0.com/oauth/token';
+$this->urlResourceOwner = 'https://your-tenant.auth0.com/userinfo';
+```
+
+**Note:** The BFF layer (`/api/auth/callback`, `/api/auth/logout`) requires **no code changes** — it works with any OAuth2-compliant provider via `league/oauth2-client`.
+
 ## Email Variables
 
 These variables configure email sending.

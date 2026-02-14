@@ -3,10 +3,12 @@ declare(strict_types=1);
 
 namespace App;
 
-use App\Appli\Controller\AuthLoginController;
 use App\Appli\Controller\AuthLogoutController;
-use App\Appli\Controller\AuthTokenController;
+use App\Appli\Controller\BffAuthCallbackController;
 use App\Appli\Controller\CreateConnexionController;
+use App\Appli\Controller\OAuthAuthorizeController;
+use App\Appli\Controller\OAuthTokenController;
+use App\Appli\Controller\OAuthUserInfoController;
 use App\Appli\Controller\CreateExclusionUtilisateurController;
 use App\Appli\Controller\CreateIdeeController;
 use App\Appli\Controller\CreateIdeeSuppressionController;
@@ -37,6 +39,7 @@ use App\Appli\RepositoryAdaptor\OccasionRepositoryAdaptor;
 use App\Appli\RepositoryAdaptor\ResultatRepositoryAdaptor;
 use App\Appli\RepositoryAdaptor\UtilisateurRepositoryAdaptor;
 use App\Appli\Settings\DoctrineSettings;
+use App\Appli\Settings\OAuth2Settings;
 use App\Dom\Plugin\MailPlugin;
 use App\Dom\Plugin\PasswordPlugin;
 use App\Dom\Repository\AuthCodeRepository;
@@ -48,6 +51,7 @@ use App\Appli\Settings\ErrorSettings;
 use App\Dom\Repository\ExclusionRepository;
 use DI\Container;
 use DI\ContainerBuilder;
+use League\OAuth2\Client\Provider\GenericProvider;
 use Doctrine\Migrations\Configuration\EntityManager\ExistingEntityManager;
 use Doctrine\Migrations\Configuration\Migration\ConfigurationArray;
 use Doctrine\Migrations\DependencyFactory;
@@ -98,6 +102,15 @@ class Bootstrap
                 $settings->config
             ),
 
+            GenericProvider::class => fn(OAuth2Settings $settings) => new GenericProvider([
+                'clientId' => $settings->clientId,
+                'clientSecret' => $settings->clientSecret,
+                'redirectUri' => $settings->redirectUri,
+                'urlAuthorize' => $settings->urlAuthorize,
+                'urlAccessToken' => $settings->urlAccessToken,
+                'urlResourceOwnerDetails' => $settings->urlResourceOwner,
+            ]),
+
             AuthCodeRepository::class => \DI\autowire(AuthCodeRepositoryAdaptor::class),
             ExclusionRepository::class => \DI\autowire(ExclusionRepositoryAdaptor::class),
             IdeeRepository::class => \DI\autowire(IdeeRepositoryAdaptor::class),
@@ -142,9 +155,17 @@ class Bootstrap
             $response);
 
         $this->slimApp->post('/connexion', CreateConnexionController::class);
+
+        // TEMPORARY: OAuth2 Authorization Server endpoints (will be replaced by external IdP)
+        $this->slimApp->group('/oauth', function (RouteCollectorProxyInterface $group) {
+            $group->map(['GET', 'POST'], '/authorize', OAuthAuthorizeController::class);
+            $group->post('/token', OAuthTokenController::class);
+            $group->get('/userinfo', OAuthUserInfoController::class);
+        });
+
+        // PERMANENT: BFF authentication endpoints (stays when switching to external IdP)
         $this->slimApp->group('/auth', function (RouteCollectorProxyInterface $group) {
-            $group->post('/login', AuthLoginController::class);
-            $group->post('/token', AuthTokenController::class);
+            $group->post('/callback', BffAuthCallbackController::class);
             $group->post('/logout', AuthLogoutController::class);
         });
         $this->slimApp->group('/idee', function (RouteCollectorProxyInterface $group) {

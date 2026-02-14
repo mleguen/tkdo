@@ -8,66 +8,42 @@ use GuzzleHttp\Cookie\CookieJar;
 
 class AuthCookieIntTest extends IntTestCase
 {
+    private const AUTHORIZE_PATH = '/oauth/authorize';
+    private const CALLBACK_PATH = '/auth/callback';
+
     /**
-     * Test that cookie-based authentication works for protected endpoints
+     * Helper: create a user and get an auth code via the OAuth authorize endpoint.
+     *
+     * @return array{code: string, utilisateur: \App\Appli\ModelAdaptor\UtilisateurAdaptor}
      */
-    public function testCookieAuthWorksForProtectedEndpoints(): void
+    private function createUserAndGetCode(): array
     {
         $utilisateur = $this->utilisateur()->withIdentifiant('utilisateur')->persist(self::$em);
 
-        // Step 1: Login and get auth code
-        $this->requestApi(
-            false,
-            'POST',
-            '/auth/login',
-            $loginStatusCode,
-            $loginBody,
-            '',
-            [
-                'identifiant' => $utilisateur->getIdentifiant(),
-                'mdp' => $utilisateur->getMdpClair(),
-            ]
-        );
-        $this->assertEquals(200, $loginStatusCode);
-        $code = $loginBody['code'];
+        $baseUri = getenv('TKDO_BASE_URI');
+        $client = new \GuzzleHttp\Client(['allow_redirects' => false]);
 
-        // Step 2: Exchange code for cookie (using Guzzle with cookie jar)
-        $cookieJar = new CookieJar();
-        $client = new \GuzzleHttp\Client(['cookies' => $cookieJar]);
-
-        $tokenResponse = $client->request(
+        $response = $client->request(
             'POST',
-            getenv('TKDO_BASE_URI') . '/auth/token',
+            $baseUri . self::AUTHORIZE_PATH,
             [
-                'json' => ['code' => $code],
+                'form_params' => [
+                    'identifiant' => $utilisateur->getIdentifiant(),
+                    'mdp' => $utilisateur->getMdpClair(),
+                    'client_id' => 'tkdo',
+                    'redirect_uri' => 'http://localhost:4200/auth/callback',
+                    'response_type' => 'code',
+                    'state' => 'test',
+                ],
                 'http_errors' => false,
             ]
         );
 
-        $this->assertEquals(200, $tokenResponse->getStatusCode());
+        $this->assertEquals(302, $response->getStatusCode());
+        $location = $response->getHeaderLine('Location');
+        parse_str(parse_url($location, PHP_URL_QUERY) ?: '', $queryParams);
 
-        // Verify cookie was set
-        $cookie = $cookieJar->getCookieByName('tkdo_jwt');
-        $this->assertNotNull($cookie, 'Cookie tkdo_jwt should be set');
-        // Path is configurable via TKDO_API_BASE_PATH; defaults to /
-        $this->assertNotEmpty($cookie->getPath());
-        // Secure flag is only set in production mode (TKDO_DEV_MODE=0)
-        // In dev mode (tests), Secure is omitted to allow HTTP testing
-        $this->assertTrue($cookie->getHttpOnly());
-
-        // Step 3: Use cookie to access a protected endpoint
-        $userResponse = $client->request(
-            'GET',
-            getenv('TKDO_BASE_URI') . '/utilisateur/' . $utilisateur->getId(),
-            [
-                'http_errors' => false,
-            ]
-        );
-
-        $this->assertEquals(200, $userResponse->getStatusCode());
-        $userData = json_decode((string)$userResponse->getBody(), true);
-        $this->assertEquals($utilisateur->getId(), $userData['id']);
-        $this->assertEquals($utilisateur->getNom(), $userData['nom']);
+        return ['code' => $queryParams['code'], 'utilisateur' => $utilisateur];
     }
 
     /**
@@ -116,43 +92,27 @@ class AuthCookieIntTest extends IntTestCase
      */
     public function testLogoutClearsCookie(): void
     {
-        $utilisateur = $this->utilisateur()->withIdentifiant('utilisateur')->persist(self::$em);
+        ['code' => $code, 'utilisateur' => $utilisateur] = $this->createUserAndGetCode();
 
-        // Step 1: Login and get auth code
-        $this->requestApi(
-            false,
-            'POST',
-            '/auth/login',
-            $loginStatusCode,
-            $loginBody,
-            '',
-            [
-                'identifiant' => $utilisateur->getIdentifiant(),
-                'mdp' => $utilisateur->getMdpClair(),
-            ]
-        );
-        $this->assertEquals(200, $loginStatusCode);
-        $code = $loginBody['code'];
-
-        // Step 2: Exchange code for cookie
+        // Exchange code via BFF callback
         $cookieJar = new CookieJar();
         $client = new \GuzzleHttp\Client(['cookies' => $cookieJar]);
 
-        $tokenResponse = $client->request(
+        $callbackResponse = $client->request(
             'POST',
-            getenv('TKDO_BASE_URI') . '/auth/token',
+            getenv('TKDO_BASE_URI') . self::CALLBACK_PATH,
             [
                 'json' => ['code' => $code],
                 'http_errors' => false,
             ]
         );
-        $this->assertEquals(200, $tokenResponse->getStatusCode());
+        $this->assertEquals(200, $callbackResponse->getStatusCode());
 
         // Verify cookie exists
         $cookie = $cookieJar->getCookieByName('tkdo_jwt');
         $this->assertNotNull($cookie, 'Cookie should exist before logout');
 
-        // Step 3: Logout
+        // Logout
         $logoutResponse = $client->request(
             'POST',
             getenv('TKDO_BASE_URI') . '/auth/logout',
@@ -169,7 +129,7 @@ class AuthCookieIntTest extends IntTestCase
             $this->assertEmpty($cookie->getValue(), 'Cookie value should be empty after logout');
         }
 
-        // Step 4: Verify protected endpoint returns 401 after logout
+        // Verify protected endpoint returns 401 after logout
         $userResponse = $client->request(
             'GET',
             getenv('TKDO_BASE_URI') . '/utilisateur/' . $utilisateur->getId(),

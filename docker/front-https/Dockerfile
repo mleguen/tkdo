@@ -21,6 +21,8 @@ SSLSessionCacheTimeout  300\n\
     SSLEngine on\n\
     SSLCertificateFile "/usr/local/apache2/conf/certs/localhost.crt"\n\
     SSLCertificateKeyFile "/usr/local/apache2/conf/certs/localhost.key"\n\
+    ProxyPass "/oauth/" "http://slim-web/oauth/"\n\
+    ProxyPassReverse "/oauth/" "http://slim-web/oauth/"\n\
     ProxyPass "/api/" "http://slim-web/"\n\
     ProxyPassReverse "/api/" "http://slim-web/"\n\
     ProxyPass "/" "http://angular/"\n\
