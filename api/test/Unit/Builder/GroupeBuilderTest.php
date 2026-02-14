@@ -7,6 +7,7 @@ namespace Test\Unit\Builder;
 use App\Appli\ModelAdaptor\GroupeAdaptor;
 use PHPUnit\Framework\TestCase;
 use Test\Builder\GroupeBuilder;
+use Test\Builder\UtilisateurBuilder;
 
 /**
  * Unit tests for GroupeBuilder.
@@ -137,5 +138,54 @@ class GroupeBuilderTest extends TestCase
 
         $this->assertEquals('Test Groupe', $values['nom']);
         $this->assertTrue($values['archive']);
+    }
+
+    public function testWithAppartenanceReturnsSelfForChaining(): void
+    {
+        $builder = GroupeBuilder::unGroupe();
+        $utilisateur = UtilisateurBuilder::aUser()->build();
+
+        $result = $builder->withAppartenance($utilisateur);
+
+        $this->assertSame($builder, $result);
+    }
+
+    public function testBuildWithAppartenanceCreatesLinkedEntities(): void
+    {
+        $utilisateur = UtilisateurBuilder::aUser()->build();
+
+        $groupe = GroupeBuilder::unGroupe()
+            ->withAppartenance($utilisateur, true)
+            ->build();
+
+        $appartenances = $groupe->getAppartenances();
+        $this->assertCount(1, $appartenances);
+        $this->assertTrue($appartenances[0]->getEstAdmin());
+    }
+
+    public function testBuildWithMultipleAppartenances(): void
+    {
+        $user1 = UtilisateurBuilder::aUser()->build();
+        $user2 = UtilisateurBuilder::aUser()->build();
+
+        $groupe = GroupeBuilder::unGroupe()
+            ->withAppartenance($user1, true)
+            ->withAppartenance($user2)
+            ->build();
+
+        $appartenances = $groupe->getAppartenances();
+        $this->assertCount(2, $appartenances);
+    }
+
+    public function testBuildWithAppartenanceDefaultEstAdminIsFalse(): void
+    {
+        $utilisateur = UtilisateurBuilder::aUser()->build();
+
+        $groupe = GroupeBuilder::unGroupe()
+            ->withAppartenance($utilisateur)
+            ->build();
+
+        $appartenances = $groupe->getAppartenances();
+        $this->assertFalse($appartenances[0]->getEstAdmin());
     }
 }

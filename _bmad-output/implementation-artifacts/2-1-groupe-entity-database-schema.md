@@ -1,6 +1,6 @@
 # Story 2.1: Groupe Entity & Database Schema
 
-Status: done
+Status: review
 
 ## Story
 
@@ -44,6 +44,16 @@ So that the foundation for group-based isolation exists.
   - [x] 5.3 Create `api/test/Unit/Appli/ModelAdaptor/GroupeAdaptorTest.php` — entity behavior tests
   - [x] 5.4 Create `api/test/Int/GroupeRepositoryTest.php` — CRUD integration tests
   - [x] 5.5 Run `./composer test` — all tests must pass (557+ existing + new)
+
+### Review Follow-ups (AI)
+
+**Code Review Date:** 2026-02-14
+**Reviewer:** mleguen (GitHub PR #101)
+**Issues Found:** 1 (0 Critical, 0 High, 1 Medium)
+
+#### Medium Priority Issues
+
+- [x] [AI-Review][MEDIUM] Add member setup methods to GroupeBuilder for test convenience (withAppartenance or addMembre). While withDescription() removal is correct (no such field in Groupe entity), removing member-related methods reduced test usability. Tests must manually create AppartenanceAdaptor objects (see GroupeRepositoryTest:83-103). Builder should support fluent member addition via withAppartenance(Utilisateur, bool estAdmin, DateTime dateAjout) or addMembre(). [api/test/Builder/GroupeBuilder.php:20] [PR#101 comment](https://github.com/mleguen/tkdo/pull/101#discussion_r2807767130)
 
 ## Dev Notes
 
@@ -596,6 +606,13 @@ Claude Opus 4.6 (claude-opus-4-6)
 
 ### Completion Notes List
 
+- **2026-02-14 - PR Comments Reviewed (Evidence-Based Investigation):**
+  - Reviewed 1 unresolved GitHub PR comment (0 already resolved, filtered out)
+  - Investigation: Read 7 files including scaffold, entity, tests, Story 1.0, epics, PRD
+  - Validated: 1 partially valid (withDescription removal correct, withMembres removal is valid concern)
+  - Updated Review Follow-ups section with 1 action item
+  - Responded to comment in PR #101 with investigation evidence
+  - Key finding: Description field never existed in PRD/architecture - Story 1.0 scaffold invented it speculatively
 - Created Groupe and Appartenance domain interfaces following Occasion/Exclusion patterns
 - Created GroupeAdaptor with `@OneToMany` collection and AppartenanceAdaptor with composite `@Id` on two `@ManyToOne` relationships
 - Added explicit `name=` in `@Column` annotations for camelCase-to-snake_case mapping (`date_creation`, `est_admin`, `date_ajout`)
@@ -607,6 +624,13 @@ Claude Opus 4.6 (claude-opus-4-6)
 - Updated GroupeBuilderTest to match new implementation (removed scaffold-specific tests)
 - All 258 backend tests pass (146 unit + 112 integration, 1047 assertions)
 - PHPStan level 8 clean (no errors)
+- **2026-02-14 - Review Follow-up Resolution:**
+  - Resolved review finding [MEDIUM]: Added `withAppartenance(Utilisateur, bool, ?DateTime)` method to GroupeBuilder
+  - Internal property naming aligned to `$appartenances` for consistency with domain terminology
+  - Simplified `GroupeRepositoryTest::testAppartenanceCanBeCreatedAndLinked` to use builder (reduced boilerplate from 8 lines to 3)
+  - Added 4 new unit tests for `withAppartenance` method (chaining, single, multiple, default estAdmin)
+  - All 262 backend tests pass (150 unit + 112 integration, 1052 assertions)
+  - PHPStan level 8 clean
 
 ### Known Limitations (Deferred to Future Stories)
 
@@ -617,6 +641,7 @@ Claude Opus 4.6 (claude-opus-4-6)
 ### Change Log
 
 - 2026-02-14: Story 2.1 implementation — Created Groupe entity, Appartenance junction entity, database migration, repository layer, DI registration, and comprehensive tests
+- 2026-02-14: Addressed code review findings — 1 item resolved: Added `withAppartenance()` method to GroupeBuilder, simplified GroupeRepositoryTest
 
 ### File List
 

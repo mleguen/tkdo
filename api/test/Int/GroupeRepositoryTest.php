@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Test\Int;
 
-use App\Appli\ModelAdaptor\AppartenanceAdaptor;
 use App\Appli\ModelAdaptor\GroupeAdaptor;
 use App\Dom\Exception\GroupeInconnuException;
 use App\Dom\Model\Groupe;
@@ -83,14 +82,11 @@ class GroupeRepositoryTest extends IntTestCase
     public function testAppartenanceCanBeCreatedAndLinked(): void
     {
         $utilisateur = UtilisateurBuilder::aUser()->persist(self::$em);
-        $groupe = GroupeBuilder::unGroupe()->withNom('Famille Test')->persist(self::$em);
+        $groupe = GroupeBuilder::unGroupe()
+            ->withNom('Famille Test')
+            ->withAppartenance($utilisateur, true)
+            ->persist(self::$em);
 
-        $appartenance = new AppartenanceAdaptor($groupe, $utilisateur);
-        $appartenance->setEstAdmin(true)
-            ->setDateAjout(new DateTime());
-
-        self::$em->persist($appartenance);
-        self::$em->flush();
         self::$em->clear();
 
         /** @var GroupeAdaptor $reloaded */

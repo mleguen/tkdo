@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Test\Builder;
 
+use App\Appli\ModelAdaptor\AppartenanceAdaptor;
 use App\Appli\ModelAdaptor\GroupeAdaptor;
+use App\Dom\Model\Utilisateur;
 use DateTime;
 use Doctrine\ORM\EntityManager;
 
@@ -29,6 +31,8 @@ class GroupeBuilder
 
     private string $nom;
     private bool $archive = false;
+    /** @var array<array{utilisateur: Utilisateur, estAdmin: bool, dateAjout: ?DateTime}> */
+    private array $appartenances = [];
 
     private function __construct()
     {
@@ -63,6 +67,19 @@ class GroupeBuilder
     }
 
     /**
+     * Add a member (Appartenance) to the group
+     */
+    public function withAppartenance(Utilisateur $utilisateur, bool $estAdmin = false, ?DateTime $dateAjout = null): self
+    {
+        $this->appartenances[] = [
+            'utilisateur' => $utilisateur,
+            'estAdmin' => $estAdmin,
+            'dateAjout' => $dateAjout,
+        ];
+        return $this;
+    }
+
+    /**
      * Build the Groupe entity in memory (not persisted)
      */
     public function build(): GroupeAdaptor
@@ -71,6 +88,14 @@ class GroupeBuilder
         $groupe->setNom($this->nom)
             ->setArchive($this->archive)
             ->setDateCreation(new DateTime());
+
+        foreach ($this->appartenances as $appt) {
+            $appartenance = new AppartenanceAdaptor($groupe, $appt['utilisateur']);
+            $appartenance->setEstAdmin($appt['estAdmin'])
+                ->setDateAjout($appt['dateAjout'] ?? new DateTime());
+            $groupe->addAppartenance($appartenance);
+        }
+
         return $groupe;
     }
 
@@ -79,9 +104,24 @@ class GroupeBuilder
      */
     public function persist(EntityManager $em): GroupeAdaptor
     {
-        $groupe = $this->build();
+        $groupe = new GroupeAdaptor();
+        $groupe->setNom($this->nom)
+            ->setArchive($this->archive)
+            ->setDateCreation(new DateTime());
         $em->persist($groupe);
         $em->flush();
+
+        foreach ($this->appartenances as $appt) {
+            $appartenance = new AppartenanceAdaptor($groupe, $appt['utilisateur']);
+            $appartenance->setEstAdmin($appt['estAdmin'])
+                ->setDateAjout($appt['dateAjout'] ?? new DateTime());
+            $groupe->addAppartenance($appartenance);
+            $em->persist($appartenance);
+        }
+        if (!empty($this->appartenances)) {
+            $em->flush();
+        }
+
         return $groupe;
     }
 
