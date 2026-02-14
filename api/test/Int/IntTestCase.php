@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Test\Int;
 
+use App\Appli\ModelAdaptor\AppartenanceAdaptor;
 use App\Appli\ModelAdaptor\AuthCodeAdaptor;
 use App\Appli\ModelAdaptor\ExclusionAdaptor;
+use App\Appli\ModelAdaptor\GroupeAdaptor;
 use App\Appli\ModelAdaptor\IdeeAdaptor;
 use App\Appli\ModelAdaptor\OccasionAdaptor;
 use App\Appli\ModelAdaptor\ResultatAdaptor;
@@ -67,11 +69,13 @@ class IntTestCase extends TestCase
     public function tearDown(): void
     {
         foreach ([
+            AppartenanceAdaptor::class,
             AuthCodeAdaptor::class,
             IdeeAdaptor::class,
             ResultatAdaptor::class,
             OccasionAdaptor::class,
             ExclusionAdaptor::class,
+            GroupeAdaptor::class,
             UtilisateurAdaptor::class,
         ] as $class) {
             foreach (self::$em->getRepository($class)->findAll() as $entite) {

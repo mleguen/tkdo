@@ -32,6 +32,7 @@ use App\Appli\PluginAdaptor\MailPluginAdaptor;
 use App\Appli\PluginAdaptor\PasswordPluginAdaptor;
 use App\Appli\RepositoryAdaptor\AuthCodeRepositoryAdaptor;
 use App\Appli\RepositoryAdaptor\ExclusionRepositoryAdaptor;
+use App\Appli\RepositoryAdaptor\GroupeRepositoryAdaptor;
 use App\Appli\RepositoryAdaptor\IdeeRepositoryAdaptor;
 use App\Appli\RepositoryAdaptor\OccasionRepositoryAdaptor;
 use App\Appli\RepositoryAdaptor\ResultatRepositoryAdaptor;
@@ -40,6 +41,7 @@ use App\Appli\Settings\DoctrineSettings;
 use App\Dom\Plugin\MailPlugin;
 use App\Dom\Plugin\PasswordPlugin;
 use App\Dom\Repository\AuthCodeRepository;
+use App\Dom\Repository\GroupeRepository;
 use App\Dom\Repository\IdeeRepository;
 use App\Dom\Repository\OccasionRepository;
 use App\Dom\Repository\ResultatRepository;
@@ -100,6 +102,7 @@ class Bootstrap
 
             AuthCodeRepository::class => \DI\autowire(AuthCodeRepositoryAdaptor::class),
             ExclusionRepository::class => \DI\autowire(ExclusionRepositoryAdaptor::class),
+            GroupeRepository::class => \DI\autowire(GroupeRepositoryAdaptor::class),
             IdeeRepository::class => \DI\autowire(IdeeRepositoryAdaptor::class),
             LoggerInterface::class => \DI\autowire(AppLogger::class),
             MailPlugin::class => \DI\autowire(MailPluginAdaptor::class),

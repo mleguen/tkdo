@@ -61,8 +61,8 @@ development_status:
   epic-1-retrospective: optional
 
   # Epic 2: Groups & Membership
-  epic-2: backlog
-  2-1-groupe-entity-database-schema: backlog
+  epic-2: in-progress
+  2-1-groupe-entity-database-schema: review
   2-2-group-membership-in-jwt-claims: backlog
   2-3-view-my-groups: backlog
   2-4-view-group-members: backlog

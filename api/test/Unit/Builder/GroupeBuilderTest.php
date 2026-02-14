@@ -4,22 +4,21 @@ declare(strict_types=1);
 
 namespace Test\Unit\Builder;
 
+use App\Appli\ModelAdaptor\GroupeAdaptor;
 use PHPUnit\Framework\TestCase;
 use Test\Builder\GroupeBuilder;
 
 /**
- * Unit tests for GroupeBuilder scaffold.
+ * Unit tests for GroupeBuilder.
  *
- * Tests verify the builder pattern API works correctly.
- * The actual entity creation (build/persist) will be tested when
- * GroupeAdaptor entity is implemented in Story 2.1.
+ * Tests verify the builder pattern API works correctly
+ * and produces valid GroupeAdaptor entities.
  */
 class GroupeBuilderTest extends TestCase
 {
     #[\Override]
     public function setUp(): void
     {
-        // Reset counter before each test for isolation
         GroupeBuilder::resetCounter();
     }
 
@@ -65,84 +64,30 @@ class GroupeBuilderTest extends TestCase
         $this->assertSame($builder, $result);
     }
 
-    public function testWithDescriptionSetsDescription(): void
+    public function testDefaultArchiveIsFalse(): void
+    {
+        $builder = GroupeBuilder::unGroupe();
+
+        $values = $builder->getValues();
+        $this->assertFalse($values['archive']);
+    }
+
+    public function testWithArchiveSetsFlag(): void
     {
         $builder = GroupeBuilder::unGroupe()
-            ->withDescription('Un groupe familial');
+            ->withArchive(true);
 
         $values = $builder->getValues();
-        $this->assertEquals('Un groupe familial', $values['description']);
+        $this->assertTrue($values['archive']);
     }
 
-    public function testWithDescriptionReturnsSelfForChaining(): void
+    public function testWithArchiveReturnsSelfForChaining(): void
     {
         $builder = GroupeBuilder::unGroupe();
 
-        $result = $builder->withDescription('Test');
+        $result = $builder->withArchive(true);
 
         $this->assertSame($builder, $result);
-    }
-
-    public function testDefaultDescriptionIsNull(): void
-    {
-        $builder = GroupeBuilder::unGroupe();
-
-        $values = $builder->getValues();
-        $this->assertNull($values['description']);
-    }
-
-    public function testWithMembresSetsMembersList(): void
-    {
-        $membre1 = new \stdClass();
-        $membre2 = new \stdClass();
-
-        $builder = GroupeBuilder::unGroupe()
-            ->withMembres([$membre1, $membre2]);
-
-        $values = $builder->getValues();
-        $this->assertCount(2, $values['membres']);
-        $this->assertSame($membre1, $values['membres'][0]);
-        $this->assertSame($membre2, $values['membres'][1]);
-    }
-
-    public function testWithMembresReturnsSelfForChaining(): void
-    {
-        $builder = GroupeBuilder::unGroupe();
-
-        $result = $builder->withMembres([]);
-
-        $this->assertSame($builder, $result);
-    }
-
-    public function testAddMembreAppendsMember(): void
-    {
-        $membre1 = new \stdClass();
-        $membre2 = new \stdClass();
-
-        $builder = GroupeBuilder::unGroupe()
-            ->addMembre($membre1)
-            ->addMembre($membre2);
-
-        $values = $builder->getValues();
-        $this->assertCount(2, $values['membres']);
-    }
-
-    public function testAddMembreReturnsSelfForChaining(): void
-    {
-        $builder = GroupeBuilder::unGroupe();
-
-        $result = $builder->addMembre(new \stdClass());
-
-        $this->assertSame($builder, $result);
-    }
-
-    public function testDefaultMembresIsEmptyArray(): void
-    {
-        $builder = GroupeBuilder::unGroupe();
-
-        $values = $builder->getValues();
-        $this->assertIsArray($values['membres']);
-        $this->assertEmpty($values['membres']);
     }
 
     public function testResetCounterResetsToZero(): void
@@ -156,40 +101,41 @@ class GroupeBuilderTest extends TestCase
         $this->assertEquals('Groupe 1', $builder->getValues()['nom']);
     }
 
-    public function testBuildThrowsRuntimeException(): void
+    public function testBuildReturnsGroupeAdaptor(): void
     {
-        $builder = GroupeBuilder::unGroupe();
+        $groupe = GroupeBuilder::unGroupe()->build();
 
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('scaffold');
-
-        $builder->build();
+        $this->assertInstanceOf(GroupeAdaptor::class, $groupe);
     }
 
-    public function testPersistThrowsRuntimeException(): void
+    public function testBuildSetsNomAndDateCreation(): void
     {
-        $builder = GroupeBuilder::unGroupe();
-        $em = $this->createMock(\Doctrine\ORM\EntityManager::class);
+        $groupe = GroupeBuilder::unGroupe()
+            ->withNom('Test Groupe')
+            ->build();
 
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('scaffold');
+        $this->assertEquals('Test Groupe', $groupe->getNom());
+        $this->assertNotNull($groupe->getDateCreation());
+    }
 
-        $builder->persist($em);
+    public function testBuildSetsArchiveFlag(): void
+    {
+        $groupe = GroupeBuilder::unGroupe()
+            ->withArchive(true)
+            ->build();
+
+        $this->assertTrue($groupe->getArchive());
     }
 
     public function testFluentApiChaining(): void
     {
-        $membre = new \stdClass();
-
         $builder = GroupeBuilder::unGroupe()
             ->withNom('Test Groupe')
-            ->withDescription('Description')
-            ->addMembre($membre);
+            ->withArchive(true);
 
         $values = $builder->getValues();
 
         $this->assertEquals('Test Groupe', $values['nom']);
-        $this->assertEquals('Description', $values['description']);
-        $this->assertCount(1, $values['membres']);
+        $this->assertTrue($values['archive']);
     }
 }

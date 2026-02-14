@@ -214,7 +214,7 @@ public function __invoke(Request $request, Response $response): Response
 - **Read `docs/testing.md`** for test execution commands (lines 947-961 for backend, 89-99 for frontend)
 - **Don't ask the user** for commands that are documented - be autonomous
 - Key commands: `docker compose up -d front`, `./console fixtures`, `./composer test -- --testsuite=Unit`, `./npm run e2e`
-- Test suites: `./composer test -- --testsuite=Unit` (unit), `--testsuite=Integration` (integration), `--coverage-text` (coverage)
+- Test suites: `./composer test -- --testsuite=Unit` (unit), `--testsuite=Int` (integration), `--coverage-text` (coverage)
 
 **Story Commit Workflow (CRITICAL):**
 - **NEVER commit implementation before fully updating story status**
