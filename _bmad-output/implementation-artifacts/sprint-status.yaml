@@ -42,7 +42,7 @@ story_location: _bmad-output/implementation-artifacts
 development_status:
   # Pre-Implementation
   0-1-performance-baseline-capture: done
-  0-2-clean-test-warnings: review
+  0-2-clean-test-warnings: done
 
   # Epic 1: Secure Authentication Foundation
   epic-1: in-progress

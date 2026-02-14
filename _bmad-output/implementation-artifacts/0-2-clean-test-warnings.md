@@ -1,6 +1,6 @@
 # Story 0.2: Clean Up Test Warnings
 
-Status: review
+Status: done
 
 ## Story
 
@@ -65,7 +65,7 @@ so that the test output is clean, the mail testing stack properly supports Frenc
   - [x] 4.3 Update `docs/testing.md`: MailHog → MailDev references
   - [x] 4.4 Update `docs/environment-variables.md`: `MAILHOG_BASE_URI` → `MAILDEV_BASE_URI`
   - [x] 4.5 Update remaining docs that reference MailHog: `docs/troubleshooting.md`, `docs/notifications.md`, `docs/backend-dev.md`, `docs/ci-testing-strategy.md`, `docs/architecture.md`
-  - [x] 4.6 Capture new test baseline: `./composer test 2>&1 | grep -E "Tests:|Assertions:|Deprecations:|Notices:" > _bmad-output/implementation-artifacts/.baseline-0-2-clean-test-warnings.txt`
+  - [x] 4.6 ~~Capture new test baseline~~ (Removed per user request - root cause eliminated, baseline process unnecessary)
 
 ### Review Follow-ups (AI)
 
@@ -74,6 +74,7 @@ so that the test output is clean, the mail testing stack properly supports Frenc
 - [x] [AI-Review][MEDIUM] Add explicit SMTP port 1025 validation test - Create integration test that verifies PHP mail() successfully delivers to MailDev SMTP on port 1025 (currently only implicit via API verification)
 - [x] [AI-Review][LOW] Improve MailService error handling - `api/src/Appli/Service/MailService.php:26` - Replace broad Exception catch with specific mail-related exceptions or add error logging
 - [x] [AI-Review][LOW] Add UTF-8 edge case tests - Add test for very long UTF-8 subjects (>76 chars), emoji, mixed character sets to validate mb_encode_mimeheader robustness
+- [ ] [AI-Review][LOW] Consider more specific exception handling in MailService - `api/src/Appli/Service/MailService.php:25` - Current catch of `\ErrorException | \ValueError` is acceptable (narrowed from broad `Exception` in previous review), but could potentially be further refined to catch only mail-specific exceptions if they become identifiable
 
 ## Dev Notes
 
@@ -211,6 +212,7 @@ Claude Opus 4.6 (claude-opus-4-6)
 
 ### Change Log
 
+- 2026-02-14: Second code review completed — Found 6 issues (2 MEDIUM, 4 LOW). User dismissed issues 1-4 as "hair-splitting" (documentation clarity). Fixed issue 5 (clarified task 4.6 was removed per user request). Created 1 LOW priority action item for issue 6 (MailService exception handling observation). All ACs validated, all tasks complete. Story status: done.
 - 2026-02-14: PR Comments Reviewed (Evidence-Based Investigation) — Reviewed 3 GitHub PR comments from Copilot. Investigation: Read IntTestCase.php (lines 55-112). Validated: All 3 comments are duplicates of existing adversarial review findings. Updated Review Follow-ups section with 3 PR comment URLs linked. Responded to all comments in PR #98 with investigation evidence.
 - 2026-02-14: Code review completed — Found 9 issues (2 HIGH, 4 MEDIUM, 3 LOW). Fixed 2 doc-only issues (BACKLOG.md cleanup, Dev Notes correction). Created 5 action items for code improvements. Story status reverted to in-progress pending action item resolution.
 - 2026-02-14: Completed Task 4 documentation updates — all MailHog references replaced with MailDev across docs, removed test baseline process from project-context.md, cleaned .gitignore.
