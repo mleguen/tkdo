@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Appli\Service;
 
 use App\Appli\Settings\MailSettings;
-use Exception;
 
 class MailService
 {
@@ -23,7 +22,7 @@ class MailService
 
             return mail($to, mb_encode_mimeheader($subject, 'UTF-8'), $message, $additional_headers);
         }
-        catch (Exception) {
+        catch (\ErrorException | \ValueError) {
             return false;
         }
     }

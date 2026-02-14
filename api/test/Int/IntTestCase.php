@@ -20,6 +20,7 @@ use DateTime;
 use DateTimeInterface;
 use Doctrine\ORM\EntityManager;
 use GuzzleHttp\Client as GuzzleClient;
+use GuzzleHttp\Exception\GuzzleException;
 use Iterator;
 use PHPUnit\Framework\TestCase;
 use Test\Builder\IdeeBuilder;
@@ -55,7 +56,11 @@ class IntTestCase extends TestCase
     public function setUp(): void
     {
         $this->client = new GuzzleClient();
-        $this->maildevBaseUri = rtrim(getenv('MAILDEV_BASE_URI') ?: '', '/');
+        $maildevBaseUri = getenv('MAILDEV_BASE_URI');
+        if ($maildevBaseUri === false || $maildevBaseUri === '') {
+            $this->fail('MAILDEV_BASE_URI environment variable is not set. Set it to the MailDev API base URL (e.g., http://maildev:1080).');
+        }
+        $this->maildevBaseUri = rtrim($maildevBaseUri, '/');
         $this->purgeEmails();
     }
 
@@ -100,15 +105,33 @@ class IntTestCase extends TestCase
      */
     protected function depileDerniersEmailsRecus(): array
     {
-        $response = $this->client->get($this->maildevBaseUri . '/email');
+        try {
+            $response = $this->client->get($this->maildevBaseUri . '/email');
+        } catch (GuzzleException $e) {
+            throw new \RuntimeException(
+                "MailDev is unavailable at {$this->maildevBaseUri}: {$e->getMessage()}"
+            );
+        }
         $emailsRecus = json_decode((string) $response->getBody(), true);
+        if (!is_array($emailsRecus)) {
+            throw new \RuntimeException(
+                "MailDev returned invalid JSON from GET /email. Response: " .
+                substr((string) $response->getBody(), 0, 200)
+            );
+        }
         $this->purgeEmails();
         return $emailsRecus;
     }
 
     private function purgeEmails(): void
     {
-        $this->client->delete($this->maildevBaseUri . '/email/all');
+        try {
+            $this->client->delete($this->maildevBaseUri . '/email/all');
+        } catch (GuzzleException $e) {
+            throw new \RuntimeException(
+                "MailDev is unavailable at {$this->maildevBaseUri}: {$e->getMessage()}"
+            );
+        }
     }
 
     protected function postConnexion(bool $curl, ?UtilisateurAdaptor $utilisateur = null): UtilisateurAdaptor

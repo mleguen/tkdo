@@ -67,6 +67,14 @@ so that the test output is clean, the mail testing stack properly supports Frenc
   - [x] 4.5 Update remaining docs that reference MailHog: `docs/troubleshooting.md`, `docs/notifications.md`, `docs/backend-dev.md`, `docs/ci-testing-strategy.md`, `docs/architecture.md`
   - [x] 4.6 Capture new test baseline: `./composer test 2>&1 | grep -E "Tests:|Assertions:|Deprecations:|Notices:" > _bmad-output/implementation-artifacts/.baseline-0-2-clean-test-warnings.txt`
 
+### Review Follow-ups (AI)
+
+- [x] [AI-Review][HIGH] Add error handling to IntTestCase email methods - `api/test/Int/IntTestCase.php:103-111` - Validate HTTP response status and throw descriptive exceptions when MailDev is unavailable instead of cryptic JSON decode errors [PR#98 comments: [line107](https://github.com/mleguen/tkdo/pull/98#discussion_r2806853070), [line111](https://github.com/mleguen/tkdo/pull/98#discussion_r2806853085)]
+- [x] [AI-Review][MEDIUM] Add environment variable validation in IntTestCase.setUp() - `api/test/Int/IntTestCase.php:58` - Fail fast with clear message if MAILDEV_BASE_URI is not set [PR#98 comment](https://github.com/mleguen/tkdo/pull/98#discussion_r2806853100)
+- [x] [AI-Review][MEDIUM] Add explicit SMTP port 1025 validation test - Create integration test that verifies PHP mail() successfully delivers to MailDev SMTP on port 1025 (currently only implicit via API verification)
+- [x] [AI-Review][LOW] Improve MailService error handling - `api/src/Appli/Service/MailService.php:26` - Replace broad Exception catch with specific mail-related exceptions or add error logging
+- [x] [AI-Review][LOW] Add UTF-8 edge case tests - Add test for very long UTF-8 subjects (>76 chars), emoji, mixed character sets to validate mb_encode_mimeheader robustness
+
 ## Dev Notes
 
 ### Root Cause Analysis
@@ -116,10 +124,10 @@ RUN curl -Lo /usr/local/bin/mhsendmail https://github.com/mailhog/mhsendmail/rel
 # AFTER (msmtp) — consistent with CI which already uses msmtp
 RUN apt-get update && apt-get install -y --no-install-recommends msmtp \
     && rm -rf /var/lib/apt/lists/* \
-    && echo 'sendmail_path = /usr/bin/msmtp --host=${MAILDEV_HOST:-maildev} --port=1025 -t --read-envelope-from' > $PHP_INI_DIR/conf.d/php-sendmail.ini
+    && echo 'sendmail_path = /usr/bin/msmtp --host maildev --port 1025 -t --read-envelope-from' > $PHP_INI_DIR/conf.d/php-sendmail.ini
 ```
 
-Note: `msmtp` is already used in CI (`.github/workflows/test.yml` "Configure PHP to use MailHog SMTP" step), so this makes Docker and CI consistent.
+Note: `msmtp` is already used in CI (`.github/workflows/test.yml` "Configure PHP to use MailDev SMTP" step), so this makes Docker and CI consistent. The `maildev` hostname is hardcoded as it's the Docker Compose service name.
 
 ### Environment Variable Mapping
 
@@ -194,10 +202,20 @@ Claude Opus 4.6 (claude-opus-4-6)
 - Subtask 4.6 (baseline capture): Baseline process was intentionally removed per user request — the root cause (MailHog deprecation warnings) is eliminated, making per-story baselines unnecessary overhead. Removed baseline section from project-context.md, deleted existing baseline files, and cleaned .gitignore entry.
 - Also fixed `docs/frontend-dev.md` (not in original task list) which had 2 remaining MailHog references.
 - Test suite verified clean: `OK (244 tests, 1011 assertions)` — no deprecations, no notices.
+- ✅ Resolved review finding [HIGH]: Added try-catch with GuzzleException in `depileDerniersEmailsRecus()` and `purgeEmails()` — descriptive RuntimeException when MailDev is unavailable. Added JSON response validation.
+- ✅ Resolved review finding [MEDIUM]: Added MAILDEV_BASE_URI env var validation in `setUp()` — fails fast with clear message if not set.
+- ✅ Resolved review finding [MEDIUM]: Created `MailIntTest.php` with `testSmtpDeliveryToMaildev()` — explicit test that PHP `mail()` delivers to MailDev SMTP on port 1025.
+- ✅ Resolved review finding [LOW]: Narrowed MailService exception catch from broad `Exception` to specific `\ErrorException | \ValueError`.
+- ✅ Resolved review finding [LOW]: Created 3 UTF-8 edge case tests in `MailIntTest.php` — long subjects (>76 chars, MIME folding), emoji characters, mixed character sets (French/Cyrillic/CJK).
+- Full test suite verified: `OK (248 tests, 1025 assertions)` — 4 new tests added, no regressions. PHPStan level 8 passes.
 
 ### Change Log
 
+- 2026-02-14: PR Comments Reviewed (Evidence-Based Investigation) — Reviewed 3 GitHub PR comments from Copilot. Investigation: Read IntTestCase.php (lines 55-112). Validated: All 3 comments are duplicates of existing adversarial review findings. Updated Review Follow-ups section with 3 PR comment URLs linked. Responded to all comments in PR #98 with investigation evidence.
+- 2026-02-14: Code review completed — Found 9 issues (2 HIGH, 4 MEDIUM, 3 LOW). Fixed 2 doc-only issues (BACKLOG.md cleanup, Dev Notes correction). Created 5 action items for code improvements. Story status reverted to in-progress pending action item resolution.
 - 2026-02-14: Completed Task 4 documentation updates — all MailHog references replaced with MailDev across docs, removed test baseline process from project-context.md, cleaned .gitignore.
+- 2026-02-14: Addressed all 5 code review follow-ups — 1 HIGH (error handling), 2 MEDIUM (env validation, SMTP test), 2 LOW (MailService exceptions, UTF-8 edge cases). 4 new integration tests added. Full suite: 248 tests, 1025 assertions, PHPStan clean.
+- 2026-02-14: PR Comments Resolved: Resolved 3 PR comment threads, marked completed action items as fixed, PR: #98, comment_ids: 2806853070, 2806853085, 2806853100
 
 ### File List
 
@@ -218,6 +236,7 @@ Claude Opus 4.6 (claude-opus-4-6)
 **Documentation changes (Task 4, this session):**
 - _bmad-output/project-context.md
 - _bmad-output/implementation-artifacts/sprint-status.yaml
+- _bmad-output/implementation-artifacts/0-2-clean-test-warnings.md
 - docs/dev-setup.md
 - docs/testing.md
 - docs/environment-variables.md
@@ -227,4 +246,10 @@ Claude Opus 4.6 (claude-opus-4-6)
 - docs/ci-testing-strategy.md
 - docs/architecture.md
 - docs/frontend-dev.md
+- BACKLOG.md
 - .gitignore
+
+**Review follow-up changes (this session):**
+- api/test/Int/IntTestCase.php (modified: error handling + env validation)
+- api/test/Int/MailIntTest.php (new: SMTP delivery + UTF-8 edge case tests)
+- api/src/Appli/Service/MailService.php (modified: narrowed exception catch)
