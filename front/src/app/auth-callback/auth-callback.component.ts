@@ -1,11 +1,11 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 import { BackendService } from '../backend.service';
 
 @Component({
   selector: 'app-auth-callback',
-  imports: [],
+  imports: [RouterLink],
   template: `
     @if (erreur) {
       <div class="alert alert-danger">{{ erreur }}</div>

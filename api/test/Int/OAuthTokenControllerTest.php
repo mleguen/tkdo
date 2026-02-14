@@ -63,6 +63,7 @@ class OAuthTokenControllerTest extends IntTestCase
                 'grant_type' => 'authorization_code',
                 'code' => $code,
                 'client_id' => 'tkdo',
+                'client_secret' => 'dev-secret',
             ]
         );
 
@@ -102,6 +103,7 @@ class OAuthTokenControllerTest extends IntTestCase
                 'grant_type' => 'authorization_code',
                 'code' => 'expired_test_code',
                 'client_id' => 'tkdo',
+                'client_secret' => 'dev-secret',
             ]
         );
 
@@ -125,6 +127,7 @@ class OAuthTokenControllerTest extends IntTestCase
                 'grant_type' => 'authorization_code',
                 'code' => $code,
                 'client_id' => 'tkdo',
+                'client_secret' => 'dev-secret',
             ]
         );
         $this->assertEquals(200, $firstStatusCode);
@@ -141,6 +144,7 @@ class OAuthTokenControllerTest extends IntTestCase
                 'grant_type' => 'authorization_code',
                 'code' => $code,
                 'client_id' => 'tkdo',
+                'client_secret' => 'dev-secret',
             ]
         );
 
@@ -161,6 +165,7 @@ class OAuthTokenControllerTest extends IntTestCase
                 'grant_type' => 'authorization_code',
                 'code' => 'totally_invalid_code',
                 'client_id' => 'tkdo',
+                'client_secret' => 'dev-secret',
             ]
         );
 
@@ -180,6 +185,7 @@ class OAuthTokenControllerTest extends IntTestCase
             [
                 'code' => 'some_code',
                 'client_id' => 'tkdo',
+                'client_secret' => 'dev-secret',
             ]
         );
 
@@ -200,10 +206,52 @@ class OAuthTokenControllerTest extends IntTestCase
                 'grant_type' => 'password',
                 'code' => 'some_code',
                 'client_id' => 'tkdo',
+                'client_secret' => 'dev-secret',
             ]
         );
 
         $this->assertEquals(400, $statusCode);
+    }
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
+    public function testInvalidClientSecretReturns401(bool $curl): void
+    {
+        $this->requestApi(
+            $curl,
+            'POST',
+            self::TOKEN_PATH,
+            $statusCode,
+            $body,
+            '',
+            [
+                'grant_type' => 'authorization_code',
+                'code' => 'some_code',
+                'client_id' => 'tkdo',
+                'client_secret' => 'wrong-secret',
+            ]
+        );
+
+        $this->assertEquals(401, $statusCode);
+    }
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
+    public function testMissingClientSecretReturns401(bool $curl): void
+    {
+        $this->requestApi(
+            $curl,
+            'POST',
+            self::TOKEN_PATH,
+            $statusCode,
+            $body,
+            '',
+            [
+                'grant_type' => 'authorization_code',
+                'code' => 'some_code',
+                'client_id' => 'tkdo',
+            ]
+        );
+
+        $this->assertEquals(401, $statusCode);
     }
 
     /**
@@ -225,6 +273,7 @@ class OAuthTokenControllerTest extends IntTestCase
                 'grant_type' => 'authorization_code',
                 'code' => $code,
                 'client_id' => 'tkdo',
+                'client_secret' => 'dev-secret',
             ]));
             curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/x-www-form-urlencoded']);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);

@@ -112,11 +112,22 @@ This story refactors to OAuth2-compliant architecture, clearly separating:
 
 - [x] Task 5: Cleanup and documentation (AC: #4)
   - [x] 5.1 Delete `api/src/Appli/Controller/AuthLoginController.php`
-  - [x] 5.2 Delete `api/src/Appli/Controller/AuthTokenController.php`
+  - [x] 5.2 ~~Delete `api/src/Appli/Controller/AuthTokenController.php`~~ Already deleted in prior story
   - [x] 5.3 Update `api/src/Bootstrap.php` — removed old routes (`/auth/login`, `/auth/token`), verified new routes
-  - [x] 5.4 Deleted `AuthLoginControllerTest.php` and `AuthTokenControllerTest.php` (replaced by new OAuth2 tests)
+  - [x] 5.4 ~~Deleted `AuthTokenControllerTest.php`~~ Already deleted in prior story; deleted `AuthLoginControllerTest.php` (replaced by new OAuth2 tests)
   - [x] 5.5 Updated `AuthCookieIntTest.php` to use new OAuth2 flow (`/oauth/authorize` + `/auth/callback`)
   - [x] 5.6 Run test suite: PHPStan OK, 256 backend tests (1024 assertions) OK, 60 frontend tests OK
+
+### Review Follow-ups (AI)
+
+- [x] [AI-Review][HIGH] BffAuthService.extraitInfoUtilisateur() manually decodes JWT with hardcoded claim names (sub, adm, groupe_ids) instead of using GenericProvider.getResourceOwner() — temp-auth-server-specific logic in PERMANENT BFF code, violates AC #3 verification criterion [api/src/Appli/Service/BffAuthService.php:49-77]
+- [x] [AI-Review][MEDIUM] AuthCallbackComponent missing RouterLink import — routerLink="/connexion" in error template is non-functional because imports: [] is empty [front/src/app/auth-callback/auth-callback.component.ts:8,12] [PR#100 comment](https://github.com/mleguen/tkdo/pull/100#discussion_r2807310040)
+- [x] [AI-Review][MEDIUM] OAuthTokenController.findValidAuthCode() uses EntityManager/QueryBuilder directly in controller — query logic should be in AuthCodeRepository per hexagonal architecture [api/src/Appli/Controller/OAuthTokenController.php:102-121]
+- [x] [AI-Review][MEDIUM] Duplicate genereState() in BackendService and ConnexionComponent with divergent storage key constants — ConnexionComponent should use BackendService.connecte() or extract shared utility; BackendService injection in ConnexionComponent is unused dead code [front/src/app/backend.service.ts:197 + front/src/app/connexion/connexion.component.ts:77] [PR#100 comment](https://github.com/mleguen/tkdo/pull/100#discussion_r2807310037)
+- [x] [AI-Review][MEDIUM] BffAuthCallbackController does not catch RuntimeException from extraitInfoUtilisateur() — malformed access_token JWT causes 500 instead of 401 [api/src/Appli/Controller/BffAuthCallbackController.php:47-82] [PR#100 comment](https://github.com/mleguen/tkdo/pull/100#discussion_r2807310046)
+- [x] [AI-Review][MEDIUM] OAuthAuthorizeController returns 400 on invalid credentials during form POST — user exits SPA and sees raw error page instead of staying on login form with error message [api/src/Appli/Controller/OAuthAuthorizeController.php:96] [PR#100 comment](https://github.com/mleguen/tkdo/pull/100#discussion_r2807310052)
+- [x] [AI-Review][MEDIUM] OAuthAuthorizeController does not validate redirect_uri against allowlist — open redirect risk; OAuthTokenController does not validate client_secret — combined allows auth code theft [api/src/Appli/Controller/OAuthAuthorizeController.php:105-116] [PR#100 comment](https://github.com/mleguen/tkdo/pull/100#discussion_r2807310061)
+- [x] [AI-Review][LOW] ConnexionComponent retour query param handling — was removed but needed for post-login redirect; re-added with sessionStorage-based oauth_retour pattern [front/src/app/connexion/connexion.component.ts:28-30]
 
 ## Dev Notes
 
@@ -336,6 +347,8 @@ Claude Opus 4.6
 - OAuthTokenController returns OAuth2 standard error format (`{"error": "...", "error_description": "..."}`) so that league/oauth2-client can parse errors and throw IdentityProviderException
 - OAuth2Settings uses `TKDO_BASE_URI` env var directly (not hardcoded Docker hostname) for back-channel URL resolution
 - Removed concurrent BFF callback test — deadlock when BFF and token endpoint share the same FPM pool; race condition already tested at `/oauth/token` level
+- 2026-02-14 — PR Comments Reviewed (Evidence-Based Investigation): Reviewed 7 unresolved GitHub PR comments on PR #100 (0 already resolved). Classification: 3 valid (new action items created), 1 duplicate of existing finding, 1 consolidated with existing finding, 2 invalid (dismissed with evidence). Updated Review Follow-ups section to 8 total action items (1 HIGH, 6 MEDIUM, 1 LOW). Responded to all 7 comments in PR #100 with investigation evidence.
+- 2026-02-14 — Review Follow-ups Implemented: All 8 review items fixed. Key changes: BffAuthService uses GenericProvider.getResourceOwner() via new /oauth/userinfo endpoint (Item 1 HIGH), redirect_uri path-based validation + client_secret validation (Item 7), auth code lookup moved to repository (Item 3). E2E failures discovered — front Docker container needed rebuild to pick up /oauth/ ProxyPass rules. All tests green: PHPStan OK, 145 unit, 264 backend, 60 frontend, 12 E2E.
 
 ### Change Log
 
@@ -355,12 +368,32 @@ Claude Opus 4.6
 - Created frontend tests: auth-callback.component.spec.ts, updated backend.service.spec.ts
 - Updated Cypress E2E: CSRF state validation test
 
+**Review follow-up changes (2026-02-14):**
+- Refactored BffAuthService to use GenericProvider.getResourceOwner() instead of manual JWT decoding
+- Created OAuthUserInfoController (TEMPORARY) — GET /oauth/userinfo for GenericProvider resource owner endpoint
+- Added GenericProvider factory to DI container in Bootstrap.php
+- Added RouterLink import to AuthCallbackComponent
+- Moved findValidAuthCode() logic to AuthCodeRepository.readAllValid() (hexagonal architecture)
+- Removed EntityManager dependency from OAuthTokenController
+- Exported CLE_OAUTH_STATE and OAUTH_CLIENT_ID constants from BackendService; made genereState() public
+- ConnexionComponent uses BackendService.genereState() and shared constants (removed duplicate)
+- Added RuntimeException catch in BffAuthCallbackController
+- OAuthAuthorizeController: invalid credentials now redirect to /connexion with error (302 not 400)
+- OAuthAuthorizeController: redirect_uri path-based validation (open redirect protection)
+- OAuthTokenController: client_secret validation (auth code theft prevention)
+- ConnexionComponent: re-added retour query param → sessionStorage oauth_retour for post-login redirect
+- Updated integration tests for all review changes (redirect_uri, client_secret, invalid creds redirect)
+- Rewrote BffAuthServiceTest to mock GenericProvider and test getResourceOwner()
+- Rebuilt front Docker container to apply /oauth/ ProxyPass rules
+- 2026-02-14 - PR Comments Resolved: Resolved 5 PR comment threads, marked completed action items as fixed, PR: #100, comment_ids: 2807310040, 2807310037, 2807310046, 2807310052, 2807310061
+
 ### File List
 
 **Created:**
 - `api/src/Appli/Settings/OAuth2Settings.php` — PERMANENT: GenericProvider config from env vars
 - `api/src/Appli/Controller/OAuthAuthorizeController.php` — TEMPORARY: OAuth2 authorize endpoint
 - `api/src/Appli/Controller/OAuthTokenController.php` — TEMPORARY: OAuth2 token endpoint
+- `api/src/Appli/Controller/OAuthUserInfoController.php` — TEMPORARY: OAuth2 userinfo endpoint for GenericProvider
 - `api/src/Appli/Service/BffAuthService.php` — PERMANENT: league/oauth2-client wrapper
 - `api/src/Appli/Controller/BffAuthCallbackController.php` — PERMANENT: BFF auth callback
 - `front/src/app/auth-callback/auth-callback.component.ts` — PERMANENT: OAuth2 callback component
@@ -373,18 +406,21 @@ Claude Opus 4.6
 **Modified:**
 - `api/composer.json` — Added `league/oauth2-client` dependency
 - `api/composer.lock` — Updated lock file
-- `api/src/Bootstrap.php` — New OAuth2 + BFF route groups, removed legacy routes
+- `api/src/Bootstrap.php` — New OAuth2 + BFF route groups, GenericProvider DI factory, removed legacy routes
+- `api/src/Dom/Repository/AuthCodeRepository.php` — Added readAllValid() method
+- `api/src/Appli/RepositoryAdaptor/AuthCodeRepositoryAdaptor.php` — Implemented readAllValid()
 - `docker/front/Dockerfile` — Added `/oauth/` ProxyPass
 - `docker/front-https/Dockerfile` — Added `/oauth/` ProxyPass
-- `front/src/app/backend.service.ts` — OAuth2 redirect flow, state generation, code exchange
+- `front/src/app/backend.service.ts` — OAuth2 redirect flow, state generation, code exchange, exported constants
 - `front/src/app/backend.service.spec.ts` — Updated auth tests for OAuth2 flow
-- `front/src/app/connexion/connexion.component.ts` — Traditional form POST to /oauth/authorize
+- `front/src/app/connexion/connexion.component.ts` — Form POST to /oauth/authorize, uses shared constants/genereState
 - `front/src/app/app.routes.ts` — Added /auth/callback route
 - `front/cypress/e2e/connexion.cy.ts` — Added CSRF state validation test
 - `api/test/Int/AuthCookieIntTest.php` — Updated to use new OAuth2 flow
+- `api/test/Int/OAuthAuthorizeControllerTest.php` — Updated for redirect_uri validation, invalid creds redirect
+- `api/test/Int/OAuthTokenControllerTest.php` — Added client_secret validation tests
+- `_bmad-output/implementation-artifacts/sprint-status.yaml` — Updated story status
 
 **Deleted:**
 - `api/src/Appli/Controller/AuthLoginController.php` — Replaced by OAuthAuthorizeController
-- `api/src/Appli/Controller/AuthTokenController.php` — Replaced by OAuthTokenController
 - `api/test/Int/AuthLoginControllerTest.php` — Replaced by OAuthAuthorizeControllerTest
-- `api/test/Int/AuthTokenControllerTest.php` — Replaced by OAuthTokenControllerTest

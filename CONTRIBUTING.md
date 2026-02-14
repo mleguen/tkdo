@@ -406,7 +406,7 @@ class IdeeAdaptor implements Idee { }      // Doctrine entity
 
 Run before committing:
 ```bash
-# Run PHPStan static analysis
+# Run PHPStan static analysis (256M memory limit included)
 ./composer phpstan
 
 # Run all tests

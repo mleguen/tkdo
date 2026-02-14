@@ -7,17 +7,15 @@ declare(strict_types=1);
 namespace App\Appli\Controller;
 
 use App\Appli\ModelAdaptor\AuthAdaptor;
-use App\Appli\ModelAdaptor\AuthCodeAdaptor;
 use App\Appli\Service\AuthService;
 use App\Appli\Service\RouteService;
+use App\Appli\Settings\OAuth2Settings;
 use App\Dom\Exception\UtilisateurInconnuException;
 use App\Dom\Repository\AuthCodeRepository;
 use App\Dom\Repository\UtilisateurRepository;
-use Doctrine\ORM\EntityManager;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
-
 
 /**
  * TEMPORARY: OAuth2 Authorization Server — token endpoint.
@@ -31,8 +29,8 @@ class OAuthTokenController
     public function __construct(
         private readonly AuthCodeRepository $authCodeRepository,
         private readonly AuthService $authService,
-        private readonly EntityManager $em,
         private readonly LoggerInterface $logger,
+        private readonly OAuth2Settings $oAuth2Settings,
         private readonly RouteService $routeService,
         private readonly UtilisateurRepository $utilisateurRepository
     ) {
@@ -49,9 +47,15 @@ class OAuthTokenController
             return $this->oauthError($response, 400, 'unsupported_grant_type', "grant_type non supporté (doit être 'authorization_code')");
         }
 
+        // Validate client_secret (prevents auth code theft)
+        $clientSecret = $body['client_secret'] ?? '';
+        if ($clientSecret !== $this->oAuth2Settings->clientSecret) {
+            return $this->oauthError($response, 401, 'invalid_client', 'client_secret invalide');
+        }
+
         $codeClair = $body['code'];
 
-        // Find valid auth code by checking hash
+        // Find valid auth code by checking hash (query via repository)
         $authCode = $this->findValidAuthCode($codeClair);
         if ($authCode === null) {
             return $this->oauthError($response, 401, 'invalid_grant', 'code invalide ou expiré');
@@ -99,17 +103,12 @@ class OAuthTokenController
         return $response;
     }
 
-    private function findValidAuthCode(string $codeClair): ?AuthCodeAdaptor
+    /**
+     * Find a valid auth code matching the clear-text code.
+     */
+    private function findValidAuthCode(string $codeClair): ?\App\Dom\Model\AuthCode
     {
-        $qb = $this->em->createQueryBuilder();
-        $qb->select('c')
-            ->from(AuthCodeAdaptor::class, 'c')
-            ->where('c.expiresAt > :now')
-            ->andWhere('c.usedAt IS NULL')
-            ->setParameter('now', new \DateTime());
-
-        /** @var AuthCodeAdaptor[] $codes */
-        $codes = $qb->getQuery()->getResult();
+        $codes = $this->authCodeRepository->readAllValid();
 
         foreach ($codes as $code) {
             if ($code->verifieCode($codeClair)) {

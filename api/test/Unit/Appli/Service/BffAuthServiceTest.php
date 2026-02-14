@@ -5,31 +5,30 @@ declare(strict_types=1);
 namespace Test\Unit\Appli\Service;
 
 use App\Appli\Service\BffAuthService;
-use App\Appli\Settings\OAuth2Settings;
+use League\OAuth2\Client\Provider\GenericProvider;
+use League\OAuth2\Client\Provider\GenericResourceOwner;
+use League\OAuth2\Client\Token\AccessToken;
+use League\OAuth2\Client\Token\AccessTokenInterface;
 use PHPUnit\Framework\TestCase;
 
 class BffAuthServiceTest extends TestCase
 {
-    public function testExtraitInfoUtilisateurDecodesJwtClaims(): void
+    public function testExtraitInfoUtilisateurUsesResourceOwner(): void
     {
-        $settings = new OAuth2Settings();
-        $service = new BffAuthService($settings);
-
-        // Build a test JWT with known claims
-        $header = base64_encode(json_encode(['alg' => 'RS256', 'typ' => 'JWT'], JSON_THROW_ON_ERROR));
-        $payload = base64_encode(json_encode([
+        $owner = new GenericResourceOwner([
             'sub' => 42,
-            'adm' => true,
+            'admin' => true,
             'groupe_ids' => [1, 2, 3],
-            'exp' => time() + 3600,
-        ], JSON_THROW_ON_ERROR));
-        $signature = base64_encode('fake-signature');
-        $jwt = "$header.$payload.$signature";
+        ], 'sub');
 
-        // Create a mock AccessToken
-        $mockToken = $this->createMock(\League\OAuth2\Client\Token\AccessTokenInterface::class);
-        $mockToken->method('getToken')->willReturn($jwt);
+        $mockProvider = $this->createMock(GenericProvider::class);
+        $mockToken = $this->createMock(AccessToken::class);
 
+        $mockProvider->method('getResourceOwner')
+            ->with($mockToken)
+            ->willReturn($owner);
+
+        $service = new BffAuthService($mockProvider);
         $result = $service->extraitInfoUtilisateur($mockToken);
 
         $this->assertEquals(42, $result['sub']);
@@ -39,21 +38,17 @@ class BffAuthServiceTest extends TestCase
 
     public function testExtraitInfoUtilisateurDefaultValues(): void
     {
-        $settings = new OAuth2Settings();
-        $service = new BffAuthService($settings);
-
-        // Build a minimal JWT without optional claims
-        $header = base64_encode(json_encode(['alg' => 'RS256', 'typ' => 'JWT'], JSON_THROW_ON_ERROR));
-        $payload = base64_encode(json_encode([
+        $owner = new GenericResourceOwner([
             'sub' => 1,
-            'exp' => time() + 3600,
-        ], JSON_THROW_ON_ERROR));
-        $signature = base64_encode('fake-signature');
-        $jwt = "$header.$payload.$signature";
+        ], 'sub');
 
-        $mockToken = $this->createMock(\League\OAuth2\Client\Token\AccessTokenInterface::class);
-        $mockToken->method('getToken')->willReturn($jwt);
+        $mockProvider = $this->createMock(GenericProvider::class);
+        $mockToken = $this->createMock(AccessToken::class);
 
+        $mockProvider->method('getResourceOwner')
+            ->willReturn($owner);
+
+        $service = new BffAuthService($mockProvider);
         $result = $service->extraitInfoUtilisateur($mockToken);
 
         $this->assertEquals(1, $result['sub']);
@@ -61,16 +56,15 @@ class BffAuthServiceTest extends TestCase
         $this->assertEquals([], $result['groupe_ids']);
     }
 
-    public function testExtraitInfoUtilisateurThrowsOnInvalidJwt(): void
+    public function testExtraitInfoUtilisateurThrowsOnWrongTokenType(): void
     {
-        $settings = new OAuth2Settings();
-        $service = new BffAuthService($settings);
+        $mockProvider = $this->createMock(GenericProvider::class);
+        $mockToken = $this->createMock(AccessTokenInterface::class);
 
-        $mockToken = $this->createMock(\League\OAuth2\Client\Token\AccessTokenInterface::class);
-        $mockToken->method('getToken')->willReturn('not-a-jwt');
+        $service = new BffAuthService($mockProvider);
 
         $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('access_token JWT invalide');
+        $this->expectExceptionMessage('type de token inattendu');
 
         $service->extraitInfoUtilisateur($mockToken);
     }

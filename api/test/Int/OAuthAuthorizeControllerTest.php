@@ -7,6 +7,7 @@ namespace Test\Int;
 class OAuthAuthorizeControllerTest extends IntTestCase
 {
     private const AUTHORIZE_PATH = '/oauth/authorize';
+    private const VALID_REDIRECT_URI = 'http://localhost:4200/auth/callback';
 
     #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
     public function testGetRedirectsToLoginPage(bool $curl): void
@@ -16,7 +17,7 @@ class OAuthAuthorizeControllerTest extends IntTestCase
         $params = http_build_query([
             'response_type' => 'code',
             'client_id' => 'tkdo',
-            'redirect_uri' => 'http://localhost:4200/auth/callback',
+            'redirect_uri' => self::VALID_REDIRECT_URI,
             'state' => 'test-state-123',
         ]);
 
@@ -41,7 +42,7 @@ class OAuthAuthorizeControllerTest extends IntTestCase
         $this->requestApi(
             $curl,
             'GET',
-            self::AUTHORIZE_PATH . '?response_type=code&redirect_uri=http://localhost/callback',
+            self::AUTHORIZE_PATH . '?response_type=code&redirect_uri=' . urlencode(self::VALID_REDIRECT_URI),
             $statusCode,
             $body
         );
@@ -55,7 +56,21 @@ class OAuthAuthorizeControllerTest extends IntTestCase
         $this->requestApi(
             $curl,
             'GET',
-            self::AUTHORIZE_PATH . '?client_id=tkdo&redirect_uri=http://localhost/callback',
+            self::AUTHORIZE_PATH . '?client_id=tkdo&redirect_uri=' . urlencode(self::VALID_REDIRECT_URI),
+            $statusCode,
+            $body
+        );
+
+        $this->assertEquals(400, $statusCode);
+    }
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
+    public function testGetInvalidRedirectUriReturns400(bool $curl): void
+    {
+        $this->requestApi(
+            $curl,
+            'GET',
+            self::AUTHORIZE_PATH . '?response_type=code&client_id=tkdo&redirect_uri=' . urlencode('http://evil.com/steal'),
             $statusCode,
             $body
         );
@@ -69,7 +84,6 @@ class OAuthAuthorizeControllerTest extends IntTestCase
         $utilisateur = $this->utilisateur()->withIdentifiant('utilisateur')->persist(self::$em);
 
         $baseUri = getenv('TKDO_BASE_URI');
-        $redirectUri = 'http://localhost:4200/auth/callback';
 
         $client = new \GuzzleHttp\Client(['allow_redirects' => false]);
         $response = $client->request(
@@ -80,7 +94,7 @@ class OAuthAuthorizeControllerTest extends IntTestCase
                     'identifiant' => $utilisateur->getIdentifiant(),
                     'mdp' => $utilisateur->getMdpClair(),
                     'client_id' => 'tkdo',
-                    'redirect_uri' => $redirectUri,
+                    'redirect_uri' => self::VALID_REDIRECT_URI,
                     'response_type' => 'code',
                     'state' => 'csrf-state-abc',
                 ],
@@ -90,7 +104,7 @@ class OAuthAuthorizeControllerTest extends IntTestCase
 
         $this->assertEquals(302, $response->getStatusCode());
         $location = $response->getHeaderLine('Location');
-        $this->assertStringStartsWith($redirectUri, $location);
+        $this->assertStringStartsWith(self::VALID_REDIRECT_URI, $location);
         $this->assertStringContainsString('code=', $location);
         $this->assertStringContainsString('state=csrf-state-abc', $location);
 
@@ -103,7 +117,39 @@ class OAuthAuthorizeControllerTest extends IntTestCase
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
-    public function testPostInvalidCredentialsReturns400(bool $curl): void
+    public function testPostInvalidCredentialsRedirectsToLoginWithError(bool $curl): void
+    {
+        $utilisateur = $this->utilisateur()->withIdentifiant('utilisateur')->persist(self::$em);
+
+        $baseUri = getenv('TKDO_BASE_URI');
+
+        $client = new \GuzzleHttp\Client(['allow_redirects' => false]);
+        $response = $client->request(
+            'POST',
+            $baseUri . self::AUTHORIZE_PATH,
+            [
+                'form_params' => [
+                    'identifiant' => $utilisateur->getIdentifiant(),
+                    'mdp' => 'mauvais' . $utilisateur->getMdpClair(),
+                    'client_id' => 'tkdo',
+                    'redirect_uri' => self::VALID_REDIRECT_URI,
+                    'response_type' => 'code',
+                    'state' => 'test',
+                ],
+                'http_errors' => false,
+            ]
+        );
+
+        // Invalid credentials should redirect back to login form with error
+        $this->assertEquals(302, $response->getStatusCode());
+        $location = $response->getHeaderLine('Location');
+        $this->assertStringContainsString('/connexion', $location);
+        $this->assertStringContainsString('erreur=', $location);
+        $this->assertStringContainsString('oauth=1', $location);
+    }
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
+    public function testPostInvalidRedirectUriReturns400(bool $curl): void
     {
         $utilisateur = $this->utilisateur()->withIdentifiant('utilisateur')->persist(self::$em);
 
@@ -116,9 +162,9 @@ class OAuthAuthorizeControllerTest extends IntTestCase
             '',
             [
                 'identifiant' => $utilisateur->getIdentifiant(),
-                'mdp' => 'mauvais' . $utilisateur->getMdpClair(),
+                'mdp' => $utilisateur->getMdpClair(),
                 'client_id' => 'tkdo',
-                'redirect_uri' => 'http://localhost/callback',
+                'redirect_uri' => 'http://evil.com/steal',
                 'response_type' => 'code',
                 'state' => 'test',
             ]

@@ -79,8 +79,8 @@ interface PostAuthCallbackDTO {
   utilisateur: Pick<UtilisateurPrive, 'id' | 'nom' | 'admin'>;
 }
 
-const CLE_OAUTH_STATE = 'oauth_state';
-const OAUTH_CLIENT_ID = 'tkdo';
+export const CLE_OAUTH_STATE = 'oauth_state';
+export const OAUTH_CLIENT_ID = 'tkdo';
 
 @Injectable({
   providedIn: 'root',
@@ -194,7 +194,7 @@ export class BackendService {
     this.idUtilisateurConnecte$.next(utilisateur.id);
   }
 
-  private genereState(): string {
+  genereState(): string {
     const array = new Uint8Array(32);
     crypto.getRandomValues(array);
     return Array.from(array, (b) => b.toString(16).padStart(2, '0')).join('');
