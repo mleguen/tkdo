@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 
 import { AdminComponent } from './admin/admin.component';
+import { AuthCallbackComponent } from './auth-callback/auth-callback.component';
 import { ConnexionComponent } from './connexion/connexion.component';
 import { DeconnexionComponent } from './deconnexion/deconnexion.component';
 import { ListeOccasionsComponent } from './liste-occasions/liste-occasions.component';
@@ -18,6 +19,7 @@ export const routes: Routes = [
     canActivate: [ConnexionGuard, adminGuard],
     runGuardsAndResolvers: 'always',
   },
+  { path: 'auth/callback', component: AuthCallbackComponent },
   { path: 'connexion', component: ConnexionComponent },
   { path: 'deconnexion', component: DeconnexionComponent },
   {

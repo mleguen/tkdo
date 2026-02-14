@@ -3,10 +3,11 @@ declare(strict_types=1);
 
 namespace App;
 
-use App\Appli\Controller\AuthLoginController;
 use App\Appli\Controller\AuthLogoutController;
-use App\Appli\Controller\AuthTokenController;
+use App\Appli\Controller\BffAuthCallbackController;
 use App\Appli\Controller\CreateConnexionController;
+use App\Appli\Controller\OAuthAuthorizeController;
+use App\Appli\Controller\OAuthTokenController;
 use App\Appli\Controller\CreateExclusionUtilisateurController;
 use App\Appli\Controller\CreateIdeeController;
 use App\Appli\Controller\CreateIdeeSuppressionController;
@@ -145,9 +146,16 @@ class Bootstrap
             $response);
 
         $this->slimApp->post('/connexion', CreateConnexionController::class);
+
+        // TEMPORARY: OAuth2 Authorization Server endpoints (will be replaced by external IdP)
+        $this->slimApp->group('/oauth', function (RouteCollectorProxyInterface $group) {
+            $group->map(['GET', 'POST'], '/authorize', OAuthAuthorizeController::class);
+            $group->post('/token', OAuthTokenController::class);
+        });
+
+        // PERMANENT: BFF authentication endpoints (stays when switching to external IdP)
         $this->slimApp->group('/auth', function (RouteCollectorProxyInterface $group) {
-            $group->post('/login', AuthLoginController::class);
-            $group->post('/token', AuthTokenController::class);
+            $group->post('/callback', BffAuthCallbackController::class);
             $group->post('/logout', AuthLogoutController::class);
         });
         $this->slimApp->group('/idee', function (RouteCollectorProxyInterface $group) {

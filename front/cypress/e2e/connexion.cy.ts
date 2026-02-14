@@ -106,6 +106,14 @@ describe('connexion/déconnexion/reconnexion', () => {
     });
   });
 
+  it('valider le paramètre state OAuth2 (protection CSRF)', () => {
+    // Directly navigate to callback with a code but wrong/missing state
+    cy.visit('/auth/callback?code=fake-code&state=wrong-state');
+
+    // Should show error because no matching state in sessionStorage
+    cy.contains("échec de l'authentification").should('be.visible');
+  });
+
   it('se déconnecter et se reconnecter avec un autre identifiant', () => {
     cy.fixture('utilisateurs').then((utilisateurs) => {
       etantDonneQue(jeSuisConnecteEnTantQue(utilisateurs.soi));

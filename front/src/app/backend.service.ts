@@ -59,8 +59,8 @@ export interface Idee {
 }
 
 const URL_API = '/api';
-const URL_AUTH_LOGIN = `${URL_API}/auth/login`;
-const URL_AUTH_TOKEN = `${URL_API}/auth/token`;
+const URL_OAUTH_AUTHORIZE = '/oauth/authorize';
+const URL_AUTH_CALLBACK = `${URL_API}/auth/callback`;
 const URL_AUTH_LOGOUT = `${URL_API}/auth/logout`;
 const URL_LISTE_OCCASIONS = `${URL_API}/occasion`;
 const URL_OCCASION = (idOccasion: number) =>
@@ -75,13 +75,12 @@ const URL_SUPPRESSION_IDEE = (idIdee: number) =>
 const CLE_ID_UTILISATEUR = 'id_utilisateur';
 const CLE_LISTE_OCCASIONS = 'occasions';
 
-interface PostAuthLoginDTO {
-  code: string;
-}
-
-interface PostAuthTokenDTO {
+interface PostAuthCallbackDTO {
   utilisateur: Pick<UtilisateurPrive, 'id' | 'nom' | 'admin'>;
 }
+
+const CLE_OAUTH_STATE = 'oauth_state';
+const OAUTH_CLIENT_ID = 'tkdo';
 
 @Injectable({
   providedIn: 'root',
@@ -151,17 +150,41 @@ export class BackendService {
     );
   }
 
-  async connecte(identifiant: string, mdp: string) {
-    // Step 1: POST /auth/login to get auth code
-    const { code } = await firstValueFrom(
-      this.http.post<PostAuthLoginDTO>(URL_AUTH_LOGIN, { identifiant, mdp }),
-    );
+  connecte(retour: string = '') {
+    // Generate CSRF state parameter and store in sessionStorage
+    const state = this.genereState();
+    sessionStorage.setItem(CLE_OAUTH_STATE, state);
 
-    // Step 2: POST /auth/token to exchange code for JWT cookie
-    // withCredentials required to receive HttpOnly cookie from response
+    // Store the return URL for post-login redirect
+    if (retour) {
+      sessionStorage.setItem('oauth_retour', retour);
+    }
+
+    // Build OAuth2 authorization URL and redirect the browser
+    const callbackUrl = new URL('/auth/callback', this.document.baseURI).href;
+    const params = new URLSearchParams({
+      response_type: 'code',
+      client_id: OAUTH_CLIENT_ID,
+      redirect_uri: callbackUrl,
+      state,
+    });
+
+    this.document.location.href = `${URL_OAUTH_AUTHORIZE}?${params.toString()}`;
+  }
+
+  async echangeCode(code: string, state: string) {
+    // Validate CSRF state parameter
+    const storedState = sessionStorage.getItem(CLE_OAUTH_STATE);
+    sessionStorage.removeItem(CLE_OAUTH_STATE);
+
+    if (!storedState || storedState !== state) {
+      throw new Error('état OAuth2 invalide (CSRF)');
+    }
+
+    // Exchange code for JWT cookie via BFF callback
     const { utilisateur } = await firstValueFrom(
-      this.http.post<PostAuthTokenDTO>(
-        URL_AUTH_TOKEN,
+      this.http.post<PostAuthCallbackDTO>(
+        URL_AUTH_CALLBACK,
         { code },
         { withCredentials: true },
       ),
@@ -169,6 +192,12 @@ export class BackendService {
 
     localStorage.setItem(CLE_ID_UTILISATEUR, JSON.stringify(utilisateur.id));
     this.idUtilisateurConnecte$.next(utilisateur.id);
+  }
+
+  private genereState(): string {
+    const array = new Uint8Array(32);
+    crypto.getRandomValues(array);
+    return Array.from(array, (b) => b.toString(16).padStart(2, '0')).join('');
   }
 
   async deconnecte() {
