@@ -6,8 +6,8 @@ declare(strict_types=1);
 
 namespace App\Appli\Service;
 
-use App\Appli\Settings\OAuth2Settings;
 use League\OAuth2\Client\Provider\GenericProvider;
+use League\OAuth2\Client\Token\AccessToken;
 use League\OAuth2\Client\Token\AccessTokenInterface;
 
 /**
@@ -17,18 +17,9 @@ use League\OAuth2\Client\Token\AccessTokenInterface;
  */
 class BffAuthService
 {
-    private GenericProvider $provider;
-
-    public function __construct(OAuth2Settings $settings)
-    {
-        $this->provider = new GenericProvider([
-            'clientId' => $settings->clientId,
-            'clientSecret' => $settings->clientSecret,
-            'redirectUri' => $settings->redirectUri,
-            'urlAuthorize' => $settings->urlAuthorize,
-            'urlAccessToken' => $settings->urlAccessToken,
-            'urlResourceOwnerDetails' => $settings->urlResourceOwner,
-        ]);
+    public function __construct(
+        private readonly GenericProvider $provider
+    ) {
     }
 
     /**
@@ -42,36 +33,26 @@ class BffAuthService
     }
 
     /**
-     * Extract user claims from the access token JWT.
+     * Extract user claims from the access token via the resource owner endpoint.
+     * Uses standard GenericProvider::getResourceOwner() — no manual JWT decoding.
      *
      * @return array{sub: int, adm: bool, groupe_ids: int[]}
      */
     public function extraitInfoUtilisateur(AccessTokenInterface $token): array
     {
-        $jwt = $token->getToken();
-
-        // Decode JWT payload (second segment, base64url-encoded)
-        $parts = explode('.', $jwt);
-        if (count($parts) !== 3) {
-            throw new \RuntimeException('access_token JWT invalide');
+        if (!$token instanceof AccessToken) {
+            throw new \RuntimeException('type de token inattendu');
         }
 
-        /** @var array<string, mixed>|null $payload */
-        $payload = json_decode(
-            base64_decode(strtr($parts[1], '-_', '+/')),
-            true
-        );
-
-        if ($payload === null) {
-            throw new \RuntimeException('payload JWT invalide');
-        }
+        $owner = $this->provider->getResourceOwner($token);
+        $data = $owner->toArray();
 
         /** @var int[] $groupeIds */
-        $groupeIds = isset($payload['groupe_ids']) ? (array) $payload['groupe_ids'] : [];
+        $groupeIds = isset($data['groupe_ids']) ? (array) $data['groupe_ids'] : [];
 
         return [
-            'sub' => (int) ($payload['sub'] ?? 0),
-            'adm' => isset($payload['adm']) && $payload['adm'],
+            'sub' => (int) ($data['sub'] ?? 0),
+            'adm' => !empty($data['admin']),
             'groupe_ids' => $groupeIds,
         ];
     }

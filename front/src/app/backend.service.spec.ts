@@ -69,11 +69,7 @@ describe('BackendService', () => {
 
   describe('Authentication', () => {
     it('should generate and store OAuth2 state on connecte()', () => {
-      // Test the genereState method indirectly by calling connecte()
-      // connecte() will try to set document.location.href which causes
-      // navigation, so we verify state was stored before that happens
-      // by calling the private method directly
-      const state = service['genereState']();
+      const state = service.genereState();
       expect(state.length).toBe(64); // 32 bytes = 64 hex chars
       expect(state).toMatch(/^[a-f0-9]{64}$/);
     });

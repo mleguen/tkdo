@@ -190,7 +190,7 @@ public function __invoke(Request $request, Response $response): Response
 - No multiple empty lines (max 1), no trailing spaces
 
 **PHPStan/CodeSniffer (Backend):**
-- PHPStan level 8 (strictest)
+- PHPStan level 8 (strictest), requires `--memory-limit=256M` (included in `./composer phpstan`)
 - PHP_CodeSniffer for PSR compliance
 - Rector for code modernization
 

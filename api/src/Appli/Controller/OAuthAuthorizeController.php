@@ -7,6 +7,7 @@ declare(strict_types=1);
 namespace App\Appli\Controller;
 
 use App\Appli\Service\RouteService;
+use App\Appli\Settings\OAuth2Settings;
 use App\Dom\Exception\UtilisateurInconnuException;
 use App\Dom\Repository\AuthCodeRepository;
 use App\Dom\Repository\UtilisateurRepository;
@@ -27,6 +28,7 @@ class OAuthAuthorizeController
     public function __construct(
         private readonly AuthCodeRepository $authCodeRepository,
         private readonly LoggerInterface $logger,
+        private readonly OAuth2Settings $oAuth2Settings,
         private readonly RouteService $routeService,
         private readonly UtilisateurRepository $utilisateurRepository
     ) {
@@ -93,7 +95,19 @@ class OAuthAuthorizeController
                 ->withHeader('Location', $redirectUrl)
                 ->withStatus(302);
         } catch (UtilisateurInconnuException) {
-            throw new HttpBadRequestException($request, 'identifiants invalides');
+            // Redirect back to login form with error — user stays in SPA flow
+            $loginUrl = '/connexion?' . http_build_query([
+                'oauth' => '1',
+                'erreur' => 'identifiants invalides',
+                'client_id' => $body['client_id'],
+                'redirect_uri' => $body['redirect_uri'],
+                'state' => $state,
+                'response_type' => $body['response_type'],
+            ]);
+
+            return $response
+                ->withHeader('Location', $loginUrl)
+                ->withStatus(302);
         }
     }
 
@@ -112,6 +126,15 @@ class OAuthAuthorizeController
         }
         if (!isset($params['response_type']) || $params['response_type'] !== 'code') {
             throw new HttpBadRequestException($request, "champ 'response_type' manquant ou invalide (doit être 'code')");
+        }
+
+        // Validate redirect_uri path (open redirect protection)
+        // TEMPORARY: Path-based validation works across dev environments (localhost, Docker).
+        // Combined with client_secret validation on /oauth/token, this prevents auth code theft.
+        $redirectPath = parse_url((string) $params['redirect_uri'], PHP_URL_PATH);
+        $allowedPath = parse_url($this->oAuth2Settings->redirectUri, PHP_URL_PATH);
+        if ($redirectPath !== $allowedPath) {
+            throw new HttpBadRequestException($request, 'redirect_uri non autorisé');
         }
     }
 }

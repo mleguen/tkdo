@@ -1,8 +1,12 @@
-import { Component, OnInit, inject, DOCUMENT } from '@angular/core';
+import { Component, inject, DOCUMENT } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 
-import { BackendService } from '../backend.service';
+import {
+  BackendService,
+  CLE_OAUTH_STATE,
+  OAUTH_CLIENT_ID,
+} from '../backend.service';
 
 @Component({
   selector: 'app-connexion',
@@ -10,11 +14,11 @@ import { BackendService } from '../backend.service';
   templateUrl: './connexion.component.html',
   styleUrl: './connexion.component.scss',
 })
-export class ConnexionComponent implements OnInit {
+export class ConnexionComponent {
   private readonly fb = inject(FormBuilder);
   private readonly backend = inject(BackendService);
-  private readonly route = inject(ActivatedRoute);
   private readonly document = inject<Document>(DOCUMENT);
+  private readonly route = inject(ActivatedRoute);
 
   erreurConnexion?: string;
   formConnexion = this.fb.group({
@@ -22,25 +26,21 @@ export class ConnexionComponent implements OnInit {
     mdp: ['', Validators.required],
   });
 
-  private retour = '';
-
-  ngOnInit(): void {
-    this.route.queryParamMap.subscribe((queryParams) => {
-      this.retour = queryParams.get('retour') || '';
-    });
-  }
-
   connecte() {
     const { identifiant, mdp } = this.formConnexion.value;
     if (!identifiant || !mdp) return;
 
-    // Generate CSRF state and store in sessionStorage
-    const state = this.genereState();
-    sessionStorage.setItem('oauth_state', state);
+    // Store the return URL so AuthCallbackComponent can redirect back after login
+    const retour = this.route.snapshot.queryParamMap.get('retour');
+    if (retour) {
+      sessionStorage.setItem('oauth_retour', retour);
+    }
 
-    // Store return URL for post-login redirect
-    if (this.retour) {
-      sessionStorage.setItem('oauth_retour', this.retour);
+    // Reuse state from BackendService.connecte() flow, or generate new one
+    let state = sessionStorage.getItem(CLE_OAUTH_STATE);
+    if (!state) {
+      state = this.backend.genereState();
+      sessionStorage.setItem(CLE_OAUTH_STATE, state);
     }
 
     // Build callback URL
@@ -56,7 +56,7 @@ export class ConnexionComponent implements OnInit {
     const fields: Record<string, string> = {
       identifiant,
       mdp,
-      client_id: 'tkdo',
+      client_id: OAUTH_CLIENT_ID,
       redirect_uri: callbackUrl,
       response_type: 'code',
       state,
@@ -72,11 +72,5 @@ export class ConnexionComponent implements OnInit {
 
     this.document.body.appendChild(form);
     form.submit();
-  }
-
-  private genereState(): string {
-    const array = new Uint8Array(32);
-    crypto.getRandomValues(array);
-    return Array.from(array, (b) => b.toString(16).padStart(2, '0')).join('');
   }
 }

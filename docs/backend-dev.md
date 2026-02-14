@@ -1599,7 +1599,7 @@ Composer scripts provide shortcuts for common tasks.
 | ------------------ | --------------------------------- | ------------------------------------------- |
 | `console`          | `./console`                       | Run console commands (helper script)        |
 | `doctrine`         | `./doctrine`                      | Run Doctrine CLI (helper script)            |
-| `phpstan`          | `./phpstan analyze`               | Run PHPStan static analysis (helper script) |
+| `phpstan`          | `./composer run phpstan`          | Run PHPStan static analysis (256M memory)   |
 | `reset-doctrine`   | `./composer run reset-doctrine`   | Full database reset                         |
 | `install-fixtures` | `./composer run install-fixtures` | Reset DB and load fixtures                  |
 | `test`             | `./composer test`                 | Run all tests                               |
@@ -1672,10 +1672,10 @@ Composer scripts provide shortcuts for common tasks.
 #### Code Quality
 
 ```bash
-# Run PHPStan for static analysis
-./phpstan analyze
-# Or using composer script (equivalent to ./phpstan analyze)
+# Run PHPStan for static analysis (--memory-limit=256M included in composer script)
 ./composer run phpstan
+# Or using the wrapper script directly (requires manual memory limit flag)
+./phpstan analyze --memory-limit=256M
 
 # Run Rector for automated refactoring
 ./composer run rector

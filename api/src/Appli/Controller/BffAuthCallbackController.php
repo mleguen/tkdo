@@ -77,6 +77,9 @@ class BffAuthCallbackController
         } catch (IdentityProviderException $e) {
             $this->logger->warning("BFF: échec échange code OAuth2: {$e->getMessage()}");
             throw new HttpUnauthorizedException($request, 'code invalide ou expiré');
+        } catch (\RuntimeException $e) {
+            $this->logger->warning("BFF: erreur extraction info utilisateur: {$e->getMessage()}");
+            throw new HttpUnauthorizedException($request, 'code invalide ou expiré');
         } catch (UtilisateurInconnuException) {
             throw new HttpUnauthorizedException($request, 'code invalide ou expiré');
         }

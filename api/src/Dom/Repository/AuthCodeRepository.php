@@ -29,6 +29,13 @@ interface AuthCodeRepository
     public function readValidByUtilisateur(int $utilisateurId): array;
 
     /**
+     * Find all valid (not expired, not used) auth codes.
+     *
+     * @return AuthCode[]
+     */
+    public function readAllValid(): array;
+
+    /**
      * Atomically mark an auth code as used.
      * Returns true if the code was successfully marked (it wasn't already used).
      * Returns false if the code was already used (race condition protection).

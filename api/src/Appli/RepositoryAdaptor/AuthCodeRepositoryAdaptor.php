@@ -59,6 +59,22 @@ class AuthCodeRepositoryAdaptor implements AuthCodeRepository
      * {@inheritdoc}
      */
     #[\Override]
+    public function readAllValid(): array
+    {
+        $qb = $this->em->createQueryBuilder();
+        $qb->select('c')
+            ->from(AuthCodeAdaptor::class, 'c')
+            ->where('c.expiresAt > :now')
+            ->andWhere('c.usedAt IS NULL')
+            ->setParameter('now', new DateTime());
+
+        return $qb->getQuery()->getResult();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    #[\Override]
     public function readValidByUtilisateur(int $utilisateurId): array
     {
         $qb = $this->em->createQueryBuilder();

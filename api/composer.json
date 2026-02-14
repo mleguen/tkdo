@@ -81,7 +81,7 @@
       "@reset-doctrine",
       "@console -- fixtures"
     ],
-    "phpstan": "vendor/bin/phpstan analyze",
+    "phpstan": "vendor/bin/phpstan analyze --memory-limit=256M",
     "rector": "rector",
     "test": "phpunit"
   }
