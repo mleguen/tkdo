@@ -1,6 +1,6 @@
 # Story 2.1: Groupe Entity & Database Schema
 
-Status: review
+Status: done
 
 ## Story
 
@@ -608,6 +608,12 @@ Claude Opus 4.6 (claude-opus-4-6)
 - All 258 backend tests pass (146 unit + 112 integration, 1047 assertions)
 - PHPStan level 8 clean (no errors)
 
+### Known Limitations (Deferred to Future Stories)
+
+- **AC#3 Clarification**: The acceptance criterion states "it lives in the Dom layer" with "proper Doctrine ORM annotations". Technically, the Groupe *interface* lives in Dom layer (no Doctrine dependencies), while the GroupeAdaptor with Doctrine annotations lives in Appli layer. This follows hexagonal architecture correctly. Future AC wording should distinguish between interface (Dom) and adaptor (Appli).
+- **No archived groups filter**: GroupeRepository has no methods like `readAllActive()` or `readAllArchived()`. Future stories requiring group filtering will add these as needed.
+- **No pagination in readAll()**: Returns all groups without pagination. Acceptable for family-scale deployments (10-20 users). Future optimization if needed for larger deployments.
+
 ### Change Log
 
 - 2026-02-14: Story 2.1 implementation — Created Groupe entity, Appartenance junction entity, database migration, repository layer, DI registration, and comprehensive tests
@@ -632,3 +638,4 @@ Claude Opus 4.6 (claude-opus-4-6)
 - `api/test/Unit/Builder/GroupeBuilderTest.php` — Updated tests for new implementation
 - `api/test/Int/IntTestCase.php` — Added AppartenanceAdaptor and GroupeAdaptor to tearDown cleanup
 - `_bmad-output/implementation-artifacts/sprint-status.yaml` — Status updated to review
+- `_bmad-output/project-context.md` — Fixed test suite name from `Integration` to `Int`
