@@ -579,14 +579,10 @@ For more details, see [Frontend Development Guide](frontend-dev.md).
 
 2. **Ensure test data is correct:**
    - Component tests may expect specific mock data
-   - Integration tests use dev-backend.interceptor.ts mocks
    - E2E tests require fixtures to be loaded
 
 3. **Reset test environment:**
    ```bash
-   # For integration tests
-   ./npm run int
-
    # For E2E tests (reset database first)
    ./composer run install-fixtures
    ./npm run e2e

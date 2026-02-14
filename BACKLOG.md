@@ -607,7 +607,7 @@ Following the viewport testing audit, components with responsive behavior need v
 
 ### Important Reminders
 
-- **Always run tests** after each task: Frontend (`./npm test && ./npm run ct && ./npm run int`) and Backend (`./composer test`)
+- **Always run tests** after each task: Frontend (`./npm test && ./npm run ct`) and Backend (`./composer test`)
 - **Update documentation** in the same commit as code changes
 - **Follow commit conventions** as specified in `.claude/commit-conventions.md`
 - **Maintain database compatibility** when renaming code elements - use Doctrine annotations to map English property names to French database columns
@@ -656,7 +656,7 @@ Following the viewport testing audit, components with responsive behavior need v
 
 ### Deprecation Warnings (Dart Sass 3.0.0)
 
-**Context:** Following the Angular 21 upgrade, multiple Sass deprecation warnings are reported by `./npm run ct`, `./npm run int`, and `./npm run e2e`. These relate to Dart Sass 3.0.0 breaking changes that will remove deprecated features.
+**Context:** Following the Angular 21 upgrade, multiple Sass deprecation warnings are reported by `./npm run ct` and `./npm run e2e`. These relate to Dart Sass 3.0.0 breaking changes that will remove deprecated features.
 
 **Status:** All Sass `@import` deprecation warnings in our code originate from Bootstrap 5.3, which does not yet support Sass modules (`@use`/`@forward`). Bootstrap will migrate to Sass modules in version 6. Until then, these warnings cannot be eliminated without switching to compiled Bootstrap CSS.
 
@@ -674,7 +674,7 @@ Following the viewport testing audit, components with responsive behavior need v
      @import "../../../node_modules/bootstrap/scss/mixins";
      ```
    - **Cannot replace with:** `@use` syntax until Bootstrap 6 is released
-   - **Warnings reported by:** `./npm run ct`, `./npm run int`, `./npm run e2e` (3 warnings per build)
+   - **Warnings reported by:** `./npm run ct`, `./npm run e2e` (3 warnings per build)
    - **Reference:** https://sass-lang.com/d/import
    - **Verified:** December 2025 - Bootstrap 5.3 still uses `@import` internally and is incompatible with `@use`
 

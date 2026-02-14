@@ -95,20 +95,13 @@ describe('connexion/déconnexion/reconnexion', () => {
       });
 
       // Verify real cookie security via Cypress devtools protocol (bypasses
-      // HttpOnly restriction).  The DevBackendInterceptor sets a sessionStorage
-      // flag on every interception; when present, no real HTTP cookies exist.
-      cy.window().then((win) => {
-        const isMockBackend =
-          win.sessionStorage.getItem('__dev_mock_backend_active') !== null;
-        if (!isMockBackend) {
-          cy.getCookies().then((cookies) => {
-            const jwtCookie = cookies.find((c) => c.name === 'tkdo_jwt');
-            expect(jwtCookie, 'tkdo_jwt cookie must exist after login').to.not
-              .be.undefined;
-            expect(jwtCookie!.httpOnly, 'tkdo_jwt cookie should be HttpOnly').to
-              .be.true;
-          });
-        }
+      // HttpOnly restriction)
+      cy.getCookies().then((cookies) => {
+        const jwtCookie = cookies.find((c) => c.name === 'tkdo_jwt');
+        expect(jwtCookie, 'tkdo_jwt cookie must exist after login').to.not.be
+          .undefined;
+        expect(jwtCookie!.httpOnly, 'tkdo_jwt cookie should be HttpOnly').to.be
+          .true;
       });
     });
   });

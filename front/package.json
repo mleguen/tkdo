@@ -10,7 +10,6 @@
     "test": "npm run format && ng lint && ng test",
     "lint": "ng lint",
     "e2e": "npm run build && cypress run --config baseUrl=http://front",
-    "int": "ng e2e",
     "cypress:open": "cypress open",
     "cypress:run": "cypress run",
     "ct": "ng run tkdo-front:ct",

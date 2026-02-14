@@ -4,10 +4,6 @@ export class AppPage {
     cy.clearCookie('tkdo_jwt');
     // Also clear the user ID from localStorage
     cy.window().then((w) => w.localStorage.removeItem('id_utilisateur'));
-    // Clear simulated cookie from sessionStorage (for integration tests with DevBackendInterceptor)
-    cy.window().then((w) =>
-      w.sessionStorage.removeItem('__dev_simulated_cookie_tkdo_jwt'),
-    );
   }
 
   boutonSeDeconnecter() {

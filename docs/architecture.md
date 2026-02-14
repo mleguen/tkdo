@@ -26,7 +26,7 @@ graph TB
     subgraph Frontend["Frontend Layer"]
         Angular["Angular 17 SPA<br/>(TypeScript)"]
         Components["Standalone Components<br/>Bootstrap 5 UI<br/>RxJS State Management"]
-        Interceptors["HTTP Interceptors<br/>(Auth, Dev Mock, Errors)"]
+        Interceptors["HTTP Interceptors<br/>(Auth, Errors)"]
     end
 
     subgraph Backend["Backend API Layer"]
@@ -178,22 +178,20 @@ export class BackendService {
 
 ### HTTP Interceptors
 
-**Decision:** Use HTTP interceptors for cross-cutting concerns (authentication, mocking, error handling).
+**Decision:** Use HTTP interceptors for cross-cutting concerns (authentication, error handling).
 
 **Interceptor Pipeline:** `front/src/app/http-interceptors.ts`
 
 ```typescript
 export const httpInterceptorProviders = [
   { provide: HTTP_INTERCEPTORS, useClass: ErreurBackendInterceptor, multi: true },
-  { provide: HTTP_INTERCEPTORS, useClass: AuthBackendInterceptor, multi: true },
-  { provide: HTTP_INTERCEPTORS, useClass: DevBackendInterceptor, multi: true }
+  { provide: HTTP_INTERCEPTORS, useClass: AuthBackendInterceptor, multi: true }
 ];
 ```
 
 **Execution Order (Outside-In):**
 1. **ErreurBackendInterceptor** - Outermost, handles HTTP errors globally
 2. **AuthBackendInterceptor** - Adds JWT authentication tokens
-3. **DevBackendInterceptor** - Mocks API in development mode (when enabled)
 
 #### Authentication Interceptor
 
@@ -218,26 +216,6 @@ intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<an
 - Centralized authentication logic
 - No need to manually add headers in every service call
 - Consistent token handling across all API requests
-
-#### Development Backend Interceptor
-
-**File:** `front/src/app/dev-backend.interceptor.ts`
-
-**Purpose:** Mock API responses during frontend development without running the backend.
-
-**Features:**
-- Simulates 100ms server latency
-- Mock user database (alice, bob, charlie, david, eve)
-- Supports authentication flow
-- Implements soft deletes for ideas
-- Enables rapid frontend iteration
-
-**When to Use:**
-- Frontend development without backend
-- UI/UX prototyping
-- Component testing with predictable data
-
-**How to Enable:** Set `dev` flag in `BackendService` constructor.
 
 #### Error Handling Interceptor
 

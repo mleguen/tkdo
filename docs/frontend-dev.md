@@ -10,7 +10,6 @@ This guide covers everything you need to know for developing the Tkdo frontend a
 - [Development Workflow](#development-workflow)
 - [Testing](#testing)
 - [Development Server](#development-server)
-- [Dev Backend Interceptor](#dev-backend-interceptor)
 - [Building for Production](#building-for-production)
 - [Upgrade Procedures](#upgrade-procedures)
 - [Code Style and Conventions](#code-style-and-conventions)
@@ -53,7 +52,6 @@ The Tkdo frontend is built with modern Angular practices and architectural decis
 
 **HTTP Interceptors:**
 - `auth-backend.interceptor.ts` - Adds authentication tokens to requests
-- `dev-backend.interceptor.ts` - Mocks API responses in development mode
 - `erreur-backend.interceptor.ts` - Handles HTTP errors globally
 
 ```mermaid
@@ -80,7 +78,6 @@ graph TB
 
     subgraph Interceptors
         AuthInterceptor[Auth Interceptor<br/>Add Token]
-        DevInterceptor[Dev Interceptor<br/>Mock API]
         ErrorInterceptor[Error Interceptor<br/>Handle Errors]
     end
 
@@ -91,9 +88,8 @@ graph TB
     Admin --> BackendService
 
     BackendService --> AuthInterceptor
-    AuthInterceptor --> DevInterceptor
-    DevInterceptor --> ErrorInterceptor
-    ErrorInterceptor --> API[Real API<br/>or Mocked]
+    AuthInterceptor --> ErrorInterceptor
+    ErrorInterceptor --> API[Real API]
 ```
 
 ## Project Structure
@@ -176,7 +172,6 @@ All npm commands must be run through the Docker wrapper script `./npm` from the 
 |-----------------------|--------------------------|----------------------------------------------------|
 | **test**              | `./npm test`             | Run format + lint + unit tests (Jasmine/Karma)     |
 | **ct**                | `./npm run ct`           | Run component tests (Cypress component testing)    |
-| **int**               | `./npm run int`          | Run integration tests (Cypress with dev server)    |
 | **e2e**               | `./npm run e2e`          | Run end-to-end tests (Cypress with full stack)     |
 | **cypress:open**      | `./npm run cypress:open` | Open Cypress interactive test runner               |
 | **cypress:run**       | `./npm run cypress:run`  | Run Cypress tests in headless mode                 |
@@ -212,7 +207,7 @@ docker compose up -d front
 
 ### Daily Workflow
 
-**Option 1: Full stack development (with real backend)**
+**Full stack development (with real backend)**
 
 ```bash
 # The full stack is already running
@@ -225,20 +220,16 @@ docker compose up -d front
 ./npm run build
 ```
 
-**Option 2: Frontend-only development (with mocked backend)**
+**Alternative: Dev server with hot reload**
 
 ```bash
-# Start Angular dev server
+# Start Angular dev server (proxies API to real backend)
 ./npm start
 
 # Access at http://localhost:4200
-# API requests are intercepted and mocked
 # Hot reload enabled
+# API requests are proxied to the real backend
 ```
-
-**Recommended workflow:**
-- Use Option 2 (dev server with mocked API) for UI development
-- Use Option 1 (full stack) for integration testing and API-dependent features
 
 ### Code Changes
 
@@ -251,7 +242,7 @@ docker compose up -d front
 
 ## Testing
 
-The frontend has a comprehensive testing strategy with three test levels.
+The frontend has a comprehensive testing strategy with three test types.
 
 ### Test Types Overview
 
@@ -259,7 +250,6 @@ The frontend has a comprehensive testing strategy with three test levels.
 |-----------------|---------------------|--------------------------------------------------|-----------------------|
 | **Unit**        | Jasmine/Karma       | Test individual functions and classes            | `./npm test`          |
 | **Component**   | Cypress             | Test components in isolation with mocked deps    | `./npm run ct`        |
-| **Integration** | Cypress             | Test user flows with mocked API                  | `./npm run int`       |
 | **E2E**         | Cypress             | Test complete flows with real backend            | `./npm run e2e`       |
 
 ### Unit Tests
@@ -283,7 +273,7 @@ This runs: formatting + linting + unit tests
 ```
 
 **Current Status**:
-> ⚠️ **Known Gap**: Unit tests are currently minimal (mostly component instantiation). Many tests that could be unit tests are currently in integration tests. Future work should move more logic tests to unit level.
+> ⚠️ **Known Gap**: Unit tests are currently minimal (mostly component instantiation). Future work should move more logic tests to unit level.
 
 **Example unit test** (`backend.service.spec.ts`):
 
@@ -327,7 +317,7 @@ describe('BackendService', () => {
 ```
 
 **Current Status**:
-> ⚠️ **Known Gap**: Component tests are currently minimal (mostly component mounting). Many tests that could be component tests are currently in integration tests. Future work should move component behavior tests from integration to component level.
+> ⚠️ **Known Gap**: Component tests are currently minimal (mostly component mounting). Future work should move more component behavior tests to component level.
 
 **Example component test** (`app.component.cy.ts`):
 
@@ -400,70 +390,11 @@ describe('ListeIdeesComponent', () => {
 - Checking the number of child components rendered based on data
 - Testing component composition and hierarchy
 
-### Integration Tests
-
-**Technology**: Cypress with Angular Dev Server
-
-**Location**: `cypress/e2e/*.cy.ts` files
-
-**How it works**:
-- Starts Angular dev server (`ng serve`)
-- API requests are intercepted by `dev-backend.interceptor.ts`
-- Tests run against mocked API responses
-- Fast execution (no real backend needed)
-
-**Run all integration tests**:
-
-```bash
-./npm run int
-```
-
-**Run specific integration tests**:
-
-```bash
-./npm run int -- --spec '**/liste-idees.cy.ts'
-```
-
-**Run specific tests within a file**:
-
-Edit the test file and use:
-- `it.only(...)` - Run only this test
-- `it.skip(...)` - Skip this test
-
-```typescript
-describe('Liste idees', () => {
-  it.only('should display ideas', () => {
-    // Only this test runs
-  });
-
-  it.skip('should add idea', () => {
-    // This test is skipped
-  });
-});
-```
-
-**Example integration test**:
-
-```typescript
-describe('Login page', () => {
-  beforeEach(() => {
-    cy.visit('/');
-  });
-
-  it('should login with valid credentials', () => {
-    cy.get('input[name="identifiant"]').type('alice');
-    cy.get('input[name="mdp"]').type('mdpalice');
-    cy.get('button[type="submit"]').click();
-    cy.url().should('include', '/idee');
-  });
-});
-```
-
 ### End-to-End Tests
 
 **Technology**: Cypress with Full Stack
 
-**Location**: Same as integration tests (`cypress/e2e/*.cy.ts`)
+**Location**: `cypress/e2e/*.cy.ts` files
 
 **How it works**:
 - Runs against the full Docker environment
@@ -487,24 +418,21 @@ describe('Login page', () => {
 ./composer run install-fixtures
 ```
 
-**Note**: E2E tests use the same test files as integration tests but access the full environment via `http://front` instead of the dev server.
+**Note**: E2E tests access the full environment via `http://front`.
 
 ### Test Data
 
-**Development/Integration tests** use mock data from `dev-backend.interceptor.ts`:
+**E2E tests** use fixtures from `api/src/Appli/Fixture/`:
 - alice / mdpalice (admin)
 - bob / mdpbob
 - charlie / mdpcharlie
 - david / mdpdavid
 - eve / mdpeve
-
-**E2E tests** use fixtures from `api/src/Appli/Fixture/`:
-- Same usernames and passwords as dev data
 - Must be refreshed with `./composer run install-fixtures`
 
 ## Development Server
 
-The Angular development server provides hot reload and API mocking for rapid frontend development.
+The Angular development server provides hot reload for rapid frontend development.
 
 ### Starting the Dev Server
 
@@ -528,11 +456,11 @@ The Angular development server provides hot reload and API mocking for rapid fro
 
 | Aspect              | Dev Server (`:4200`)           | Full Stack (`:8080`)              |
 |---------------------|--------------------------------|-----------------------------------|
-| **API**             | Mocked (dev-backend.interceptor) | Real (PHP + MySQL)               |
+| **API**             | Proxied to real backend        | Real (PHP + MySQL)                |
 | **Hot Reload**      | Yes                            | No (must rebuild)                 |
 | **Build Speed**     | Fast                           | Slower                            |
 | **Email Testing**   | Not available                  | Available (MailHog)               |
-| **Best For**        | UI development, rapid iteration | API integration, full flow testing|
+| **Best For**        | UI development, rapid iteration | Full flow testing, E2E tests      |
 
 ### Configuration
 
@@ -548,106 +476,8 @@ The Angular development server provides hot reload and API mocking for rapid fro
 ```
 
 **Proxy Configuration** (`src/proxy.conf.js`):
-- Used when dev server needs to proxy to real API
-- Currently, dev server uses interceptor mocking instead
+- Proxies API requests to the real backend
 - Uses environment variable `FRONT_DEV_PORT` (default: 8080) for target port
-
-## Dev Backend Interceptor
-
-The dev backend interceptor (`dev-backend.interceptor.ts`) provides a complete mock backend for frontend development without requiring the API server.
-
-### How It Works
-
-```mermaid
-sequenceDiagram
-    participant Component
-    participant BackendService
-    participant HttpClient
-    participant DevInterceptor
-    participant RealAPI
-
-    Component->>BackendService: getOccasions()
-    BackendService->>HttpClient: GET /api/occasion
-    HttpClient->>DevInterceptor: intercept(request)
-
-    alt Development Mode
-        DevInterceptor->>DevInterceptor: Mock response
-        DevInterceptor-->>HttpClient: HttpResponse (mocked data)
-    else Production Mode
-        DevInterceptor->>RealAPI: Forward request
-        RealAPI-->>DevInterceptor: Real response
-        DevInterceptor-->>HttpClient: HttpResponse (real data)
-    end
-
-    HttpClient-->>BackendService: Observable<Occasion[]>
-    BackendService-->>Component: occasions
-```
-
-### When It's Active
-
-The interceptor is **only active** when:
-
-1. Running dev server (`./npm start`)
-2. Running integration tests (`./npm run int`)
-
-The interceptor is **inactive** when:
-
-3. Building for production (`./npm run build`)
-4. Running e2e tests (`./npm run e2e`)
-5. Accessing full stack (http://localhost:8080)
-
-### Mock Data
-
-**Users** (defined at top of `dev-backend.interceptor.ts`):
-
-```typescript
-const alice: UtilisateurAvecMdp = {
-  id: 0,
-  identifiant: 'alice',
-  mdp: 'mdpalice',
-  nom: 'Alice',
-  admin: true,
-  // ...
-};
-```
-
-**API Routes Mocked**:
-- `POST /api/connexion` - Login
-- `DELETE /api/connexion` - Logout
-- `GET /api/utilisateur/:id` - Get user
-- `PUT /api/utilisateur/:id` - Update user
-- `GET /api/occasion` - List occasions
-- `GET /api/occasion/:id` - Get occasion
-- `GET /api/idee` - List ideas
-- `POST /api/idee` - Create idea
-- `DELETE /api/idee/:id` - Delete idea
-
-### Modifying Mock Data
-
-To add or modify mock data:
-
-1. Open `front/src/app/dev-backend.interceptor.ts`
-2. Find the relevant mock data section (users, occasions, ideas)
-3. Add or modify the mock objects
-4. Save the file (dev server will auto-reload)
-
-**Example - Add a new test user**:
-
-```typescript
-const frank: UtilisateurAvecMdp = {
-  id: 5,
-  identifiant: 'frank',
-  email: 'frank@tkdo.org',
-  nom: 'Frank',
-  mdp: 'mdpfrank',
-  genre: Genre.Masculin,
-  admin: false,
-  prefNotifIdees: PrefNotifIdees.Quotidienne,
-};
-
-// Add to utilisateurs array
-const utilisateurs = [alice, bob, charlie, david, eve, frank];
-```
 
 ## Building for Production
 
@@ -795,7 +625,7 @@ The project maintains Angular and dependencies at the latest stable versions usi
     ```bash
     ./npm run lint
     ./npm test
-    ./npm run int
+    ./npm run e2e
     ./npm run build
     ```
 

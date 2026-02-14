@@ -341,7 +341,6 @@ flowchart LR
 # Frontend - ALL LEVELS REQUIRED before commits
 ./npm test      # Unit tests + format + lint
 ./npm run ct    # Component tests
-./npm run int   # Integration tests
 
 # Before PRs/releases - ALSO REQUIRED
 ./npm run e2e   # End-to-end tests (needs docker compose up -d front)

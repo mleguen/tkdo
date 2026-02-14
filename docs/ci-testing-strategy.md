@@ -71,7 +71,6 @@ The project uses wrapper scripts to execute commands inside Docker containers:
 # Frontend commands (via npm container)
 ./npm test      # Wraps: docker compose run --rm npm npm test
 ./npm run ct    # Component tests
-./npm run int   # Integration tests
 ./npm run e2e   # E2E tests
 
 # Backend commands (via php-cli container)
@@ -621,8 +620,6 @@ jobs:
       mailhog:
         image: mailhog/mailhog
     steps:
-      - name: Frontend integration tests
-        run: npm run int
       - name: Backend integration tests
         run: composer test -- --testsuite Int
 
@@ -669,7 +666,7 @@ jobs:
     runs-on: ubuntu-latest
     services: ...
     steps:
-      - run: npm run int && composer test
+      - run: composer test
 
 # .github/workflows/e2e-tests.yml
 name: E2E Tests

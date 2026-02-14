@@ -36,7 +36,7 @@ Tkdo follows a **pragmatic testing strategy** that balances comprehensive covera
  /--------\
 /          \ Integration Tests (moderate)
 ------------  - API endpoint tests
-              - Component tests with mocked backends
+              - Component tests with dependencies
 
               Unit Tests (many)
               - Business logic
@@ -58,20 +58,19 @@ Tkdo uses multiple testing levels to ensure code quality:
 |-----------------|-------------------|--------------------------|--------|------------|-------|
 | Unit (Frontend) | Jasmine/Karma     | Single service/guard     | Fast   | Low        | Few   |
 | Component       | Cypress Component | Single component         | Fast   | Medium     | Some  |
-| Integration (FE)| Cypress E2E       | Multiple components      | Medium | High       | Many  |
 | Unit (Backend)  | PHPUnit           | Single Port/Service      | Fast   | Medium     | Some  |
 | Integration (BE)| PHPUnit + DB      | Full API endpoint        | Medium | High       | Many  |
 | End-to-End      | Cypress E2E + API | Complete user flow       | Slow   | Highest    | Few   |
 
 ### Test Distribution
 
-- **Frontend**: ~6 unit tests, ~11 component tests, ~2 integration test suites
+- **Frontend**: ~6 unit tests, ~11 component tests
 - **Backend**: ~5 unit test classes, ~6 integration test classes
-- **E2E**: Covered by frontend integration tests on full environment
+- **E2E**: ~2 test suites covering critical user flows on full environment
 
 ### Browser Support Policy
 
-All Cypress tests (component, integration, and E2E) are executed on **multiple browsers** to ensure cross-browser compatibility:
+All Cypress tests (component and E2E) are executed on **multiple browsers** to ensure cross-browser compatibility:
 
 **Supported Browsers:**
 - **Chrome** - Primary browser, tested on every commit
@@ -79,7 +78,6 @@ All Cypress tests (component, integration, and E2E) are executed on **multiple b
 
 **CI Testing:**
 - Component tests run on both Chrome and Firefox in parallel
-- Integration tests run on both Chrome and Firefox in parallel
 - E2E tests run on both Chrome and Firefox in parallel
 
 **Not Currently Supported:**
@@ -91,12 +89,10 @@ You can test on any browser locally:
 ```bash
 # Chrome (default)
 ./npm run ct
-./npm run int
 ./npm run e2e
 
 # Firefox
 ./npm run ct -- --browser firefox
-./npm run int -- --browser firefox
 ./npm run e2e -- --browser firefox
 
 # Edge (if installed)
@@ -105,7 +101,7 @@ You can test on any browser locally:
 
 **Adding New Browsers:**
 To add a new browser to CI testing, update the matrix in:
-- `.github/workflows/test.yml` (component and integration tests)
+- `.github/workflows/test.yml` (component tests)
 - `.github/workflows/e2e.yml` (E2E tests)
 
 ### Test Parallelization
@@ -117,10 +113,6 @@ To improve CI execution speed, tests are parallelized where beneficial:
 - Each browser (Chrome, Firefox) runs 2 parallel shards
 - Total: 4 parallel jobs (chrome-shard1, chrome-shard2, firefox-shard1, firefox-shard2)
 - Sharding uses `SPLIT=2` and `SPLIT_INDEX1` environment variables (1-based indexing)
-
-**Frontend Integration Tests:**
-- Run on 2 browsers in parallel (Chrome, Firefox)
-- No sharding (only 2 test files)
 
 **Backend Unit Tests:**
 - Tests run sequentially in a single job
@@ -141,7 +133,7 @@ To improve CI execution speed, tests are parallelized where beneficial:
 
 ## Frontend Testing
 
-The frontend uses **Jasmine/Karma** for unit tests and **Cypress** for component, integration, and end-to-end tests.
+The frontend uses **Jasmine/Karma** for unit tests and **Cypress** for component and end-to-end tests.
 
 ### Unit Tests with Jasmine/Karma
 
@@ -307,159 +299,6 @@ it('should submit form', () => {
 >
 > **TODO**: Many tests that are currently in integration tests should be moved to component tests for better isolation and speed.
 
-### Integration Tests with Cypress
-
-Integration tests verify multiple components working together with a **mocked backend** (no real API).
-
-#### Test Structure
-
-```typescript
-import { ConnexionPage } from 'cypress/po/connexion.po';
-import { jeSuisConnecteEnTantQue } from 'cypress/preconditions/connexion.pre';
-import { etantDonneQue } from 'cypress/preconditions/preconditions';
-
-describe('connexion/déconnexion', () => {
-  beforeEach(() => {
-    // Setup spies for console logs
-    cy.window()
-      .its('console')
-      .then((console) => cy.spy(console, 'log').as('log'));
-  });
-
-  it('se connecter', () => {
-    cy.visit('/');
-
-    const connexionPage = new ConnexionPage();
-    connexionPage.titre().should('have.text', 'Connexion');
-
-    cy.fixture('utilisateurs').then((utilisateurs) => {
-      connexionPage.identifiant().type(utilisateurs.soi.identifiant);
-      connexionPage.motDePasse().type(utilisateurs.soi.mdp);
-      connexionPage.boutonSeConnecter().click();
-      connexionPage.nomUtilisateur().should('have.text', utilisateurs.soi.nom);
-    });
-  });
-});
-```
-
-#### Key Patterns
-
-**Page Objects** (`cypress/po/`):
-```typescript
-export class ConnexionPage {
-  titre() {
-    return cy.get('h1');
-  }
-
-  identifiant() {
-    return cy.get('[name=identifiant]');
-  }
-
-  boutonSeConnecter() {
-    return cy.get('button[type=submit]');
-  }
-}
-```
-
-**Preconditions** (`cypress/preconditions/`):
-```typescript
-export function jeSuisConnecteEnTantQue(utilisateur: any) {
-  return () => {
-    cy.visit('/');
-    // Login logic
-  };
-}
-
-export function etantDonneQue(...preconditions: (() => void)[]) {
-  preconditions.forEach(pre => pre());
-}
-```
-
-**Fixtures** (`cypress/fixtures/`):
-
-| File | Purpose |
-|------|---------|
-| `utilisateurs.json` | Test user credentials |
-| `idees.json` | Test gift ideas |
-| `groupes.json` | Test groups (v2) |
-| `listes.json` | Test visibility assignments (v2) |
-
-```json
-// utilisateurs.json
-{
-  "soi": {
-    "identifiant": "alice",
-    "mdp": "mdpalice",
-    "nom": "Alice"
-  }
-}
-
-// groupes.json (v2 - for future use)
-{
-  "famille": {
-    "nom": "Famille",
-    "membres": ["alice", "bob", "charlie"]
-  }
-}
-
-// listes.json (v2 - for future use)
-{
-  "alice": {
-    "visiblePar": ["famille"]
-  }
-}
-```
-
-**Backend Mocking:**
-
-Integration tests run against the Angular dev server with **API request interception**:
-
-```typescript
-// front/src/app/dev-backend.interceptor.ts
-// Intercepts HTTP requests and returns mock data
-```
-
-The dev server automatically uses this interceptor when not in production mode.
-
-#### Running Integration Tests
-
-```bash
-# From project root - run all integration tests
-./npm run int
-
-# Run specific test file
-./npm run int -- --spec '**/connexion.cy.ts'
-
-# Run specific test within a file (use it.only() in the file)
-# Or skip tests (use it.skip() in the file)
-```
-
-**Interactive Mode:**
-```bash
-./npm run cypress:open
-# Then select "E2E Testing" and choose integration tests
-```
-
-#### Test Organization
-
-```
-front/cypress/
-├── e2e/                      # Integration test specs
-│   ├── connexion.cy.ts
-│   └── liste-idees.cy.ts
-├── fixtures/                 # Test data
-│   └── utilisateurs.json
-├── po/                       # Page Objects
-│   ├── connexion.po.ts
-│   └── profil.po.ts
-├── preconditions/            # Test setup helpers
-│   ├── connexion.pre.ts
-│   └── preconditions.ts
-└── support/                  # Cypress configuration
-    ├── commands.ts
-    └── e2e.ts
-```
-
 ### Responsive Design Testing
 
 All frontend tests should verify that components and user flows work correctly across different viewport sizes. This ensures a consistent user experience on desktop, tablet, and mobile devices.
@@ -616,7 +455,7 @@ describe('HeaderComponent - Responsive Navigation', () => {
 });
 ```
 
-#### Integration Tests - Viewport Examples
+#### E2E Tests - Viewport Examples
 
 **Testing a complete user flow on both mobile and desktop:**
 
@@ -819,10 +658,10 @@ Or override for specific test runs:
 
 ```bash
 # Run with mobile viewport as default (below 768px breakpoint)
-./npm run int -- --config viewportWidth=375,viewportHeight=667
+./npm run e2e -- --config viewportWidth=375,viewportHeight=667
 
 # Run at exact desktop breakpoint (768px)
-./npm run int -- --config viewportWidth=768,viewportHeight=1024
+./npm run e2e -- --config viewportWidth=768,viewportHeight=1024
 ```
 
 ## Backend Testing
@@ -1317,12 +1156,9 @@ End-to-end tests verify complete user workflows on the **full application stack*
 
 ### Test Structure
 
-E2E tests are the same Cypress integration tests but run against the complete environment:
+E2E tests use Cypress to verify complete user workflows against the full application stack:
 
 ```bash
-# Integration tests (mocked backend)
-./npm run int
-
 # E2E tests (real backend)
 ./npm run e2e
 ```
@@ -1393,18 +1229,6 @@ Example alignment:
     ->setNom('Alice')
 ```
 
-### E2E vs Integration Tests
-
-| Aspect           | Integration Tests           | E2E Tests                    |
-|------------------|-----------------------------|------------------------------|
-| Backend          | Mocked (dev interceptor)    | Real API                     |
-| Database         | Not used                    | Real database                |
-| Speed            | Fast (~10s)                 | Slower (~30s)                |
-| Data setup       | Fixtures in code            | Database fixtures            |
-| Isolation        | Complete                    | Requires data reset          |
-| Confidence       | High                        | Highest                      |
-| When to run      | Every commit                | Before merge/deploy          |
-
 ## Writing New Tests
 
 ### Choosing the Right Test Type
@@ -1422,7 +1246,7 @@ Is it business logic in a Port?
   └─> Write backend unit test
 
 Is it a multi-component user flow?
-  └─> Write frontend integration test
+  └─> Write E2E test or component test
 
 Is it a critical user journey?
   └─> Verify E2E test covers it
@@ -1633,7 +1457,7 @@ open http://localhost:8025
 1. **Run single test in isolation**
    ```bash
    # Frontend
-   ./npm run int -- --spec '**/connexion.cy.ts'
+   ./npm run e2e -- --spec '**/connexion.cy.ts'
 
    # Backend
    ./composer test -- --filter testCreeUtilisateur
@@ -1677,13 +1501,11 @@ open http://localhost:8025
 **Frontend:**
 - Unit tests: Minimal (service instantiation only)
 - Component tests: Minimal (mounting only)
-- Integration tests: Good coverage of main user flows
 - E2E tests: Critical paths covered
 
 **Backend:**
 - Unit tests: Moderate coverage of Port business logic
 - Integration tests: Good coverage of API endpoints
-- E2E tests: Same as frontend integration tests
 
 ### Coverage Goals
 
@@ -1773,8 +1595,8 @@ The following areas need improvement:
      - Input/output binding
      - Conditional rendering
 
-3. **Many Tests Should Move from Integration to Component**
-   - Current: Many component-level behaviors tested at integration level
+3. **Many Tests Should Move from E2E to Component**
+   - Current: Many component-level behaviors tested at E2E level
    - **TODO**: Move appropriate tests to component level for:
      - Better isolation
      - Faster execution

@@ -1,6 +1,6 @@
 # Story 1.1b: Remove Dev Backend Interceptor
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 
@@ -41,33 +41,33 @@ The `DevBackendInterceptor` (`front/src/app/dev-backend.interceptor.ts`) is an A
 
 ## Tasks / Subtasks
 
-- [ ] Task 1: Remove DevBackendInterceptor and registration (AC: #1)
-  - [ ] 1.1 Delete `front/src/app/dev-backend.interceptor.ts`
-  - [ ] 1.2 Delete `front/src/app/dev-backend.interceptor.spec.ts`
-  - [ ] 1.3 Update `front/src/app/http-interceptors.ts` — remove `isDevMode()` block and DevBackendInterceptor import
-  - [ ] 1.4 Verify no other files import from `dev-backend.interceptor`
+- [x] Task 1: Remove DevBackendInterceptor and registration (AC: #1)
+  - [x] 1.1 Delete `front/src/app/dev-backend.interceptor.ts`
+  - [x] 1.2 Delete `front/src/app/dev-backend.interceptor.spec.ts`
+  - [x] 1.3 Update `front/src/app/http-interceptors.ts` — remove `isDevMode()` block and DevBackendInterceptor import
+  - [x] 1.4 Verify no other files import from `dev-backend.interceptor`
 
-- [ ] Task 2: Remove `npm run int` script (AC: #2)
-  - [ ] 2.1 Remove `"int": "ng e2e"` from `front/package.json` scripts
-  - [ ] 2.2 Check CI workflows — remove any `npm run int` steps if present
-  - [ ] 2.3 Update `docs/testing.md` — remove references to `npm run int` and mock backend mode
+- [x] Task 2: Remove `npm run int` script (AC: #2)
+  - [x] 2.1 Remove `"int": "ng e2e"` from `front/package.json` scripts
+  - [x] 2.2 Check CI workflows — remove any `npm run int` steps if present
+  - [x] 2.3 Update `docs/testing.md` — remove references to `npm run int` and mock backend mode
 
-- [ ] Task 3: Clean up E2E tests — remove mock-detection branching (AC: #3)
-  - [ ] 3.1 In `front/cypress/e2e/connexion.cy.ts`: remove `__dev_mock_backend_active` check (lines 100-112), keep only the real cookie assertions
-  - [ ] 3.2 In `front/cypress/po/app.po.ts`: remove `__dev_simulated_cookie_tkdo_jwt` sessionStorage cleanup from `invaliderSession()`
-  - [ ] 3.3 Search for any other references to `__dev_mock_backend_active`, `__dev_simulated_cookie_tkdo_jwt`, `MOCK_BACKEND_ACTIVE_KEY`, `SIMULATED_COOKIE_KEY` and remove them
+- [x] Task 3: Clean up E2E tests — remove mock-detection branching (AC: #3)
+  - [x] 3.1 In `front/cypress/e2e/connexion.cy.ts`: remove `__dev_mock_backend_active` check (lines 100-112), keep only the real cookie assertions
+  - [x] 3.2 In `front/cypress/po/app.po.ts`: remove `__dev_simulated_cookie_tkdo_jwt` sessionStorage cleanup from `invaliderSession()`
+  - [x] 3.3 Search for any other references to `__dev_mock_backend_active`, `__dev_simulated_cookie_tkdo_jwt`, `MOCK_BACKEND_ACTIVE_KEY`, `SIMULATED_COOKIE_KEY` and remove them
 
-- [ ] Task 4: Verify all tests pass (AC: #2, #4)
-  - [ ] 4.1 Run component tests: `./npm test -- --watch=false --browsers=ChromeHeadless`
-  - [ ] 4.2 Run E2E tests: `./composer run install-fixtures && ./npm run e2e`
-  - [ ] 4.3 Run backend tests: `./composer test` (should be unaffected, sanity check)
+- [x] Task 4: Verify all tests pass (AC: #2, #4)
+  - [x] 4.1 Run component tests: `./npm test -- --watch=false --browsers=ChromeHeadless`
+  - [x] 4.2 Run E2E tests: `./composer run install-fixtures && ./npm run e2e`
+  - [x] 4.3 Run backend tests: `./composer test` (should be unaffected, sanity check)
 
-- [ ] Task 5: Update documentation (AC: #1)
-  - [ ] 5.1 Update `docs/dev-setup.md` — remove any "run without Docker" instructions referencing the interceptor
-  - [ ] 5.2 Update `docs/frontend-dev.md` — remove DevBackendInterceptor references
-  - [ ] 5.3 Update `docs/troubleshooting.md` — remove DevBackendInterceptor references
-  - [ ] 5.4 Update `docs/architecture.md` — remove DevBackendInterceptor references
-  - [ ] 5.5 Update `_bmad-output/project-context.md` if it references the interceptor
+- [x] Task 5: Update documentation (AC: #1)
+  - [x] 5.1 Update `docs/dev-setup.md` — remove any "run without Docker" instructions referencing the interceptor
+  - [x] 5.2 Update `docs/frontend-dev.md` — remove DevBackendInterceptor references
+  - [x] 5.3 Update `docs/troubleshooting.md` — remove DevBackendInterceptor references
+  - [x] 5.4 Update `docs/architecture.md` — remove DevBackendInterceptor references
+  - [x] 5.5 Update `_bmad-output/project-context.md` if it references the interceptor
 
 ## Dev Notes
 
@@ -128,12 +128,53 @@ Verification approach:
 
 ### Agent Model Used
 
-{{agent_model_name_version}}
+Claude Opus 4.6 (claude-opus-4-6)
 
 ### Debug Log References
 
+No issues encountered. Clean deletion story — all tests passed on first run after changes.
+
 ### Completion Notes List
+
+- Deleted DevBackendInterceptor (~560 lines) and its spec file
+- Simplified `http-interceptors.ts` to only register AuthBackendInterceptor and ErreurBackendInterceptor
+- Removed `"int": "ng e2e"` script from package.json
+- Removed entire `frontend-integration-tests` CI job from `.github/workflows/test.yml`
+- Cleaned E2E tests: removed `__dev_mock_backend_active` branching in `connexion.cy.ts`, removed `__dev_simulated_cookie_tkdo_jwt` cleanup in `app.po.ts`
+- Cookie security assertions in `connexion.cy.ts` now always run (no more mock-vs-real branching)
+- Updated 9 documentation files to remove all DevBackendInterceptor and `npm run int` references
+- Task 5.1 (dev-setup.md) was N/A — no interceptor references existed in that file
+- All tests pass: 52 unit tests, 11 E2E tests, 244 backend tests (matching baseline)
 
 ### Change Log
 
+- 2026-02-14: Removed DevBackendInterceptor, `npm run int` script, CI integration test job, mock-detection branching in E2E tests, and updated all documentation
+
 ### File List
+
+**Deleted:**
+- front/src/app/dev-backend.interceptor.ts
+- front/src/app/dev-backend.interceptor.spec.ts
+
+**Modified (source):**
+- front/src/app/http-interceptors.ts
+- front/package.json
+- front/cypress/e2e/connexion.cy.ts
+- front/cypress/po/app.po.ts
+- .github/workflows/test.yml
+
+**Modified (documentation):**
+- docs/testing.md
+- docs/frontend-dev.md
+- docs/troubleshooting.md
+- docs/architecture.md
+- docs/DOCUMENTATION-GUIDE.md
+- docs/ci-testing-strategy.md
+- CONTRIBUTING.md
+- BACKLOG.md
+- _bmad-output/project-context.md
+
+**Modified (workflow tracking):**
+- _bmad-output/implementation-artifacts/sprint-status.yaml
+- _bmad-output/implementation-artifacts/1-1b-remove-dev-backend-interceptor.md
+- _bmad-output/implementation-artifacts/.baseline-1-1b-remove-dev-backend-interceptor.txt

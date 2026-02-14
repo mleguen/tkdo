@@ -430,7 +430,6 @@ Run before committing:
 # Frontend Tests - ALL THREE LEVELS REQUIRED
 ./npm test      # 1. Unit tests + format + lint (REQUIRED)
 ./npm run ct    # 2. Component tests (REQUIRED)
-./npm run int   # 3. Integration tests (REQUIRED)
 
 # Backend Tests
 ./composer test  # All backend tests (REQUIRED)
@@ -552,10 +551,10 @@ describe('Login Flow', () => {
 
 User workflows that involve responsive UI elements (navigation, forms, modals) should be tested on both mobile and desktop viewports to ensure proper behavior across devices. See [Testing Guide - Responsive Design Testing](docs/testing.md#responsive-design-testing) for patterns and examples.
 
-**Run integration tests:**
+**Run E2E tests:**
 ```bash
-./npm run int
-./npm run int -- --spec '**/login.cy.ts'  # Specific file
+./composer run install-fixtures && ./npm run e2e
+./npm run e2e -- --spec '**/connexion.cy.ts'  # Specific file
 ```
 
 #### End-to-End Tests (Cypress with Docker)
@@ -832,7 +831,7 @@ Do not mention routine BACKLOG/CHANGELOG maintenance that is standard documentat
 
 Add deprecation warnings to the backlog when they're reported by:
 
-- **npm commands**: `./npm install`, `./npm test`, `./npm run ct`, `./npm run int`, `./npm run e2e`, `./npm run build`
+- **npm commands**: `./npm install`, `./npm test`, `./npm run ct`, `./npm run e2e`, `./npm run build`
 - **Angular CLI**: `./ng update`, `./ng build`, `./ng serve`
 - **Composer**: `./composer install`, `./composer update`, `./composer test`
 
@@ -921,7 +920,6 @@ When a deprecation is fixed:
    # Frontend
    ./npm test
    ./npm run ct
-   ./npm run int
 
    # Backend
    ./composer test
@@ -1029,7 +1027,7 @@ Example: `1.4.3` → `1.5.0` (new features) or `1.4.4` (bug fixes)
 
 1. **Run all tests** (E2E tests are mandatory for releases):
    ```bash
-   ./npm test && ./npm run ct && ./npm run int
+   ./npm test && ./npm run ct
    ./composer test
    docker compose up -d front && ./composer run install-fixtures && ./npm run e2e
    ```
@@ -1092,7 +1090,6 @@ Example: `1.4.3` → `1.5.0` (new features) or `1.4.4` (bug fixes)
 ```bash
 ./npm test           # Unit tests
 ./npm run ct         # Component tests
-./npm run int        # Integration tests
 ```
 
 **Q: How do I reset my development database?**
