@@ -1,6 +1,6 @@
 # Story 1.1c: OAuth2 Standards Alignment
 
-Status: review
+Status: done
 
 ## Story
 
@@ -386,6 +386,7 @@ Claude Opus 4.6
 - Rewrote BffAuthServiceTest to mock GenericProvider and test getResourceOwner()
 - Rebuilt front Docker container to apply /oauth/ ProxyPass rules
 - 2026-02-14 - PR Comments Resolved: Resolved 5 PR comment threads, marked completed action items as fixed, PR: #100, comment_ids: 2807310040, 2807310037, 2807310046, 2807310052, 2807310061
+- 2026-02-14 — Code Review Documentation Fixes: Fixed 3 documentation issues found during adversarial code review. (1) Updated `docs/backend-dev.md` Authentication section to document OAuth2 cookie-based flow as primary with comprehensive architecture diagrams and step-by-step flow. (2) Added OAuth2 Configuration section to `docs/environment-variables.md` documenting OAUTH2_CLIENT_ID, OAUTH2_CLIENT_SECRET, OAUTH2_REDIRECT_URI with external IdP switching guide. (3) Removed misleading comment in OAuth2Settings.php that incorrectly stated urlResourceOwner was "not used" when it's actually used by GenericProvider.getResourceOwner().
 
 ### File List
 
@@ -420,6 +421,9 @@ Claude Opus 4.6
 - `api/test/Int/OAuthAuthorizeControllerTest.php` — Updated for redirect_uri validation, invalid creds redirect
 - `api/test/Int/OAuthTokenControllerTest.php` — Added client_secret validation tests
 - `_bmad-output/implementation-artifacts/sprint-status.yaml` — Updated story status
+- `api/src/Appli/Settings/OAuth2Settings.php` — Removed misleading "not used" comment
+- `docs/backend-dev.md` — Updated Authentication section to document OAuth2 cookie-based flow
+- `docs/environment-variables.md` — Added OAuth2 Configuration section with IdP switching guide
 
 **Deleted:**
 - `api/src/Appli/Controller/AuthLoginController.php` — Replaced by OAuthAuthorizeController

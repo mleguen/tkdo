@@ -27,6 +27,6 @@ class OAuth2Settings
             ?: ('http://localhost:8080' . $basePath);
         $this->urlAuthorize = $baseUri . '/oauth/authorize';
         $this->urlAccessToken = $baseUri . '/oauth/token';
-        $this->urlResourceOwner = $baseUri . '/oauth/userinfo'; // Not used (claims in token)
+        $this->urlResourceOwner = $baseUri . '/oauth/userinfo';
     }
 }
