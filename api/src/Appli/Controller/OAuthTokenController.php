@@ -1,5 +1,7 @@
 <?php
 
+// TEMPORARY: Will be replaced by external IdP
+
 declare(strict_types=1);
 
 namespace App\Appli\Controller;
@@ -8,19 +10,24 @@ use App\Appli\ModelAdaptor\AuthAdaptor;
 use App\Appli\ModelAdaptor\AuthCodeAdaptor;
 use App\Appli\Service\AuthService;
 use App\Appli\Service\RouteService;
+use App\Dom\Exception\UtilisateurInconnuException;
 use App\Dom\Repository\AuthCodeRepository;
 use App\Dom\Repository\UtilisateurRepository;
 use Doctrine\ORM\EntityManager;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
-use App\Dom\Exception\UtilisateurInconnuException;
-use Slim\Exception\HttpUnauthorizedException;
 
-class AuthTokenController
+
+/**
+ * TEMPORARY: OAuth2 Authorization Server — token endpoint.
+ * Will be replaced by external IdP (Google, Auth0, etc.) post-MVP.
+ *
+ * POST: Accepts grant_type=authorization_code, returns standard OAuth2 token response.
+ *       The access_token is a JWT containing user claims (sub, nom, email, genre, admin, groupe_ids).
+ */
+class OAuthTokenController
 {
-    use CookieConfigTrait;
-
     public function __construct(
         private readonly AuthCodeRepository $authCodeRepository,
         private readonly AuthService $authService,
@@ -36,58 +43,64 @@ class AuthTokenController
      */
     public function __invoke(ServerRequestInterface $request, ResponseInterface $response, array $args): ResponseInterface
     {
-        $body = $this->routeService->getParsedRequestBody($request, ['code']);
+        $body = $this->routeService->getParsedRequestBody($request, ['grant_type', 'code', 'client_id']);
+
+        if ($body['grant_type'] !== 'authorization_code') {
+            return $this->oauthError($response, 400, 'unsupported_grant_type', "grant_type non supporté (doit être 'authorization_code')");
+        }
+
         $codeClair = $body['code'];
 
-        // Find all auth codes for all users (we don't know which user yet)
-        // We need to iterate and check the hash
+        // Find valid auth code by checking hash
         $authCode = $this->findValidAuthCode($codeClair);
-
         if ($authCode === null) {
-            throw new HttpUnauthorizedException($request, 'code invalide ou expiré');
+            return $this->oauthError($response, 401, 'invalid_grant', 'code invalide ou expiré');
         }
 
         // Atomically mark as used - prevents race conditions
         $marked = $this->authCodeRepository->marqueUtilise($authCode->getId());
         if (!$marked) {
-            // Another request already used this code
-            throw new HttpUnauthorizedException($request, 'code invalide ou expiré');
+            return $this->oauthError($response, 401, 'invalid_grant', 'code invalide ou expiré');
         }
 
-        // Load the user (may have been deleted between login and token exchange)
+        // Load the user
         try {
             $utilisateur = $this->utilisateurRepository->read($authCode->getUtilisateurId());
         } catch (UtilisateurInconnuException) {
-            throw new HttpUnauthorizedException($request, 'code invalide ou expiré');
+            return $this->oauthError($response, 401, 'invalid_grant', 'code invalide ou expiré');
         }
 
-        // Create auth and generate JWT
+        // Create JWT as access_token with user claims
         // groupe_ids will be populated in Story 2.2+, empty for now
         $auth = AuthAdaptor::fromUtilisateur($utilisateur, []);
         $jwt = $this->authService->encode($auth);
 
-        $this->logger->info("Utilisateur {$utilisateur->getId()} ({$utilisateur->getNom()}) connecté via token exchange" . ($utilisateur->getAdmin() ? ' (admin)' : ''));
+        $this->logger->info("OAuth2 token émis pour utilisateur {$utilisateur->getId()} ({$utilisateur->getNom()})");
 
-        // Set HttpOnly cookie with JWT via response header
-        $response = $this->addCookieHeader($response, $jwt);
-
-        // Return user payload (without the JWT)
+        // Return standard OAuth2 token response
         return $this->routeService->getResponseWithJsonBody($response, json_encode([
-            'utilisateur' => [
-                'id' => $utilisateur->getId(),
-                'nom' => $utilisateur->getNom(),
-                'email' => $utilisateur->getEmail(),
-                'genre' => $utilisateur->getGenre(),
-                'admin' => $utilisateur->getAdmin(),
-                'groupe_ids' => [], // Will be populated in Story 2.2+
-            ],
+            'access_token' => $jwt,
+            'token_type' => 'Bearer',
+            'expires_in' => $this->authService->getValidite(),
         ], JSON_THROW_ON_ERROR));
+    }
+
+    /**
+     * Return a standard OAuth2 error response (RFC 6749 §5.2).
+     */
+    private function oauthError(ResponseInterface $response, int $status, string $error, string $description): ResponseInterface
+    {
+        $response = $response->withStatus($status)
+            ->withHeader('Content-Type', 'application/json');
+        $response->getBody()->write(json_encode([
+            'error' => $error,
+            'error_description' => $description,
+        ], JSON_THROW_ON_ERROR));
+        return $response;
     }
 
     private function findValidAuthCode(string $codeClair): ?AuthCodeAdaptor
     {
-        // Query all non-expired, non-used auth codes and check the hash
-        // This is necessary because we store hashed codes
         $qb = $this->em->createQueryBuilder();
         $qb->select('c')
             ->from(AuthCodeAdaptor::class, 'c')
@@ -105,21 +118,5 @@ class AuthTokenController
         }
 
         return null;
-    }
-
-    private function addCookieHeader(ResponseInterface $response, string $jwt): ResponseInterface
-    {
-        $expires = time() + $this->authService->getValidite();
-        $expiresGmt = gmdate('D, d M Y H:i:s', $expires) . ' GMT';
-
-        $cookie = sprintf(
-            'tkdo_jwt=%s; Expires=%s; Path=%s; %sHttpOnly; SameSite=Strict',
-            $jwt,
-            $expiresGmt,
-            $this->getCookiePath(),
-            $this->getSecureFlag()
-        );
-
-        return $response->withHeader('Set-Cookie', $cookie);
     }
 }

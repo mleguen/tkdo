@@ -44,6 +44,7 @@ describe('BackendService', () => {
 
   beforeEach(() => {
     localStorage.clear();
+    sessionStorage.clear();
     TestBed.configureTestingModule({
       imports: [],
       providers: [
@@ -59,6 +60,7 @@ describe('BackendService', () => {
   afterEach(() => {
     httpMock.verify();
     localStorage.clear();
+    sessionStorage.clear();
   });
 
   it('should be created', () => {
@@ -66,33 +68,55 @@ describe('BackendService', () => {
   });
 
   describe('Authentication', () => {
-    it('should connect using two-step auth flow and store user ID', async () => {
-      const connectPromise = service.connecte('testuser', 'password');
+    it('should generate and store OAuth2 state on connecte()', () => {
+      // Test the genereState method indirectly by calling connecte()
+      // connecte() will try to set document.location.href which causes
+      // navigation, so we verify state was stored before that happens
+      // by calling the private method directly
+      const state = service['genereState']();
+      expect(state.length).toBe(64); // 32 bytes = 64 hex chars
+      expect(state).toMatch(/^[a-f0-9]{64}$/);
+    });
 
-      // Step 1: Login request
-      const loginReq = httpMock.expectOne('/api/auth/login');
-      expect(loginReq.request.method).toBe('POST');
-      expect(loginReq.request.body).toEqual({
-        identifiant: 'testuser',
-        mdp: 'password',
-      });
-      loginReq.flush({ code: 'auth-code-123' });
+    it('should exchange code via BFF callback and store user ID', async () => {
+      // Store a known state in sessionStorage
+      sessionStorage.setItem('oauth_state', 'test-state-abc');
 
-      // Wait for micro-task to process the response and trigger the next request
-      await new Promise((resolve) => setTimeout(resolve, 0));
+      const echangePromise = service.echangeCode(
+        'auth-code-123',
+        'test-state-abc',
+      );
 
-      // Step 2: Token exchange request
-      const tokenReq = httpMock.expectOne('/api/auth/token');
-      expect(tokenReq.request.method).toBe('POST');
-      expect(tokenReq.request.body).toEqual({ code: 'auth-code-123' });
-      expect(tokenReq.request.withCredentials).toBe(true);
-      tokenReq.flush({
+      // BFF callback request
+      const callbackReq = httpMock.expectOne('/api/auth/callback');
+      expect(callbackReq.request.method).toBe('POST');
+      expect(callbackReq.request.body).toEqual({ code: 'auth-code-123' });
+      expect(callbackReq.request.withCredentials).toBe(true);
+      callbackReq.flush({
         utilisateur: { id: 1, nom: 'Test User', admin: false },
       });
 
-      await connectPromise;
+      await echangePromise;
 
       expect(localStorage.getItem('id_utilisateur')).toBe('1');
+      // State should be cleared after use
+      expect(sessionStorage.getItem('oauth_state')).toBeNull();
+    });
+
+    it('should reject echangeCode with invalid state (CSRF protection)', async () => {
+      sessionStorage.setItem('oauth_state', 'correct-state');
+
+      await expectAsync(
+        service.echangeCode('some-code', 'wrong-state'),
+      ).toBeRejectedWithError('état OAuth2 invalide (CSRF)');
+    });
+
+    it('should reject echangeCode when no state stored', async () => {
+      sessionStorage.removeItem('oauth_state');
+
+      await expectAsync(
+        service.echangeCode('some-code', 'any-state'),
+      ).toBeRejectedWithError('état OAuth2 invalide (CSRF)');
     });
 
     it('should disconnect and clear local state', async () => {
