@@ -69,6 +69,11 @@ The `DevBackendInterceptor` (`front/src/app/dev-backend.interceptor.ts`) is an A
   - [x] 5.4 Update `docs/architecture.md` — remove DevBackendInterceptor references
   - [x] 5.5 Update `_bmad-output/project-context.md` if it references the interceptor
 
+### Review Follow-ups (AI)
+
+- [x] [AI-Review][MEDIUM] Update docs/README.md line 133 — change "Interceptors - Handle authentication tokens and development mocking" to "Interceptors - Handle authentication tokens and error handling" [docs/README.md:133]
+- [x] [AI-Review][MEDIUM] Update docs/frontend-dev.md to reflect AuthBackendInterceptor actual behavior (enables cookies, not tokens) — Fix line 54 description and Mermaid diagram line 80 label [docs/frontend-dev.md:54,80] [PR#97 comment](https://github.com/mleguen/tkdo/pull/97#discussion_r2806667968)
+
 ## Dev Notes
 
 ### What stays untouched
@@ -145,10 +150,20 @@ No issues encountered. Clean deletion story — all tests passed on first run af
 - Updated 9 documentation files to remove all DevBackendInterceptor and `npm run int` references
 - Task 5.1 (dev-setup.md) was N/A — no interceptor references existed in that file
 - All tests pass: 52 unit tests, 11 E2E tests, 244 backend tests (matching baseline)
+- **2026-02-14 - PR Comments Reviewed (Evidence-Based Investigation):**
+  - Reviewed 1 unresolved GitHub PR comment (0 already resolved, filtered out)
+  - Investigation: Read 2 files (docs/frontend-dev.md, auth-backend.interceptor.ts) with 30 avg lines per comment
+  - Validated: 1 valid, 0 duplicate, 0 invalid
+  - Updated Review Follow-ups section with 2 action items (1 from adversarial review, 1 from PR)
+  - Responded to all comments in PR #97 with investigation evidence
+- ✅ Resolved review finding [MEDIUM]: Updated docs/README.md — changed "development mocking" to "error handling" in interceptor description
+- ✅ Resolved review finding [MEDIUM]: Updated docs/frontend-dev.md — AuthBackendInterceptor description now says "Enables credentials (cookies) on API requests" and Mermaid diagram label changed from "Add Token" to "Enable Cookies"
 
 ### Change Log
 
 - 2026-02-14: Removed DevBackendInterceptor, `npm run int` script, CI integration test job, mock-detection branching in E2E tests, and updated all documentation
+- 2026-02-14: Addressed 2 code review findings — fixed interceptor descriptions in docs/README.md and docs/frontend-dev.md
+- 2026-02-14 - PR Comments Resolved: Resolved 1 PR comment thread, marked completed action item as fixed, PR: #97, comment_ids: 2806667968
 
 ### File List
 
@@ -164,6 +179,7 @@ No issues encountered. Clean deletion story — all tests passed on first run af
 - .github/workflows/test.yml
 
 **Modified (documentation):**
+- docs/README.md
 - docs/testing.md
 - docs/frontend-dev.md
 - docs/troubleshooting.md

@@ -130,7 +130,7 @@ graph TB
 
 - **Single Page Application** - Fast, responsive user experience
 - **Component-based** - Reusable, testable UI components
-- **Interceptors** - Handle authentication tokens and development mocking
+- **Interceptors** - Handle authentication tokens and error handling
 - **Routing** - Client-side navigation without full page reloads
 
 **Backend:**

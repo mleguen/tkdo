@@ -51,7 +51,7 @@ The Tkdo frontend is built with modern Angular practices and architectural decis
 - Guards manage authentication state
 
 **HTTP Interceptors:**
-- `auth-backend.interceptor.ts` - Adds authentication tokens to requests
+- `auth-backend.interceptor.ts` - Enables credentials (cookies) on API requests
 - `erreur-backend.interceptor.ts` - Handles HTTP errors globally
 
 ```mermaid
@@ -77,7 +77,7 @@ graph TB
     end
 
     subgraph Interceptors
-        AuthInterceptor[Auth Interceptor<br/>Add Token]
+        AuthInterceptor[Auth Interceptor<br/>Enable Cookies]
         ErrorInterceptor[Error Interceptor<br/>Handle Errors]
     end
 
