@@ -191,31 +191,31 @@ export const httpInterceptorProviders = [
 
 **Execution Order (Outside-In):**
 1. **ErreurBackendInterceptor** - Outermost, handles HTTP errors globally
-2. **AuthBackendInterceptor** - Adds JWT authentication tokens
+2. **AuthBackendInterceptor** - Enables cookie credentials on API requests
 
 #### Authentication Interceptor
 
 **File:** `front/src/app/auth-backend.interceptor.ts`
 
-**Purpose:** Automatically attach JWT tokens to API requests.
+**Purpose:** Enable cookie-based authentication by setting `withCredentials: true` on API requests, allowing the browser to send HttpOnly JWT cookies automatically.
 
 ```typescript
-intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-  if (request.url.startsWith('/api/') && this.backendService.token) {
-    request = request.clone({
-      setHeaders: {
-        Authorization: `Bearer ${this.backendService.token}`
-      }
-    });
-  }
-  return next.handle(request);
+intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
+  if (!this.backend.estUrlBackend(url)) return next.handle(request);
+
+  // Add withCredentials to send HttpOnly cookies with requests
+  return next.handle(
+    request.clone({
+      withCredentials: true,
+    }),
+  );
 }
 ```
 
 **Why This Approach:**
-- Centralized authentication logic
-- No need to manually add headers in every service call
-- Consistent token handling across all API requests
+- Centralized credential configuration for all API requests
+- HttpOnly cookies are more secure than localStorage tokens (immune to XSS)
+- No manual cookie handling needed — the browser manages cookie attachment
 
 #### Error Handling Interceptor
 

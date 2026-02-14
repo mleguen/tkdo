@@ -452,7 +452,6 @@ docker compose up -d front        # Start full stack
 **Why all test levels matter:**
 - **Unit tests**: Catch logic errors in services/guards/interceptors
 - **Component tests**: Verify component rendering and interactions
-- **Integration tests**: Validate complete user workflows with mocked backend
 - **E2E tests**: Ensure full stack integration works correctly
 - **Skipping any level** may allow bugs to reach production
 
@@ -530,12 +529,12 @@ Components with responsive behavior should be tested across different viewport s
 ./npm run ct
 ```
 
-#### Integration Tests (Cypress)
+#### E2E Tests (Cypress with Docker)
 
-Test user workflows with mocked backend:
+Test complete user workflows against the real backend:
 
 ```typescript
-// login.cy.ts
+// connexion.cy.ts
 describe('Login Flow', () => {
   it('should login successfully', () => {
     cy.visit('/connexion');
@@ -553,20 +552,14 @@ User workflows that involve responsive UI elements (navigation, forms, modals) s
 
 **Run E2E tests:**
 ```bash
-./composer run install-fixtures && ./npm run e2e
-./npm run e2e -- --spec '**/connexion.cy.ts'  # Specific file
-```
-
-#### End-to-End Tests (Cypress with Docker)
-
-Test complete application with real backend:
-
-```bash
-# Reset test data
+# Reset test data (required before every E2E run — tests modify data)
 ./composer run install-fixtures
 
-# Run E2E tests
+# Run all E2E tests
 ./npm run e2e
+
+# Run a specific spec file
+./npm run e2e -- --spec '**/connexion.cy.ts'
 ```
 
 ### Backend Testing

@@ -73,6 +73,8 @@ The `DevBackendInterceptor` (`front/src/app/dev-backend.interceptor.ts`) is an A
 
 - [x] [AI-Review][MEDIUM] Update docs/README.md line 133 — change "Interceptors - Handle authentication tokens and development mocking" to "Interceptors - Handle authentication tokens and error handling" [docs/README.md:133]
 - [x] [AI-Review][MEDIUM] Update docs/frontend-dev.md to reflect AuthBackendInterceptor actual behavior (enables cookies, not tokens) — Fix line 54 description and Mermaid diagram line 80 label [docs/frontend-dev.md:54,80] [PR#97 comment](https://github.com/mleguen/tkdo/pull/97#discussion_r2806667968)
+- [x] [AI-Review][HIGH] Update docs/architecture.md lines 196-218 — Replace outdated Bearer token documentation with cookie-based auth reality. Current docs show `Authorization: Bearer` header mechanism that doesn't exist; interceptor only sets `withCredentials: true` for HttpOnly cookies. Update purpose, code example, and rationale to match actual implementation from Story 1.1 [docs/architecture.md:196-218]
+- [x] [AI-Review][MEDIUM] Fix CONTRIBUTING.md lines 455, 533-535 — Remove or rename confusing "Integration Tests" references. Integration tests (`npm run int`) were deleted in this story, but terminology persists. Line 455 says "Integration tests: Validate complete user workflows with mocked backend" and lines 533-535 have "Integration Tests (Cypress)" section header. Either rename to "Component Tests" or remove section entirely [CONTRIBUTING.md:455,533-535]
 
 ## Dev Notes
 
@@ -158,12 +160,15 @@ No issues encountered. Clean deletion story — all tests passed on first run af
   - Responded to all comments in PR #97 with investigation evidence
 - ✅ Resolved review finding [MEDIUM]: Updated docs/README.md — changed "development mocking" to "error handling" in interceptor description
 - ✅ Resolved review finding [MEDIUM]: Updated docs/frontend-dev.md — AuthBackendInterceptor description now says "Enables credentials (cookies) on API requests" and Mermaid diagram label changed from "Add Token" to "Enable Cookies"
+- ✅ Resolved review finding [HIGH]: Updated docs/architecture.md — Replaced outdated Bearer token documentation with cookie-based auth reality. Updated purpose, code example, rationale, and execution order description to match actual `withCredentials: true` implementation.
+- ✅ Resolved review finding [MEDIUM]: Fixed CONTRIBUTING.md — Removed "Integration tests" bullet from test levels list (line 455), merged "Integration Tests (Cypress)" section into "E2E Tests (Cypress with Docker)" section (lines 533-558), eliminating references to deleted `npm run int` mock-backend mode.
 
 ### Change Log
 
 - 2026-02-14: Removed DevBackendInterceptor, `npm run int` script, CI integration test job, mock-detection branching in E2E tests, and updated all documentation
 - 2026-02-14: Addressed 2 code review findings — fixed interceptor descriptions in docs/README.md and docs/frontend-dev.md
 - 2026-02-14 - PR Comments Resolved: Resolved 1 PR comment thread, marked completed action item as fixed, PR: #97, comment_ids: 2806667968
+- 2026-02-14: Addressed remaining 2 code review findings — fixed architecture.md Bearer token docs and CONTRIBUTING.md integration test references
 
 ### File List
 
