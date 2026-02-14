@@ -297,25 +297,22 @@ $app->options('/{routes:.+}', function ($request, $response) {
 
 #### 2. AuthMiddleware
 
-Extracts and validates JWT tokens from the `Authorization` header:
+Extracts and validates JWT tokens from **HttpOnly cookies** (primary) or `Authorization` header (backward compatibility):
 
 ```php
 // src/Appli/Middleware/AuthMiddleware.php
 public function process(Request $request, RequestHandler $handler): Response
 {
-    $authHeader = $request->getHeaderLine('Authorization');
+    $cookies = $request->getCookieParams();
+    $serverParams = $request->getServerParams();
 
-    // Extract token from Bearer or Basic auth
-    if (preg_match('/Bearer\s+(.*)$/i', $authHeader, $matches)) {
-        $token = $matches[1];
-    } elseif (preg_match('/Basic\s+(.*)$/i', $authHeader, $matches)) {
-        $decoded = base64_decode($matches[1]);
-        list($token, ) = explode(':', $decoded);
-    }
+    // Try cookie FIRST (OAuth2 flow), then fall back to Authorization header
+    $auth = $this->authentifieViaCookie($cookies)
+        ?? $this->authentifieViaHeader($serverParams['HTTP_AUTHORIZATION'] ?? '');
 
     // Validate token
     try {
-        $auth = $this->authService->decode($token);
+        $this->logger->info("Utilisateur {$auth->getIdUtilisateur()} authentifié");
         $request = $request->withAttribute('auth', $auth);
     } catch (AuthException $err) {
         $request = $request->withAttribute('authErr', $err);
@@ -367,23 +364,145 @@ $app->post('/my-new-endpoint', MyNewController::class);
 
 ## Authentication and Authorization
 
-### JWT Authentication
+### OAuth2 + BFF Authentication (Current)
 
-The API uses **JWT (JSON Web Tokens)** with RSA signing for authentication.
+Tkdo uses **OAuth2 authorization code flow** with a **Backend-For-Frontend (BFF) pattern** to keep JWTs secure in HttpOnly cookies. This architecture enables switching between the temporary built-in authorization server and external Identity Providers (Google, Auth0, etc.) with only configuration changes.
 
-#### Token Structure
+#### Architecture Overview
+
+```
+┌──────────────────────────────────────────────────────────────────┐
+│                         FRONTEND (Angular)                        │
+│  • Redirects to /oauth/authorize (browser navigation)            │
+│  • Handles callback at /auth/callback (receives code)            │
+│  • POSTs code to BFF /api/auth/callback (XHR)                    │
+└──────────────────────────────────────────────────────────────────┘
+                               │
+                               ▼
+┌──────────────────────────────────────────────────────────────────┐
+│              TEMPORARY AUTHORIZATION SERVER (PHP)                 │
+│  Routes: /oauth/authorize, /oauth/token, /oauth/userinfo         │
+│  • Validates credentials, issues auth codes                      │
+│  • Exchanges codes for access tokens (JWTs with user claims)     │
+│  • Will be REPLACED by external IdP post-MVP                     │
+└──────────────────────────────────────────────────────────────────┘
+                               │
+                               ▼
+┌──────────────────────────────────────────────────────────────────┐
+│                   PERMANENT BFF LAYER (PHP)                       │
+│  Routes: /api/auth/callback, /api/auth/logout                    │
+│  • Exchanges auth code via back-channel (league/oauth2-client)   │
+│  • Creates application JWT, sets HttpOnly cookie                 │
+│  • NO CODE CHANGES needed when switching IdPs                    │
+└──────────────────────────────────────────────────────────────────┘
+```
+
+#### OAuth2 Flow (Step-by-Step)
+
+**1. User initiates login**
+
+```typescript
+// Frontend: BackendService.connecte()
+const state = crypto.randomBytes(32).toString('hex'); // CSRF protection
+sessionStorage.setItem('oauth_state', state);
+
+// Browser redirect to authorization endpoint
+window.location.href = `/oauth/authorize?response_type=code&client_id=tkdo&redirect_uri=/auth/callback&state=${state}`;
+```
+
+**2. Authorization server validates credentials**
+
+```php
+// Backend: OAuthAuthorizeController (TEMPORARY)
+POST /oauth/authorize
+{
+  "identifiant": "user@example.com",
+  "mdp": "password",
+  "client_id": "tkdo",
+  "redirect_uri": "http://localhost:4200/auth/callback",
+  "response_type": "code",
+  "state": "csrf_token"
+}
+
+// Returns 302 redirect to: /auth/callback?code=xxx&state=xxx
+```
+
+**3. Frontend receives authorization code**
+
+```typescript
+// Angular: AuthCallbackComponent
+const code = route.queryParams.code;
+const state = route.queryParams.state;
+
+// Validate CSRF state
+if (state !== sessionStorage.getItem('oauth_state')) {
+  throw new Error('Invalid state');
+}
+
+// Exchange code for session
+await backendService.echangeCode(code, state);
+```
+
+**4. BFF exchanges code for JWT and sets cookie**
+
+```php
+// Backend: BffAuthCallbackController (PERMANENT)
+POST /api/auth/callback
+{ "code": "xxx" }
+
+// Uses league/oauth2-client to call /oauth/token
+$accessToken = $this->provider->getAccessToken('authorization_code', ['code' => $code]);
+
+// Extracts user claims via /oauth/userinfo
+$claims = $this->provider->getResourceOwner($accessToken)->toArray();
+
+// Creates application JWT
+$jwt = $this->authService->encode($claims);
+
+// Sets HttpOnly cookie (JWT never exposed to JavaScript)
+Set-Cookie: tkdo_jwt=<jwt>; HttpOnly; Secure; SameSite=Strict; Path=/api; Max-Age=3600
+
+// Returns user info (NOT the JWT)
+{ "utilisateur": { "id": 123, "nom": "John", "admin": false } }
+```
+
+**5. Subsequent requests use cookie automatically**
+
+```typescript
+// Frontend: All /api requests include withCredentials: true
+http.get('/api/utilisateur/123', { withCredentials: true });
+
+// Browser automatically sends cookie (no JavaScript access)
+Cookie: tkdo_jwt=<jwt>
+```
+
+**6. AuthMiddleware validates cookie on every request**
+
+```php
+// Backend: AuthMiddleware
+// Tries cookie FIRST, then Authorization header (backward compatibility)
+$auth = $this->authentifieViaCookie($cookies)
+    ?? $this->authentifieViaHeader($authHeader);
+
+$request = $request->withAttribute('auth', $auth);
+```
+
+#### JWT Token Structure
+
+JWTs contain user identity and permissions:
 
 ```json
 {
-  "sub": 123,        // User ID
-  "adm": true,       // Is administrator
-  "exp": 1672531200  // Expiration timestamp
+  "sub": 123,           // User ID
+  "adm": true,          // Is administrator
+  "groupe_ids": [1, 5], // Group memberships
+  "exp": 1672531200     // Expiration timestamp (1 hour)
 }
 ```
 
 #### Configuration
 
-Located in `src/Appli/Settings/AuthSettings.php`:
+**JWT Settings** (`src/Appli/Settings/AuthSettings.php`):
 
 ```php
 class AuthSettings
@@ -395,35 +514,67 @@ class AuthSettings
 }
 ```
 
-#### Generating Tokens
+**OAuth2 Settings** (`src/Appli/Settings/OAuth2Settings.php`):
 
 ```php
-// src/Appli/Service/AuthService.php
-public function encode(AuthAdaptor $auth): string
+class OAuth2Settings
 {
-    $payload = [
-        'sub' => $auth->getId(),
-        'adm' => $auth->estAdmin(),
-        'exp' => time() + $this->settings->validity
-    ];
-
-    return JWT::encode($payload, $privateKey, $this->settings->algorithm);
+    public string $clientId;        // From OAUTH2_CLIENT_ID env
+    public string $clientSecret;    // From OAUTH2_CLIENT_SECRET env
+    public string $redirectUri;     // From OAUTH2_REDIRECT_URI env
+    public string $urlAuthorize;    // /oauth/authorize (temp) or IdP URL
+    public string $urlAccessToken;  // /oauth/token (temp) or IdP URL
+    public string $urlResourceOwner; // /oauth/userinfo (temp) or IdP URL
 }
 ```
 
-#### Validating Tokens
+See [Environment Variables](environment-variables.md#oauth2-configuration) for configuration details.
 
-Tokens are automatically validated by `AuthMiddleware`. Controllers can access the authenticated user:
+#### Switching to External Identity Provider
+
+To replace the temporary authorization server with Google, Auth0, etc.:
+
+**1. Update environment variables:**
+
+```bash
+OAUTH2_CLIENT_ID=your-idp-client-id
+OAUTH2_CLIENT_SECRET=your-idp-client-secret
+OAUTH2_REDIRECT_URI=https://yourapp.com/auth/callback
+```
+
+**2. Update OAuth2Settings.php URLs** (one-time code change):
+
+```php
+// Example: Auth0
+$this->urlAuthorize = 'https://your-tenant.auth0.com/authorize';
+$this->urlAccessToken = 'https://your-tenant.auth0.com/oauth/token';
+$this->urlResourceOwner = 'https://your-tenant.auth0.com/userinfo';
+```
+
+**3. Delete temporary authorization server code:**
+
+- `OAuthAuthorizeController.php`
+- `OAuthTokenController.php`
+- `OAuthUserInfoController.php`
+
+**No changes needed** to BFF layer (`BffAuthCallbackController`, `BffAuthService`) — works with any OAuth2 provider via `league/oauth2-client`.
+
+#### Using Authentication in Controllers
+
+Controllers extending `AuthController` can access the authenticated user:
 
 ```php
 class MyController extends AuthController
 {
     public function __invoke(Request $request, Response $response): Response
     {
-        // Get authenticated user (throws exception if not authenticated)
-        $auth = $this->getAuth($request);
+        // Call parent to enforce authentication
+        parent::__invoke($request, $response);
 
-        // Use $auth->getId() and $auth->estAdmin()
+        // Get authenticated user (guaranteed to exist after parent::__invoke())
+        $auth = $this->getAuth();
+
+        // Use $auth->getIdUtilisateur() and $auth->estAdmin()
     }
 }
 ```
