@@ -39,13 +39,11 @@
   "require-dev": {
     "guzzlehttp/guzzle": "^7.8",
     "jangregor/phpstan-prophecy": "^2.1",
-    "php-http/guzzle7-adapter": "^1.0",
     "phpspec/prophecy-phpunit": "^2.3",
     "phpstan/extension-installer": "^1.4",
     "phpstan/phpstan": "^2.1",
     "phpunit/phpunit": "^11.5",
     "rector/rector": "^2.0",
-    "rpkamp/mailhog-client": "^2.0",
     "squizlabs/php_codesniffer": "^3.7"
   },
   "config": {

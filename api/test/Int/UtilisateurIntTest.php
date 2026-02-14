@@ -62,10 +62,10 @@ class UtilisateurIntTest extends IntTestCase
         $emailsRecus = $this->depileDerniersEmailsRecus();
         $this->assertCount(1, $emailsRecus);
         $this->assertMessageRecipientsContains($utilisateur->getEmail(), $emailsRecus[0]);
-        $this->assertEquals("Création de votre compte", $emailsRecus[0]->subject);
-        $this->assertEquals(1, preg_match('/- identifiant : ([^\r\n]*)/', $emailsRecus[0]->body, $matches));
+        $this->assertEquals("Création de votre compte", $emailsRecus[0]['subject']);
+        $this->assertEquals(1, preg_match('/- identifiant : ([^\r\n]*)/', $emailsRecus[0]['text'], $matches));
         $this->assertEquals($utilisateur->getIdentifiant(), $matches[1]);
-        $this->assertEquals(1, preg_match('/- mot de passe : ([^\r\n]*)/', $emailsRecus[0]->body, $matches));
+        $this->assertEquals(1, preg_match('/- mot de passe : ([^\r\n]*)/', $emailsRecus[0]['text'], $matches));
         $utilisateur->setMdpClair($matches[1]);
 
         // User can login with credentials from email
@@ -86,8 +86,8 @@ class UtilisateurIntTest extends IntTestCase
         $emailsRecus = $this->depileDerniersEmailsRecus();
         $this->assertCount(1, $emailsRecus);
         $this->assertMessageRecipientsContains($utilisateur->getEmail(), $emailsRecus[0]);
-        $this->assertEquals("Réinitialisation de votre mot de passe", $emailsRecus[0]->subject);
-        $this->assertEquals(1, preg_match('/- mot de passe : ([^\r\n]*)/', $emailsRecus[0]->body, $matches));
+        $this->assertEquals("Réinitialisation de votre mot de passe", $emailsRecus[0]['subject']);
+        $this->assertEquals(1, preg_match('/- mot de passe : ([^\r\n]*)/', $emailsRecus[0]['text'], $matches));
         $utilisateur->setMdpClair($matches[1]);
 
         // User can login with new password

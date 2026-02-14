@@ -27,7 +27,7 @@ This document outlines the investigation and recommendations for implementing Gi
 - Use `actions/setup-node@v4` for Node.js 20
 - Use `shivammathur/setup-php@v2` for PHP 8.4
 - Use MySQL 5.7 service container for database
-- Keep Mailhog for email testing (standardized in ecosystem)
+- Use MailDev for email testing (actively maintained, UTF-8 support)
 - Implement tiered test execution with fail-fast
 - Use dependency caching for both npm and Composer
 - Implement artifact retention with cleanup policies
@@ -51,7 +51,7 @@ flowchart LR
     npm[npm container<br/>Node.js tools] --> front[front container<br/>nginx :8080]
     composer[php-cli container<br/>Composer tools] --> api[slim-fpm<br/>PHP-FPM]
     api --> mysql[(mysql<br/>MySQL 5.6)]
-    api --> mailhog[mailhog<br/>:8025]
+    api --> maildev[maildev<br/>:1080]
     front --> api
 
     classDef tools fill:#ffe6cc,stroke:#b34700,stroke-width:2px,color:#000
@@ -60,7 +60,7 @@ flowchart LR
 
     class npm,composer tools
     class front,api runtime
-    class mysql,mailhog data
+    class mysql,maildev data
 ```
 
 ### Wrapper Scripts
@@ -118,11 +118,11 @@ jobs:
         ports:
           - 3306:3306
 
-      mailhog:
-        image: mailhog/mailhog
+      maildev:
+        image: maildev/maildev
         ports:
           - 1025:1025
-          - 8025:8025
+          - 1080:1080
 
     steps:
       - uses: actions/checkout@v4
@@ -169,7 +169,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Start services
-        run: docker compose up -d mysql mailhog
+        run: docker compose up -d mysql maildev
 
       - name: Wait for MySQL
         run: |
@@ -282,29 +282,15 @@ services:
 
 **Note:** MySQL 5.7 reaches EOL in October 2023, but is still widely used. Consider migration to MySQL 8.0 in the future (tracked in backlog).
 
-### Mailhog vs Maildev
+### MailDev
 
-**Current:** Mailhog (`mailhog/mailhog`)
+**Current:** MailDev (`maildev/maildev`)
 
-**Alternative:** Maildev (`maildev/maildev`)
-
-**Comparison:**
-
-| Feature               | Mailhog           | Maildev           |
-|----------------------|-------------------|-------------------|
-| Maintenance          | Inactive (2020)   | Active (2024)     |
-| Docker image size    | ~40 MB            | ~100 MB           |
-| API compatibility    | HTTP + SMTP       | HTTP + SMTP       |
-| Web UI               | Yes               | Yes               |
-| GitHub Actions usage | Common            | Less common       |
-
-**Investigation result:**
-
-- Mailhog is more widely used in CI environments despite being unmaintained
-- The project already uses `rpkamp/mailhog-client` for integration tests
-- Switching would require updating integration test dependencies
-
-**Recommendation:** Keep Mailhog for now. Migration to Maildev can be done later if needed.
+The project migrated from MailHog to MailDev (Story 0.2) because:
+- MailHog is unmaintained (last release 2020) and caused PHP deprecation/notice warnings
+- MailDev is actively maintained with native UTF-8/SMTPUTF8 support
+- MailDev's REST API is simple enough that no PHP client library is needed (direct Guzzle calls)
+- Integration tests now use `depileDerniersEmailsRecus()` and `assertMessageRecipientsContains()` with MailDev's JSON API
 
 ## Repository Visibility and Free Tier Strategy
 
@@ -617,8 +603,8 @@ jobs:
     services:
       mysql:
         image: mysql:5.7
-      mailhog:
-        image: mailhog/mailhog
+      maildev:
+        image: maildev/maildev
     steps:
       - name: Backend integration tests
         run: composer test -- --testsuite Int
@@ -630,8 +616,8 @@ jobs:
     services:
       mysql:
         image: mysql:5.7
-      mailhog:
-        image: mailhog/mailhog
+      maildev:
+        image: maildev/maildev
     steps:
       - name: E2E tests
         run: npm run e2e
@@ -1086,7 +1072,7 @@ on:
 1. Frontend integration tests (mocked backend)
 2. Backend integration tests (real database)
 
-**Services:** MySQL 5.7, Mailhog
+**Services:** MySQL 5.7, MailDev
 
 **Estimated execution time:** ~5-8 minutes
 
@@ -1097,7 +1083,7 @@ on:
 **Jobs:**
 1. Full stack E2E tests with Cypress
 
-**Services:** MySQL 5.7, Mailhog
+**Services:** MySQL 5.7, MailDev
 
 **Trigger:** Only on PRs and main branch
 

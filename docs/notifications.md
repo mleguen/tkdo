@@ -556,7 +556,7 @@ Tkdo uses only one email-related environment variable:
 For complete information about email configuration, including:
 
 - Email environment variables and defaults
-- System-level SMTP configuration (sendmail, msmtp, MailHog)
+- System-level SMTP configuration (sendmail, msmtp, MailDev)
 - Security best practices
 
 See the [Environment Variables Reference](environment-variables.md#email-variables).

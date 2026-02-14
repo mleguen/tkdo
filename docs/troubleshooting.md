@@ -236,7 +236,7 @@ For more details, see [Development Setup Guide](dev-setup.md).
 
 ### Port Already in Use
 
-**Problem:** Error like "bind: address already in use" for port 8080, 8081, or 8025
+**Problem:** Error like "bind: address already in use" for port 8080, 8081, or 1080
 
 **Solution:**
 

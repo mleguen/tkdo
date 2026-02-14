@@ -89,7 +89,7 @@ class WorkflowGiftExchangeIntTest extends IntTestCase
             $emailsRecus = $this->depileDerniersEmailsRecus();
             $this->assertCount(1, $emailsRecus);
             $this->assertMessageRecipientsContains($participant->getEmail(), $emailsRecus[0]);
-            $this->assertEquals("Participation au tirage cadeaux {$occasion->getTitre()}", $emailsRecus[0]->subject);
+            $this->assertEquals("Participation au tirage cadeaux {$occasion->getTitre()}", $emailsRecus[0]['subject']);
         }
 
         // Step 3: Participant creates idea for another participant

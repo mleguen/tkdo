@@ -1056,14 +1056,14 @@ public static function provideCurl(): array
 
 Integration tests automatically:
 1. Set up EntityManager before all tests
-2. Purge Mailhog messages before each test
+2. Purge MailDev messages before each test
 3. Clean up all created entities after each test
 
 ```php
 public function setUp(): void
 {
     parent::setUp();
-    // Mailhog is automatically purged
+    // MailDev is automatically purged
 }
 
 public function tearDown(): void
@@ -1448,8 +1448,8 @@ SELECT * FROM tkdo_utilisateur;
 
 **Mail assertion fails:**
 ```bash
-# Check Mailhog UI
-open http://localhost:8025
+# Check MailDev UI
+open http://localhost:1080
 ```
 
 ### General Debugging Tips

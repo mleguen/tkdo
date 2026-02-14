@@ -20,13 +20,8 @@ use DateTime;
 use DateTimeInterface;
 use Doctrine\ORM\EntityManager;
 use GuzzleHttp\Client as GuzzleClient;
-use GuzzleHttp\Psr7\HttpFactory;
-use Http\Adapter\Guzzle7\Client as GuzzleAdapter;
 use Iterator;
 use PHPUnit\Framework\TestCase;
-use rpkamp\Mailhog\MailhogClient;
-use rpkamp\Mailhog\Message\Contact;
-use rpkamp\Mailhog\Message\Message;
 use Test\Builder\IdeeBuilder;
 use Test\Builder\OccasionBuilder;
 use Test\Builder\ResultatBuilder;
@@ -43,8 +38,8 @@ class IntTestCase extends TestCase
 
     /** @var GuzzleClient */
     private $client;
-    /** @var MailhogClient */
-    private $mhclient;
+    /** @var string */
+    private $maildevBaseUri;
     /** @var string */
     protected $token;
 
@@ -60,9 +55,8 @@ class IntTestCase extends TestCase
     public function setUp(): void
     {
         $this->client = new GuzzleClient();
-        $factory = new HttpFactory();
-        $this->mhclient = new MailhogClient(new GuzzleAdapter($this->client), $factory, $factory, getenv('MAILHOG_BASE_URI'));
-        $this->mhclient->purgeMessages();
+        $this->maildevBaseUri = rtrim(getenv('MAILDEV_BASE_URI') ?: '', '/');
+        $this->purgeEmails();
     }
 
     public function tearDown(): void
@@ -93,19 +87,28 @@ class IntTestCase extends TestCase
         parent::assertEquals($subset, array_intersect_key($array, $subset));
     }
 
-    protected static function assertMessageRecipientsContains(string $email, Message $message): void
+    /**
+     * @param array<string, mixed> $message
+     */
+    protected static function assertMessageRecipientsContains(string $email, array $message): void
     {
-        self::assertTrue($message->recipients->contains(new Contact($email)));
+        self::assertContains($email, array_column($message['to'], 'address'));
     }
 
     /**
-     * @return Message[]
+     * @return array<int, array<string, mixed>>
      */
     protected function depileDerniersEmailsRecus(): array
     {
-        $emailsRecus = iterator_to_array($this->mhclient->findAllMessages());
-        $this->mhclient->purgeMessages();
+        $response = $this->client->get($this->maildevBaseUri . '/email');
+        $emailsRecus = json_decode((string) $response->getBody(), true);
+        $this->purgeEmails();
         return $emailsRecus;
+    }
+
+    private function purgeEmails(): void
+    {
+        $this->client->delete($this->maildevBaseUri . '/email/all');
     }
 
     protected function postConnexion(bool $curl, ?UtilisateurAdaptor $utilisateur = null): UtilisateurAdaptor

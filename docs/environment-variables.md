@@ -101,28 +101,28 @@ FRONT_DEV_PORT=3000    # Custom port
 - Change when running multiple instances to avoid port conflicts
 - Each worktree should use a different port
 
-### MAILHOG_DEV_PORT
+### MAILDEV_DEV_PORT
 
-**Description:** Host port mapped to the MailHog email testing UI
+**Description:** Host port mapped to the MailDev email testing UI
 
 **Type:** Integer
 
 **Required:** No
 
-**Default:** `8025`
+**Default:** `1080`
 
 **Examples:**
 
 ```bash
-MAILHOG_DEV_PORT=8025    # Default port
-MAILHOG_DEV_PORT=9025    # Alternative port for second instance
-MAILHOG_DEV_PORT=8125    # Custom port
+MAILDEV_DEV_PORT=1080    # Default port
+MAILDEV_DEV_PORT=1081    # Alternative port for second instance
+MAILDEV_DEV_PORT=1082    # Custom port
 ```
 
 **Usage:**
 
 - Set in `.env` file at project root (not `api/.env`)
-- Access MailHog UI at `http://localhost:${MAILHOG_DEV_PORT}`
+- Access MailDev UI at `http://localhost:${MAILDEV_DEV_PORT}`
 - Change when running multiple instances to avoid port conflicts
 - Used only in development to view test emails
 
@@ -182,7 +182,7 @@ When working with multiple git worktrees or wanting to run multiple instances si
 
 **First instance** (default ports - no .env needed):
 ```bash
-# Uses defaults: 8080, 8081, 8025, 4200
+# Uses defaults: 8080, 8081, 1080, 4200
 docker compose up -d front
 ```
 
@@ -191,7 +191,7 @@ docker compose up -d front
 # .env at project root
 FRONT_DEV_PORT=9080
 API_DEV_PORT=9081
-MAILHOG_DEV_PORT=9025
+MAILDEV_DEV_PORT=1081
 NPM_DEV_PORT=4201
 ```
 
@@ -495,9 +495,9 @@ from noreply@example.com
 tls on
 ```
 
-**Option 3: Testing with MailHog (development)**
+**Option 3: Testing with MailDev (development)**
 
-See [Development Setup Guide](dev-setup.md#email-testing-with-mailhog) for using MailHog to capture emails during development.
+See [Development Setup Guide](dev-setup.md#email-testing-with-maildev) for using MailDev to capture emails during development.
 
 ## Development vs Production
 
@@ -530,7 +530,7 @@ override defaults.
 
 - Detailed error messages
 - Sample data in fixtures
-- MailHog captures emails
+- MailDev captures emails
 - Hot reload enabled
 
 ### Production Environment
@@ -701,7 +701,7 @@ TKDO_DEV_MODE=0
 | Variable             | Required | Default                 | Type      | Category    |
 | -------------------- | -------- | ----------------------- | --------- | ----------- |
 | `FRONT_DEV_PORT`     | No       | `8080`                  | Integer   | Docker Dev  |
-| `MAILHOG_DEV_PORT`   | No       | `8025`                  | Integer   | Docker Dev  |
+| `MAILDEV_DEV_PORT`   | No       | `1080`                  | Integer   | Docker Dev  |
 | `API_DEV_PORT`       | No       | `8081`                  | Integer   | Docker Dev  |
 | `NPM_DEV_PORT`       | No       | `4200`                  | Integer   | Docker Dev  |
 | `MYSQL_HOST`         | No       | `mysql` or `127.0.0.1`  | String    | Database    |

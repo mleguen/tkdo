@@ -24,10 +24,10 @@ services:
     profiles:
       - https
 
-  mailhog:
-    image: mailhog/mailhog
+  maildev:
+    image: maildev/maildev
     ports:
-      - ${MAILHOG_DEV_PORT:-8025}:8025
+      - ${MAILDEV_DEV_PORT:-1080}:1080
 
   mysql:
     image: mysql:5.6
@@ -80,8 +80,7 @@ services:
       XDG_CACHE_HOME: /opt/tkdo/.cache
       TKDO_DEV_MODE: "1"
       docker: "true"
-      MAILHOG_BASE_URI: http://mailhog:8025/
-      MHSENDMAIL_OPTIONS: --smtp-addr=mailhog:1025
+      MAILDEV_BASE_URI: http://maildev:1080/
       MYSQL_DATABASE: tkdo
       MYSQL_HOST: mysql
       MYSQL_PASSWORD: mdptkdo
@@ -101,11 +100,10 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
-      mailhog:
+      maildev:
         condition: service_started
     environment:
       docker: "true"
-      MHSENDMAIL_OPTIONS: --smtp-addr=mailhog:1025
       MYSQL_DATABASE: tkdo
       MYSQL_HOST: mysql
       MYSQL_PASSWORD: mdptkdo

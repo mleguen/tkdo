@@ -60,11 +60,11 @@ jobs:
         ports:
           - 3306:3306
 
-      mailhog:
-        image: mailhog/mailhog
+      maildev:
+        image: maildev/maildev
         ports:
           - 1025:1025
-          - 8025:8025
+          - 1080:1080
 
     steps:
       - name: Checkout code
@@ -135,7 +135,7 @@ jobs:
           MYSQL_DATABASE: tkdo
           MYSQL_USER: tkdo
           MYSQL_PASSWORD: mdptkdo
-          MAILHOG_BASE_URI: http://127.0.0.1:8025/
+          MAILDEV_BASE_URI: http://127.0.0.1:1080/
           TKDO_BASE_URI: http://localhost:8080
           TKDO_DEV_MODE: "1"
           TKDO_MAILER_FROM: noreply@ci
@@ -181,7 +181,7 @@ jobs:
           MYSQL_DATABASE: tkdo
           MYSQL_USER: tkdo
           MYSQL_PASSWORD: mdptkdo
-          MAILHOG_BASE_URI: http://127.0.0.1:8025/
+          MAILDEV_BASE_URI: http://127.0.0.1:1080/
           TKDO_DEV_MODE: "1"
           TKDO_BASE_URI: http://localhost:8080
           TKDO_MAILER_FROM: noreply@ci

@@ -766,11 +766,11 @@ class MailService {
 - **Domain Independence** - Business logic doesn't depend on email implementation
 - **Testability** - Easy to mock email sending in tests
 - **Flexibility** - Can switch to SendGrid, AWS SES, etc. without changing domain
-- **Environment-Specific** - Development uses MailHog, production uses SMTP
+- **Environment-Specific** - Development uses MailDev, production uses SMTP
 
 **Development Email Testing:**
-- **MailHog** - Captures all emails in development
-- **Web UI** - http://localhost:8025
+- **MailDev** - Captures all emails in development
+- **Web UI** - http://localhost:1080
 - **No Real Sending** - Prevents accidental emails during development
 
 ### Daily Notification Script Scheduling
@@ -792,7 +792,7 @@ For detailed cron setup instructions and scheduling options, see [Email Notifica
 
 **Decision:** Use Docker Compose to create a consistent, reproducible development environment.
 
-**Key Services:** Angular build, Apache frontend, MySQL database, MailHog email testing, PHP-FPM API, Nginx API routing
+**Key Services:** Angular build, Apache frontend, MySQL database, MailDev email testing, PHP-FPM API, Nginx API routing
 
 **Why Docker for Development:**
 - **Consistency** - Same environment for all developers

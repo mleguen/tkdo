@@ -155,7 +155,7 @@ api/
 | rector/rector            | 2.0+    | Automated refactoring            |
 | phpstan/phpstan          | 2.1+    | Static analysis                  |
 | squizlabs/php_codesniffer| 3.7+    | Code style checking              |
-| rpkamp/mailhog-client    | 0.4+    | Email testing                    |
+| guzzlehttp/guzzle        | 7.8+    | HTTP client (API & email testing)|
 
 ## Getting Started
 
@@ -1351,8 +1351,9 @@ class UtilisateurIntTest extends IntTestCase
         $this->assertEquals('newuser', $data['identifiant']);
 
         // Assert: Check email was sent
-        $messages = $this->mailhog->findMessagesByRecipient('new@example.com');
-        $this->assertCount(1, $messages);
+        $emailsRecus = $this->depileDerniersEmailsRecus();
+        $this->assertCount(1, $emailsRecus);
+        $this->assertMessageRecipientsContains('new@example.com', $emailsRecus[0]);
     }
 
     public function testCreateUtilisateurRequiresAdmin(): void
@@ -1406,7 +1407,8 @@ $response = $this->put('/utilisateur/123', ['email' => 'new@example.com'], $toke
 $response = $this->delete('/connexion', $token);
 
 // Check emails
-$messages = $this->mailhog->findMessagesByRecipient('user@example.com');
+$emailsRecus = $this->depileDerniersEmailsRecus();
+$this->assertMessageRecipientsContains('user@example.com', $emailsRecus[0]);
 ```
 
 **Running integration tests:**
@@ -1443,20 +1445,20 @@ Integration tests use a separate test database that is automatically:
 
 ### Email Testing
 
-Integration tests use **Mailhog** to capture and verify sent emails:
+Integration tests use **MailDev** to capture and verify sent emails via direct HTTP calls:
 
 ```php
-// Find all emails sent to a recipient
-$messages = $this->mailhog->findMessagesByRecipient('user@example.com');
-$this->assertCount(1, $messages);
+// Fetch and purge all emails
+$emailsRecus = $this->depileDerniersEmailsRecus();
+$this->assertCount(1, $emailsRecus);
 
-// Check email content
-$message = $messages[0];
-$this->assertStringContainsString('Welcome', $message->subject);
-$this->assertStringContainsString('Your account', $message->body);
+// Check email content (MailDev returns JSON arrays)
+$this->assertMessageRecipientsContains('user@example.com', $emailsRecus[0]);
+$this->assertEquals('Welcome', $emailsRecus[0]['subject']);
+$this->assertStringContainsString('Your account', $emailsRecus[0]['text']);
 ```
 
-Mailhog UI is available at `http://localhost:8025` when using Docker.
+MailDev UI is available at `http://localhost:1080` when using Docker.
 
 ### Test Data Builders
 

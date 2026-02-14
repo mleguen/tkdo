@@ -399,7 +399,7 @@ describe('ListeIdeesComponent', () => {
 **How it works**:
 - Runs against the full Docker environment
 - Real backend API (PHP + MySQL)
-- Real email server (MailHog)
+- Real email server (MailDev)
 - Test data must be refreshed between runs
 
 **Run e2e tests**:
@@ -459,7 +459,7 @@ The Angular development server provides hot reload for rapid frontend developmen
 | **API**             | Proxied to real backend        | Real (PHP + MySQL)                |
 | **Hot Reload**      | Yes                            | No (must rebuild)                 |
 | **Build Speed**     | Fast                           | Slower                            |
-| **Email Testing**   | Not available                  | Available (MailHog)               |
+| **Email Testing**   | Not available                  | Available (MailDev)               |
 | **Best For**        | UI development, rapid iteration | Full flow testing, E2E tests      |
 
 ### Configuration

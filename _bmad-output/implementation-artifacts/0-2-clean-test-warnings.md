@@ -1,6 +1,6 @@
 # Story 0.2: Clean Up Test Warnings
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 
@@ -37,35 +37,35 @@ so that the test output is clean, the mail testing stack properly supports Frenc
 
 ## Tasks / Subtasks
 
-- [ ] Task 1: Replace MailHog with MailDev in Docker (AC: #3)
-  - [ ] 1.1 In `docker-compose.yml`: replace `mailhog` service with `maildev` (image `maildev/maildev`, port `1080` for API/UI, `1025` for SMTP)
-  - [ ] 1.2 Update env vars: `MAILHOG_BASE_URI` → `MAILDEV_BASE_URI` (value: `http://maildev:1080`), `MHSENDMAIL_OPTIONS` → remove
-  - [ ] 1.3 In `docker/php-cli/Dockerfile`: replace `mhsendmail` with `msmtp` and configure `sendmail_path = msmtp --host=maildev --port=1025 -t`
-  - [ ] 1.4 In `docker/slim-fpm/Dockerfile`: same `mhsendmail` → `msmtp` replacement
-  - [ ] 1.5 Verify: `docker compose up -d front`, confirm MailDev UI at `http://localhost:1080`, confirm `./console fixtures` emails appear in MailDev
+- [x] Task 1: Replace MailHog with MailDev in Docker (AC: #3)
+  - [x] 1.1 In `docker-compose.yml`: replace `mailhog` service with `maildev` (image `maildev/maildev`, port `1080` for API/UI, `1025` for SMTP)
+  - [x] 1.2 Update env vars: `MAILHOG_BASE_URI` → `MAILDEV_BASE_URI` (value: `http://maildev:1080`), `MHSENDMAIL_OPTIONS` → remove
+  - [x] 1.3 In `docker/php-cli/Dockerfile`: replace `mhsendmail` with `msmtp` and configure `sendmail_path = msmtp --host=maildev --port=1025 -t`
+  - [x] 1.4 In `docker/slim-fpm/Dockerfile`: same `mhsendmail` → `msmtp` replacement
+  - [x] 1.5 Verify: `docker compose up -d front`, confirm MailDev UI at `http://localhost:1080`, confirm `./console fixtures` emails appear in MailDev
 
-- [ ] Task 2: Replace MailHog PHP client with direct Guzzle calls (AC: #1, #2, #5)
-  - [ ] 2.1 In `api/test/Int/IntTestCase.php`: remove all `rpkamp\Mailhog\*` imports and `Http\Adapter\Guzzle7\*` import
-  - [ ] 2.2 Replace `$this->mhclient` (`MailhogClient`) with a `string $maildevBaseUri` property initialized from `getenv('MAILDEV_BASE_URI')`
-  - [ ] 2.3 Replace `setUp()` MailHog init with: `$this->maildevBaseUri = getenv('MAILDEV_BASE_URI'); $this->purgeEmails();`
-  - [ ] 2.4 Replace `depileDerniersEmailsRecus()`: `GET {maildevBaseUri}/email` → decode JSON → purge → return array
-  - [ ] 2.5 Replace `assertMessageRecipientsContains()`: check `$email['to']` array for matching `address` field instead of `Contact` objects
-  - [ ] 2.6 Run `./composer remove rpkamp/mailhog-client php-http/guzzle7-adapter`
-  - [ ] 2.7 Run `./composer test` — confirm all tests pass, deprecation gone, notice gone
+- [x] Task 2: Replace MailHog PHP client with direct Guzzle calls (AC: #1, #2, #5)
+  - [x] 2.1 In `api/test/Int/IntTestCase.php`: remove all `rpkamp\Mailhog\*` imports and `Http\Adapter\Guzzle7\*` import
+  - [x] 2.2 Replace `$this->mhclient` (`MailhogClient`) with a `string $maildevBaseUri` property initialized from `getenv('MAILDEV_BASE_URI')`
+  - [x] 2.3 Replace `setUp()` MailHog init with: `$this->maildevBaseUri = getenv('MAILDEV_BASE_URI'); $this->purgeEmails();`
+  - [x] 2.4 Replace `depileDerniersEmailsRecus()`: `GET {maildevBaseUri}/email` → decode JSON → purge → return array
+  - [x] 2.5 Replace `assertMessageRecipientsContains()`: check `$email['to']` array for matching `address` field instead of `Contact` objects
+  - [x] 2.6 Run `./composer remove rpkamp/mailhog-client php-http/guzzle7-adapter`
+  - [x] 2.7 Run `./composer test` — confirm all tests pass, deprecation gone, notice gone
 
-- [ ] Task 3: Update CI workflows (AC: #4)
-  - [ ] 3.1 In `.github/workflows/test.yml`: replace `mailhog` service with `maildev/maildev` image, update ports (8025 → 1080), update `MAILHOG_BASE_URI` → `MAILDEV_BASE_URI` in all env blocks
-  - [ ] 3.2 In `.github/workflows/test.yml`: replace "Configure PHP to use MailHog SMTP" step — update msmtp config hostname comment (still msmtp, just rename account and comment)
-  - [ ] 3.3 In `.github/workflows/e2e.yml`: same service and env var replacements
-  - [ ] 3.4 Push and verify CI passes (CI-only changes — test locally where possible, verify remainder via CI)
+- [x] Task 3: Update CI workflows (AC: #4)
+  - [x] 3.1 In `.github/workflows/test.yml`: replace `mailhog` service with `maildev/maildev` image, update ports (8025 → 1080), update `MAILHOG_BASE_URI` → `MAILDEV_BASE_URI` in all env blocks
+  - [x] 3.2 In `.github/workflows/test.yml`: replace "Configure PHP to use MailHog SMTP" step — update msmtp config hostname comment (still msmtp, just rename account and comment)
+  - [x] 3.3 In `.github/workflows/e2e.yml`: same service and env var replacements
+  - [x] 3.4 Push and verify CI passes (CI-only changes — test locally where possible, verify remainder via CI)
 
-- [ ] Task 4: Update documentation and project-context (AC: #1)
-  - [ ] 4.1 Update `_bmad-output/project-context.md`: remove "Known Technical Debt > Test Suite Warnings" section, update test baseline to show clean output
-  - [ ] 4.2 Update `docs/dev-setup.md`: MailHog → MailDev references, port 8025 → 1080
-  - [ ] 4.3 Update `docs/testing.md`: MailHog → MailDev references
-  - [ ] 4.4 Update `docs/environment-variables.md`: `MAILHOG_BASE_URI` → `MAILDEV_BASE_URI`
-  - [ ] 4.5 Update remaining docs that reference MailHog: `docs/troubleshooting.md`, `docs/notifications.md`, `docs/backend-dev.md`, `docs/ci-testing-strategy.md`, `docs/architecture.md`
-  - [ ] 4.6 Capture new test baseline: `./composer test 2>&1 | grep -E "Tests:|Assertions:|Deprecations:|Notices:" > _bmad-output/implementation-artifacts/.baseline-0-2-clean-test-warnings.txt`
+- [x] Task 4: Update documentation and project-context (AC: #1)
+  - [x] 4.1 Update `_bmad-output/project-context.md`: remove "Known Technical Debt > Test Suite Warnings" section, update test baseline to show clean output
+  - [x] 4.2 Update `docs/dev-setup.md`: MailHog → MailDev references, port 8025 → 1080
+  - [x] 4.3 Update `docs/testing.md`: MailHog → MailDev references
+  - [x] 4.4 Update `docs/environment-variables.md`: `MAILHOG_BASE_URI` → `MAILDEV_BASE_URI`
+  - [x] 4.5 Update remaining docs that reference MailHog: `docs/troubleshooting.md`, `docs/notifications.md`, `docs/backend-dev.md`, `docs/ci-testing-strategy.md`, `docs/architecture.md`
+  - [x] 4.6 Capture new test baseline: `./composer test 2>&1 | grep -E "Tests:|Assertions:|Deprecations:|Notices:" > _bmad-output/implementation-artifacts/.baseline-0-2-clean-test-warnings.txt`
 
 ## Dev Notes
 
@@ -181,10 +181,50 @@ Note: `msmtp` is already used in CI (`.github/workflows/test.yml` "Configure PHP
 
 ### Agent Model Used
 
-{{agent_model_name_version}}
+Claude Opus 4.6 (claude-opus-4-6)
 
 ### Debug Log References
 
+- Previous session crashed due to memory issues; resumed and completed Task 4 in this session.
+
 ### Completion Notes List
 
+- Tasks 1-3 completed in previous sessions: MailHog → MailDev Docker migration, PHP client replacement with direct Guzzle calls, CI workflow updates.
+- Task 4 completed: all documentation updated to replace MailHog → MailDev references across 10+ doc files.
+- Subtask 4.6 (baseline capture): Baseline process was intentionally removed per user request — the root cause (MailHog deprecation warnings) is eliminated, making per-story baselines unnecessary overhead. Removed baseline section from project-context.md, deleted existing baseline files, and cleaned .gitignore entry.
+- Also fixed `docs/frontend-dev.md` (not in original task list) which had 2 remaining MailHog references.
+- Test suite verified clean: `OK (244 tests, 1011 assertions)` — no deprecations, no notices.
+
+### Change Log
+
+- 2026-02-14: Completed Task 4 documentation updates — all MailHog references replaced with MailDev across docs, removed test baseline process from project-context.md, cleaned .gitignore.
+
 ### File List
+
+**Code changes (Tasks 1-3, previous sessions):**
+- docker-compose.yml
+- docker/php-cli/Dockerfile
+- docker/slim-fpm/Dockerfile
+- api/test/Int/IntTestCase.php
+- api/test/Int/NotifIntTest.php
+- api/test/Int/UtilisateurIntTest.php
+- api/test/Int/WorkflowGiftExchangeIntTest.php
+- api/composer.json
+- api/composer.lock
+- api/src/Appli/Service/MailService.php
+- .github/workflows/test.yml
+- .github/workflows/e2e.yml
+
+**Documentation changes (Task 4, this session):**
+- _bmad-output/project-context.md
+- _bmad-output/implementation-artifacts/sprint-status.yaml
+- docs/dev-setup.md
+- docs/testing.md
+- docs/environment-variables.md
+- docs/troubleshooting.md
+- docs/notifications.md
+- docs/backend-dev.md
+- docs/ci-testing-strategy.md
+- docs/architecture.md
+- docs/frontend-dev.md
+- .gitignore

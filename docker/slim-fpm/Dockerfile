@@ -1,7 +1,8 @@
 FROM php:8.4-fpm
 
-RUN docker-php-ext-install -j$(nproc) \
+RUN apt-get update && apt-get install --yes --no-install-recommends \
+    msmtp \
+    && rm -rf /var/lib/apt/lists/* \
+    && docker-php-ext-install -j$(nproc) \
     pdo_mysql \
-    && curl -Lo /usr/local/bin/mhsendmail https://github.com/mailhog/mhsendmail/releases/download/v0.2.0/mhsendmail_linux_amd64 \
-    && chmod a+x /usr/local/bin/mhsendmail \
-    && echo 'sendmail_path = /usr/local/bin/mhsendmail ${MHSENDMAIL_OPTIONS}' > $PHP_INI_DIR/conf.d/php-sendmail.ini
+    && echo 'sendmail_path = /usr/bin/msmtp --host maildev --port 1025 -t --read-envelope-from' > $PHP_INI_DIR/conf.d/php-sendmail.ini

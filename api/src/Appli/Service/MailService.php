@@ -18,9 +18,10 @@ class MailService
         try {
             $additional_headers = [
                 'From' => $this->settings->from,
+                'Content-Type' => 'text/plain; charset=UTF-8',
             ];
 
-            return mail($to, $subject, $message, $additional_headers);
+            return mail($to, mb_encode_mimeheader($subject, 'UTF-8'), $message, $additional_headers);
         }
         catch (Exception) {
             return false;

@@ -72,7 +72,7 @@ DEV_GID=YOUR_GROUP_ID
 
 ### Port Configuration
 
-By default, the Docker Compose environment uses ports 8080 (frontend), 8081 (API), 8025 (MailHog), and 4200 (Angular dev server). These ports can be customized via environment variables to run multiple instances simultaneously.
+By default, the Docker Compose environment uses ports 8080 (frontend), 8081 (API), 1080 (MailDev), and 4200 (Angular dev server). These ports can be customized via environment variables to run multiple instances simultaneously.
 
 **For running multiple instances** (e.g., in different git worktrees), see [Environment Variables Reference - Docker Development Variables](environment-variables.md#docker-development-variables).
 
@@ -115,7 +115,7 @@ docker compose up -d front
 **What this does:**
 - Downloads and builds all Docker images (first time only)
 - Starts MySQL database
-- Starts MailHog (email testing tool)
+- Starts MailDev (email testing tool)
 - Starts PHP-FPM backend
 - Starts nginx web server for API
 - Builds Angular frontend
@@ -194,8 +194,8 @@ Once the environment is running:
 - URL: http://localhost:8081
 - Direct access to the backend API
 
-**Email testing (MailHog):**
-- URL: http://localhost:8025
+**Email testing (MailDev):**
+- URL: http://localhost:1080
 - View all emails sent by the application
 - Useful for testing notifications
 
@@ -246,7 +246,7 @@ graph TB
     Front --> SlimWeb[slim-web container<br/>nginx :8081]
     SlimWeb --> SlimFPM[slim-fpm container<br/>PHP-FPM + API code]
     SlimFPM --> MySQL[mysql container<br/>MySQL 5.6]
-    SlimFPM --> MailHog[mailhog container<br/>:8025]
+    SlimFPM --> MailDev[maildev container<br/>:1080]
     npm[npm container<br/>Node.js tools] -.->|Build| Angular
 ```
 
@@ -259,7 +259,7 @@ graph TB
 | **slim-web** | nginx server for API                         | 8081          |
 | **slim-fpm** | PHP-FPM running the Slim Framework API       | -             |
 | **mysql**    | MySQL 5.6 database                           | -             |
-| **mailhog**  | Email testing server                         | 8025          |
+| **maildev**  | Email testing server                         | 1080          |
 | **npm**      | Node.js tools (npm, ng, cypress, npx)        | 4200          |
 | **php-cli**  | PHP CLI tools (composer, doctrine, console)  | -             |
 

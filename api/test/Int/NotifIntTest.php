@@ -51,7 +51,7 @@ class NotifIntTest extends IntTestCase
         $emailsRecus = $this->depileDerniersEmailsRecus();
         $this->assertCount(1, $emailsRecus);
         $this->assertMessageRecipientsContains($participantInstant->getEmail(), $emailsRecus[0]);
-        $this->assertEquals("Nouvelle idée de cadeau pour {$utilisateur->getNom()}", $emailsRecus[0]->subject);
+        $this->assertEquals("Nouvelle idée de cadeau pour {$utilisateur->getNom()}", $emailsRecus[0]['subject']);
     }
 
     /**
@@ -99,7 +99,7 @@ class NotifIntTest extends IntTestCase
         $emailsRecus = $this->depileDerniersEmailsRecus();
         $this->assertCount(1, $emailsRecus);
         $this->assertMessageRecipientsContains($participantInstant->getEmail(), $emailsRecus[0]);
-        $this->assertEquals("Idée de cadeau supprimée pour {$utilisateur->getNom()}", $emailsRecus[0]->subject);
+        $this->assertEquals("Idée de cadeau supprimée pour {$utilisateur->getNom()}", $emailsRecus[0]['subject']);
     }
 
     /**
@@ -189,8 +189,8 @@ class NotifIntTest extends IntTestCase
         $emailsRecus = $this->depileDerniersEmailsRecus();
         $this->assertCount(1, $emailsRecus);
         $this->assertMessageRecipientsContains($participantQuotidien->getEmail(), $emailsRecus[0]);
-        $this->assertEquals('Actualités Tkdo', $emailsRecus[0]->subject);
-        $this->assertMatchesRegularExpression("/nouvelles idées de cadeaux/", $emailsRecus[0]->body);
+        $this->assertEquals('Actualités Tkdo', $emailsRecus[0]['subject']);
+        $this->assertMatchesRegularExpression("/nouvelles idées de cadeaux/", $emailsRecus[0]['text']);
     }
 
     /**
@@ -387,8 +387,8 @@ class NotifIntTest extends IntTestCase
         $emailsRecus = $this->depileDerniersEmailsRecus();
         $this->assertCount(1, $emailsRecus);
         $this->assertMessageRecipientsContains($participantQuotidien->getEmail(), $emailsRecus[0]);
-        $this->assertMatchesRegularExpression("/nouvelle idée de cadeau/", $emailsRecus[0]->body);
-        $this->assertMatchesRegularExpression("/a été retirée de sa liste/", $emailsRecus[0]->body);
+        $this->assertMatchesRegularExpression("/nouvelle idée de cadeau/", $emailsRecus[0]['text']);
+        $this->assertMatchesRegularExpression("/a été retirée de sa liste/", $emailsRecus[0]['text']);
     }
 
     /**
