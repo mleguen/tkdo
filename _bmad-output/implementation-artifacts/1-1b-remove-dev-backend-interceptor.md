@@ -1,6 +1,6 @@
 # Story 1.1b: Remove Dev Backend Interceptor
 
-Status: review
+Status: done
 
 ## Story
 
@@ -141,6 +141,11 @@ Claude Opus 4.6 (claude-opus-4-6)
 
 No issues encountered. Clean deletion story — all tests passed on first run after changes.
 
+**Test Verification (Code Review - 2026-02-14):**
+- Component + Unit Tests: 52 of 52 SUCCESS (6 Karma unit + 46 Cypress component)
+- E2E Tests: 11 of 11 PASSING (5 connexion.cy.ts + 6 liste-idees.cy.ts)
+- Backend Tests: 244 tests, 1011 assertions (matches baseline)
+
 ### Completion Notes List
 
 - Deleted DevBackendInterceptor (~560 lines) and its spec file
@@ -169,6 +174,7 @@ No issues encountered. Clean deletion story — all tests passed on first run af
 - 2026-02-14: Addressed 2 code review findings — fixed interceptor descriptions in docs/README.md and docs/frontend-dev.md
 - 2026-02-14 - PR Comments Resolved: Resolved 1 PR comment thread, marked completed action item as fixed, PR: #97, comment_ids: 2806667968
 - 2026-02-14: Addressed remaining 2 code review findings — fixed architecture.md Bearer token docs and CONTRIBUTING.md integration test references
+- 2026-02-14 - Code Review Fixes: Fixed init-ng script (removed dev-backend interceptor generation), verified all tests pass (52 component/unit, 11 E2E, 244 backend)
 
 ### File List
 
@@ -194,6 +200,9 @@ No issues encountered. Clean deletion story — all tests passed on first run af
 - CONTRIBUTING.md
 - BACKLOG.md
 - _bmad-output/project-context.md
+
+**Modified (setup scripts):**
+- init-ng
 
 **Modified (workflow tracking):**
 - _bmad-output/implementation-artifacts/sprint-status.yaml

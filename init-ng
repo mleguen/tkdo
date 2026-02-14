@@ -80,7 +80,7 @@ for c in admin connexion deconnexion header idee liste-idees liste-occasions occ
     ./ng generate component $c --standalone
 done
 
-for i in erreur-backend auth-backend dev-backend; do
+for i in erreur-backend auth-backend; do
     ./ng generate interceptor $i --no-functional
 done
 
