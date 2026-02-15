@@ -1,4 +1,5 @@
 import { Component, inject, DOCUMENT } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 
@@ -28,10 +29,9 @@ export class ConnexionComponent {
 
   constructor() {
     // Read error from OAuth2 redirect (e.g., invalid credentials)
-    const erreur = this.route.snapshot.queryParamMap.get('erreur');
-    if (erreur) {
-      this.erreurConnexion = erreur;
-    }
+    this.route.queryParamMap.pipe(takeUntilDestroyed()).subscribe((params) => {
+      this.erreurConnexion = params.get('erreur') ?? undefined;
+    });
   }
 
   connecte() {

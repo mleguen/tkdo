@@ -120,6 +120,8 @@ This story refactors to OAuth2-compliant architecture, clearly separating:
 
 ### Review Follow-ups (AI)
 
+- [x] [AI-Review][CRITICAL] Frontend Component Tests failing - ConnexionComponent OAuth2 state reuse test expects 'existing-state-xyz' but gets 'test-state-abc123'; TypeScript compilation error TS2339 "Property 'as' does not exist on type 'SinonStub'" - cy.stub() chaining error in test setup [front/src/app/connexion/connexion.component.cy.ts:13,177] [CI Run](https://github.com/mleguen/tkdo/actions/runs/22036859600/job/63671166674)
+- [x] [AI-Review][CRITICAL] Frontend Component Tests failing - ConnexionComponent error display test can't find .alert-danger element when erreur query param is present; OAuth2 error redirect feature not rendering error message correctly in component template [front/src/app/connexion/connexion.component.cy.ts:269] [CI Run](https://github.com/mleguen/tkdo/actions/runs/22036859600/job/63671166674)
 - [x] [AI-Review][CRITICAL] Frontend Component Tests failing - ConnexionComponent tests throw TypeError from Angular EventEmitter - all 8 tests in shard 1/2 failing (successful login, failed login, navigation, form validation). Root cause hypothesis: Tests mock BackendService.connecte() but component now uses form.submit() for OAuth2 flow instead of calling backend.connecte(), causing test stub/spy to fail when tests expect connecte() calls [front/src/app/connexion/connexion.component.cy.ts] [CI Run](https://github.com/mleguen/tkdo/actions/runs/22022436064/job/63633693300)
 - [x] [AI-Review][CRITICAL] E2E Tests timing out on authentication - can't find post-login elements (#nomUtilisateur, a#menuMonProfil, #btnSeDeconnecter). Root cause hypothesis: OAuth2 login flow not working in E2E environment - likely missing OAuth2 endpoint mocks or incorrect callback URL configuration in test environment [front/cypress/e2e/connexion.cy.ts] [CI Run](https://github.com/mleguen/tkdo/actions/runs/22022436063)
 - [x] [AI-Review][CRITICAL] Backend Integration Tests hung/timed out - ran for 6 hours before failing. Root cause hypothesis: Abnormal timeout suggests deadlock or infinite loop, possibly in OAuth2 token endpoint when handling concurrent requests or in database connection pool [api/test/Int/] [CI Run](https://github.com/mleguen/tkdo/actions/runs/22022436064/job/63633671966)
@@ -357,6 +359,8 @@ Claude Opus 4.6
 - 2026-02-14 — Review Follow-ups Implemented: All 8 review items fixed. Key changes: BffAuthService uses GenericProvider.getResourceOwner() via new /oauth/userinfo endpoint (Item 1 HIGH), redirect_uri path-based validation + client_secret validation (Item 7), auth code lookup moved to repository (Item 3). E2E failures discovered — front Docker container needed rebuild to pick up /oauth/ ProxyPass rules. All tests green: PHPStan OK, 145 unit, 264 backend, 60 frontend, 12 E2E.
 - 2026-02-15 — New PR Comments Reviewed (Evidence-Based Investigation): Reviewed 6 new unresolved GitHub PR comments on PR #100 (7 already resolved, filtered out). Investigation: Read 10 files with ~30 avg lines per comment. Classification: 2 valid standalone (1 MEDIUM, 1 LOW), 1 consolidated group with 2 comments (LOW), 2 invalid/out-of-scope (dismissed with evidence). Updated Review Follow-ups section to 11 total action items (8 completed, 3 new). Responded to all 6 comments in PR #100 with investigation evidence. Story status changed to in-progress.
 - 2026-02-15 — Final Review Follow-ups Implemented (6 items): Root cause analysis and fixes for 3 CRITICAL CI failures + 3 smaller items. (1) CRITICAL: ConnexionComponent Cypress tests rewritten for OAuth2 form POST flow — mock genereState(), stub form.submit(), verify OAuth2 fields. Also added erreur query param reading to ConnexionComponent for OAuth2 error redirects. (2) CRITICAL: CI E2E nginx missing /oauth/ proxy rule — added location block. (3) CRITICAL: CI PHP built-in server single-threaded deadlock on BFF back-channel call — added PHP_CLI_SERVER_WORKERS=4 to both test.yml and e2e.yml. (4) MEDIUM: OAuthUserInfoController now uses RouteService.getAuth() and catches UtilisateurInconnuException. (5) LOW: Renamed misleading test. (6) LOW: Added client_id validation to OAuthAuthorizeController and OAuthTokenController. All tests green: PHPStan OK, 145 unit, 272 backend (1057 assertions), 60 frontend, 12 E2E.
+- 2026-02-15 — Post-Review CI Check & PR Comment Analysis: Adversarial code review marked story as done, but post-review CI check discovered 2 new CRITICAL test failures in ConnexionComponent Cypress tests (state reuse logic + error display). PR review check found 0 unresolved comments from submitted reviews (2 comments exist but are from PENDING/draft review, correctly filtered out per workflow). Story status reverted from done → in-progress. New action items: 2 CRITICAL (CI failures). Total Review Follow-ups: 16 items (14 completed [x], 2 new [ ]). CI Run: https://github.com/mleguen/tkdo/actions/runs/22036859600
+- 2026-02-15 — Final CI Failures Resolved (2 CRITICAL items): (1) State reuse test: Root cause was stale hidden OAuth2 forms accumulating in DOM across tests — `querySelector` returned form from prior test. Fixed by adding form cleanup in `afterEach`. Also fixed TS2339 error by splitting `cy.stub().returns().as()` chain (`.returns()` returns `sinon.SinonStub`, not `Cypress.Agent`). (2) Error display test: Root cause was component reading `erreur` from `route.snapshot` in constructor (one-time read), but test navigated after mount. Fixed by switching to `route.queryParamMap` observable with `takeUntilDestroyed()` for reactive param handling. All tests green: PHPStan OK, 272 backend (1057 assertions), 60 frontend, 225 component, 12 E2E.
 
 ### Change Log
 
@@ -407,6 +411,10 @@ Claude Opus 4.6
 - Added integration tests for client_id validation (authorize + token endpoints)
 - 2026-02-15 - PR Comments Resolved: Resolved 4 PR comment threads, marked completed action items as fixed, PR: #100, comment_ids: 2807799366, 2807799372, 2807799381, 2807799377
 
+**CI failure fixes (2026-02-15):**
+- ConnexionComponent: switched erreur query param from snapshot to queryParamMap observable with takeUntilDestroyed()
+- ConnexionComponent Cypress tests: fixed cy.stub() chaining (split `.returns().as()` → `.as()` then `.returns()`), added form cleanup in afterEach
+
 ### File List
 
 **Created:**
@@ -443,8 +451,8 @@ Claude Opus 4.6
 - `api/src/Appli/Settings/OAuth2Settings.php` — Removed misleading "not used" comment
 - `docs/backend-dev.md` — Updated Authentication section to document OAuth2 cookie-based flow
 - `docs/environment-variables.md` — Added OAuth2 Configuration section with IdP switching guide
-- `front/src/app/connexion/connexion.component.cy.ts` — Rewritten for OAuth2 form POST flow
-- `front/src/app/connexion/connexion.component.ts` — Added erreur query param reading from OAuth2 redirects
+- `front/src/app/connexion/connexion.component.cy.ts` — Rewritten for OAuth2 form POST flow; fixed cy.stub() chaining, added form cleanup in afterEach
+- `front/src/app/connexion/connexion.component.ts` — OAuth2 form POST, erreur via queryParamMap observable with takeUntilDestroyed()
 - `front/src/app/backend.service.spec.ts` — Renamed misleading test
 - `api/src/Appli/Controller/OAuthUserInfoController.php` — Uses RouteService.getAuth(), catches UtilisateurInconnuException
 - `api/src/Appli/Controller/OAuthAuthorizeController.php` — Added client_id validation

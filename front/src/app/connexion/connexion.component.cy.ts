@@ -10,7 +10,8 @@ describe('ConnexionComponent', () => {
 
   beforeEach(() => {
     formSubmitStub = cy.stub().as('formSubmit');
-    genereStateStub = cy.stub().returns('test-state-abc123').as('genereState');
+    genereStateStub = cy.stub().as('genereState');
+    genereStateStub.returns('test-state-abc123');
 
     // Stub HTMLFormElement.prototype.submit to prevent actual navigation
     cy.stub(HTMLFormElement.prototype, 'submit').callsFake(function (
@@ -45,6 +46,10 @@ describe('ConnexionComponent', () => {
 
   afterEach(() => {
     sessionStorage.clear();
+    // Remove hidden OAuth2 forms appended to document.body by connecte()
+    document
+      .querySelectorAll('form[action="/oauth/authorize"]')
+      .forEach((f) => f.remove());
   });
 
   describe('Form Rendering', () => {
@@ -158,7 +163,9 @@ describe('ConnexionComponent', () => {
     });
 
     it('should reuse existing state from sessionStorage', () => {
-      sessionStorage.setItem(CLE_OAUTH_STATE, 'existing-state-xyz');
+      cy.window().then((win) => {
+        win.sessionStorage.setItem(CLE_OAUTH_STATE, 'existing-state-xyz');
+      });
 
       cy.get('#identifiant').type('alice');
       cy.get('#mdp').type('mdpalice');
