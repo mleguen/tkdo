@@ -11,7 +11,7 @@ So that I can access my account and lists.
 ## Dependencies
 
 - **Story 1.1c** (OAuth2 Standards Alignment) — MUST be complete. The entire login flow relies on the OAuth2 authorize + BFF callback mechanism implemented in 1.1c.
-- **Story 2.2 in-flight change (known issue):** Story 2.2 fixes an OIDC compliance issue where `OAuthUserInfoController` returns app-specific data (`adm`, `groupe_ids`) that a real IdP wouldn't know about. After the fix, `/oauth/userinfo` returns only standard OIDC claims (`sub`, `name`, `email`), and `BffAuthCallbackController` enriches app-specific data (`admin`, `groupe_ids`) from the DB-loaded `$utilisateur` entity. **Check whether this fix has been merged into your branch** before implementing Task 5 — the BFF controller code may differ from what's shown in the 1.1c story file.
+- **Story 2.2** (Group Membership in JWT Claims) — **MERGED**. The OIDC compliance fix is now integrated: `OAuthUserInfoController` returns only standard OIDC claims (`sub`, `name`, `email`), and `BffAuthCallbackController` loads app-specific data (`admin`, `groupe_ids`, `groupe_admin_ids`) from the DB via `$utilisateur` entity and `GroupeRepository`.
 
 ## Background
 
@@ -202,8 +202,8 @@ $validite = $seSouvenir
 $jwt = $this->authService->encode($auth, $validite);
 ```
 
-**IMPORTANT — BFF app-specific data enrichment:**
-The current code (1.1c) uses `$claims['groupe_ids']` from the userinfo endpoint to build the auth token and response. After the Story 2.2 OIDC fix, this data comes from the `$utilisateur` entity loaded from DB instead. When implementing Task 5, check the actual state of `BffAuthCallbackController` — if `$claims['groupe_ids']` is still present, it works; if the 2.2 fix is merged, `groupe_ids` and `admin` already come from `$utilisateur`. Either way, the remember-me logic (validity extension) is independent of where app-specific data comes from.
+**BFF app-specific data enrichment (Story 2.2 merged):**
+After the Story 2.2 OIDC fix, `BffAuthCallbackController` loads group memberships directly from the database via `GroupeRepository::readAppartenancesForUtilisateur()` (not from IdP claims). The `$auth` token is built from `$utilisateur` (DB entity) with `$groupeIds` and `$groupeAdminIds` queried from `Appartenance` records. The remember-me logic (validity extension) is independent of where app-specific data comes from.
 
 **Failed attempts pattern:**
 ```php

@@ -149,7 +149,7 @@ This story refactors to OAuth2-compliant architecture, clearly separating:
 
 ## Known Issues
 
-- **OAuthUserInfoController returns app-specific data** — The temporary `/oauth/userinfo` endpoint returns `sub`, `adm`, and `groupe_ids`, but a real OIDC-compliant IdP would only return standard claims (`sub`, `name`, `email`). App-specific data (`admin`, `groupe_ids`) should be enriched by the BFF controller from the database, not sourced from the IdP. Fix in progress on Story 2.2 branch: OAuthUserInfoController will return only standard OIDC fields; BffAuthCallbackController will read app-specific data from the `$utilisateur` entity loaded from DB.
+- ~~**OAuthUserInfoController returns app-specific data**~~ — **RESOLVED in Story 2.2** (merged). OAuthUserInfoController now returns only standard OIDC claims (`sub`, `name`, `email`). BffAuthCallbackController loads app-specific data (`admin`, `groupe_ids`, `groupe_admin_ids`) from the `$utilisateur` entity and `GroupeRepository` directly from the database.
 
 ## Dev Notes
 
