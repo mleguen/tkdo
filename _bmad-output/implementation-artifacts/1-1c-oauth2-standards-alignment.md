@@ -147,6 +147,10 @@ This story refactors to OAuth2-compliant architecture, clearly separating:
 - [x] [AI-Review][HIGH] Remove ./phpstan wrapper script — Wrapper is now more complex to use than `./composer run phpstan`; helper that doesn't help should be deleted in favor of composer script only [docs/backend-dev.md + ./phpstan] [PR#100 unresolved thread](https://github.com/mleguen/tkdo/pull/100)
 - [x] [AI-Review][HIGH] Clarify form cleanup comment in Cypress test — Current comment explains test-specific workaround but user questions if DOM persistence between tests could happen in real life; if yes, fix should be in production code not test cleanup [front/src/app/connexion/connexion.component.cy.ts:52] [PR#100 unresolved thread](https://github.com/mleguen/tkdo/pull/100)
 
+## Known Issues
+
+- **OAuthUserInfoController returns app-specific data** — The temporary `/oauth/userinfo` endpoint returns `sub`, `adm`, and `groupe_ids`, but a real OIDC-compliant IdP would only return standard claims (`sub`, `name`, `email`). App-specific data (`admin`, `groupe_ids`) should be enriched by the BFF controller from the database, not sourced from the IdP. Fix in progress on Story 2.2 branch: OAuthUserInfoController will return only standard OIDC fields; BffAuthCallbackController will read app-specific data from the `$utilisateur` entity loaded from DB.
+
 ## Dev Notes
 
 ### Architecture Overview
