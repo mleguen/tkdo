@@ -56,6 +56,13 @@ So that group context is available for all authenticated requests.
   - [x] 5.5 Test JWT cookie contains correct claims (decode and verify)
   - [x] 5.6 Run `./composer test` — all tests pass (274+ existing + new)
 
+### Review Follow-ups (AI)
+
+- [x] [AI-Review][CRITICAL] Wrap `array_map`/`array_filter` result with `array_values()` to prevent non-sequential keys causing JSON object serialization instead of array — affects both `$groupeIds` and `$groupeAdminIds` in `AuthTokenController.php:69-73`
+- [x] [AI-Review][HIGH] Add integration test with 3+ groups where admin groups have non-consecutive indexes to verify JSON array serialization — `AuthTokenControllerTest.php`
+- [x] [AI-Review][MEDIUM] Add integration test for AC #2 (session refresh): login with no groups, add group to user, perform new token exchange, verify group appears in claims — `AuthTokenControllerTest.php`
+- [x] [AI-Review][LOW] Consider adding runtime `array_map('intval', ...)` in `AuthService.decode()` to ensure `groupe_ids` and `groupe_admin_ids` contain only integers after JWT decode — `AuthService.php:44-47`
+
 ## Dev Notes
 
 ### Brownfield Context
@@ -430,6 +437,7 @@ No issues encountered. All tasks completed in a single pass with red-green-refac
 - **Task 3:** Added `readAppartenancesForUtilisateur()` to `GroupeRepository` interface and implemented in `GroupeRepositoryAdaptor` using DQL QueryBuilder with `archive = false` filter; created 4 new integration tests covering active groups, archived exclusion, empty results, and admin flag preservation.
 - **Task 4:** Injected `GroupeRepository` into `AuthTokenController` constructor; replaced hardcoded `[]` with real membership query using `readAppartenancesForUtilisateur()`; extracted `groupe_ids` and `groupe_admin_ids` via `array_map`/`array_filter`; removed TODO comments from Story 1.1; added `groupe_admin_ids` to response body.
 - **Task 5:** Added 5 new integration tests: active groups with admin distinction, archived group exclusion, JWT cookie claim verification; updated existing no-groups test to verify `groupe_admin_ids`; full suite passes with 295 tests / 1129 assertions; PHPStan level 8 clean.
+- **Review Follow-ups:** Addressed all 4 code review findings: (1) CRITICAL — wrapped `array_map`/`array_filter` results with `array_values()` in AuthTokenController to prevent JSON object serialization from non-sequential keys; (2) HIGH — added integration test with 3 groups and non-consecutive admin indexes verifying sequential JSON array keys; (3) MEDIUM — added AC #2 session refresh integration test: login with no groups, add group, re-login, verify new group in claims; (4) LOW — added `array_map('intval', ...)` in AuthService.decode() for type safety on JWT-decoded arrays. Full suite: 299 tests / 1157 assertions, PHPStan level 8 clean.
 
 ### File List
 
@@ -447,6 +455,15 @@ No issues encountered. All tasks completed in a single pass with red-green-refac
 - `api/test/Unit/Appli/ModelAdaptor/AuthAdaptorTest.php` — 8 unit tests for AuthAdaptor
 - `api/test/Unit/Appli/Service/AuthServiceTest.php` — 4 unit tests for AuthService JWT encode/decode
 
+**Modified (review follow-ups):**
+- `api/src/Appli/Controller/AuthTokenController.php` — Added `array_values()` wrapping on `$groupeIds` and `$groupeAdminIds`
+- `api/src/Appli/Service/AuthService.php` — Added `array_map('intval', ...)` for type safety in decode()
+- `api/test/Int/AuthTokenControllerTest.php` — Added 2 new integration tests (non-consecutive index, session refresh)
+- `api/test/Unit/Appli/Service/AuthServiceTest.php` — Fixed misleading comment on backward compat test, renamed test method
+- `_bmad-output/project-context.md` — Added `php` host prohibition rule, PHPStan memory limit note
+
 ## Change Log
 
 - 2026-02-15: Implemented group membership in JWT claims — `groupe_ids` and `groupe_admin_ids` now populated from database during token exchange. Added `readAppartenancesForUtilisateur()` DQL query filtering archived groups. 295 tests pass (21 new), PHPStan level 8 clean.
+- 2026-02-15: Adversarial code review — Fixed misleading test comment in AuthServiceTest. Added PHPStan memory limit and `php` host prohibition to project-context.md. Created 4 action items: CRITICAL array_values() bug, HIGH gap-index test, MEDIUM AC#2 refresh test, LOW decode type safety.
+- 2026-02-15: Addressed all 4 code review findings — Fixed CRITICAL array_values() bug, added HIGH non-consecutive index test, added MEDIUM AC#2 session refresh test, added LOW intval type safety. 299 tests / 1157 assertions pass, PHPStan level 8 clean.

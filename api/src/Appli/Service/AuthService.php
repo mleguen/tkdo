@@ -42,9 +42,9 @@ class AuthService
             $key = new Key($this->clePublique, $this->settings->algo);
             $payload = JWT::decode($token, $key);
             /** @var int[] $groupeIds */
-            $groupeIds = isset($payload->groupe_ids) ? (array) $payload->groupe_ids : [];
+            $groupeIds = isset($payload->groupe_ids) ? array_map('intval', (array) $payload->groupe_ids) : [];
             /** @var int[] $groupeAdminIds */
-            $groupeAdminIds = isset($payload->groupe_admin_ids) ? (array) $payload->groupe_admin_ids : [];
+            $groupeAdminIds = isset($payload->groupe_admin_ids) ? array_map('intval', (array) $payload->groupe_admin_ids) : [];
             return new AuthAdaptor(
                 intval($payload->sub),
                 isset($payload->adm) && $payload->adm,

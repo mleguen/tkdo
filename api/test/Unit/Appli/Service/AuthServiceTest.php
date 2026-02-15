@@ -44,16 +44,18 @@ class AuthServiceTest extends TestCase
         $this->assertEquals([], $decoded->getGroupeAdminIds());
     }
 
-    public function testDecodeOldTokenWithoutGroupeAdminIdsFallsBackToEmptyArray(): void
+    public function testDecodeTokenWithEmptyGroupeAdminIdsDefaultsToEmptyArray(): void
     {
-        // Simulate an old token that only has groupe_ids but not groupe_admin_ids
+        // Encode a token where groupeAdminIds defaults to [] via constructor
+        // Note: this does NOT test truly old tokens (missing the claim entirely),
+        // because encode() always writes groupe_admin_ids to the payload.
+        // Backward compatibility with old tokens lacking the claim is covered
+        // by the isset() fallback in decode().
         $auth = new AuthAdaptor(42, false, [10, 20]);
 
         $token = $this->authService->encode($auth);
         $decoded = $this->authService->decode($token);
 
-        // Even though the token was encoded with current code (which includes groupe_admin_ids),
-        // verify that decoding handles the claim correctly
         $this->assertEquals([], $decoded->getGroupeAdminIds());
     }
 

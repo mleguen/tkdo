@@ -243,6 +243,7 @@ public function __invoke(Request $request, Response $response): Response
 - Wrappers: `./console`, `./doctrine`, `./composer`, `./ng`, `./npm`, `./cypress`, `./k6`
 - `./composer test`, `./composer phpstan`, `./composer rector`
 - `./npm test`, `./npm run build`, `./npm run e2e`
+- PHPStan may require `./composer phpstan -- --memory-limit=256M` if the default 128M is insufficient
 
 **Database:**
 - Doctrine migrations: version-based naming
@@ -266,7 +267,8 @@ public function __invoke(Request $request, Response $response): Response
 **Development Environment:**
 - ❌ NEVER ask to install tools on the host - use Docker wrappers
 - ❌ NEVER ask the user how to start Docker or run tests - read the docs
-- ❌ NEVER run `npm`, `composer`, `ng`, `cypress` directly - ALWAYS use `./npm`, `./composer`, etc.
+- ❌ NEVER run `npm`, `composer`, `ng`, `cypress`, `php` directly - ALWAYS use `./npm`, `./composer`, etc.
+- ❌ NEVER run `php` on the host for testing or debugging - use `./composer` scripts or run commands inside the Docker container
 - ✅ ALWAYS use `./wrapper` scripts for CLI tools (they run in Docker containers)
 - ✅ ALWAYS read `docs/dev-setup.md` and `docs/testing.md` for commands
 
