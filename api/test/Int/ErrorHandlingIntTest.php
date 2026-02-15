@@ -168,7 +168,7 @@ class ErrorHandlingIntTest extends IntTestCase
         $client = new \GuzzleHttp\Client();
         $response = $client->request(
             'POST',
-            getenv('TKDO_API_BASE_URI') . '/occasion',
+            getenv('TKDO_BASE_URI') . '/occasion',
             [
                 'body' => '{invalid json}',
                 'headers' => $headers,

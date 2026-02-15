@@ -19,15 +19,14 @@ class OAuth2Settings
     {
         $this->clientId = (string) (getenv('OAUTH2_CLIENT_ID') ?: 'tkdo');
         $this->clientSecret = (string) (getenv('OAUTH2_CLIENT_SECRET') ?: 'dev-secret');
-        $frontBaseUri = (string) (getenv('TKDO_FRONT_BASE_URI') ?: 'http://localhost:4200');
-        $this->redirectUri = $frontBaseUri . '/auth/callback';
+        $baseUri = (string) (getenv('TKDO_BASE_URI') ?: 'http://localhost:4200');
+        $this->redirectUri = $baseUri . '/auth/callback';
 
-        // TEMPORARY: These point to the built-in auth server; will change to external IdP URLs
-        $basePath = getenv('TKDO_API_BASE_PATH') ?: '';
-        $baseUri = getenv('TKDO_API_BASE_URI')
-            ?: ('http://localhost:8080' . $basePath);
-        $this->urlAuthorize = $baseUri . '/oauth/authorize';
-        $this->urlAccessToken = $baseUri . '/oauth/token';
-        $this->urlResourceOwner = $baseUri . '/oauth/userinfo';
+        // TEMPORARY: Points to the built-in auth server; will be replaced by external IdP URLs
+        $issuerBaseUri = getenv('OAUTH2_ISSUER_BASE_URI')
+            ?: $baseUri;
+        $this->urlAuthorize = $issuerBaseUri . '/oauth/authorize';
+        $this->urlAccessToken = $issuerBaseUri . '/oauth/token';
+        $this->urlResourceOwner = $issuerBaseUri . '/oauth/userinfo';
     }
 }

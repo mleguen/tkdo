@@ -21,7 +21,7 @@ class OAuthTokenControllerTest extends IntTestCase
     {
         $utilisateur = $this->utilisateur()->withIdentifiant('utilisateur')->persist(self::$em);
 
-        $baseUri = getenv('TKDO_API_BASE_URI');
+        $baseUri = getenv('TKDO_BASE_URI');
         $client = new \GuzzleHttp\Client(['allow_redirects' => false]);
 
         $response = $client->request(
@@ -282,7 +282,7 @@ class OAuthTokenControllerTest extends IntTestCase
     {
         ['code' => $code] = $this->createUserAndGetCode();
 
-        $baseUri = getenv('TKDO_API_BASE_URI');
+        $baseUri = getenv('TKDO_BASE_URI');
         $concurrency = 5;
         $handles = [];
         $multiHandle = curl_multi_init();

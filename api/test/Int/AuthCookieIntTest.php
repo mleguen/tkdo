@@ -20,7 +20,7 @@ class AuthCookieIntTest extends IntTestCase
     {
         $utilisateur = $this->utilisateur()->withIdentifiant('utilisateur')->persist(self::$em);
 
-        $baseUri = getenv('TKDO_API_BASE_URI');
+        $baseUri = getenv('TKDO_BASE_URI');
         $client = new \GuzzleHttp\Client(['allow_redirects' => false]);
 
         $response = $client->request(
@@ -57,7 +57,7 @@ class AuthCookieIntTest extends IntTestCase
         $client = new \GuzzleHttp\Client();
         $response = $client->request(
             'GET',
-            getenv('TKDO_API_BASE_URI') . '/utilisateur/' . $utilisateur->getId(),
+            getenv('TKDO_BASE_URI') . '/utilisateur/' . $utilisateur->getId(),
             [
                 'http_errors' => false,
             ]
@@ -100,7 +100,7 @@ class AuthCookieIntTest extends IntTestCase
 
         $callbackResponse = $client->request(
             'POST',
-            getenv('TKDO_API_BASE_URI') . self::CALLBACK_PATH,
+            getenv('TKDO_BASE_URI') . self::CALLBACK_PATH,
             [
                 'json' => ['code' => $code],
                 'http_errors' => false,
@@ -115,7 +115,7 @@ class AuthCookieIntTest extends IntTestCase
         // Logout
         $logoutResponse = $client->request(
             'POST',
-            getenv('TKDO_API_BASE_URI') . '/auth/logout',
+            getenv('TKDO_BASE_URI') . '/auth/logout',
             [
                 'http_errors' => false,
             ]
@@ -132,7 +132,7 @@ class AuthCookieIntTest extends IntTestCase
         // Verify protected endpoint returns 401 after logout
         $userResponse = $client->request(
             'GET',
-            getenv('TKDO_API_BASE_URI') . '/utilisateur/' . $utilisateur->getId(),
+            getenv('TKDO_BASE_URI') . '/utilisateur/' . $utilisateur->getId(),
             [
                 'http_errors' => false,
             ]

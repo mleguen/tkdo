@@ -13,7 +13,7 @@ class OAuthAuthorizeControllerTest extends IntTestCase
     public function testGetRedirectsToLoginPage(bool $curl): void
     {
         // GET /oauth/authorize with valid params should redirect to /connexion
-        $baseUri = getenv('TKDO_API_BASE_URI');
+        $baseUri = getenv('TKDO_BASE_URI');
         $params = http_build_query([
             'response_type' => 'code',
             'client_id' => 'tkdo',
@@ -83,7 +83,7 @@ class OAuthAuthorizeControllerTest extends IntTestCase
     {
         $utilisateur = $this->utilisateur()->withIdentifiant('utilisateur')->persist(self::$em);
 
-        $baseUri = getenv('TKDO_API_BASE_URI');
+        $baseUri = getenv('TKDO_BASE_URI');
 
         $client = new \GuzzleHttp\Client(['allow_redirects' => false]);
         $response = $client->request(
@@ -121,7 +121,7 @@ class OAuthAuthorizeControllerTest extends IntTestCase
     {
         $utilisateur = $this->utilisateur()->withIdentifiant('utilisateur')->persist(self::$em);
 
-        $baseUri = getenv('TKDO_API_BASE_URI');
+        $baseUri = getenv('TKDO_BASE_URI');
 
         $client = new \GuzzleHttp\Client(['allow_redirects' => false]);
         $response = $client->request(

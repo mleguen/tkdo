@@ -113,7 +113,7 @@ Create a file at `api/.env.prod` with your production settings. At minimum:
 ```bash
 # api/.env.prod
 MYSQL_PASSWORD=your_secure_password_here
-TKDO_API_BASE_URI=https://tkdo.example.com
+TKDO_BASE_URI=https://tkdo.example.com
 TKDO_DEV_MODE=0
 ```
 
@@ -131,7 +131,7 @@ Alternatively, set variables in your Apache virtual host configuration using `Se
     DocumentRoot /var/www/tkdo
 
     SetEnv MYSQL_PASSWORD "secure_password_here"
-    SetEnv TKDO_API_BASE_URI "https://tkdo.example.com"
+    SetEnv TKDO_BASE_URI "https://tkdo.example.com"
     SetEnv TKDO_DEV_MODE "0"
     # ... other variables as needed
 
@@ -326,7 +326,7 @@ cd /var/www/tkdo/api
 **Arguments:**
 
 - `--admin-email` - (Optional) Administrator's email address
-  - If omitted, uses `admin@your-domain.com` (derived from `TKDO_API_BASE_URI`)
+  - If omitted, uses `admin@your-domain.com` (derived from `TKDO_BASE_URI`)
 
 **Expected output:**
 

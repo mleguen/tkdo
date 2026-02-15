@@ -202,7 +202,7 @@ class UserService {
 Use backticks for:
 - Commands: `npm install`
 - File paths: `docs/user-guide.md`
-- Variable names: `TKDO_API_BASE_URI`
+- Variable names: `TKDO_BASE_URI`
 - Class/function names: `UserService`
 - Short code snippets: `const user = { id: 1 }`
 

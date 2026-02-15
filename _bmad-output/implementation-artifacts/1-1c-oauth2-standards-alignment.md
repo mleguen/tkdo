@@ -373,6 +373,7 @@ Claude Opus 4.6
 - 2026-02-15 — Final CI Failures Resolved (2 CRITICAL items): (1) State reuse test: Root cause was stale hidden OAuth2 forms accumulating in DOM across tests — `querySelector` returned form from prior test. Fixed by adding form cleanup in `afterEach`. Also fixed TS2339 error by splitting `cy.stub().returns().as()` chain (`.returns()` returns `sinon.SinonStub`, not `Cypress.Agent`). (2) Error display test: Root cause was component reading `erreur` from `route.snapshot` in constructor (one-time read), but test navigated after mount. Fixed by switching to `route.queryParamMap` observable with `takeUntilDestroyed()` for reactive param handling. All tests green: PHPStan OK, 272 backend (1057 assertions), 60 frontend, 225 component, 12 E2E.
 - 2026-02-15 — Final Documentation Review Follow-ups (6 LOW items): All documentation/comment improvements from PR review. (1) Added text-based sequence diagram to docs/backend-dev.md showing 10-step OAuth2 flow between browser, auth server, and BFF. (2) Clarified /auth/callback is an Angular SPA route, not a server endpoint. (3) Documented user info persistence: only user ID in localStorage, full object refetched via API on reload. (4) Clarified PHPStan: `./composer run phpstan` is recommended (includes --memory-limit=256M), `./phpstan` wrapper for custom flags. (5) Explained why OAUTH2_REDIRECT_URI is separate from TKDO_BASE_URI (frontend vs backend URL). (6) Expanded form cleanup comment in connexion.component.cy.ts explaining test pollution prevention.
 - 2026-02-15 — Final PR Review Follow-ups (4 HIGH items): (1) Renamed OAUTH2_REDIRECT_URI → TKDO_FRONT_BASE_URI: env var now stores frontend base URL (e.g., http://localhost:4200), code appends /auth/callback. Simpler config that doesn't depend on SPA route. (2) Renamed TKDO_BASE_URI → TKDO_API_BASE_URI across ~30 files (source, tests, CI, Docker, docs) for naming consistency with TKDO_FRONT_BASE_URI. (3) Removed redundant Architecture Overview box diagram from docs/backend-dev.md — sequence diagram provides better clarity. (4) Deleted ./phpstan wrapper script, updated docs to use only `./composer run phpstan`. (5) Clarified form cleanup comment in connexion.component.cy.ts — explicitly states this cannot happen in production because form.submit() always triggers full page navigation. All tests green: PHPStan OK, 145 unit, 127 integration (721 assertions), 60 frontend, 12 E2E.
+- 2026-02-15 — Env var cleanup: Reverted TKDO_API_BASE_URI → TKDO_BASE_URI (public application URL). Removed TKDO_FRONT_BASE_URI (redundant — it was just TKDO_BASE_URI). Introduced temporary OAUTH2_ISSUER_BASE_URI for back-channel calls (falls back to TKDO_BASE_URI). Rationale: TKDO_BASE_URI was always the public URL (used for email links), renaming to TKDO_API_BASE_URI caused confusion; TKDO_FRONT_BASE_URI was unnecessary since the frontend doesn't read any env vars (uses relative paths via reverse proxy). All tests green: PHPStan OK, 161 unit, 137 integration (741 assertions), 60 frontend.
 
 ### Change Log
 
@@ -444,6 +445,13 @@ Claude Opus 4.6
 - Removed ./phpstan entry from docs/project-scan-report.json
 - Clarified form cleanup comment in connexion.component.cy.ts (production impossibility)
 
+**Env var cleanup (2026-02-15):**
+- Reverted TKDO_API_BASE_URI → TKDO_BASE_URI across source, tests, CI, Docker, and docs
+- Removed TKDO_FRONT_BASE_URI — OAuth2Settings now uses TKDO_BASE_URI for redirect_uri
+- Introduced temporary OAUTH2_ISSUER_BASE_URI in OAuth2Settings for back-channel OAuth2 URLs (falls back to TKDO_BASE_URI)
+- Removed unused TKDO_API_BASE_PATH read from OAuth2Settings (no longer needed)
+- Updated docs/environment-variables.md: replaced TKDO_FRONT_BASE_URI section with OAUTH2_ISSUER_BASE_URI docs
+
 ### File List
 
 **Created:**
@@ -488,22 +496,22 @@ Claude Opus 4.6
 - `api/src/Appli/Controller/OAuthTokenController.php` — Added client_id validation
 - `api/test/Int/OAuthAuthorizeControllerTest.php` — Added client_id validation test
 - `api/test/Int/OAuthTokenControllerTest.php` — Added client_id validation test
-- `.github/workflows/test.yml` — Added PHP_CLI_SERVER_WORKERS=4 for back-channel calls; renamed TKDO_BASE_URI → TKDO_API_BASE_URI
-- `.github/workflows/e2e.yml` — Added PHP_CLI_SERVER_WORKERS=4 + /oauth/ nginx proxy rule; renamed TKDO_BASE_URI → TKDO_API_BASE_URI
-- `api/src/Appli/Settings/OAuth2Settings.php` — OAUTH2_REDIRECT_URI → TKDO_FRONT_BASE_URI (builds redirect URI from base + /auth/callback); TKDO_BASE_URI → TKDO_API_BASE_URI
-- `api/src/Appli/Settings/UriSettings.php` — TKDO_BASE_URI → TKDO_API_BASE_URI
-- `api/test/Int/IntTestCase.php` — TKDO_BASE_URI → TKDO_API_BASE_URI
-- `api/test/Int/ErrorHandlingIntTest.php` — TKDO_BASE_URI → TKDO_API_BASE_URI
-- `api/test/Int/OAuthAuthorizeControllerTest.php` — TKDO_BASE_URI → TKDO_API_BASE_URI
-- `api/test/Int/BffAuthCallbackControllerTest.php` — TKDO_BASE_URI → TKDO_API_BASE_URI
-- `api/test/Int/OAuthTokenControllerTest.php` — TKDO_BASE_URI → TKDO_API_BASE_URI
-- `api/test/Int/AuthCookieIntTest.php` — TKDO_BASE_URI → TKDO_API_BASE_URI
-- `docker-compose.yml` — TKDO_BASE_URI → TKDO_API_BASE_URI
-- `docs/dev-setup.md` — TKDO_BASE_URI → TKDO_API_BASE_URI
-- `docs/deployment-apache.md` — TKDO_BASE_URI → TKDO_API_BASE_URI
-- `docs/environment-variables.md` — OAUTH2_REDIRECT_URI → TKDO_FRONT_BASE_URI; TKDO_BASE_URI → TKDO_API_BASE_URI
-- `docs/backend-dev.md` — Removed Architecture Overview box diagram; removed ./phpstan references; OAUTH2_REDIRECT_URI → TKDO_FRONT_BASE_URI
-- `docs/DOCUMENTATION-GUIDE.md` — TKDO_BASE_URI → TKDO_API_BASE_URI
+- `.github/workflows/test.yml` — Added PHP_CLI_SERVER_WORKERS=4 for back-channel calls; uses TKDO_BASE_URI
+- `.github/workflows/e2e.yml` — Added PHP_CLI_SERVER_WORKERS=4 + /oauth/ nginx proxy rule; uses TKDO_BASE_URI
+- `api/src/Appli/Settings/OAuth2Settings.php` — Uses TKDO_BASE_URI for redirect_uri, OAUTH2_ISSUER_BASE_URI (temporary) for back-channel URLs
+- `api/src/Appli/Settings/UriSettings.php` — Uses TKDO_BASE_URI for email links
+- `api/test/Int/IntTestCase.php` — Uses TKDO_BASE_URI
+- `api/test/Int/ErrorHandlingIntTest.php` — Uses TKDO_BASE_URI
+- `api/test/Int/OAuthAuthorizeControllerTest.php` — Uses TKDO_BASE_URI
+- `api/test/Int/BffAuthCallbackControllerTest.php` — Uses TKDO_BASE_URI
+- `api/test/Int/OAuthTokenControllerTest.php` — Uses TKDO_BASE_URI
+- `api/test/Int/AuthCookieIntTest.php` — Uses TKDO_BASE_URI
+- `docker-compose.yml` — Uses TKDO_BASE_URI (was TKDO_API_BASE_URI)
+- `docs/dev-setup.md` — Uses TKDO_BASE_URI
+- `docs/deployment-apache.md` — Uses TKDO_BASE_URI
+- `docs/environment-variables.md` — TKDO_BASE_URI + OAUTH2_ISSUER_BASE_URI docs (removed TKDO_FRONT_BASE_URI section)
+- `docs/backend-dev.md` — Removed Architecture Overview box diagram; removed ./phpstan references; uses TKDO_BASE_URI
+- `docs/DOCUMENTATION-GUIDE.md` — Uses TKDO_BASE_URI
 - `docs/project-scan-report.json` — Removed ./phpstan entry
 - `front/src/app/connexion/connexion.component.cy.ts` — Updated form cleanup comment
 

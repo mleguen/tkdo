@@ -10,6 +10,6 @@ class UriSettings
 
     public function __construct()
     {
-        $this->baseUri = getenv('TKDO_API_BASE_URI') ?: 'http://localhost:4200';
+        $this->baseUri = getenv('TKDO_BASE_URI') ?: 'http://localhost:4200';
     }
 }
