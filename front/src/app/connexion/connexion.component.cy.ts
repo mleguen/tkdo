@@ -46,7 +46,11 @@ describe('ConnexionComponent', () => {
 
   afterEach(() => {
     sessionStorage.clear();
-    // Remove hidden OAuth2 forms appended to document.body by connecte()
+    // Cleanup: connecte() appends a hidden <form> to document.body for the OAuth2
+    // POST redirect. In tests, forms accumulate across test cases because the DOM
+    // persists between tests. Without this cleanup, querySelector('#identifiant')
+    // could match a field from a prior test's form. This is test-specific — in
+    // production, the form submission triggers a full page navigation.
     document
       .querySelectorAll('form[action="/oauth/authorize"]')
       .forEach((f) => f.remove());

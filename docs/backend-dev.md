@@ -374,7 +374,8 @@ Tkdo uses **OAuth2 authorization code flow** with a **Backend-For-Frontend (BFF)
 ┌──────────────────────────────────────────────────────────────────┐
 │                         FRONTEND (Angular)                        │
 │  • Redirects to /oauth/authorize (browser navigation)            │
-│  • Handles callback at /auth/callback (receives code)            │
+│  • Handles callback at /auth/callback (Angular SPA route,        │
+│    NOT a server endpoint — served by AuthCallbackComponent)      │
 │  • POSTs code to BFF /api/auth/callback (XHR)                    │
 └──────────────────────────────────────────────────────────────────┘
                                │
@@ -396,6 +397,50 @@ Tkdo uses **OAuth2 authorization code flow** with a **Backend-For-Frontend (BFF)
 │  • NO CODE CHANGES needed when switching IdPs                    │
 └──────────────────────────────────────────────────────────────────┘
 ```
+
+#### Sequence Diagram
+
+```
+  Browser/Angular          Auth Server (TEMP)           BFF (PERMANENT)
+       │                        │                            │
+  1.   │──GET /oauth/authorize──▶                            │
+       │  ?response_type=code   │                            │
+       │  &client_id=tkdo       │                            │
+       │  &redirect_uri=...     │                            │
+       │  &state=abc            │                            │
+       │                        │                            │
+  2.   │◀─302 → /connexion─────│                            │
+       │  (shows login form)    │                            │
+       │                        │                            │
+  3.   │──POST /oauth/authorize─▶                            │
+       │  {identifiant, mdp,    │                            │
+       │   client_id, state...} │                            │
+       │                        │                            │
+  4.   │◀─302 → /auth/callback──│                            │
+       │  ?code=xxx&state=abc   │                            │
+       │                        │                            │
+  5.   │  (Angular reads code)  │                            │
+       │──POST /api/auth/callback──────────────────────────▶│
+       │  {code: "xxx"}         │                            │
+       │                        │                            │
+  6.   │                        │◀──POST /oauth/token────────│
+       │                        │   {grant_type, code,       │
+       │                        │    client_id, secret}      │
+       │                        │                            │
+  7.   │                        │──{access_token: JWT}──────▶│
+       │                        │                            │
+  8.   │                        │◀──GET /oauth/userinfo──────│
+       │                        │   Authorization: Bearer JWT│
+       │                        │                            │
+  9.   │                        │──{sub, adm, groupe_ids}──▶│
+       │                        │                            │
+  10.  │◀─{utilisateur: {...}}──────────────────────────────│
+       │  + Set-Cookie: tkdo_jwt=<app-jwt>; HttpOnly        │
+       │                        │                            │
+```
+
+> Steps 6-9 are **back-channel** (server-to-server) — the browser never sees the access token.
+> When switching to an external IdP, only the Auth Server column changes; the BFF column stays identical.
 
 #### OAuth2 Flow (Step-by-Step)
 
@@ -465,6 +510,8 @@ Set-Cookie: tkdo_jwt=<jwt>; HttpOnly; Secure; SameSite=Strict; Path=/api; Max-Ag
 // Returns user info (NOT the JWT)
 { "utilisateur": { "id": 123, "nom": "John", "admin": false } }
 ```
+
+> **User info persistence:** Only the user ID is stored in `localStorage` (see `BackendService`, line ~193). On page reload, the full user object is refetched from the API using the HttpOnly cookie — the JWT itself is never accessible to JavaScript.
 
 **5. Subsequent requests use cookie automatically**
 
@@ -1750,7 +1797,7 @@ Composer scripts provide shortcuts for common tasks.
 | ------------------ | --------------------------------- | ------------------------------------------- |
 | `console`          | `./console`                       | Run console commands (helper script)        |
 | `doctrine`         | `./doctrine`                      | Run Doctrine CLI (helper script)            |
-| `phpstan`          | `./composer run phpstan`          | Run PHPStan static analysis (256M memory)   |
+| `phpstan`          | `./composer run phpstan`          | Run PHPStan static analysis (256M memory, recommended over `./phpstan` wrapper) |
 | `reset-doctrine`   | `./composer run reset-doctrine`   | Full database reset                         |
 | `install-fixtures` | `./composer run install-fixtures` | Reset DB and load fixtures                  |
 | `test`             | `./composer test`                 | Run all tests                               |
@@ -1823,9 +1870,11 @@ Composer scripts provide shortcuts for common tasks.
 #### Code Quality
 
 ```bash
-# Run PHPStan for static analysis (--memory-limit=256M included in composer script)
+# Recommended: Run PHPStan via composer script (includes --memory-limit=256M automatically)
 ./composer run phpstan
-# Or using the wrapper script directly (requires manual memory limit flag)
+
+# Alternative: Run via wrapper script directly (you must pass --memory-limit yourself)
+# Use this when you need custom PHPStan flags (e.g., --debug, --generate-baseline)
 ./phpstan analyze --memory-limit=256M
 
 # Run Rector for automated refactoring

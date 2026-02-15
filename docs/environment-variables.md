@@ -509,12 +509,14 @@ OAUTH2_REDIRECT_URI=http://localhost:4200/auth/callback      # Development
 OAUTH2_REDIRECT_URI=https://tkdo.example.com/auth/callback   # Production
 ```
 
+**Why a separate env var?** `TKDO_BASE_URI` points to the **backend** (e.g., `http://localhost:8080`), but the OAuth2 redirect target is the **frontend** (e.g., `http://localhost:4200/auth/callback`). In development these are different origins; in production behind a reverse proxy they may share a domain but the distinction is still useful for clarity.
+
 **Usage:**
 
 - Must match the URL registered with your OAuth2 provider
 - Used for redirect_uri validation (open redirect protection)
 - Must include protocol (`http://` or `https://`)
-- Path must be `/auth/callback` (handled by Angular AuthCallbackComponent)
+- Path must be `/auth/callback` (handled by Angular `AuthCallbackComponent` — this is a frontend SPA route, not a server endpoint)
 
 **Impact:**
 
