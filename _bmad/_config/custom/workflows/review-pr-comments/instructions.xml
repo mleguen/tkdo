@@ -42,6 +42,9 @@
     <action>Read COMPLETE story file</action>
     <action>Set {{story_key}} = extracted key from filename (e.g., "1-2-user-authentication.md" → "1-2-user-authentication")</action>
 
+    <action>Extract current story status from the file (line starting with "Status:")</action>
+    <action>Store as {{original_story_status}} (e.g., "done", "in-progress", "ready-for-dev")</action>
+
     <action>Locate "Review Follow-ups (AI)" subsection under Tasks/Subtasks</action>
 
     <check if="Review Follow-ups section exists">
@@ -56,27 +59,88 @@
     </check>
 
     <check if="Review Follow-ups section does NOT exist">
-      <output>⚠️ No "Review Follow-ups (AI)" section found in story.</output>
-      <ask>Did the adversarial code-review complete with option 2 (Create action items)?
+      <output>ℹ️ No "Review Follow-ups (AI)" section found in story.
 
-Options:
-- [c] Continue anyway (I'll create the section)
-- [x] Exit (run code-review first)
-      </ask>
+This is normal when adversarial code-review found no issues and marked the story as "{{original_story_status}}".
+Will automatically create the section if CI failures or valid PR comments are found.</output>
 
-      <check if="response == x">
-        <output>Please run the adversarial code-review workflow first and choose option 2 (Create action items).</output>
-        <action>Exit workflow</action>
-      </check>
-
-      <check if="response == c">
-        <action>Set {{existing_findings}} = empty list</action>
-        <output>Continuing with empty findings list. Will create Review Follow-ups section.</output>
-      </check>
+      <action>Set {{existing_findings}} = empty list</action>
+      <action>Set {{section_needs_creation}} = true</action>
     </check>
   </step>
 
-  <step n="2" goal="Detect and retrieve GitHub PR comments">
+  <step n="2" goal="Check CI status and create action items for failures">
+    <critical>CI failures are often more critical than PR comments and should be addressed first</critical>
+
+    <action>Check if current directory is a Git repository with GitHub remote</action>
+
+    <check if="not a git repository OR no GitHub remote">
+      <output>⚠️ Not a GitHub repository. Skipping CI check.</output>
+      <action>Continue to step 3 (PR comments)</action>
+    </check>
+
+    <action>Check for open Pull Request using: `gh pr list --head $(git branch --show-current) --json number,url,title`</action>
+
+    <check if="no open PR">
+      <output>ℹ️ No open GitHub PR found for current branch. Skipping CI check.</output>
+      <action>Continue to step 3 (PR comments)</action>
+    </check>
+
+    <action>Set {{pr_number}} from detected PR</action>
+    <action>Get CI check status using: `gh pr checks {{pr_number}}`</action>
+
+    <action>Parse CI check results and identify failures:
+      - Extract check names with status "fail"
+      - Group related failures (e.g., E2E chrome + firefox = same root cause)
+      - For each failing check, capture: name, status, detailsUrl (GitHub Actions run URL)
+      - Store the detailsUrl for each failure - this is CRITICAL for developers to investigate
+    </action>
+
+    <check if="no CI failures">
+      <output>✅ All CI checks passing. Proceeding to PR comment review.</output>
+      <action>Continue to step 3 (PR comments)</action>
+    </check>
+
+    <output>**🚨 CI Failures Detected**
+
+Found {{failure_count}} failing CI checks:
+{{list_of_failures}}
+
+Investigating failures and creating action items...</output>
+
+    <action>For EACH failing CI check or group of related failures:
+      1. Read the check logs to identify error patterns (use `gh run view` with log filters)
+      2. Formulate a root cause hypothesis based on:
+         - Error messages
+         - Affected tests/components
+         - Recent code changes in the story
+         - Common patterns (e.g., auth flow changes breaking tests)
+      3. Create a CRITICAL action item in story with:
+         - [AI-Review][CRITICAL] prefix
+         - Concise description of failure
+         - Root cause hypothesis
+         - File/location reference
+         - **[CI Run]({{details_url}})** link at the end - MANDATORY for investigation
+    </action>
+
+    <example>
+      Action item format:
+      `- [ ] [AI-Review][CRITICAL] Frontend Component Tests failing - ConnexionComponent tests throw TypeError... [front/src/app/connexion/connexion.component.cy.ts] [CI Run](https://github.com/owner/repo/actions/runs/12345/job/67890)`
+    </example>
+
+    <action>Add all CI failure action items to the story's "Review Follow-ups (AI)" section at the TOP (before other findings)</action>
+
+    <action>Update {{existing_findings}} list to include new CI failure items</action>
+
+    <output>**✅ CI Failures Documented**
+
+Added {{ci_failure_count}} CRITICAL action items to story for CI failures.
+These should be addressed before PR comment items.
+
+Story status updated to: in-progress</output>
+  </step>
+
+  <step n="3" goal="Detect and retrieve GitHub PR comments">
     <action>Check if current directory is a Git repository with GitHub remote</action>
 
     <check if="not a git repository OR no GitHub remote">
@@ -112,25 +176,43 @@ URL: {{pr_url}}
 
 Retrieving unresolved review comments...</output>
 
-    <action>Retrieve all review comments using: `gh api repos/OWNER/REPO/pulls/{{pr_number}}/comments --jq '.[] | {id: .id, path: .path, line: .line, body: .body, user: .user.login, html_url: .html_url, in_reply_to_id: .in_reply_to_id}'`</action>
+    <action>Use GitHub GraphQL API to retrieve unresolved review threads directly (much more efficient than REST API):
+      ```bash
+      gh api graphql -f query='
+      query {
+        repository(owner: "OWNER", name: "REPO") {
+          pullRequest(number: {{pr_number}}) {
+            reviewThreads(first: 100) {
+              nodes {
+                isResolved
+                comments(first: 10) {
+                  nodes {
+                    id
+                    databaseId
+                    path
+                    line
+                    body
+                    author {
+                      login
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      ' --jq '.data.repository.pullRequest.reviewThreads.nodes[] | select(.isResolved == false) | .comments.nodes[0] | {id: .databaseId, path: .path, line: .line, body: .body, user: .author.login}'
+      ```
+      This directly filters to unresolved threads, eliminating the need for complex REST API filtering.
+    </action>
 
-    <action>Filter to only root-level comments (where in_reply_to_id is null) - these are the original review comments, not replies</action>
-
-    <action>For each root-level comment, check if it already has resolution replies:
-      1. Fetch all comments for this PR again
-      2. For each root comment, find any replies (where in_reply_to_id == root comment id)
-      3. Check if ANY reply contains resolution markers:
-         - "✓ Classification: RESOLVED"
-         - "✅ **VALID**" or "⚪ **OUT OF SCOPE**" or "⚪ **INVALID**"
-         - Pattern indicating prior review workflow response
-      4. Mark comment as already_resolved=true if resolution reply found
-      5. Filter out all comments where already_resolved=true
+    <action>For each unresolved thread, fetch the full comment body using REST API:
+      `gh api repos/OWNER/REPO/pulls/{{pr_number}}/comments --jq ".[] | select(.id == $comment_id) | {path: .path, line: .line, body: .body, html_url: .html_url}"`
     </action>
 
     <output>**📊 Comment Status:**
-- {{total_root_comments}} total root-level review comments
-- {{already_resolved_count}} already resolved (have review responses)
-- {{unresolved_count}} unresolved (need processing)
+- {{unresolved_count}} unresolved review threads found via GraphQL
 
 Proceeding with {{unresolved_count}} unresolved comments...</output>
 
@@ -150,7 +232,7 @@ From reviewers: {{reviewer_list}}
 Processing each comment...</output>
   </step>
 
-  <step n="3" goal="Investigate and validate PR comments with evidence">
+  <step n="4" goal="Investigate and validate PR comments with evidence">
     <critical>INVESTIGATION BEFORE CLASSIFICATION - No premature judgments allowed</critical>
 
     <action>For EACH unresolved PR comment, follow this investigation-first process:
@@ -268,7 +350,7 @@ Breakdown by severity:
     </output>
   </step>
 
-  <step n="4" goal="Merge PR comments into story action items">
+  <step n="5" goal="Merge PR comments into story action items">
     <critical>Update the story file's Review Follow-ups section with merged findings</critical>
 
     <action>Build updated action items list:
@@ -318,7 +400,7 @@ Updated "Review Follow-ups (AI)" section with:
 File: {{story_file}}</output>
   </step>
 
-  <step n="5" goal="Respond to all unresolved GitHub PR comments">
+  <step n="6" goal="Respond to all unresolved GitHub PR comments">
     <critical>Follow .claude/README.md guidelines for PR comment responses</critical>
 
     <action>Read {claude_readme} Pull Request Review Responses section</action>
@@ -415,34 +497,90 @@ Posted {{response_count}} threaded replies in PR #{{pr_number}}.
 All responses are visible in the Files Changed review tab under their respective code lines.</output>
   </step>
 
-  <step n="6" goal="Update story status and summary">
+  <step n="7" goal="Update story status and summary">
     <action>Add completion note to story's Dev Agent Record → Completion Notes List:
 
-**{{date}} - PR Comments Reviewed (Evidence-Based Investigation):**
-- Reviewed {{comment_count}} unresolved GitHub PR comments ({{already_resolved_count}} already resolved, filtered out)
+**{{date}} - CI Checks and PR Comments Reviewed (Evidence-Based Investigation):**
+- CI Status: {{ci_failure_count}} failing checks → {{ci_failure_count}} CRITICAL action items created
+- PR Comments: Reviewed {{comment_count}} unresolved GitHub PR comments ({{already_resolved_count}} already resolved, filtered out)
 - Investigation: Read {{files_read_count}} files with {{avg_context_lines_read}} avg lines per comment
 - Validated: {{valid_count}} valid, {{duplicate_count}} duplicate, {{invalid_count}} invalid
-- Updated Review Follow-ups section with {{total_findings}} action items
-- Responded to all comments in PR #{{pr_number}} with investigation evidence
+- Updated Review Follow-ups section with {{total_findings}} action items ({{ci_failure_count}} CRITICAL from CI, {{new_from_pr}} from PR)
+- Story status: {{if status_changed}}{{original_story_status}} → in-progress (action items found){{else}}{{original_story_status}} (unchanged){{endif}}
+- {{if epic_updated}}Epic file updated to reflect story status change{{endif}}
+- Responded to all PR comments in PR #{{pr_number}} with investigation evidence
     </action>
 
-    <action>Ensure story Status remains "in-progress" (since action items exist)</action>
+    <action>Update story status based on action items:
+      1. Calculate {{new_action_items_added}} = {{ci_failure_count}} + {{new_from_pr}}
+      2. If {{new_action_items_added}} > 0 AND {{original_story_status}} == "done":
+         - Change story status from "done" to "in-progress"
+         - Note: Adversarial review marked it done, but CI/PR found issues
+      3. If {{new_action_items_added}} > 0 AND story status is anything else:
+         - Ensure status is "in-progress" (not "done" or "ready-for-dev")
+      4. If {{new_action_items_added}} == 0:
+         - Keep original status unchanged
+    </action>
+
+    <action>If {{section_needs_creation}} == true:
+      - Create "### Review Follow-ups (AI)" subsection under "## Tasks / Subtasks"
+      - Add all new action items to this section
+      - Note in completion log that section was created
+    </action>
+
     <action>Save story file</action>
+
+    <check if="story status changed from 'done' to 'in-progress'">
+      <critical>Must update epic file to reflect story status change</critical>
+
+      <action>Find epic file:
+        1. Extract epic number from story key (e.g., "1-2-authentication" → epic "1")
+        2. Look for epic file matching pattern: {{implementation_artifacts}}/epic-{{epic_number}}.md or {{implementation_artifacts}}/{{epic_number}}-*.md
+        3. Read COMPLETE epic file
+      </action>
+
+      <action>Update story status in epic:
+        1. Find the story entry in epic's story list (typically in a table or list format)
+        2. Change status from "done" to "in-progress" for {{story_key}}
+        3. Save epic file
+      </action>
+
+      <output>**📝 Epic Updated**
+
+Story status changed in epic file:
+- Story: {{story_key}}
+- Status: done → in-progress
+- Reason: {{ci_failure_count}} CI failures + {{new_from_pr}} PR comments found
+- Epic file: {{epic_file}}</output>
+    </check>
 
     <output>**✅ Workflow Complete!**
 
 **Summary:**
 - Story: {{story_file}}
 - PR: #{{pr_number}} ({{pr_url}})
-- Comments Reviewed: {{comment_count}}
-- Action Items: {{total_findings}} total ({{new_from_pr}} new from PR)
+- CI Checks: {{ci_failure_count}} failing → {{ci_failure_count}} CRITICAL action items
+- PR Comments Reviewed: {{comment_count}}
+- Action Items: {{total_findings}} total ({{ci_failure_count}} CRITICAL from CI + {{new_from_pr}} from PR comments)
 - All PR comments responded in threaded conversations
 
+{{if status_changed}}**⚠️ Story Status Changed:**
+- Original status: {{original_story_status}}
+- New status: in-progress
+- Reason: Adversarial review found no issues, but CI/PR comments revealed {{new_action_items_added}} problems
+- Epic updated: {{if epic_updated}}Yes{{else}}No epic file found{{endif}}
+{{endif}}
+
+{{if section_needs_creation}}**📝 Review Follow-ups Section Created:**
+The "Review Follow-ups (AI)" section was automatically created since adversarial review didn't find issues initially.
+{{endif}}
+
 **Next Steps:**
-1. Review the "Review Follow-ups (AI)" section in {{story_file}}
-2. Address the action items (fix code, add tests, update docs)
-3. Run code-review again to verify fixes
-4. Mark action items as [x] when complete
+1. **PRIORITY: Fix CI failures first** (CRITICAL action items at top of Review Follow-ups section)
+2. Review remaining action items from PR comments
+3. Address all action items (fix code, add tests, update docs)
+4. Run code-review again to verify fixes
+5. Mark action items as [x] when complete
 
 The story status is "in-progress" until all action items are resolved.</output>
   </step>

@@ -1,6 +1,6 @@
 # Story 1.1c: OAuth2 Standards Alignment
 
-Status: done
+Status: in-progress
 
 ## Story
 
@@ -120,6 +120,9 @@ This story refactors to OAuth2-compliant architecture, clearly separating:
 
 ### Review Follow-ups (AI)
 
+- [ ] [AI-Review][CRITICAL] Frontend Component Tests failing - ConnexionComponent tests throw TypeError from Angular EventEmitter - all 8 tests in shard 1/2 failing (successful login, failed login, navigation, form validation). Root cause hypothesis: Tests mock BackendService.connecte() but component now uses form.submit() for OAuth2 flow instead of calling backend.connecte(), causing test stub/spy to fail when tests expect connecte() calls [front/src/app/connexion/connexion.component.cy.ts] [CI Run](https://github.com/mleguen/tkdo/actions/runs/22022436064/job/63633693300)
+- [ ] [AI-Review][CRITICAL] E2E Tests timing out on authentication - can't find post-login elements (#nomUtilisateur, a#menuMonProfil, #btnSeDeconnecter). Root cause hypothesis: OAuth2 login flow not working in E2E environment - likely missing OAuth2 endpoint mocks or incorrect callback URL configuration in test environment [front/cypress/e2e/connexion.cy.ts] [CI Run](https://github.com/mleguen/tkdo/actions/runs/22022436063)
+- [ ] [AI-Review][CRITICAL] Backend Integration Tests hung/timed out - ran for 6 hours before failing. Root cause hypothesis: Abnormal timeout suggests deadlock or infinite loop, possibly in OAuth2 token endpoint when handling concurrent requests or in database connection pool [api/test/Int/] [CI Run](https://github.com/mleguen/tkdo/actions/runs/22022436064/job/63633671966)
 - [x] [AI-Review][HIGH] BffAuthService.extraitInfoUtilisateur() manually decodes JWT with hardcoded claim names (sub, adm, groupe_ids) instead of using GenericProvider.getResourceOwner() — temp-auth-server-specific logic in PERMANENT BFF code, violates AC #3 verification criterion [api/src/Appli/Service/BffAuthService.php:49-77]
 - [x] [AI-Review][MEDIUM] AuthCallbackComponent missing RouterLink import — routerLink="/connexion" in error template is non-functional because imports: [] is empty [front/src/app/auth-callback/auth-callback.component.ts:8,12] [PR#100 comment](https://github.com/mleguen/tkdo/pull/100#discussion_r2807310040)
 - [x] [AI-Review][MEDIUM] OAuthTokenController.findValidAuthCode() uses EntityManager/QueryBuilder directly in controller — query logic should be in AuthCodeRepository per hexagonal architecture [api/src/Appli/Controller/OAuthTokenController.php:102-121]
@@ -128,6 +131,9 @@ This story refactors to OAuth2-compliant architecture, clearly separating:
 - [x] [AI-Review][MEDIUM] OAuthAuthorizeController returns 400 on invalid credentials during form POST — user exits SPA and sees raw error page instead of staying on login form with error message [api/src/Appli/Controller/OAuthAuthorizeController.php:96] [PR#100 comment](https://github.com/mleguen/tkdo/pull/100#discussion_r2807310052)
 - [x] [AI-Review][MEDIUM] OAuthAuthorizeController does not validate redirect_uri against allowlist — open redirect risk; OAuthTokenController does not validate client_secret — combined allows auth code theft [api/src/Appli/Controller/OAuthAuthorizeController.php:105-116] [PR#100 comment](https://github.com/mleguen/tkdo/pull/100#discussion_r2807310061)
 - [x] [AI-Review][LOW] ConnexionComponent retour query param handling — was removed but needed for post-login redirect; re-added with sessionStorage-based oauth_retour pattern [front/src/app/connexion/connexion.component.ts:28-30]
+- [ ] [AI-Review][MEDIUM] OAuthUserInfoController bypasses RouteService.getAuth() error handling and doesn't catch UtilisateurInconnuException — invalid tokens return generic error message; deleted users cause uncaught 500 instead of 401 [api/src/Appli/Controller/OAuthUserInfoController.php:38-43] [PR#100 comment](https://github.com/mleguen/tkdo/pull/100#discussion_r2807799366)
+- [ ] [AI-Review][LOW] Test name "should generate and store OAuth2 state on connecte()" is misleading — test only calls genereState(), doesn't test connecte() method or sessionStorage writes [front/src/app/backend.service.spec.ts:71-75] [PR#100 comment](https://github.com/mleguen/tkdo/pull/100#discussion_r2807799372)
+- [ ] [AI-Review][LOW] OAuth2 endpoints don't validate client_id matches configured value — OAuthAuthorizeController and OAuthTokenController accept any client_id instead of enforcing OAuth2Settings::clientId [api/src/Appli/Controller/OAuthAuthorizeController.php:121-123 + api/src/Appli/Controller/OAuthTokenController.php:44-54] [PR#100 comments: [authorize](https://github.com/mleguen/tkdo/pull/100#discussion_r2807799381), [token](https://github.com/mleguen/tkdo/pull/100#discussion_r2807799377)]
 
 ## Dev Notes
 
@@ -349,6 +355,7 @@ Claude Opus 4.6
 - Removed concurrent BFF callback test — deadlock when BFF and token endpoint share the same FPM pool; race condition already tested at `/oauth/token` level
 - 2026-02-14 — PR Comments Reviewed (Evidence-Based Investigation): Reviewed 7 unresolved GitHub PR comments on PR #100 (0 already resolved). Classification: 3 valid (new action items created), 1 duplicate of existing finding, 1 consolidated with existing finding, 2 invalid (dismissed with evidence). Updated Review Follow-ups section to 8 total action items (1 HIGH, 6 MEDIUM, 1 LOW). Responded to all 7 comments in PR #100 with investigation evidence.
 - 2026-02-14 — Review Follow-ups Implemented: All 8 review items fixed. Key changes: BffAuthService uses GenericProvider.getResourceOwner() via new /oauth/userinfo endpoint (Item 1 HIGH), redirect_uri path-based validation + client_secret validation (Item 7), auth code lookup moved to repository (Item 3). E2E failures discovered — front Docker container needed rebuild to pick up /oauth/ ProxyPass rules. All tests green: PHPStan OK, 145 unit, 264 backend, 60 frontend, 12 E2E.
+- 2026-02-15 — New PR Comments Reviewed (Evidence-Based Investigation): Reviewed 6 new unresolved GitHub PR comments on PR #100 (7 already resolved, filtered out). Investigation: Read 10 files with ~30 avg lines per comment. Classification: 2 valid standalone (1 MEDIUM, 1 LOW), 1 consolidated group with 2 comments (LOW), 2 invalid/out-of-scope (dismissed with evidence). Updated Review Follow-ups section to 11 total action items (8 completed, 3 new). Responded to all 6 comments in PR #100 with investigation evidence. Story status changed to in-progress.
 
 ### Change Log
 
