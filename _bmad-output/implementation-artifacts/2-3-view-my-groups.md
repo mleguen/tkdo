@@ -64,6 +64,14 @@ So that I understand my context and can navigate between groups.
   - [x] 6.5 Group items link to `/groupe/{id}` (placeholder route for Story 2.4)
   - [x] 6.6 Write unit tests for header component groups dropdown rendering
 
+### Review Follow-ups (AI)
+
+- [x] [AI-Review][MEDIUM] Add alphabetical sorting of groups within active/archived sections [api/src/Appli/RepositoryAdaptor/GroupeRepositoryAdaptor.php:83-92] — Add `->orderBy('g.nom', 'ASC')` to DQL query in `readToutesAppartenancesForUtilisateur()`
+- [x] [AI-Review][MEDIUM] Add integration test for user with only active groups (no archived) [api/test/Int/ListGroupeControllerTest.php] — Add `testListGroupeWithOnlyActiveGroups()` test method
+- [x] [AI-Review][MEDIUM] Add response structure validation in frontend groupes$ observable [front/src/app/backend.service.ts:135-148] — Validate API response shape or add safe navigation in template to handle malformed responses
+- [x] [AI-Review][MEDIUM] Document performance limitation for large group lists [api/src/Dom/Port/GroupePort.php:22-39] — Note: Similar to JWT cookie limitation, no pagination currently implemented. Consider for future story if users have 50+ groups.
+- [x] [AI-Review][LOW] Add frontend test for edge case: user with only archived groups [front/src/app/header/header.component.spec.ts] — Verify divider logic when no active groups exist
+
 ## Dev Notes
 
 ### Brownfield Context
@@ -692,6 +700,11 @@ None — clean implementation with no blocking issues.
 - Task 4: Created `ListGroupeController` extending AuthController, registered `GET /groupe` route in Bootstrap.php. Follows singular route convention (`/groupe` not `/groupes`). 4 integration tests including BFF OAuth auth flow for `estAdmin` verification.
 - Task 5: Added `Groupe` and `GroupeResponse` interfaces to `backend.service.ts`. Created `groupes$` observable chained from `utilisateurConnecte$` with `shareReplay(1)` caching and `catchError` graceful degradation. 4 unit tests.
 - Task 6: Added "Mes groupes" dropdown to header with active groups, archived section with "(archivé)" labels, "Aucun groupe" empty state, and "Ma liste" link always accessible. 5 component tests.
+- ✅ Resolved review finding [MEDIUM]: Added alphabetical sorting (`orderBy g.nom ASC`) to `readToutesAppartenancesForUtilisateur()` DQL query.
+- ✅ Resolved review finding [MEDIUM]: Added `testListGroupeWithOnlyActiveGroups()` integration test verifying correct response when user has no archived groups.
+- ✅ Resolved review finding [MEDIUM]: Added `map` operator to `groupes$` observable validating response structure with `Array.isArray()` fallback for malformed responses.
+- ✅ Resolved review finding [MEDIUM]: Documented performance limitation (no pagination) in GroupePort JSDoc. Acceptable for current usage (<10 groups per user).
+- ✅ Resolved review finding [LOW]: Added frontend test for only-archived-groups edge case, verifying no active/archived divider when active list is empty.
 
 ### Implementation Plan
 
@@ -724,3 +737,5 @@ None — clean implementation with no blocking issues.
 ## Change Log
 
 - 2026-02-15: Implemented Story 2.3 — View My Groups. Added `GET /api/groupe` endpoint returning user's active and archived groups with admin flag. Added "Mes groupes" dropdown to header navigation with archived section and "Ma liste" link. 333 backend tests pass (14 new), 68 frontend tests pass (9 new). PHPStan level 8 clean.
+- 2026-02-15: Code review complete. 6 issues found (0 HIGH, 4 MEDIUM, 2 LOW). Fixed issue #6 (added code comment for "Ma liste" placement). Created 5 action items for remaining issues. Story status remains in-progress until action items addressed.
+- 2026-02-15: Addressed code review findings — 5 items resolved. Added alphabetical sorting to DQL query, integration test for only-active-groups, response structure validation in frontend, performance limitation docs, and frontend edge case test. 334 backend tests pass (1 new), 69 frontend tests pass (1 new). PHPStan level 8 clean.

@@ -86,6 +86,7 @@ class GroupeRepositoryAdaptor implements GroupeRepository
             ->from(AppartenanceAdaptor::class, 'a')
             ->join('a.groupe', 'g')
             ->where('a.utilisateur = :utilisateurId')
+            ->orderBy('g.nom', 'ASC')
             ->setParameter('utilisateurId', $utilisateurId);
 
         /** @var Appartenance[] */

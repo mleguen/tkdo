@@ -110,6 +110,31 @@ describe('HeaderComponent', () => {
     expect(texts).toContain('Ma liste');
   });
 
+  it('should render only archived groups without divider when no active groups', () => {
+    configure({
+      actifs: [],
+      archives: [
+        { id: 1, nom: 'Noël 2024', archive: true, estAdmin: false },
+        { id: 2, nom: 'Été 2023', archive: true, estAdmin: false },
+      ],
+    });
+
+    const header = fixture.nativeElement.querySelector('.dropdown-header');
+    expect(header?.textContent?.trim()).toBe('Archivés');
+
+    const archivedItems = fixture.nativeElement.querySelectorAll(
+      '#menuMesGroupes + div .text-muted[ngbdropdownitem]',
+    );
+    expect(archivedItems.length).toBe(2);
+
+    // No divider between active and archived when no active groups
+    const dividers = fixture.nativeElement.querySelectorAll(
+      '#menuMesGroupes + div .dropdown-divider',
+    );
+    // Only the "Ma liste" divider should exist, not active/archived separator
+    expect(dividers.length).toBe(1);
+  });
+
   it('should show divider between active and archived groups', () => {
     configure({
       actifs: [{ id: 1, nom: 'Famille', archive: false, estAdmin: false }],

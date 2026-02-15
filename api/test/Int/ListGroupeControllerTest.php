@@ -156,6 +156,38 @@ class ListGroupeControllerTest extends IntTestCase
         $this->assertFalse($adminFlags['Member Group']);
     }
 
+    public function testListGroupeWithOnlyActiveGroups(): void
+    {
+        $utilisateur = $this->utilisateur()->withIdentifiant('testuser')->persist(self::$em);
+
+        GroupeBuilder::unGroupe()
+            ->withNom('Famille')
+            ->withAppartenance($utilisateur, false)
+            ->persist(self::$em);
+        GroupeBuilder::unGroupe()
+            ->withNom('Amis')
+            ->withAppartenance($utilisateur, true)
+            ->persist(self::$em);
+
+        ['client' => $client] = $this->authenticateUser($utilisateur);
+
+        $response = $client->request(
+            'GET',
+            getenv('TKDO_BASE_URI') . self::GROUPE_PATH,
+            ['http_errors' => false]
+        );
+
+        $this->assertEquals(200, $response->getStatusCode());
+        $body = json_decode((string) $response->getBody(), true);
+
+        $this->assertCount(2, $body['actifs']);
+        $this->assertCount(0, $body['archives']);
+
+        $nomsActifs = array_column($body['actifs'], 'nom');
+        $this->assertContains('Amis', $nomsActifs);
+        $this->assertContains('Famille', $nomsActifs);
+    }
+
     public function testListGroupeRequiresAuthentication(): void
     {
         $this->requestApi(

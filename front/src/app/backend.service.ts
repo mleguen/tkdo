@@ -136,13 +136,15 @@ export class BackendService {
       switchMap((utilisateur) =>
         utilisateur === null
           ? of(null)
-          : this.http
-              .get<GroupeResponse>(URL_GROUPE)
-              .pipe(
-                catchError(() =>
-                  of({ actifs: [], archives: [] } as GroupeResponse),
-                ),
+          : this.http.get<GroupeResponse>(URL_GROUPE).pipe(
+              map((res) => ({
+                actifs: Array.isArray(res?.actifs) ? res.actifs : [],
+                archives: Array.isArray(res?.archives) ? res.archives : [],
+              })),
+              catchError(() =>
+                of({ actifs: [], archives: [] } as GroupeResponse),
               ),
+            ),
       ),
       shareReplay(1),
     );
