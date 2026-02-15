@@ -1,6 +1,6 @@
 # Story 1.1c: OAuth2 Standards Alignment
 
-Status: review
+Status: done
 
 ## Story
 
