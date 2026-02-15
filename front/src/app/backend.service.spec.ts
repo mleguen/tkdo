@@ -68,7 +68,7 @@ describe('BackendService', () => {
   });
 
   describe('Authentication', () => {
-    it('should generate and store OAuth2 state on connecte()', () => {
+    it('should generate a 64-char hex state via genereState()', () => {
       const state = service.genereState();
       expect(state.length).toBe(64); // 32 bytes = 64 hex chars
       expect(state).toMatch(/^[a-f0-9]{64}$/);

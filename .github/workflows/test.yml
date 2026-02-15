@@ -349,12 +349,15 @@ jobs:
           TKDO_BASE_URI: http://localhost:8000
           TKDO_DEV_MODE: "1"
           TKDO_MAILER_FROM: noreply@ci
+          # Multiple workers needed: BFF callback makes back-channel HTTP call
+          # to /oauth/token on the same server (requires concurrent request handling)
+          PHP_CLI_SERVER_WORKERS: "4"
         run: |
           cd api/public
           php -S localhost:8000 index.php &
           echo $! > /tmp/php-server.pid
           sleep 2
-          echo "PHP server started on port 8000"
+          echo "PHP server started on port 8000 (4 workers)"
 
       - name: Run integration tests
         env:

@@ -1,32 +1,50 @@
 import { provideRouter, Router } from '@angular/router';
 import { TestBed } from '@angular/core/testing';
-import { HttpErrorResponse } from '@angular/common/http';
 
 import { ConnexionComponent } from './connexion.component';
-import { BackendService } from '../backend.service';
-import { SinonStub } from 'node_modules/cypress/types/sinon';
+import { BackendService, CLE_OAUTH_STATE } from '../backend.service';
 
 describe('ConnexionComponent', () => {
-  let router: Router;
-  let connecteStub: SinonStub;
+  let formSubmitStub: Cypress.Agent<sinon.SinonStub>;
+  let genereStateStub: Cypress.Agent<sinon.SinonStub>;
 
   beforeEach(() => {
-    connecteStub = cy.stub().as('connecte');
+    formSubmitStub = cy.stub().as('formSubmit');
+    genereStateStub = cy.stub().returns('test-state-abc123').as('genereState');
+
+    // Stub HTMLFormElement.prototype.submit to prevent actual navigation
+    cy.stub(HTMLFormElement.prototype, 'submit').callsFake(function (
+      this: HTMLFormElement,
+    ) {
+      // Only intercept our dynamic OAuth2 form (has action="/oauth/authorize")
+      if (this.action.endsWith('/oauth/authorize')) {
+        formSubmitStub();
+      }
+    });
+
     const mockBackendService = {
-      connecte: connecteStub,
+      genereState: genereStateStub,
+      connecte: cy.stub(),
+      // Provide observables that component parent might need
+      erreur$: { subscribe: cy.stub() },
+      utilisateurConnecte$: {
+        pipe: cy.stub().returns({ subscribe: cy.stub() }),
+      },
     };
 
     cy.mount(ConnexionComponent, {
       providers: [
         provideRouter([
           { path: '', component: ConnexionComponent },
-          { path: 'profil', component: ConnexionComponent }, // Dummy route for navigation
+          { path: 'profil', component: ConnexionComponent },
         ]),
         { provide: BackendService, useValue: mockBackendService },
       ],
-    }).then(() => {
-      router = TestBed.inject(Router);
     });
+  });
+
+  afterEach(() => {
+    sessionStorage.clear();
   });
 
   describe('Form Rendering', () => {
@@ -89,93 +107,93 @@ describe('ConnexionComponent', () => {
     });
   });
 
-  describe('Successful Login Flow', () => {
-    it('should call backend service and navigate on successful login', () => {
-      connecteStub.resolves();
+  describe('OAuth2 Form Submission', () => {
+    it('should create and submit a hidden form to /oauth/authorize on login', () => {
+      cy.get('#identifiant').type('alice');
+      cy.get('#mdp').type('mdpalice');
+      cy.get('#btnSeConnecter').click();
+
+      cy.get('@formSubmit').should('have.been.calledOnce');
+      cy.get('@genereState').should('have.been.calledOnce');
+    });
+
+    it('should include correct OAuth2 fields in the form', () => {
+      cy.get('#identifiant').type('alice');
+      cy.get('#mdp').type('mdpalice');
+      cy.get('#btnSeConnecter').click();
+
+      // Verify the hidden form was appended with correct fields
+      cy.document().then((doc) => {
+        const form = doc.querySelector(
+          'form[action="/oauth/authorize"]',
+        ) as HTMLFormElement;
+        expect(form).to.not.equal(null);
+        expect(form.method).to.equal('post');
+
+        const getValue = (name: string): string => {
+          const input = form.querySelector(
+            `input[name="${name}"]`,
+          ) as HTMLInputElement | null;
+          return input?.value ?? '';
+        };
+        expect(getValue('identifiant')).to.equal('alice');
+        expect(getValue('mdp')).to.equal('mdpalice');
+        expect(getValue('client_id')).to.equal('tkdo');
+        expect(getValue('response_type')).to.equal('code');
+        expect(getValue('state')).to.equal('test-state-abc123');
+        expect(getValue('redirect_uri')).to.include('/auth/callback');
+      });
+    });
+
+    it('should store state in sessionStorage', () => {
+      cy.get('#identifiant').type('alice');
+      cy.get('#mdp').type('mdpalice');
+      cy.get('#btnSeConnecter').click();
 
       cy.window().then(() => {
-        cy.spy(router, 'navigateByUrl').as('navigateByUrl');
+        expect(sessionStorage.getItem(CLE_OAUTH_STATE)).to.equal(
+          'test-state-abc123',
+        );
       });
+    });
+
+    it('should reuse existing state from sessionStorage', () => {
+      sessionStorage.setItem(CLE_OAUTH_STATE, 'existing-state-xyz');
 
       cy.get('#identifiant').type('alice');
       cy.get('#mdp').type('mdpalice');
       cy.get('#btnSeConnecter').click();
 
-      cy.get('@connecte').should('have.been.calledWith', 'alice', 'mdpalice');
-      cy.get('@navigateByUrl').should('have.been.calledWith', '');
+      // Should NOT call genereState since state already exists
+      cy.get('@genereState').should('not.have.been.called');
+
+      cy.document().then((doc) => {
+        const form = doc.querySelector(
+          'form[action="/oauth/authorize"]',
+        ) as HTMLFormElement;
+        const stateInput = form?.querySelector(
+          'input[name="state"]',
+        ) as HTMLInputElement;
+        expect(stateInput?.value).to.equal('existing-state-xyz');
+      });
     });
 
-    it('should not display error message on successful login', () => {
-      connecteStub.resolves();
-
-      cy.get('#identifiant').type('alice');
-      cy.get('#mdp').type('mdpalice');
-      cy.get('#btnSeConnecter').click();
-
-      cy.get('.alert-danger').should('not.exist');
+    it('should not submit form when fields are empty', () => {
+      cy.get('#btnSeConnecter').should('be.disabled');
+      cy.get('@formSubmit').should('not.have.been.called');
     });
   });
 
-  describe('Failed Login', () => {
-    it('should display error message on failed login with description', () => {
-      const error = new HttpErrorResponse({
-        error: { description: 'Identifiant ou mot de passe incorrect' },
-        status: 401,
-        statusText: 'Unauthorized',
-      });
-      connecteStub.rejects(error);
-
-      cy.get('#identifiant').type('wronguser');
-      cy.get('#mdp').type('wrongpassword');
-      cy.get('#btnSeConnecter').click();
-
-      cy.get('.alert-danger')
-        .should('exist')
-        .should('contain.text', 'Identifiant ou mot de passe incorrect');
-    });
-
-    it('should display generic error message when no description provided', () => {
-      const error = new HttpErrorResponse({
-        error: {},
-        status: 500,
-        statusText: 'Internal Server Error',
-      });
-      connecteStub.rejects(error);
-
-      cy.get('#identifiant').type('wronguser');
-      cy.get('#mdp').type('wrongpassword');
-      cy.get('#btnSeConnecter').click();
-
-      cy.get('.alert-danger')
-        .should('exist')
-        .should('contain.text', 'connexion impossible');
-    });
-
-    it('should not navigate on failed login', () => {
-      const error = new HttpErrorResponse({
-        error: { description: 'Invalid credentials' },
-        status: 401,
-        statusText: 'Unauthorized',
-      });
-      connecteStub.rejects(error);
-
-      cy.window().then(() => {
-        cy.spy(router, 'navigateByUrl').as('navigateByUrl');
-      });
-
-      cy.get('#identifiant').type('wronguser');
-      cy.get('#mdp').type('wrongpassword');
-      cy.get('#btnSeConnecter').click();
-
-      cy.get('@navigateByUrl').should('not.have.been.called');
-    });
-  });
-
-  describe('Navigation with Return URL', () => {
-    it('should navigate to return URL after successful login', () => {
-      const returnUrlStub = cy.stub().as('connecteReturn').resolves();
+  describe('Return URL Handling', () => {
+    it('should store retour query param in sessionStorage', () => {
+      // Remount with retour query param
       const mockBackendService = {
-        connecte: returnUrlStub,
+        genereState: cy.stub().returns('state-123'),
+        connecte: cy.stub(),
+        erreur$: { subscribe: cy.stub() },
+        utilisateurConnecte$: {
+          pipe: cy.stub().returns({ subscribe: cy.stub() }),
+        },
       };
 
       cy.mount(ConnexionComponent, {
@@ -187,51 +205,17 @@ describe('ConnexionComponent', () => {
           { provide: BackendService, useValue: mockBackendService },
         ],
       }).then(() => {
-        router = TestBed.inject(Router);
+        const router = TestBed.inject(Router);
         router.navigate([''], { queryParams: { retour: '/profil' } });
-      });
-
-      cy.window().then(() => {
-        cy.spy(router, 'navigateByUrl').as('navigateByUrl');
       });
 
       cy.get('#identifiant').type('alice');
       cy.get('#mdp').type('mdpalice');
       cy.get('#btnSeConnecter').click();
 
-      cy.get('@navigateByUrl').should('have.been.calledWith', '/profil');
-    });
-  });
-
-  describe('Form Submission with Invalid Data', () => {
-    it('should not make backend call when form is invalid', () => {
-      cy.get('#btnSeConnecter').should('be.disabled');
-      cy.get('@connecte').should('not.have.been.called');
-    });
-
-    it('should not clear error message when user starts typing after failed login', () => {
-      const error = new HttpErrorResponse({
-        error: { description: 'Invalid credentials' },
-        status: 401,
-        statusText: 'Unauthorized',
+      cy.window().then(() => {
+        expect(sessionStorage.getItem('oauth_retour')).to.equal('/profil');
       });
-      connecteStub.rejects(error);
-
-      cy.get('#identifiant').type('wronguser');
-      cy.get('#mdp').type('wrongpassword');
-      cy.get('#btnSeConnecter').click();
-
-      cy.get('.alert-danger')
-        .should('exist')
-        .should('contain.text', 'Invalid credentials');
-
-      // Start typing in the identifiant field
-      cy.get('#identifiant').clear().type('newuser');
-
-      // Error message should still exist (component doesn't clear errors on typing)
-      cy.get('.alert-danger')
-        .should('exist')
-        .should('contain.text', 'Invalid credentials');
     });
   });
 
@@ -254,19 +238,35 @@ describe('ConnexionComponent', () => {
       cy.get('#identifiant').should('have.value', 'user@example.com');
       cy.get('#mdp').should('have.value', 'P@ssw0rd!#$');
     });
+  });
+});
 
-    it('should preserve whitespace in inputs', () => {
-      connecteStub.resolves();
+describe('ConnexionComponent with error query param', () => {
+  it('should display error from OAuth2 redirect', () => {
+    const mockBackendService = {
+      genereState: cy.stub().returns('state-123'),
+      connecte: cy.stub(),
+      erreur$: { subscribe: cy.stub() },
+      utilisateurConnecte$: {
+        pipe: cy.stub().returns({ subscribe: cy.stub() }),
+      },
+    };
 
-      cy.get('#identifiant').type('  testuser  ');
-      cy.get('#mdp').type('  password  ');
-      cy.get('#btnSeConnecter').click();
-
-      cy.get('@connecte').should(
-        'have.been.calledWith',
-        '  testuser  ',
-        '  password  ',
-      );
+    // Mount then navigate to URL with error param
+    cy.mount(ConnexionComponent, {
+      providers: [
+        provideRouter([{ path: '**', component: ConnexionComponent }]),
+        { provide: BackendService, useValue: mockBackendService },
+      ],
+    }).then(() => {
+      const router = TestBed.inject(Router);
+      router.navigate(['connexion'], {
+        queryParams: { erreur: 'identifiants invalides', oauth: '1' },
+      });
     });
+
+    cy.get('.alert-danger')
+      .should('exist')
+      .should('contain.text', 'identifiants invalides');
   });
 });

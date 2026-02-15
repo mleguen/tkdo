@@ -185,12 +185,15 @@ jobs:
           TKDO_DEV_MODE: "1"
           TKDO_BASE_URI: http://localhost:8080
           TKDO_MAILER_FROM: noreply@ci
+          # Multiple workers needed: BFF callback makes back-channel HTTP call
+          # to /oauth/token on the same server (requires concurrent request handling)
+          PHP_CLI_SERVER_WORKERS: "4"
         run: |
           cd api/public
           php -S localhost:8000 index.php &
           echo $! > /tmp/php-server.pid
           sleep 2
-          echo "PHP server started on port 8000"
+          echo "PHP server started on port 8000 (4 workers)"
 
       # Start frontend static server in background with SPA routing support
       - name: Start frontend static server
@@ -238,7 +241,14 @@ jobs:
               listen 8080;
               server_name localhost;
 
-              # API requests go to PHP backend
+              # OAuth2 endpoints go to PHP backend (preserves /oauth/ prefix)
+              location /oauth/ {
+                  proxy_pass http://localhost:8000/oauth/;
+                  proxy_set_header Host $host;
+                  proxy_set_header X-Real-IP $remote_addr;
+              }
+
+              # API requests go to PHP backend (strips /api/ prefix)
               location /api/ {
                   proxy_pass http://localhost:8000/;
                   proxy_set_header Host $host;

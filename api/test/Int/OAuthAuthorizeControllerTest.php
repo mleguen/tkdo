@@ -192,4 +192,18 @@ class OAuthAuthorizeControllerTest extends IntTestCase
 
         $this->assertEquals(400, $statusCode);
     }
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
+    public function testInvalidClientIdReturns400(bool $curl): void
+    {
+        $this->requestApi(
+            $curl,
+            'GET',
+            self::AUTHORIZE_PATH . '?response_type=code&client_id=wrong-client&redirect_uri=' . urlencode(self::VALID_REDIRECT_URI),
+            $statusCode,
+            $body
+        );
+
+        $this->assertEquals(400, $statusCode);
+    }
 }

@@ -121,6 +121,9 @@ class OAuthAuthorizeController
         if (!isset($params['client_id']) || $params['client_id'] === '') {
             throw new HttpBadRequestException($request, "champ 'client_id' manquant");
         }
+        if ($params['client_id'] !== $this->oAuth2Settings->clientId) {
+            throw new HttpBadRequestException($request, 'client_id invalide');
+        }
         if (!isset($params['redirect_uri']) || $params['redirect_uri'] === '') {
             throw new HttpBadRequestException($request, "champ 'redirect_uri' manquant");
         }

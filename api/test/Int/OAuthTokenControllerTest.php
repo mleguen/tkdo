@@ -254,6 +254,27 @@ class OAuthTokenControllerTest extends IntTestCase
         $this->assertEquals(401, $statusCode);
     }
 
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
+    public function testInvalidClientIdReturns401(bool $curl): void
+    {
+        $this->requestApi(
+            $curl,
+            'POST',
+            self::TOKEN_PATH,
+            $statusCode,
+            $body,
+            '',
+            [
+                'grant_type' => 'authorization_code',
+                'code' => 'some_code',
+                'client_id' => 'wrong-client',
+                'client_secret' => 'dev-secret',
+            ]
+        );
+
+        $this->assertEquals(401, $statusCode);
+    }
+
     /**
      * Test concurrent code exchange — exactly one should succeed.
      */

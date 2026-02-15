@@ -6,8 +6,8 @@ declare(strict_types=1);
 
 namespace App\Appli\Controller;
 
-use App\Appli\ModelAdaptor\AuthAdaptor;
 use App\Appli\Service\RouteService;
+use App\Dom\Exception\UtilisateurInconnuException;
 use App\Dom\Repository\UtilisateurRepository;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -33,14 +33,14 @@ class OAuthUserInfoController
      */
     public function __invoke(ServerRequestInterface $request, ResponseInterface $response, array $args): ResponseInterface
     {
-        // AuthMiddleware already validated the Bearer token and set auth attribute
-        /** @var AuthAdaptor|null $auth */
-        $auth = $request->getAttribute('auth');
-        if ($auth === null) {
-            throw new HttpUnauthorizedException($request, 'token invalide ou manquant');
-        }
+        // Use RouteService.getAuth() for proper error handling (checks authErr attribute)
+        $auth = $this->routeService->getAuth($request);
 
-        $utilisateur = $this->utilisateurRepository->read($auth->getIdUtilisateur());
+        try {
+            $utilisateur = $this->utilisateurRepository->read($auth->getIdUtilisateur());
+        } catch (UtilisateurInconnuException) {
+            throw new HttpUnauthorizedException($request, 'utilisateur inconnu');
+        }
 
         return $this->routeService->getResponseWithJsonBody($response, json_encode([
             'sub' => $utilisateur->getId(),

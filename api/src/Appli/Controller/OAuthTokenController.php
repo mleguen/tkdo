@@ -47,6 +47,11 @@ class OAuthTokenController
             return $this->oauthError($response, 400, 'unsupported_grant_type', "grant_type non supporté (doit être 'authorization_code')");
         }
 
+        // Validate client_id matches configured value
+        if ($body['client_id'] !== $this->oAuth2Settings->clientId) {
+            return $this->oauthError($response, 401, 'invalid_client', 'client_id invalide');
+        }
+
         // Validate client_secret (prevents auth code theft)
         $clientSecret = $body['client_secret'] ?? '';
         if ($clientSecret !== $this->oAuth2Settings->clientSecret) {

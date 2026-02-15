@@ -26,6 +26,14 @@ export class ConnexionComponent {
     mdp: ['', Validators.required],
   });
 
+  constructor() {
+    // Read error from OAuth2 redirect (e.g., invalid credentials)
+    const erreur = this.route.snapshot.queryParamMap.get('erreur');
+    if (erreur) {
+      this.erreurConnexion = erreur;
+    }
+  }
+
   connecte() {
     const { identifiant, mdp } = this.formConnexion.value;
     if (!identifiant || !mdp) return;

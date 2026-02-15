@@ -1,6 +1,6 @@
 # Story 1.1c: OAuth2 Standards Alignment
 
-Status: in-progress
+Status: review
 
 ## Story
 
@@ -120,9 +120,9 @@ This story refactors to OAuth2-compliant architecture, clearly separating:
 
 ### Review Follow-ups (AI)
 
-- [ ] [AI-Review][CRITICAL] Frontend Component Tests failing - ConnexionComponent tests throw TypeError from Angular EventEmitter - all 8 tests in shard 1/2 failing (successful login, failed login, navigation, form validation). Root cause hypothesis: Tests mock BackendService.connecte() but component now uses form.submit() for OAuth2 flow instead of calling backend.connecte(), causing test stub/spy to fail when tests expect connecte() calls [front/src/app/connexion/connexion.component.cy.ts] [CI Run](https://github.com/mleguen/tkdo/actions/runs/22022436064/job/63633693300)
-- [ ] [AI-Review][CRITICAL] E2E Tests timing out on authentication - can't find post-login elements (#nomUtilisateur, a#menuMonProfil, #btnSeDeconnecter). Root cause hypothesis: OAuth2 login flow not working in E2E environment - likely missing OAuth2 endpoint mocks or incorrect callback URL configuration in test environment [front/cypress/e2e/connexion.cy.ts] [CI Run](https://github.com/mleguen/tkdo/actions/runs/22022436063)
-- [ ] [AI-Review][CRITICAL] Backend Integration Tests hung/timed out - ran for 6 hours before failing. Root cause hypothesis: Abnormal timeout suggests deadlock or infinite loop, possibly in OAuth2 token endpoint when handling concurrent requests or in database connection pool [api/test/Int/] [CI Run](https://github.com/mleguen/tkdo/actions/runs/22022436064/job/63633671966)
+- [x] [AI-Review][CRITICAL] Frontend Component Tests failing - ConnexionComponent tests throw TypeError from Angular EventEmitter - all 8 tests in shard 1/2 failing (successful login, failed login, navigation, form validation). Root cause hypothesis: Tests mock BackendService.connecte() but component now uses form.submit() for OAuth2 flow instead of calling backend.connecte(), causing test stub/spy to fail when tests expect connecte() calls [front/src/app/connexion/connexion.component.cy.ts] [CI Run](https://github.com/mleguen/tkdo/actions/runs/22022436064/job/63633693300)
+- [x] [AI-Review][CRITICAL] E2E Tests timing out on authentication - can't find post-login elements (#nomUtilisateur, a#menuMonProfil, #btnSeDeconnecter). Root cause hypothesis: OAuth2 login flow not working in E2E environment - likely missing OAuth2 endpoint mocks or incorrect callback URL configuration in test environment [front/cypress/e2e/connexion.cy.ts] [CI Run](https://github.com/mleguen/tkdo/actions/runs/22022436063)
+- [x] [AI-Review][CRITICAL] Backend Integration Tests hung/timed out - ran for 6 hours before failing. Root cause hypothesis: Abnormal timeout suggests deadlock or infinite loop, possibly in OAuth2 token endpoint when handling concurrent requests or in database connection pool [api/test/Int/] [CI Run](https://github.com/mleguen/tkdo/actions/runs/22022436064/job/63633671966)
 - [x] [AI-Review][HIGH] BffAuthService.extraitInfoUtilisateur() manually decodes JWT with hardcoded claim names (sub, adm, groupe_ids) instead of using GenericProvider.getResourceOwner() — temp-auth-server-specific logic in PERMANENT BFF code, violates AC #3 verification criterion [api/src/Appli/Service/BffAuthService.php:49-77]
 - [x] [AI-Review][MEDIUM] AuthCallbackComponent missing RouterLink import — routerLink="/connexion" in error template is non-functional because imports: [] is empty [front/src/app/auth-callback/auth-callback.component.ts:8,12] [PR#100 comment](https://github.com/mleguen/tkdo/pull/100#discussion_r2807310040)
 - [x] [AI-Review][MEDIUM] OAuthTokenController.findValidAuthCode() uses EntityManager/QueryBuilder directly in controller — query logic should be in AuthCodeRepository per hexagonal architecture [api/src/Appli/Controller/OAuthTokenController.php:102-121]
@@ -131,9 +131,9 @@ This story refactors to OAuth2-compliant architecture, clearly separating:
 - [x] [AI-Review][MEDIUM] OAuthAuthorizeController returns 400 on invalid credentials during form POST — user exits SPA and sees raw error page instead of staying on login form with error message [api/src/Appli/Controller/OAuthAuthorizeController.php:96] [PR#100 comment](https://github.com/mleguen/tkdo/pull/100#discussion_r2807310052)
 - [x] [AI-Review][MEDIUM] OAuthAuthorizeController does not validate redirect_uri against allowlist — open redirect risk; OAuthTokenController does not validate client_secret — combined allows auth code theft [api/src/Appli/Controller/OAuthAuthorizeController.php:105-116] [PR#100 comment](https://github.com/mleguen/tkdo/pull/100#discussion_r2807310061)
 - [x] [AI-Review][LOW] ConnexionComponent retour query param handling — was removed but needed for post-login redirect; re-added with sessionStorage-based oauth_retour pattern [front/src/app/connexion/connexion.component.ts:28-30]
-- [ ] [AI-Review][MEDIUM] OAuthUserInfoController bypasses RouteService.getAuth() error handling and doesn't catch UtilisateurInconnuException — invalid tokens return generic error message; deleted users cause uncaught 500 instead of 401 [api/src/Appli/Controller/OAuthUserInfoController.php:38-43] [PR#100 comment](https://github.com/mleguen/tkdo/pull/100#discussion_r2807799366)
-- [ ] [AI-Review][LOW] Test name "should generate and store OAuth2 state on connecte()" is misleading — test only calls genereState(), doesn't test connecte() method or sessionStorage writes [front/src/app/backend.service.spec.ts:71-75] [PR#100 comment](https://github.com/mleguen/tkdo/pull/100#discussion_r2807799372)
-- [ ] [AI-Review][LOW] OAuth2 endpoints don't validate client_id matches configured value — OAuthAuthorizeController and OAuthTokenController accept any client_id instead of enforcing OAuth2Settings::clientId [api/src/Appli/Controller/OAuthAuthorizeController.php:121-123 + api/src/Appli/Controller/OAuthTokenController.php:44-54] [PR#100 comments: [authorize](https://github.com/mleguen/tkdo/pull/100#discussion_r2807799381), [token](https://github.com/mleguen/tkdo/pull/100#discussion_r2807799377)]
+- [x] [AI-Review][MEDIUM] OAuthUserInfoController bypasses RouteService.getAuth() error handling and doesn't catch UtilisateurInconnuException — invalid tokens return generic error message; deleted users cause uncaught 500 instead of 401 [api/src/Appli/Controller/OAuthUserInfoController.php:38-43] [PR#100 comment](https://github.com/mleguen/tkdo/pull/100#discussion_r2807799366)
+- [x] [AI-Review][LOW] Test name "should generate and store OAuth2 state on connecte()" is misleading — test only calls genereState(), doesn't test connecte() method or sessionStorage writes [front/src/app/backend.service.spec.ts:71-75] [PR#100 comment](https://github.com/mleguen/tkdo/pull/100#discussion_r2807799372)
+- [x] [AI-Review][LOW] OAuth2 endpoints don't validate client_id matches configured value — OAuthAuthorizeController and OAuthTokenController accept any client_id instead of enforcing OAuth2Settings::clientId [api/src/Appli/Controller/OAuthAuthorizeController.php:121-123 + api/src/Appli/Controller/OAuthTokenController.php:44-54] [PR#100 comments: [authorize](https://github.com/mleguen/tkdo/pull/100#discussion_r2807799381), [token](https://github.com/mleguen/tkdo/pull/100#discussion_r2807799377)]
 
 ## Dev Notes
 
@@ -356,6 +356,7 @@ Claude Opus 4.6
 - 2026-02-14 — PR Comments Reviewed (Evidence-Based Investigation): Reviewed 7 unresolved GitHub PR comments on PR #100 (0 already resolved). Classification: 3 valid (new action items created), 1 duplicate of existing finding, 1 consolidated with existing finding, 2 invalid (dismissed with evidence). Updated Review Follow-ups section to 8 total action items (1 HIGH, 6 MEDIUM, 1 LOW). Responded to all 7 comments in PR #100 with investigation evidence.
 - 2026-02-14 — Review Follow-ups Implemented: All 8 review items fixed. Key changes: BffAuthService uses GenericProvider.getResourceOwner() via new /oauth/userinfo endpoint (Item 1 HIGH), redirect_uri path-based validation + client_secret validation (Item 7), auth code lookup moved to repository (Item 3). E2E failures discovered — front Docker container needed rebuild to pick up /oauth/ ProxyPass rules. All tests green: PHPStan OK, 145 unit, 264 backend, 60 frontend, 12 E2E.
 - 2026-02-15 — New PR Comments Reviewed (Evidence-Based Investigation): Reviewed 6 new unresolved GitHub PR comments on PR #100 (7 already resolved, filtered out). Investigation: Read 10 files with ~30 avg lines per comment. Classification: 2 valid standalone (1 MEDIUM, 1 LOW), 1 consolidated group with 2 comments (LOW), 2 invalid/out-of-scope (dismissed with evidence). Updated Review Follow-ups section to 11 total action items (8 completed, 3 new). Responded to all 6 comments in PR #100 with investigation evidence. Story status changed to in-progress.
+- 2026-02-15 — Final Review Follow-ups Implemented (6 items): Root cause analysis and fixes for 3 CRITICAL CI failures + 3 smaller items. (1) CRITICAL: ConnexionComponent Cypress tests rewritten for OAuth2 form POST flow — mock genereState(), stub form.submit(), verify OAuth2 fields. Also added erreur query param reading to ConnexionComponent for OAuth2 error redirects. (2) CRITICAL: CI E2E nginx missing /oauth/ proxy rule — added location block. (3) CRITICAL: CI PHP built-in server single-threaded deadlock on BFF back-channel call — added PHP_CLI_SERVER_WORKERS=4 to both test.yml and e2e.yml. (4) MEDIUM: OAuthUserInfoController now uses RouteService.getAuth() and catches UtilisateurInconnuException. (5) LOW: Renamed misleading test. (6) LOW: Added client_id validation to OAuthAuthorizeController and OAuthTokenController. All tests green: PHPStan OK, 145 unit, 272 backend (1057 assertions), 60 frontend, 12 E2E.
 
 ### Change Log
 
@@ -395,6 +396,17 @@ Claude Opus 4.6
 - 2026-02-14 - PR Comments Resolved: Resolved 5 PR comment threads, marked completed action items as fixed, PR: #100, comment_ids: 2807310040, 2807310037, 2807310046, 2807310052, 2807310061
 - 2026-02-14 — Code Review Documentation Fixes: Fixed 3 documentation issues found during adversarial code review. (1) Updated `docs/backend-dev.md` Authentication section to document OAuth2 cookie-based flow as primary with comprehensive architecture diagrams and step-by-step flow. (2) Added OAuth2 Configuration section to `docs/environment-variables.md` documenting OAUTH2_CLIENT_ID, OAUTH2_CLIENT_SECRET, OAUTH2_REDIRECT_URI with external IdP switching guide. (3) Removed misleading comment in OAuth2Settings.php that incorrectly stated urlResourceOwner was "not used" when it's actually used by GenericProvider.getResourceOwner().
 
+**Review follow-up changes (2026-02-15):**
+- Rewrote ConnexionComponent Cypress tests for OAuth2 form POST flow (genereState mock, form.submit stub, OAuth2 field verification)
+- Added erreur query param reading to ConnexionComponent constructor (displays OAuth2 error redirects)
+- Added /oauth/ proxy rule to CI nginx config in e2e.yml
+- Added PHP_CLI_SERVER_WORKERS=4 to test.yml and e2e.yml (fixes single-threaded deadlock)
+- OAuthUserInfoController: uses RouteService.getAuth(), catches UtilisateurInconnuException
+- Renamed misleading test name in backend.service.spec.ts
+- Added client_id validation to OAuthAuthorizeController and OAuthTokenController
+- Added integration tests for client_id validation (authorize + token endpoints)
+- 2026-02-15 - PR Comments Resolved: Resolved 4 PR comment threads, marked completed action items as fixed, PR: #100, comment_ids: 2807799366, 2807799372, 2807799381, 2807799377
+
 ### File List
 
 **Created:**
@@ -431,6 +443,16 @@ Claude Opus 4.6
 - `api/src/Appli/Settings/OAuth2Settings.php` — Removed misleading "not used" comment
 - `docs/backend-dev.md` — Updated Authentication section to document OAuth2 cookie-based flow
 - `docs/environment-variables.md` — Added OAuth2 Configuration section with IdP switching guide
+- `front/src/app/connexion/connexion.component.cy.ts` — Rewritten for OAuth2 form POST flow
+- `front/src/app/connexion/connexion.component.ts` — Added erreur query param reading from OAuth2 redirects
+- `front/src/app/backend.service.spec.ts` — Renamed misleading test
+- `api/src/Appli/Controller/OAuthUserInfoController.php` — Uses RouteService.getAuth(), catches UtilisateurInconnuException
+- `api/src/Appli/Controller/OAuthAuthorizeController.php` — Added client_id validation
+- `api/src/Appli/Controller/OAuthTokenController.php` — Added client_id validation
+- `api/test/Int/OAuthAuthorizeControllerTest.php` — Added client_id validation test
+- `api/test/Int/OAuthTokenControllerTest.php` — Added client_id validation test
+- `.github/workflows/test.yml` — Added PHP_CLI_SERVER_WORKERS=4 for back-channel calls
+- `.github/workflows/e2e.yml` — Added PHP_CLI_SERVER_WORKERS=4 + /oauth/ nginx proxy rule
 
 **Deleted:**
 - `api/src/Appli/Controller/AuthLoginController.php` — Replaced by OAuthAuthorizeController
