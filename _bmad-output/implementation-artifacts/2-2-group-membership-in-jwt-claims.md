@@ -456,33 +456,16 @@ No issues encountered. All tasks completed in a single pass with red-green-refac
 - `api/src/Dom/Model/Auth.php` — Added `getGroupeAdminIds()` method to interface
 - `api/src/Dom/Repository/GroupeRepository.php` — Added `readAppartenancesForUtilisateur()` method to interface
 - `api/src/Appli/ModelAdaptor/AuthAdaptor.php` — Added `$groupeAdminIds` constructor param, getter, updated `fromUtilisateur()`
-- `api/src/Appli/RepositoryAdaptor/GroupeRepositoryAdaptor.php` — Implemented `readAppartenancesForUtilisateur()` with DQL
-- `api/src/Appli/Service/AuthService.php` — Added `groupe_admin_ids` to JWT encode/decode
-- `api/src/Appli/Controller/AuthTokenController.php` — Injected GroupeRepository, populated real group claims, removed TODOs
-- `api/test/Int/AuthTokenControllerTest.php` — Added 5 new integration tests, updated 1 existing test
+- `api/src/Appli/RepositoryAdaptor/GroupeRepositoryAdaptor.php` — Implemented `readAppartenancesForUtilisateur()` with DQL, eager-load Groupe (N+1 fix)
+- `api/src/Appli/Service/AuthService.php` — Added `groupe_admin_ids` to JWT encode/decode, `array_map('intval', ...)` type safety
+- `api/src/Appli/Controller/BffAuthCallbackController.php` — Injected GroupeRepository, query group memberships directly (application concern), `array_values()` wrapping, group count warning (>50), log level DEBUG
+- `api/test/Int/BffAuthCallbackControllerTest.php` — Added 4 integration tests (groups with admin, archived exclusion, session refresh AC#2, non-consecutive index), updated existing test for `groupe_admin_ids`
 - `api/test/Int/GroupeRepositoryTest.php` — Added 4 new integration tests for membership query
 
 **New:**
 - `api/test/Unit/Appli/ModelAdaptor/AuthAdaptorTest.php` — 8 unit tests for AuthAdaptor
-- `api/test/Unit/Appli/Service/AuthServiceTest.php` — 4 unit tests for AuthService JWT encode/decode
-
-**Modified (review follow-ups):**
-- `api/src/Appli/Controller/AuthTokenController.php` — Added `array_values()` wrapping on `$groupeIds` and `$groupeAdminIds`; added inline documentation for array_values() purpose and JWT claim staleness
-- `api/src/Appli/Service/AuthService.php` — Added `array_map('intval', ...)` for type safety in decode()
-- `api/test/Int/AuthTokenControllerTest.php` — Added 2 new integration tests (non-consecutive index, session refresh)
-- `api/test/Unit/Appli/Service/AuthServiceTest.php` — Fixed misleading comment on backward compat test, renamed test method
-- `_bmad-output/project-context.md` — Added `php` host prohibition rule, PHPStan memory limit note
-
-**Modified (third review follow-ups):**
-- `api/src/Appli/RepositoryAdaptor/GroupeRepositoryAdaptor.php` — Added `->addSelect('g')` for eager Groupe fetch (N+1 fix)
-- `api/test/Unit/Appli/Service/AuthServiceTest.php` — Added backward compat test with manual JWT payload missing `groupe_admin_ids`
-- `api/test/Int/AuthTokenControllerTest.php` — Removed unused `UtilisateurBuilder` import
-
-**New (fourth review follow-ups):**
+- `api/test/Unit/Appli/Service/AuthServiceTest.php` — 5 unit tests for AuthService JWT encode/decode (incl. backward compat)
 - `api/src/Infra/Migrations/Version20260215120000.php` — Migration adding `IDX_GROUPE_ARCHIVE` index on `tkdo_groupe.archive`
-
-**Modified (fourth review follow-ups):**
-- `api/src/Appli/Controller/AuthTokenController.php` — Added group count warning log (>50 groups), changed successful exchange log from INFO to DEBUG
 
 ## Change Log
 
@@ -496,3 +479,4 @@ No issues encountered. All tasks completed in a single pass with red-green-refac
 - 2026-02-15: Fourth adversarial code review — Fixed MEDIUM docs-only issue (added N+1 prevention comment to GroupeRepositoryAdaptor.php:65). Created 3 new action items: HIGH database index on archive column, HIGH JWT payload size warning (family-first approach), MEDIUM log level adjustment. Story status: in-progress until action items resolved.
 - 2026-02-15: Addressed all 3 fourth review findings — Added IDX_GROUPE_ARCHIVE migration, group count warning log (>50 groups), changed token exchange log to DEBUG. 300 tests / 1161 assertions pass, PHPStan level 8 clean. All 11/11 review items resolved.
 - 2026-02-15: Fifth adversarial code review — Comprehensive verification of all ACs, tasks, and review follow-ups. Found 0 HIGH, 0 MEDIUM issues. 2 LOW observations (JWT size heuristic, warning test coverage) are informational only, not defects. All 3 ACs implemented and tested, 300 tests passing, PHPStan clean. Story marked DONE.
+- 2026-02-15: Rebase onto master after Story 1.1c (OAuth2 standards alignment) merge. AuthTokenController deleted by 1.1c, replaced by OAuth2/BFF pattern. Ported group membership logic to BffAuthCallbackController (permanent, stays with external IdP) — not OAuthTokenController (temporary). Group membership is an application concern, not an IdP concern. Tests ported to BffAuthCallbackControllerTest. 319 tests / 1165 assertions pass, PHPStan level 8 clean.

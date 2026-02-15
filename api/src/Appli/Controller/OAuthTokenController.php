@@ -79,8 +79,8 @@ class OAuthTokenController
             return $this->oauthError($response, 401, 'invalid_grant', 'code invalide ou expiré');
         }
 
-        // Create JWT as access_token with user claims
-        // groupe_ids will be populated in Story 2.2+, empty for now
+        // Create JWT as access_token with identity claims only.
+        // Group memberships are an application concern handled by BffAuthCallbackController.
         $auth = AuthAdaptor::fromUtilisateur($utilisateur, []);
         $jwt = $this->authService->encode($auth);
 

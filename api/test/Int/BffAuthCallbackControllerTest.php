@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Test\Int;
 
 use GuzzleHttp\Cookie\CookieJar;
+use Test\Builder\GroupeBuilder;
 
 class BffAuthCallbackControllerTest extends IntTestCase
 {
@@ -74,6 +75,7 @@ class BffAuthCallbackControllerTest extends IntTestCase
         $this->assertEquals($utilisateur->getGenre(), $body['utilisateur']['genre']);
         $this->assertEquals($utilisateur->getAdmin(), $body['utilisateur']['admin']);
         $this->assertEquals([], $body['utilisateur']['groupe_ids']);
+        $this->assertEquals([], $body['utilisateur']['groupe_admin_ids']);
 
         // Should NOT return the token in the body
         $this->assertArrayNotHasKey('token', $body);
@@ -143,6 +145,205 @@ class BffAuthCallbackControllerTest extends IntTestCase
         $this->assertEquals(200, $userResponse->getStatusCode());
         $userData = json_decode((string) $userResponse->getBody(), true);
         $this->assertEquals($utilisateur->getId(), $userData['id']);
+    }
+
+    public function testValidCodeWithGroupsReturnsGroupeIdsAndAdminIds(): void
+    {
+        ['code' => $code, 'utilisateur' => $utilisateur] = $this->createUserAndGetCode();
+
+        // Create groups with memberships
+        $groupe1 = GroupeBuilder::unGroupe()
+            ->withNom('Famille')
+            ->withAppartenance($utilisateur, false)
+            ->persist(self::$em);
+
+        $groupe2 = GroupeBuilder::unGroupe()
+            ->withNom('Amis')
+            ->withAppartenance($utilisateur, true) // admin
+            ->persist(self::$em);
+
+        // Exchange code via BFF callback
+        $cookieJar = new CookieJar();
+        $client = new \GuzzleHttp\Client(['cookies' => $cookieJar]);
+
+        $response = $client->request(
+            'POST',
+            getenv('TKDO_BASE_URI') . self::CALLBACK_PATH,
+            [
+                'json' => ['code' => $code],
+                'http_errors' => false,
+            ]
+        );
+
+        $this->assertEquals(200, $response->getStatusCode());
+        $body = json_decode((string) $response->getBody(), true);
+
+        // Verify response contains correct group claims
+        $groupeIds = $body['utilisateur']['groupe_ids'];
+        $groupeAdminIds = $body['utilisateur']['groupe_admin_ids'];
+
+        $this->assertContains($groupe1->getId(), $groupeIds);
+        $this->assertContains($groupe2->getId(), $groupeIds);
+        $this->assertCount(2, $groupeIds);
+
+        $this->assertContains($groupe2->getId(), $groupeAdminIds);
+        $this->assertNotContains($groupe1->getId(), $groupeAdminIds);
+        $this->assertCount(1, $groupeAdminIds);
+    }
+
+    /**
+     * AC #2: Session refresh reflects new group membership.
+     * Login with no groups, add group, re-login, verify group in claims.
+     */
+    public function testSessionRefreshReflectsNewGroupMembership(): void
+    {
+        // First login — no groups
+        ['code' => $code1, 'utilisateur' => $utilisateur] = $this->createUserAndGetCode();
+
+        $cookieJar1 = new CookieJar();
+        $client1 = new \GuzzleHttp\Client(['cookies' => $cookieJar1]);
+
+        $response1 = $client1->request(
+            'POST',
+            getenv('TKDO_BASE_URI') . self::CALLBACK_PATH,
+            [
+                'json' => ['code' => $code1],
+                'http_errors' => false,
+            ]
+        );
+
+        $this->assertEquals(200, $response1->getStatusCode());
+        $body1 = json_decode((string) $response1->getBody(), true);
+        $this->assertEquals([], $body1['utilisateur']['groupe_ids']);
+        $this->assertEquals([], $body1['utilisateur']['groupe_admin_ids']);
+
+        // Add user to a group
+        $groupe = GroupeBuilder::unGroupe()
+            ->withNom('Nouveau Groupe')
+            ->withAppartenance($utilisateur, true)
+            ->persist(self::$em);
+
+        // Second login — get new auth code and exchange it
+        $baseUri = getenv('TKDO_BASE_URI');
+        $client2 = new \GuzzleHttp\Client(['allow_redirects' => false]);
+
+        $authResponse = $client2->request(
+            'POST',
+            $baseUri . self::AUTHORIZE_PATH,
+            [
+                'form_params' => [
+                    'identifiant' => $utilisateur->getIdentifiant(),
+                    'mdp' => $utilisateur->getMdpClair(),
+                    'client_id' => 'tkdo',
+                    'redirect_uri' => 'http://localhost:4200/auth/callback',
+                    'response_type' => 'code',
+                    'state' => 'test',
+                ],
+                'http_errors' => false,
+            ]
+        );
+
+        $this->assertEquals(302, $authResponse->getStatusCode());
+        $location = $authResponse->getHeaderLine('Location');
+        parse_str(parse_url($location, PHP_URL_QUERY) ?: '', $queryParams);
+        $code2 = $queryParams['code'];
+
+        $cookieJar2 = new CookieJar();
+        $client3 = new \GuzzleHttp\Client(['cookies' => $cookieJar2]);
+
+        $response2 = $client3->request(
+            'POST',
+            $baseUri . self::CALLBACK_PATH,
+            [
+                'json' => ['code' => $code2],
+                'http_errors' => false,
+            ]
+        );
+
+        $this->assertEquals(200, $response2->getStatusCode());
+        $body2 = json_decode((string) $response2->getBody(), true);
+
+        // Verify the new group appears in claims
+        $this->assertContains($groupe->getId(), $body2['utilisateur']['groupe_ids']);
+        $this->assertContains($groupe->getId(), $body2['utilisateur']['groupe_admin_ids']);
+    }
+
+    public function testValidCodeWithArchivedGroupExcludesFromClaims(): void
+    {
+        ['code' => $code, 'utilisateur' => $utilisateur] = $this->createUserAndGetCode();
+
+        $activeGroupe = GroupeBuilder::unGroupe()
+            ->withNom('Active')
+            ->withAppartenance($utilisateur, false)
+            ->persist(self::$em);
+
+        GroupeBuilder::unGroupe()
+            ->withNom('Archived')
+            ->withArchive(true)
+            ->withAppartenance($utilisateur, true)
+            ->persist(self::$em);
+
+        $cookieJar = new CookieJar();
+        $client = new \GuzzleHttp\Client(['cookies' => $cookieJar]);
+
+        $response = $client->request(
+            'POST',
+            getenv('TKDO_BASE_URI') . self::CALLBACK_PATH,
+            [
+                'json' => ['code' => $code],
+                'http_errors' => false,
+            ]
+        );
+
+        $this->assertEquals(200, $response->getStatusCode());
+        $body = json_decode((string) $response->getBody(), true);
+
+        $this->assertCount(1, $body['utilisateur']['groupe_ids']);
+        $this->assertContains($activeGroupe->getId(), $body['utilisateur']['groupe_ids']);
+        $this->assertEquals([], $body['utilisateur']['groupe_admin_ids']);
+    }
+
+    public function testValidCodeWithNonConsecutiveAdminIndexesReturnsSequentialArray(): void
+    {
+        ['code' => $code, 'utilisateur' => $utilisateur] = $this->createUserAndGetCode();
+
+        // Create 3 groups: user is admin of groups 1 and 3 (non-consecutive after array_filter)
+        GroupeBuilder::unGroupe()
+            ->withNom('G1')
+            ->withAppartenance($utilisateur, true)
+            ->persist(self::$em);
+
+        GroupeBuilder::unGroupe()
+            ->withNom('G2')
+            ->withAppartenance($utilisateur, false) // not admin
+            ->persist(self::$em);
+
+        GroupeBuilder::unGroupe()
+            ->withNom('G3')
+            ->withAppartenance($utilisateur, true)
+            ->persist(self::$em);
+
+        $cookieJar = new CookieJar();
+        $client = new \GuzzleHttp\Client(['cookies' => $cookieJar]);
+
+        $response = $client->request(
+            'POST',
+            getenv('TKDO_BASE_URI') . self::CALLBACK_PATH,
+            [
+                'json' => ['code' => $code],
+                'http_errors' => false,
+            ]
+        );
+
+        $this->assertEquals(200, $response->getStatusCode());
+        $body = json_decode((string) $response->getBody(), true);
+
+        $this->assertCount(3, $body['utilisateur']['groupe_ids']);
+        $this->assertCount(2, $body['utilisateur']['groupe_admin_ids']);
+
+        // Verify the arrays are sequential (important for JSON serialization)
+        $adminIds = $body['utilisateur']['groupe_admin_ids'];
+        $this->assertEquals(array_values($adminIds), $adminIds);
     }
 
     /**
