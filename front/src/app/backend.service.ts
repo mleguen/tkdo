@@ -58,6 +58,18 @@ export interface Idee {
   dateProposition: string;
 }
 
+export interface Groupe {
+  id: number;
+  nom: string;
+  archive: boolean;
+  estAdmin: boolean;
+}
+
+export interface GroupeResponse {
+  actifs: Groupe[];
+  archives: Groupe[];
+}
+
 const URL_API = '/api';
 const URL_OAUTH_AUTHORIZE = '/oauth/authorize';
 const URL_AUTH_CALLBACK = `${URL_API}/auth/callback`;
@@ -67,6 +79,7 @@ const URL_OCCASION = (idOccasion: number) =>
   `${URL_API}/occasion/${idOccasion}`;
 const URL_UTILISATEUR = (idUtilisateur: number) =>
   `${URL_API}/utilisateur/${idUtilisateur}`;
+const URL_GROUPE = `${URL_API}/groupe`;
 const URL_IDEES = `${URL_API}/idee`;
 const URL_IDEE = (idIdee: number) => `${URL_IDEES}/${idIdee}`;
 const URL_SUPPRESSION_IDEE = (idIdee: number) =>
@@ -90,6 +103,7 @@ export class BackendService {
   private document = inject<Document>(DOCUMENT);
 
   erreur$ = new BehaviorSubject<string | undefined>(undefined);
+  groupes$: Observable<GroupeResponse | null>;
   occasions$: Observable<Occasion[] | null>;
   utilisateurConnecte$: Observable<UtilisateurPrive | null>;
 
@@ -114,6 +128,20 @@ export class BackendService {
                   }
                   return throwError(() => err);
                 }),
+              ),
+      ),
+      shareReplay(1),
+    );
+    this.groupes$ = this.utilisateurConnecte$.pipe(
+      switchMap((utilisateur) =>
+        utilisateur === null
+          ? of(null)
+          : this.http
+              .get<GroupeResponse>(URL_GROUPE)
+              .pipe(
+                catchError(() =>
+                  of({ actifs: [], archives: [] } as GroupeResponse),
+                ),
               ),
       ),
       shareReplay(1),

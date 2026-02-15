@@ -8,6 +8,7 @@ import { provideRouter } from '@angular/router';
 import {
   BackendService,
   Genre,
+  GroupeResponse,
   Occasion,
   UtilisateurPrive,
   IdeesPour,
@@ -251,6 +252,61 @@ describe('BackendService', () => {
 
       const req = httpMock.expectOne('/api/occasion?idParticipant=1');
       req.flush(mockOccasions);
+    });
+
+    it('should emit null for groupes$ when not connected', (done) => {
+      service['idUtilisateurConnecte$'].next(null);
+
+      service.groupes$.subscribe((groupes) => {
+        expect(groupes).toBeNull();
+        done();
+      });
+    });
+
+    it('should fetch and emit groupes$ when connected', (done) => {
+      service['idUtilisateurConnecte$'].next(1);
+
+      const mockGroupes: GroupeResponse = {
+        actifs: [
+          { id: 1, nom: 'Famille', archive: false, estAdmin: false },
+          { id: 3, nom: 'Amis', archive: false, estAdmin: true },
+        ],
+        archives: [{ id: 2, nom: 'Noël 2024', archive: true, estAdmin: false }],
+      };
+
+      service.groupes$.subscribe((groupes) => {
+        if (groupes !== null) {
+          expect(groupes).toEqual(mockGroupes);
+          done();
+        }
+      });
+
+      // utilisateurConnecte$ triggers user fetch first
+      const userReq = httpMock.expectOne('/api/utilisateur/1');
+      userReq.flush(mockUtilisateur);
+
+      // Then groupes$ triggers group fetch
+      const groupeReq = httpMock.expectOne('/api/groupe');
+      groupeReq.flush(mockGroupes);
+    });
+
+    it('should emit empty groups on groupes$ API error', (done) => {
+      service['idUtilisateurConnecte$'].next(1);
+
+      service.groupes$.subscribe((groupes) => {
+        if (groupes !== null) {
+          expect(groupes).toEqual({ actifs: [], archives: [] });
+          done();
+        }
+      });
+
+      // utilisateurConnecte$ triggers user fetch
+      const userReq = httpMock.expectOne('/api/utilisateur/1');
+      userReq.flush(mockUtilisateur);
+
+      // groupes$ API call fails
+      const groupeReq = httpMock.expectOne('/api/groupe');
+      groupeReq.error(new ProgressEvent('error'), { status: 500 });
     });
   });
 

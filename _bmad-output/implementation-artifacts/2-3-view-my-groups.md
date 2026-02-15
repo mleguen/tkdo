@@ -1,6 +1,6 @@
 # Story 2.3: View My Groups
 
-Status: ready-for-dev
+Status: review
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -29,40 +29,40 @@ So that I understand my context and can navigate between groups.
 
 ## Tasks / Subtasks
 
-- [ ] Task 1: Add `readToutesAppartenancesForUtilisateur()` to GroupeRepository (AC: #1, #2, #3)
-  - [ ] 1.1 Add method signature to `api/src/Dom/Repository/GroupeRepository.php`
-  - [ ] 1.2 Implement in `api/src/Appli/RepositoryAdaptor/GroupeRepositoryAdaptor.php` — DQL without `archive` filter, with eager-load `addSelect('g')`
-  - [ ] 1.3 Write integration tests for the new method (user with active+archived groups, user with no groups, admin flag preserved)
+- [x] Task 1: Add `readToutesAppartenancesForUtilisateur()` to GroupeRepository (AC: #1, #2, #3)
+  - [x] 1.1 Add method signature to `api/src/Dom/Repository/GroupeRepository.php`
+  - [x] 1.2 Implement in `api/src/Appli/RepositoryAdaptor/GroupeRepositoryAdaptor.php` — DQL without `archive` filter, with eager-load `addSelect('g')`
+  - [x] 1.3 Write integration tests for the new method (user with active+archived groups, user with no groups, admin flag preserved)
 
-- [ ] Task 2: Create GroupePort domain service (AC: #1, #2, #3)
-  - [ ] 2.1 Create `api/src/Dom/Port/GroupePort.php` — concrete class (not interface), following OccasionPort/UtilisateurPort pattern
-  - [ ] 2.2 Method `listeGroupesUtilisateur(Auth $auth): array` returns `['actifs' => Groupe[], 'archives' => Groupe[]]`
-  - [ ] 2.3 Write unit tests for GroupePort (mock GroupeRepository with ProphecyTrait)
+- [x] Task 2: Create GroupePort domain service (AC: #1, #2, #3)
+  - [x] 2.1 Create `api/src/Dom/Port/GroupePort.php` — concrete class (not interface), following OccasionPort/UtilisateurPort pattern
+  - [x] 2.2 Method `listeGroupesUtilisateur(Auth $auth): array` returns `['actifs' => Groupe[], 'archives' => Groupe[]]`
+  - [x] 2.3 Write unit tests for GroupePort (mock GroupeRepository with ProphecyTrait)
 
-- [ ] Task 3: Add JSON encoding for groups in JsonService (AC: #1, #2)
-  - [ ] 3.1 Add `getPayloadGroupe(Groupe $groupe, bool $estAdmin): array` — private method returning `['id', 'nom', 'archive', 'estAdmin']`
-  - [ ] 3.2 Add `encodeListeGroupes(array $actifs, array $archives, array $adminIds): string` — public method
-  - [ ] 3.3 Write unit tests for JSON encoding methods
+- [x] Task 3: Add JSON encoding for groups in JsonService (AC: #1, #2)
+  - [x] 3.1 Add `getPayloadGroupe(Groupe $groupe, bool $estAdmin): array` — private method returning `['id', 'nom', 'archive', 'estAdmin']`
+  - [x] 3.2 Add `encodeListeGroupes(array $actifs, array $archives, array $adminIds): string` — public method
+  - [x] 3.3 Write unit tests for JSON encoding methods
 
-- [ ] Task 4: Create ListGroupeController and register route (AC: #1, #2, #3)
-  - [ ] 4.1 Create `api/src/Appli/Controller/ListGroupeController.php` — extends AuthController, uses GroupePort + JsonService
-  - [ ] 4.2 Register route in `api/src/Bootstrap.php`: `$this->slimApp->group('/groupe', ...)` with `$group->get('', ListGroupeController::class)`
-  - [ ] 4.3 Write integration tests for `GET /api/groupe` endpoint (user with mixed groups, user with no groups, unauthenticated returns 401)
+- [x] Task 4: Create ListGroupeController and register route (AC: #1, #2, #3)
+  - [x] 4.1 Create `api/src/Appli/Controller/ListGroupeController.php` — extends AuthController, uses GroupePort + JsonService
+  - [x] 4.2 Register route in `api/src/Bootstrap.php`: `$this->slimApp->group('/groupe', ...)` with `$group->get('', ListGroupeController::class)`
+  - [x] 4.3 Write integration tests for `GET /api/groupe` endpoint (user with mixed groups, user with no groups, unauthenticated returns 401)
 
-- [ ] Task 5: Add Groupe interface and API method to frontend BackendService (AC: #1)
-  - [ ] 5.1 Add `Groupe` interface to `front/src/app/backend.service.ts`: `{ id: number; nom: string; archive: boolean; estAdmin: boolean }`
-  - [ ] 5.2 Add `GroupeResponse` interface: `{ actifs: Groupe[]; archives: Groupe[] }`
-  - [ ] 5.3 Add `URL_GROUPE` constant: `` `${URL_API}/groupe` ``
-  - [ ] 5.4 Add `groupes$` observable chained from `utilisateurConnecte$` via `switchMap` + `shareReplay(1)`
-  - [ ] 5.5 Write unit tests for BackendService groups observable
+- [x] Task 5: Add Groupe interface and API method to frontend BackendService (AC: #1)
+  - [x] 5.1 Add `Groupe` interface to `front/src/app/backend.service.ts`: `{ id: number; nom: string; archive: boolean; estAdmin: boolean }`
+  - [x] 5.2 Add `GroupeResponse` interface: `{ actifs: Groupe[]; archives: Groupe[] }`
+  - [x] 5.3 Add `URL_GROUPE` constant: `` `${URL_API}/groupe` ``
+  - [x] 5.4 Add `groupes$` observable chained from `utilisateurConnecte$` via `switchMap` + `shareReplay(1)`
+  - [x] 5.5 Write unit tests for BackendService groups observable
 
-- [ ] Task 6: Modify header component to show groups dropdown (AC: #1, #2, #3)
-  - [ ] 6.1 Subscribe to `groupes$` in `front/src/app/header/header.component.ts`
-  - [ ] 6.2 Add "Mes groupes" dropdown in `header.component.html` — ngbDropdown with active groups, separator, archived groups with "(archivé)" label
-  - [ ] 6.3 Handle no-groups state: display "Aucun groupe" message in dropdown
-  - [ ] 6.4 Add "Ma liste" link in dropdown (always accessible, even with no groups)
-  - [ ] 6.5 Group items link to `/groupe/{id}` (placeholder route for Story 2.4)
-  - [ ] 6.6 Write unit tests for header component groups dropdown rendering
+- [x] Task 6: Modify header component to show groups dropdown (AC: #1, #2, #3)
+  - [x] 6.1 Subscribe to `groupes$` in `front/src/app/header/header.component.ts`
+  - [x] 6.2 Add "Mes groupes" dropdown in `header.component.html` — ngbDropdown with active groups, separator, archived groups with "(archivé)" label
+  - [x] 6.3 Handle no-groups state: display "Aucun groupe" message in dropdown
+  - [x] 6.4 Add "Ma liste" link in dropdown (always accessible, even with no groups)
+  - [x] 6.5 Group items link to `/groupe/{id}` (placeholder route for Story 2.4)
+  - [x] 6.6 Write unit tests for header component groups dropdown rendering
 
 ## Dev Notes
 
@@ -678,10 +678,49 @@ api/test/Int/
 
 ### Agent Model Used
 
-{{agent_model_name_version}}
+Claude Opus 4.6 (claude-opus-4-6)
 
 ### Debug Log References
 
+None — clean implementation with no blocking issues.
+
 ### Completion Notes List
 
+- Task 1: Added `readToutesAppartenancesForUtilisateur()` to GroupeRepository interface and implemented in adaptor. Unlike existing `readAppartenancesForUtilisateur()`, this method does NOT filter by archive status, returning all group memberships. 3 integration tests added.
+- Task 2: Created `GroupePort` concrete class in `Dom/Port/` following existing OccasionPort/UtilisateurPort pattern. Separates active and archived groups from flat membership list. 4 unit tests with ProphecyTrait mocks.
+- Task 3: Added `getPayloadGroupe()` and `encodeListeGroupes()` to JsonService. Uses JWT `groupeAdminIds` to annotate each group with `estAdmin` flag. 3 unit tests.
+- Task 4: Created `ListGroupeController` extending AuthController, registered `GET /groupe` route in Bootstrap.php. Follows singular route convention (`/groupe` not `/groupes`). 4 integration tests including BFF OAuth auth flow for `estAdmin` verification.
+- Task 5: Added `Groupe` and `GroupeResponse` interfaces to `backend.service.ts`. Created `groupes$` observable chained from `utilisateurConnecte$` with `shareReplay(1)` caching and `catchError` graceful degradation. 4 unit tests.
+- Task 6: Added "Mes groupes" dropdown to header with active groups, archived section with "(archivé)" labels, "Aucun groupe" empty state, and "Ma liste" link always accessible. 5 component tests.
+
+### Implementation Plan
+
+- Backend: `ListGroupeController → GroupePort → GroupeRepository.readToutesAppartenancesForUtilisateur()`
+- Frontend: `header.component → BackendService.groupes$ → GET /api/groupe`
+- No new DI bindings needed (GroupePort autowired, GroupeRepository already registered)
+- Route `/groupe` follows existing singular convention
+
 ### File List
+
+**New files:**
+- api/src/Dom/Port/GroupePort.php
+- api/src/Appli/Controller/ListGroupeController.php
+- api/test/Unit/Dom/Port/GroupePortTest.php
+- api/test/Unit/Appli/Service/JsonServiceGroupeTest.php
+- api/test/Int/ListGroupeControllerTest.php
+- front/src/app/header/header.component.spec.ts
+
+**Modified files:**
+- api/src/Dom/Repository/GroupeRepository.php
+- api/src/Appli/RepositoryAdaptor/GroupeRepositoryAdaptor.php
+- api/src/Appli/Service/JsonService.php
+- api/src/Bootstrap.php
+- api/test/Int/GroupeRepositoryTest.php
+- front/src/app/backend.service.ts
+- front/src/app/backend.service.spec.ts
+- front/src/app/header/header.component.ts
+- front/src/app/header/header.component.html
+
+## Change Log
+
+- 2026-02-15: Implemented Story 2.3 — View My Groups. Added `GET /api/groupe` endpoint returning user's active and archived groups with admin flag. Added "Mes groupes" dropdown to header navigation with archived section and "Ma liste" link. 333 backend tests pass (14 new), 68 frontend tests pass (9 new). PHPStan level 8 clean.

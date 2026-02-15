@@ -9,6 +9,7 @@ use App\Appli\Controller\CreateConnexionController;
 use App\Appli\Controller\OAuthAuthorizeController;
 use App\Appli\Controller\OAuthTokenController;
 use App\Appli\Controller\OAuthUserInfoController;
+use App\Appli\Controller\ListGroupeController;
 use App\Appli\Controller\CreateExclusionUtilisateurController;
 use App\Appli\Controller\CreateIdeeController;
 use App\Appli\Controller\CreateIdeeSuppressionController;
@@ -170,6 +171,9 @@ class Bootstrap
         $this->slimApp->group('/auth', function (RouteCollectorProxyInterface $group) {
             $group->post('/callback', BffAuthCallbackController::class);
             $group->post('/logout', AuthLogoutController::class);
+        });
+        $this->slimApp->group('/groupe', function (RouteCollectorProxyInterface $group) {
+            $group->get('', ListGroupeController::class);
         });
         $this->slimApp->group('/idee', function (RouteCollectorProxyInterface $group) {
             $group->get('', ListIdeeController::class);

@@ -7,6 +7,7 @@ namespace App\Appli\Service;
 use App\Appli\ModelAdaptor\AuthAdaptor;
 use App\Appli\Service\AuthService;
 use App\Dom\Model\Exclusion;
+use App\Dom\Model\Groupe;
 use App\Dom\Model\Idee;
 use App\Dom\Model\Occasion;
 use App\Dom\Model\Resultat;
@@ -158,6 +159,39 @@ class JsonService
         ]);
         ksort($data);
         return $data;
+    }
+
+    /**
+     * @param int[] $adminIds Group IDs where user is admin
+     * @return array<string, mixed>
+     */
+    private function getPayloadGroupe(Groupe $groupe, array $adminIds): array
+    {
+        return [
+            'id' => $groupe->getId(),
+            'nom' => $groupe->getNom(),
+            'archive' => $groupe->getArchive(),
+            'estAdmin' => in_array($groupe->getId(), $adminIds, true),
+        ];
+    }
+
+    /**
+     * @param Groupe[] $actifs
+     * @param Groupe[] $archives
+     * @param int[] $adminIds
+     */
+    public function encodeListeGroupes(array $actifs, array $archives, array $adminIds): string
+    {
+        return $this->encode([
+            'actifs' => array_map(
+                fn(Groupe $g) => $this->getPayloadGroupe($g, $adminIds),
+                array_values($actifs)
+            ),
+            'archives' => array_map(
+                fn(Groupe $g) => $this->getPayloadGroupe($g, $adminIds),
+                array_values($archives)
+            ),
+        ]);
     }
 
     /**

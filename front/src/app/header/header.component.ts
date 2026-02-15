@@ -22,6 +22,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   private readonly router = inject(Router);
   private readonly breakpointObserver = inject(BreakpointObserver);
 
+  groupes$ = this.backend.groupes$;
   occasions$ = this.backend.occasions$.pipe(
     map((occasions) => occasions?.slice(0).reverse()),
   );

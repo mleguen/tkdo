@@ -26,5 +26,13 @@ interface GroupeRepository
      */
     public function readAppartenancesForUtilisateur(int $utilisateurId): array;
 
+    /**
+     * Returns ALL group memberships for a user, including archived groups.
+     * Unlike readAppartenancesForUtilisateur(), does NOT filter by archive status.
+     *
+     * @return Appartenance[]
+     */
+    public function readToutesAppartenancesForUtilisateur(int $utilisateurId): array;
+
     public function update(Groupe $groupe): Groupe;
 }

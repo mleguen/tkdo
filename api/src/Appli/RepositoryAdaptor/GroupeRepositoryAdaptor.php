@@ -74,6 +74,24 @@ class GroupeRepositoryAdaptor implements GroupeRepository
         return $qb->getQuery()->getResult();
     }
 
+    /**
+     * @return Appartenance[]
+     */
+    #[\Override]
+    public function readToutesAppartenancesForUtilisateur(int $utilisateurId): array
+    {
+        $qb = $this->em->createQueryBuilder();
+        $qb->select('a')
+            ->addSelect('g')
+            ->from(AppartenanceAdaptor::class, 'a')
+            ->join('a.groupe', 'g')
+            ->where('a.utilisateur = :utilisateurId')
+            ->setParameter('utilisateurId', $utilisateurId);
+
+        /** @var Appartenance[] */
+        return $qb->getQuery()->getResult();
+    }
+
     public function update(Groupe $groupe): Groupe
     {
         if (trim($groupe->getNom()) === '') throw new \InvalidArgumentException('le nom ne peut pas être vide');

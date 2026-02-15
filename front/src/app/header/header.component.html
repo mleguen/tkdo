@@ -18,6 +18,57 @@
       [(ngbCollapse)]="isMenuCollapsed"
     >
       <ul class="navbar-nav me-auto">
+        <li ngbDropdown class="nav-item dropdown">
+          <button class="nav-link" id="menuMesGroupes" ngbDropdownToggle>
+            Mes groupes
+          </button>
+          <div
+            ngbDropdownMenu
+            class="dropdown-menu-dark"
+            aria-labelledby="menuMesGroupes"
+          >
+            @if (groupes$ | async; as groupes) {
+              @if (
+                groupes.actifs.length === 0 && groupes.archives.length === 0
+              ) {
+                <span class="dropdown-item-text text-muted">Aucun groupe</span>
+              }
+              @for (groupe of groupes.actifs; track groupe.id) {
+                <a
+                  ngbDropdownItem
+                  [routerLink]="['/groupe', groupe.id]"
+                  (click)="isMenuCollapsed = true"
+                  >{{ groupe.nom }}</a
+                >
+              }
+              @if (groupes.archives.length > 0) {
+                @if (groupes.actifs.length > 0) {
+                  <div class="dropdown-divider"></div>
+                }
+                <h6 class="dropdown-header">Archivés</h6>
+                @for (groupe of groupes.archives; track groupe.id) {
+                  <a
+                    ngbDropdownItem
+                    class="text-muted"
+                    [routerLink]="['/groupe', groupe.id]"
+                    (click)="isMenuCollapsed = true"
+                    >{{ groupe.nom }} (archivé)</a
+                  >
+                }
+              }
+            }
+            <div class="dropdown-divider"></div>
+            <a
+              ngbDropdownItem
+              [routerLink]="['/idee']"
+              [queryParams]="{
+                idUtilisateur: (utilisateurConnecte$ | async)?.id,
+              }"
+              (click)="isMenuCollapsed = true"
+              >Ma liste</a
+            >
+          </div>
+        </li>
         @if (occasions$ | async; as occasions) {
           @if (occasions.length > 0) {
             <li ngbDropdown class="nav-item dropdown">
