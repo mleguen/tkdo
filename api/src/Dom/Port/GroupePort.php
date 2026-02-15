@@ -25,9 +25,17 @@ class GroupePort
      */
     public function listeGroupesUtilisateur(Auth $auth): array
     {
-        $appartenances = $this->groupeRepository->readToutesAppartenancesForUtilisateur(
-            $auth->getIdUtilisateur()
-        );
+        try {
+            $appartenances = $this->groupeRepository->readToutesAppartenancesForUtilisateur(
+                $auth->getIdUtilisateur()
+            );
+        } catch (\Throwable $e) {
+            throw new \RuntimeException(
+                'Impossible de charger les groupes de l\'utilisateur ' . $auth->getIdUtilisateur(),
+                0,
+                $e
+            );
+        }
 
         $actifs = [];
         $archives = [];

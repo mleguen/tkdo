@@ -109,4 +109,16 @@ class GroupePortTest extends UnitTestCase
 
         $this->groupePort->listeGroupesUtilisateur($this->authProphecy->reveal());
     }
+
+    public function testListeGroupesUtilisateurWrapsRepositoryException(): void
+    {
+        $this->groupeRepositoryProphecy
+            ->readToutesAppartenancesForUtilisateur(42)
+            ->willThrow(new \RuntimeException('DB connection lost'));
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessageMatches('/Impossible de charger les groupes/');
+
+        $this->groupePort->listeGroupesUtilisateur($this->authProphecy->reveal());
+    }
 }

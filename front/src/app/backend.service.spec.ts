@@ -291,11 +291,13 @@ describe('BackendService', () => {
     });
 
     it('should emit empty groups on groupes$ API error', (done) => {
+      spyOn(console, 'error');
       service['idUtilisateurConnecte$'].next(1);
 
       service.groupes$.subscribe((groupes) => {
         if (groupes !== null) {
           expect(groupes).toEqual({ actifs: [], archives: [] });
+          expect(console.error).toHaveBeenCalled();
           done();
         }
       });
@@ -307,6 +309,39 @@ describe('BackendService', () => {
       // groupes$ API call fails
       const groupeReq = httpMock.expectOne('/api/groupe');
       groupeReq.error(new ProgressEvent('error'), { status: 500 });
+    });
+
+    it('should refresh groupes$ when rafraichirGroupes is called', (done) => {
+      service['idUtilisateurConnecte$'].next(1);
+
+      const mockGroupes: GroupeResponse = {
+        actifs: [{ id: 1, nom: 'Famille', archive: false, estAdmin: false }],
+        archives: [],
+      };
+
+      let emitCount = 0;
+      service.groupes$.subscribe((groupes) => {
+        if (groupes !== null) {
+          emitCount++;
+          if (emitCount === 2) {
+            expect(groupes).toEqual(mockGroupes);
+            done();
+          }
+        }
+      });
+
+      // First load
+      const userReq = httpMock.expectOne('/api/utilisateur/1');
+      userReq.flush(mockUtilisateur);
+
+      const groupeReq1 = httpMock.expectOne('/api/groupe');
+      groupeReq1.flush({ actifs: [], archives: [] });
+
+      // Trigger refresh
+      service.rafraichirGroupes();
+
+      const groupeReq2 = httpMock.expectOne('/api/groupe');
+      groupeReq2.flush(mockGroupes);
     });
   });
 

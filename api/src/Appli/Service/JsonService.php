@@ -167,12 +167,14 @@ class JsonService
      */
     private function getPayloadGroupe(Groupe $groupe, array $adminIds): array
     {
-        return [
+        $data = [
             'id' => $groupe->getId(),
             'nom' => $groupe->getNom(),
             'archive' => $groupe->getArchive(),
             'estAdmin' => in_array($groupe->getId(), $adminIds, true),
         ];
+        ksort($data);
+        return $data;
     }
 
     /**

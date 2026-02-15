@@ -96,4 +96,24 @@ class JsonServiceGroupeTest extends TestCase
         $data = json_decode($json, true);
         $this->assertTrue($data['actifs'][0]['estAdmin']);
     }
+
+    public function testEncodeListeGroupesKeysAreSorted(): void
+    {
+        $groupe = $this->prophesize(Groupe::class);
+        $groupe->getId()->willReturn(1);
+        $groupe->getNom()->willReturn('Test');
+        $groupe->getArchive()->willReturn(false);
+
+        $json = $this->jsonService->encodeListeGroupes(
+            [$groupe->reveal()],
+            [],
+            []
+        );
+
+        $data = json_decode($json, true);
+        $keys = array_keys($data['actifs'][0]);
+        $sortedKeys = $keys;
+        sort($sortedKeys);
+        $this->assertEquals($sortedKeys, $keys);
+    }
 }

@@ -3,11 +3,20 @@ import { Injectable, DOCUMENT, inject } from '@angular/core';
 import {
   BehaviorSubject,
   Observable,
+  Subject,
   firstValueFrom,
+  merge,
   of,
   throwError,
 } from 'rxjs';
-import { catchError, first, map, shareReplay, switchMap } from 'rxjs/operators';
+import {
+  catchError,
+  first,
+  map,
+  shareReplay,
+  startWith,
+  switchMap,
+} from 'rxjs/operators';
 
 export interface Occasion {
   id: number;
@@ -106,6 +115,7 @@ export class BackendService {
   groupes$: Observable<GroupeResponse | null>;
   occasions$: Observable<Occasion[] | null>;
   utilisateurConnecte$: Observable<UtilisateurPrive | null>;
+  private readonly refreshGroupes$ = new Subject<void>();
 
   protected idUtilisateurConnecte$: BehaviorSubject<number | null>;
 
@@ -136,13 +146,18 @@ export class BackendService {
       switchMap((utilisateur) =>
         utilisateur === null
           ? of(null)
-          : this.http.get<GroupeResponse>(URL_GROUPE).pipe(
-              map((res) => ({
-                actifs: Array.isArray(res?.actifs) ? res.actifs : [],
-                archives: Array.isArray(res?.archives) ? res.archives : [],
-              })),
-              catchError(() =>
-                of({ actifs: [], archives: [] } as GroupeResponse),
+          : merge(this.refreshGroupes$.pipe(startWith(undefined))).pipe(
+              switchMap(() =>
+                this.http.get<GroupeResponse>(URL_GROUPE).pipe(
+                  map((res) => ({
+                    actifs: Array.isArray(res?.actifs) ? res.actifs : [],
+                    archives: Array.isArray(res?.archives) ? res.archives : [],
+                  })),
+                  catchError((err) => {
+                    console.error('Failed to load groups:', err);
+                    return of({ actifs: [], archives: [] } as GroupeResponse);
+                  }),
+                ),
               ),
             ),
       ),
@@ -168,6 +183,10 @@ export class BackendService {
       ),
       shareReplay(1),
     );
+  }
+
+  rafraichirGroupes(): void {
+    this.refreshGroupes$.next();
   }
 
   async ajouteIdee(idUtilisateur: number, description: string) {

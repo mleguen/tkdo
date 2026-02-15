@@ -147,4 +147,47 @@ describe('HeaderComponent', () => {
     // One between active/archived, one before "Ma liste"
     expect(dividers.length).toBe(2);
   });
+
+  it('should have aria-label on active group items', () => {
+    configure({
+      actifs: [{ id: 1, nom: 'Famille', archive: false, estAdmin: false }],
+      archives: [],
+    });
+
+    const items = fixture.nativeElement.querySelectorAll(
+      '#menuMesGroupes + div [ngbDropdownItem][aria-label]',
+    );
+    const labels = Array.from(items).map((el) =>
+      (el as Element).getAttribute('aria-label'),
+    );
+    expect(labels).toContain('Groupe actif : Famille');
+  });
+
+  it('should have aria-label on archived group items', () => {
+    configure({
+      actifs: [],
+      archives: [{ id: 1, nom: 'Noël 2024', archive: true, estAdmin: false }],
+    });
+
+    const items = fixture.nativeElement.querySelectorAll(
+      '#menuMesGroupes + div [ngbDropdownItem][aria-label]',
+    );
+    const labels = Array.from(items).map((el) =>
+      (el as Element).getAttribute('aria-label'),
+    );
+    expect(labels).toContain('Groupe archivé : Noël 2024');
+  });
+
+  it('should render group items as disabled spans (no navigation until Story 2.4)', () => {
+    configure({
+      actifs: [{ id: 1, nom: 'Famille', archive: false, estAdmin: false }],
+      archives: [],
+    });
+
+    const spans = fixture.nativeElement.querySelectorAll(
+      '#menuMesGroupes + div span.disabled[ngbdropdownitem]',
+    );
+    expect(spans.length).toBeGreaterThan(0);
+    expect(spans[0].textContent?.trim()).toBe('Famille');
+  });
 });

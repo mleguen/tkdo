@@ -34,11 +34,12 @@
                 <span class="dropdown-item-text text-muted">Aucun groupe</span>
               }
               @for (groupe of groupes.actifs; track groupe.id) {
-                <a
+                <span
                   ngbDropdownItem
-                  [routerLink]="['/groupe', groupe.id]"
-                  (click)="isMenuCollapsed = true"
-                  >{{ groupe.nom }}</a
+                  class="disabled"
+                  [attr.aria-label]="'Groupe actif : ' + groupe.nom"
+                  title="Bientôt disponible (Story 2.4)"
+                  >{{ groupe.nom }}</span
                 >
               }
               @if (groupes.archives.length > 0) {
@@ -47,12 +48,12 @@
                 }
                 <h6 class="dropdown-header">Archivés</h6>
                 @for (groupe of groupes.archives; track groupe.id) {
-                  <a
+                  <span
                     ngbDropdownItem
-                    class="text-muted"
-                    [routerLink]="['/groupe', groupe.id]"
-                    (click)="isMenuCollapsed = true"
-                    >{{ groupe.nom }} (archivé)</a
+                    class="disabled text-muted"
+                    [attr.aria-label]="'Groupe archivé : ' + groupe.nom"
+                    title="Bientôt disponible (Story 2.4)"
+                    >{{ groupe.nom }} (archivé)</span
                   >
                 }
               }

@@ -71,6 +71,14 @@ So that I understand my context and can navigate between groups.
 - [x] [AI-Review][MEDIUM] Add response structure validation in frontend groupes$ observable [front/src/app/backend.service.ts:135-148] — Validate API response shape or add safe navigation in template to handle malformed responses
 - [x] [AI-Review][MEDIUM] Document performance limitation for large group lists [api/src/Dom/Port/GroupePort.php:22-39] — Note: Similar to JWT cookie limitation, no pagination currently implemented. Consider for future story if users have 50+ groups.
 - [x] [AI-Review][LOW] Add frontend test for edge case: user with only archived groups [front/src/app/header/header.component.spec.ts] — Verify divider logic when no active groups exist
+- [x] [AI-Review][MEDIUM] Add cache invalidation mechanism for groupes$ observable [front/src/app/backend.service.ts:149] — shareReplay(1) caches data indefinitely; users won't see group membership changes until page refresh. Consider using a Subject that can be manually refreshed when group operations occur.
+- [x] [AI-Review][MEDIUM] Add error logging in groupes$ catchError handler [front/src/app/backend.service.ts:144-146] — Currently silently converts all errors to empty arrays. Add console.error() before returning fallback to help with debugging server errors.
+- [x] [AI-Review][MEDIUM] Add error handling in GroupePort.listeGroupesUtilisateur() [api/src/Dom/Port/GroupePort.php:26-43] — Wrap readToutesAppartenancesForUtilisateur() call in try-catch and convert repository exceptions to domain exceptions (hexagonal architecture boundary).
+- [x] [AI-Review][MEDIUM] Add database index on groupe.nom column [create new migration] — Query uses ORDER BY g.nom (GroupeRepositoryAdaptor.php:89) but no index exists. Acceptable for <100 groups but will degrade as system scales.
+- [x] [AI-Review][LOW] Add ksort() to getPayloadGroupe() for consistent JSON key ordering [api/src/Appli/Service/JsonService.php:168-176] — Other payload methods use ksort() (e.g., getPayloadUtilisateurComplet at line 160). Adds consistency for testing/debugging.
+- [x] [AI-Review][LOW] Add logging when users have zero groups [api/src/Dom/Port/GroupePort.php:43] — Log when both actifs and archives are empty. Helps track users removed from all groups (FR95/96) who may need re-invitation.
+- [x] [AI-Review][LOW] Add aria-label attributes to group dropdown items [front/src/app/header/header.component.html:37-56] — Screen reader users need context about active vs archived groups. Add aria-label="Active group: {nom}" and aria-label="Archived group: {nom}".
+- [x] [AI-Review][LOW] Handle non-existent /groupe/:id route links [front/src/app/header/header.component.html:39, 53] — Links navigate to route that doesn't exist until Story 2.4, causing 404. Consider disabling links or adding click handler with "Coming soon" toast.
 
 ## Dev Notes
 
@@ -705,6 +713,14 @@ None — clean implementation with no blocking issues.
 - ✅ Resolved review finding [MEDIUM]: Added `map` operator to `groupes$` observable validating response structure with `Array.isArray()` fallback for malformed responses.
 - ✅ Resolved review finding [MEDIUM]: Documented performance limitation (no pagination) in GroupePort JSDoc. Acceptable for current usage (<10 groups per user).
 - ✅ Resolved review finding [LOW]: Added frontend test for only-archived-groups edge case, verifying no active/archived divider when active list is empty.
+- ✅ Resolved review finding [MEDIUM]: Added cache invalidation via `refreshGroupes$` Subject and `rafraichirGroupes()` method. Observable re-fetches from API when triggered.
+- ✅ Resolved review finding [MEDIUM]: Added `console.error('Failed to load groups:', err)` in `groupes$` catchError handler before returning fallback.
+- ✅ Resolved review finding [MEDIUM]: Added try-catch in `GroupePort.listeGroupesUtilisateur()` wrapping repository call, converts to RuntimeException with French message at hexagonal boundary.
+- ✅ Resolved review finding [MEDIUM]: Created migration `Version20260215130000` adding index `IDX_GROUPE_NOM` on `tkdo_groupe.nom` for ORDER BY optimization.
+- ✅ Resolved review finding [LOW]: Added `ksort($data)` in `getPayloadGroupe()` for consistent JSON key ordering, matching `getPayloadUtilisateurComplet()` pattern.
+- ✅ Resolved review finding [LOW]: Added zero-groups logging in `ListGroupeController` (Appli layer, architecturally correct) via `LoggerInterface::info()`.
+- ✅ Resolved review finding [LOW]: Added `aria-label` attributes: "Groupe actif : {nom}" for active, "Groupe archivé : {nom}" for archived group items.
+- ✅ Resolved review finding [LOW]: Replaced `<a routerLink>` with disabled `<span>` elements for group items. No navigation until Story 2.4; tooltip "Bientôt disponible (Story 2.4)".
 
 ### Implementation Plan
 
@@ -718,6 +734,7 @@ None — clean implementation with no blocking issues.
 **New files:**
 - api/src/Dom/Port/GroupePort.php
 - api/src/Appli/Controller/ListGroupeController.php
+- api/src/Infra/Migrations/Version20260215130000.php
 - api/test/Unit/Dom/Port/GroupePortTest.php
 - api/test/Unit/Appli/Service/JsonServiceGroupeTest.php
 - api/test/Int/ListGroupeControllerTest.php
@@ -739,3 +756,5 @@ None — clean implementation with no blocking issues.
 - 2026-02-15: Implemented Story 2.3 — View My Groups. Added `GET /api/groupe` endpoint returning user's active and archived groups with admin flag. Added "Mes groupes" dropdown to header navigation with archived section and "Ma liste" link. 333 backend tests pass (14 new), 68 frontend tests pass (9 new). PHPStan level 8 clean.
 - 2026-02-15: Code review complete. 6 issues found (0 HIGH, 4 MEDIUM, 2 LOW). Fixed issue #6 (added code comment for "Ma liste" placement). Created 5 action items for remaining issues. Story status remains in-progress until action items addressed.
 - 2026-02-15: Addressed code review findings — 5 items resolved. Added alphabetical sorting to DQL query, integration test for only-active-groups, response structure validation in frontend, performance limitation docs, and frontend edge case test. 334 backend tests pass (1 new), 69 frontend tests pass (1 new). PHPStan level 8 clean.
+- 2026-02-15: Second code review complete. 8 issues found (4 MEDIUM, 4 LOW). All issues require code changes — created 8 action items. Key findings: stale cache in groupes$ observable, silent error suppression, missing error handling in GroupePort, missing DB index on groupe.nom. Story status set to in-progress.
+- 2026-02-15: Addressed second code review findings — 8 items resolved. Cache invalidation via Subject, error logging in catchError, try-catch in GroupePort, DB index on groupe.nom, ksort consistency, zero-groups logging, aria-labels, disabled group links. 336 backend tests pass (2 new), 73 frontend tests pass (4 new). PHPStan level 8 clean.
