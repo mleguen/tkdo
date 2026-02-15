@@ -10,9 +10,9 @@ use Doctrine\Persistence\ObjectManager;
 /**
  * Fixture for creating test Groupe entities
  *
- * SCAFFOLD: This fixture is a placeholder for v2 Groupe entity support.
- * The actual GroupeAdaptor entity will be created in Story 2.1.
- * Update this fixture when the entity is implemented.
+ * DEFERRED: GroupeAdaptor entity exists (created in Story 2.1), but fixture
+ * implementation is intentionally postponed until API endpoints require it (Story 2.3+).
+ * No fixtures needed for database-layer-only stories.
  *
  * Planned data:
  * - DevMode: 2 groups (Famille, Amis) with user memberships
@@ -30,27 +30,33 @@ class GroupeFixture extends AppAbstractFixture
     public function load(ObjectManager $em): void
     {
         if ($this->devMode) {
-            // TODO: Implement when GroupeAdaptor entity is created in Story 2.1
+            // DEFERRED: Fixture implementation postponed to Story 2.3+ (when API endpoints need it)
             //
             // Planned groups:
             // - 'famille': Groupe with alice, bob, charlie as members
             // - 'amis': Groupe with bob, david, eve as members
             //
             // Example implementation:
-            // $groupeFamille = new GroupeAdaptor()
-            //     ->setNom('Famille')
-            //     ->setDescription('Groupe familial');
+            // $groupeFamille = new GroupeAdaptor();
+            // $groupeFamille->setNom('Famille')
+            //     ->setArchive(false)
+            //     ->setDateCreation(new DateTime());
             // $em->persist($groupeFamille);
             // $this->addReference('famille', $groupeFamille);
             //
-            // // Add members
-            // $groupeFamille->addMembre($this->getReference('alice', UtilisateurAdaptor::class));
-            // $groupeFamille->addMembre($this->getReference('bob', UtilisateurAdaptor::class));
-            // $groupeFamille->addMembre($this->getReference('charlie', UtilisateurAdaptor::class));
+            // // Add members via AppartenanceAdaptor
+            // $appAlice = new AppartenanceAdaptor($groupeFamille, $this->getReference('alice', UtilisateurAdaptor::class));
+            // $appAlice->setEstAdmin(true)->setDateAjout(new DateTime());
+            // $em->persist($appAlice);
             //
-            // $groupeAmis = new GroupeAdaptor()
-            //     ->setNom('Amis')
-            //     ->setDescription('Groupe d\'amis');
+            // $appBob = new AppartenanceAdaptor($groupeFamille, $this->getReference('bob', UtilisateurAdaptor::class));
+            // $appBob->setEstAdmin(false)->setDateAjout(new DateTime());
+            // $em->persist($appBob);
+            //
+            // $groupeAmis = new GroupeAdaptor();
+            // $groupeAmis->setNom('Amis')
+            //     ->setArchive(false)
+            //     ->setDateCreation(new DateTime());
             // $em->persist($groupeAmis);
             // $this->addReference('amis', $groupeAmis);
             //
@@ -58,21 +64,22 @@ class GroupeFixture extends AppAbstractFixture
 
             // Perf mode: create additional groups
             if ($this->perfMode) {
-                // TODO: Implement when GroupeAdaptor entity is created
+                // DEFERRED: Perf fixtures postponed to Story 2.3+ (when API endpoints need it)
                 //
                 // Planned perf groups:
                 // for ($i = 1; $i <= 3; $i++) {
-                //     $groupe = new GroupeAdaptor()
-                //         ->setNom("Groupe Perf {$i}")
-                //         ->setDescription("Groupe de test de performance {$i}");
+                //     $groupe = new GroupeAdaptor();
+                //     $groupe->setNom("Groupe Perf {$i}")
+                //         ->setArchive(false)
+                //         ->setDateCreation(new DateTime());
                 //     $em->persist($groupe);
                 //     $this->addReference("groupe-perf-{$i}", $groupe);
                 // }
                 // $em->flush();
 
-                $this->output->writeln(['  + Groupes perf: SCAFFOLD - en attente de l\'entité GroupeAdaptor.']);
+                $this->output->writeln(['  + Groupes perf: Fixture implementation deferred to Story 2.3+.']);
             }
         }
-        $this->output->writeln(['Groupes: SCAFFOLD - en attente de l\'entité GroupeAdaptor (Story 2.1).']);
+        $this->output->writeln(['Groupes: Fixture implementation deferred to Story 2.3+ (entity exists, no fixtures needed yet).']);
     }
 }

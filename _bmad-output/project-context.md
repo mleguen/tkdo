@@ -206,6 +206,7 @@ public function __invoke(Request $request, Response $response): Response
 **Docker-First Development (CRITICAL):**
 - **NEVER ask users to install tools on the host** - all tools run via Docker
 - **ALWAYS use wrapper scripts** for CLI tools: `./npm`, `./composer`, `./console`, `./doctrine`, `./ng`, `./cypress`, `./k6`
+- **ALWAYS run `docker compose up -d` before running tests** — integration tests depend on services (MySQL, MailDev, etc.). If tests fail with connectivity errors (e.g., "Could not resolve host: maildev"), the Docker environment is not running — fix it, don't treat it as a pre-existing issue.
 - When adding new CLI tools, create a Docker wrapper following existing patterns (see `./npm` or `./k6` for examples)
 - Add new tool services to `docker-compose.yml` with `profiles: [tools]`
 

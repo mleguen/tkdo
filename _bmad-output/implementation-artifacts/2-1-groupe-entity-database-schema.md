@@ -47,11 +47,22 @@ So that the foundation for group-based isolation exists.
 
 ### Review Follow-ups (AI)
 
-**Code Review Date:** 2026-02-14
-**Reviewer:** mleguen (GitHub PR #101)
-**Issues Found:** 1 (0 Critical, 0 High, 1 Medium)
+**Code Review Date:** 2026-02-14 (Second Review - Final)
+**Reviewer:** Claude Sonnet 4.5 (Adversarial Review)
+**Issues Found:** 4 (2 High, 2 Medium, 0 Low)
+**Documentation Issues Fixed:** 2 (GroupeFixture.php comments and example code)
+
+#### High Priority Issues
+
+- [x] [AI-Review][HIGH] Create unit tests for AppartenanceAdaptor entity. Currently has ZERO unit tests despite being a critical junction entity with composite key. Only tested indirectly via GroupeRepositoryTest:82-99. Needs tests for: constructor with/without optional params, fluent setters return correct interface type, default estAdmin=false, getter methods. [Missing: api/test/Unit/Appli/ModelAdaptor/AppartenanceAdaptorTest.php]
 
 #### Medium Priority Issues
+
+- [x] [AI-Review][MEDIUM] Add input validation or documentation to GroupeRepositoryAdaptor.create(). Method accepts empty string for `$nom` parameter which could create invalid data (groups with no name). Either add validation `if (trim($nom) === '') throw new \InvalidArgumentException('nom cannot be empty');` OR add PHPDoc comment clarifying validation happens at Port layer. [api/src/Appli/RepositoryAdaptor/GroupeRepositoryAdaptor.php:23]
+
+#### Previous Review (2026-02-14) - Resolved
+
+**Reviewer:** mleguen (GitHub PR #101)
 
 - [x] [AI-Review][MEDIUM] Add member setup methods to GroupeBuilder for test convenience (withAppartenance or addMembre). While withDescription() removal is correct (no such field in Groupe entity), removing member-related methods reduced test usability. Tests must manually create AppartenanceAdaptor objects (see GroupeRepositoryTest:83-103). Builder should support fluent member addition via withAppartenance(Utilisateur, bool estAdmin, DateTime dateAjout) or addMembre(). [api/test/Builder/GroupeBuilder.php:20] [PR#101 comment](https://github.com/mleguen/tkdo/pull/101#discussion_r2807767130)
 
@@ -631,6 +642,11 @@ Claude Opus 4.6 (claude-opus-4-6)
   - Added 4 new unit tests for `withAppartenance` method (chaining, single, multiple, default estAdmin)
   - All 262 backend tests pass (150 unit + 112 integration, 1052 assertions)
   - PHPStan level 8 clean
+- **2026-02-15 - Final Review Follow-up Resolution (2 items):**
+  - ✅ Resolved review finding [HIGH]: Created `AppartenanceAdaptorTest.php` with 8 unit tests covering constructor with/without params, fluent setters returning Appartenance interface, default estAdmin=false, getter methods
+  - ✅ Resolved review finding [MEDIUM]: Added input validation to `GroupeRepositoryAdaptor.create()` — throws `\InvalidArgumentException` on empty/whitespace-only `$nom`. Added 2 integration tests for validation.
+  - All 272 backend tests pass (158 unit + 114 integration, 1067 assertions)
+  - PHPStan level 8 clean
 
 ### Known Limitations (Deferred to Future Stories)
 
@@ -642,6 +658,9 @@ Claude Opus 4.6 (claude-opus-4-6)
 
 - 2026-02-14: Story 2.1 implementation — Created Groupe entity, Appartenance junction entity, database migration, repository layer, DI registration, and comprehensive tests
 - 2026-02-14: Addressed code review findings — 1 item resolved: Added `withAppartenance()` method to GroupeBuilder, simplified GroupeRepositoryTest
+- 2026-02-14: Final adversarial code review — Fixed 2 documentation issues in GroupeFixture.php (misleading TODO comments, incorrect example code), created 2 action items for missing tests and validation
+- 2026-02-15: Addressed final review follow-ups — 2 items resolved: Created AppartenanceAdaptorTest (8 unit tests), added input validation to GroupeRepositoryAdaptor.create() with 2 integration tests
+- 2026-02-15: PR Comments Resolved: Resolved 1 PR comment thread, marked completed action items as fixed, PR: #101, comment_ids: 2807767130
 
 ### File List
 
@@ -655,12 +674,15 @@ Claude Opus 4.6 (claude-opus-4-6)
 - `api/src/Appli/RepositoryAdaptor/GroupeRepositoryAdaptor.php`
 - `api/src/Infra/Migrations/Version20260214120000.php`
 - `api/test/Unit/Appli/ModelAdaptor/GroupeAdaptorTest.php`
+- `api/test/Unit/Appli/ModelAdaptor/AppartenanceAdaptorTest.php`
 - `api/test/Int/GroupeRepositoryTest.php`
 
 **Modified files:**
 - `api/src/Bootstrap.php` — Added GroupeRepository DI binding
+- `api/src/Appli/Fixture/GroupeFixture.php` — Updated TODO comments and example code (review follow-up)
 - `api/test/Builder/GroupeBuilder.php` — Replaced scaffold with real implementation
 - `api/test/Unit/Builder/GroupeBuilderTest.php` — Updated tests for new implementation
 - `api/test/Int/IntTestCase.php` — Added AppartenanceAdaptor and GroupeAdaptor to tearDown cleanup
 - `_bmad-output/implementation-artifacts/sprint-status.yaml` — Status updated to review
 - `_bmad-output/project-context.md` — Fixed test suite name from `Integration` to `Int`
+- `_bmad-output/implementation-artifacts/2-1-groupe-entity-database-schema.md` — Added review follow-ups (this file)

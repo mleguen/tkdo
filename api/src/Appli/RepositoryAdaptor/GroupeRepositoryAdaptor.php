@@ -22,6 +22,7 @@ class GroupeRepositoryAdaptor implements GroupeRepository
 
     public function create(string $nom): Groupe
     {
+        if (trim($nom) === '') throw new \InvalidArgumentException('nom cannot be empty');
         $groupe = new GroupeAdaptor();
         $groupe->setNom($nom)
             ->setDateCreation(new DateTime());

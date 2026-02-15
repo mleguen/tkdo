@@ -34,6 +34,20 @@ class GroupeRepositoryTest extends IntTestCase
         $this->assertInstanceOf(DateTime::class, $groupe->getDateCreation());
     }
 
+    public function testCreateThrowsOnEmptyNom(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        $this->repo->create('');
+    }
+
+    public function testCreateThrowsOnWhitespaceOnlyNom(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        $this->repo->create('   ');
+    }
+
     public function testReadRetrievesById(): void
     {
         $created = $this->repo->create('Les Amis');
