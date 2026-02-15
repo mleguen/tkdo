@@ -248,6 +248,8 @@ public function __invoke(Request $request, Response $response): Response
 **Database:**
 - Doctrine migrations: version-based naming
 - Fixtures: extend `AppAbstractFixture`, load with `./console -- fixtures`
+- MySQL CLI: `docker compose exec mysql mysql -u tkdo -pmdptkdo tkdo -e "SQL_QUERY_HERE"`
+- After adding new Doctrine-mapped properties, run `./doctrine orm:clear-cache:metadata` and `./doctrine orm:generate-proxies` to refresh the metadata cache (container restarts are unnecessary)
 
 **API:**
 - Base: `/api`, resources: `/api/{resource}`, actions: `/api/{resource}/{id}/{action}`
@@ -311,4 +313,4 @@ No known technical debt at this time. Test suite runs clean with no warnings.
 - Update when technology stack changes
 - Review quarterly for outdated rules
 
-Last Updated: 2026-01-31
+Last Updated: 2026-02-15

@@ -139,6 +139,26 @@ EOS;
     /**
      * {@inheritdoc}
      */
+    public function readOneByIdentifiantOuEmail(string $identifiantOuEmail): Utilisateur
+    {
+        $classDoctrineUtilisateur = UtilisateurAdaptor::class;
+        $dql = <<<EOS
+            SELECT u FROM $classDoctrineUtilisateur u
+            WHERE u.identifiant = :val OR u.email = :val
+EOS;
+        /** @var Utilisateur|null */
+        $result = $this->em->createQuery($dql)
+            ->setParameter('val', $identifiantOuEmail)
+            ->getOneOrNullResult();
+        if ($result === null) {
+            throw new UtilisateurInconnuException();
+        }
+        return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function update(Utilisateur $utilisateur): Utilisateur
     {
         try {

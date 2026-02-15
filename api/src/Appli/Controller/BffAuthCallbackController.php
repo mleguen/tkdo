@@ -49,6 +49,7 @@ class BffAuthCallbackController
     {
         $body = $this->routeService->getParsedRequestBody($request, ['code']);
         $codeClair = $body['code'];
+        $seSouvenir = ($body['se_souvenir'] ?? false) === true;
 
         try {
             // Exchange auth code for access token via back-channel to /oauth/token
@@ -75,14 +76,19 @@ class BffAuthCallbackController
                 $this->logger->warning("Utilisateur {$utilisateur->getId()} appartient à {$groupCount} groupes — risque de dépassement de la taille JWT cookie (4KB)");
             }
 
+            // Determine JWT/cookie validity based on "remember me"
+            $validite = $seSouvenir
+                ? $this->authService->getValiditeSeSouvenir()
+                : $this->authService->getValidite();
+
             // Create application JWT and set HttpOnly cookie
             $auth = AuthAdaptor::fromUtilisateur($utilisateur, $groupeIds, $groupeAdminIds);
-            $jwt = $this->authService->encode($auth);
+            $jwt = $this->authService->encode($auth, $validite);
 
             $this->logger->debug("BFF: utilisateur {$utilisateur->getId()} ({$utilisateur->getNom()}) connecté via OAuth2 callback");
 
             // Set HttpOnly cookie with JWT
-            $response = $this->addCookieHeader($response, $jwt);
+            $response = $this->addCookieHeader($response, $jwt, $validite);
 
             // Return user info (not the JWT)
             return $this->routeService->getResponseWithJsonBody($response, json_encode([
@@ -107,9 +113,9 @@ class BffAuthCallbackController
         }
     }
 
-    private function addCookieHeader(ResponseInterface $response, string $jwt): ResponseInterface
+    private function addCookieHeader(ResponseInterface $response, string $jwt, int $validite): ResponseInterface
     {
-        $expires = time() + $this->authService->getValidite();
+        $expires = time() + $validite;
         $expiresGmt = gmdate('D, d M Y H:i:s', $expires) . ' GMT';
 
         $cookie = sprintf(

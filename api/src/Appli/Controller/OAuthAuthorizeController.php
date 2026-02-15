@@ -73,9 +73,17 @@ class OAuthAuthorizeController
         $this->validateOAuthParams($request, $body);
 
         try {
-            $utilisateur = $this->utilisateurRepository->readOneByIdentifiant($body['identifiant']);
+            $utilisateur = $this->utilisateurRepository->readOneByIdentifiantOuEmail($body['identifiant']);
             if (!$utilisateur->verifieMdp($body['mdp'])) {
+                $utilisateur->incrementeTentativesEchouees();
+                $this->utilisateurRepository->update($utilisateur);
                 throw new UtilisateurInconnuException();
+            }
+
+            // Success: reset failed attempts counter
+            if ($utilisateur->getTentativesEchouees() > 0) {
+                $utilisateur->reinitialiserTentativesEchouees();
+                $this->utilisateurRepository->update($utilisateur);
             }
 
             // Create auth code with 60 second expiry
@@ -98,7 +106,7 @@ class OAuthAuthorizeController
             // Redirect back to login form with error — user stays in SPA flow
             $loginUrl = '/connexion?' . http_build_query([
                 'oauth' => '1',
-                'erreur' => 'identifiants invalides',
+                'erreur' => 'Identifiant ou mot de passe incorrect',
                 'client_id' => $body['client_id'],
                 'redirect_uri' => $body['redirect_uri'],
                 'state' => $state,

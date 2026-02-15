@@ -6,7 +6,7 @@ import {
 } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { AuthCallbackComponent } from './auth-callback.component';
-import { BackendService } from '../backend.service';
+import { BackendService, CLE_SE_SOUVENIR } from '../backend.service';
 
 describe('AuthCallbackComponent', () => {
   let component: AuthCallbackComponent;
@@ -62,6 +62,7 @@ describe('AuthCallbackComponent', () => {
     expect(backendSpy.echangeCode).toHaveBeenCalledWith(
       'test-code',
       'test-state',
+      false,
     );
     expect(router.navigateByUrl).toHaveBeenCalledWith('/profil');
     expect(sessionStorage.getItem('oauth_retour')).toBeNull();
@@ -76,6 +77,66 @@ describe('AuthCallbackComponent', () => {
     await fixture.whenStable();
 
     expect(router.navigateByUrl).toHaveBeenCalledWith('/occasion');
+  });
+
+  it('should read se_souvenir from sessionStorage and pass to echangeCode', async () => {
+    sessionStorage.setItem(CLE_SE_SOUVENIR, 'true');
+    configure({ code: 'test-code', state: 'test-state' });
+    backendSpy.echangeCode.and.returnValue(Promise.resolve());
+
+    const fixture = createComponent();
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    expect(backendSpy.echangeCode).toHaveBeenCalledWith(
+      'test-code',
+      'test-state',
+      true,
+    );
+    // sessionStorage should be cleaned up
+    expect(sessionStorage.getItem(CLE_SE_SOUVENIR)).toBeNull();
+  });
+
+  it('should pass false when se_souvenir not in sessionStorage', async () => {
+    configure({ code: 'test-code', state: 'test-state' });
+    backendSpy.echangeCode.and.returnValue(Promise.resolve());
+
+    const fixture = createComponent();
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    expect(backendSpy.echangeCode).toHaveBeenCalledWith(
+      'test-code',
+      'test-state',
+      false,
+    );
+  });
+
+  it('should redirect to last group when no retour and lastGroupeId exists', async () => {
+    localStorage.setItem('tkdo_lastGroupeId', '42');
+    configure({ code: 'test-code', state: 'test-state' });
+    backendSpy.echangeCode.and.returnValue(Promise.resolve());
+
+    const fixture = createComponent();
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    expect(router.navigateByUrl).toHaveBeenCalledWith('/groupe/42');
+    localStorage.removeItem('tkdo_lastGroupeId');
+  });
+
+  it('should prefer oauth_retour over lastGroupeId', async () => {
+    sessionStorage.setItem('oauth_retour', '/profil');
+    localStorage.setItem('tkdo_lastGroupeId', '42');
+    configure({ code: 'test-code', state: 'test-state' });
+    backendSpy.echangeCode.and.returnValue(Promise.resolve());
+
+    const fixture = createComponent();
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    expect(router.navigateByUrl).toHaveBeenCalledWith('/profil');
+    localStorage.removeItem('tkdo_lastGroupeId');
   });
 
   it('should show error when code is missing', () => {

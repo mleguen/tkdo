@@ -206,4 +206,186 @@ class OAuthAuthorizeControllerTest extends IntTestCase
 
         $this->assertEquals(400, $statusCode);
     }
+
+    public function testPostLoginWithEmailSucceeds(): void
+    {
+        $utilisateur = $this->utilisateur()
+            ->withIdentifiant('emailuser')
+            ->withEmail('emailuser@test.com')
+            ->persist(self::$em);
+
+        $baseUri = getenv('TKDO_BASE_URI');
+        $client = new \GuzzleHttp\Client(['allow_redirects' => false]);
+        $response = $client->request(
+            'POST',
+            $baseUri . self::AUTHORIZE_PATH,
+            [
+                'form_params' => [
+                    'identifiant' => 'emailuser@test.com', // email instead of username
+                    'mdp' => $utilisateur->getMdpClair(),
+                    'client_id' => 'tkdo',
+                    'redirect_uri' => self::VALID_REDIRECT_URI,
+                    'response_type' => 'code',
+                    'state' => 'test',
+                ],
+                'http_errors' => false,
+            ]
+        );
+
+        $this->assertEquals(302, $response->getStatusCode());
+        $location = $response->getHeaderLine('Location');
+        $this->assertStringStartsWith(self::VALID_REDIRECT_URI, $location);
+        $this->assertStringContainsString('code=', $location);
+    }
+
+    public function testPostInvalidCredentialsReturnsStandardizedErrorMessage(): void
+    {
+        $utilisateur = $this->utilisateur()->withIdentifiant('testmsg')->persist(self::$em);
+
+        $baseUri = getenv('TKDO_BASE_URI');
+        $client = new \GuzzleHttp\Client(['allow_redirects' => false]);
+        $response = $client->request(
+            'POST',
+            $baseUri . self::AUTHORIZE_PATH,
+            [
+                'form_params' => [
+                    'identifiant' => $utilisateur->getIdentifiant(),
+                    'mdp' => 'wrong-password',
+                    'client_id' => 'tkdo',
+                    'redirect_uri' => self::VALID_REDIRECT_URI,
+                    'response_type' => 'code',
+                    'state' => 'test',
+                ],
+                'http_errors' => false,
+            ]
+        );
+
+        $this->assertEquals(302, $response->getStatusCode());
+        $location = $response->getHeaderLine('Location');
+        // Verify standardized error message (URL-encoded)
+        $this->assertStringContainsString(
+            'erreur=' . urlencode('Identifiant ou mot de passe incorrect'),
+            $location
+        );
+    }
+
+    public function testPostUnknownUserReturnsStandardizedErrorMessage(): void
+    {
+        $baseUri = getenv('TKDO_BASE_URI');
+        $client = new \GuzzleHttp\Client(['allow_redirects' => false]);
+        $response = $client->request(
+            'POST',
+            $baseUri . self::AUTHORIZE_PATH,
+            [
+                'form_params' => [
+                    'identifiant' => 'nonexistent-user',
+                    'mdp' => 'anypassword',
+                    'client_id' => 'tkdo',
+                    'redirect_uri' => self::VALID_REDIRECT_URI,
+                    'response_type' => 'code',
+                    'state' => 'test',
+                ],
+                'http_errors' => false,
+            ]
+        );
+
+        $this->assertEquals(302, $response->getStatusCode());
+        $location = $response->getHeaderLine('Location');
+        // Same error message for unknown user (no info leak)
+        $this->assertStringContainsString(
+            'erreur=' . urlencode('Identifiant ou mot de passe incorrect'),
+            $location
+        );
+    }
+
+    public function testFailedLoginIncrementsTentativesEchouees(): void
+    {
+        $utilisateur = $this->utilisateur()->withIdentifiant('failcount')->persist(self::$em);
+        $this->assertEquals(0, $utilisateur->getTentativesEchouees());
+
+        $baseUri = getenv('TKDO_BASE_URI');
+        $client = new \GuzzleHttp\Client(['allow_redirects' => false]);
+
+        // First failed attempt
+        $client->request('POST', $baseUri . self::AUTHORIZE_PATH, [
+            'form_params' => [
+                'identifiant' => $utilisateur->getIdentifiant(),
+                'mdp' => 'wrong-password',
+                'client_id' => 'tkdo',
+                'redirect_uri' => self::VALID_REDIRECT_URI,
+                'response_type' => 'code',
+                'state' => 'test',
+            ],
+            'http_errors' => false,
+        ]);
+
+        // Reload from DB to check counter
+        self::$em->clear();
+        $reloaded = self::$em->find(\App\Appli\ModelAdaptor\UtilisateurAdaptor::class, $utilisateur->getId());
+        $this->assertNotNull($reloaded);
+        $this->assertEquals(1, $reloaded->getTentativesEchouees());
+
+        // Second failed attempt
+        $client->request('POST', $baseUri . self::AUTHORIZE_PATH, [
+            'form_params' => [
+                'identifiant' => $utilisateur->getIdentifiant(),
+                'mdp' => 'still-wrong',
+                'client_id' => 'tkdo',
+                'redirect_uri' => self::VALID_REDIRECT_URI,
+                'response_type' => 'code',
+                'state' => 'test',
+            ],
+            'http_errors' => false,
+        ]);
+
+        self::$em->clear();
+        $reloaded = self::$em->find(\App\Appli\ModelAdaptor\UtilisateurAdaptor::class, $utilisateur->getId());
+        $this->assertNotNull($reloaded);
+        $this->assertEquals(2, $reloaded->getTentativesEchouees());
+    }
+
+    public function testSuccessfulLoginResetsTentativesEchouees(): void
+    {
+        $utilisateur = $this->utilisateur()->withIdentifiant('resetcount')->persist(self::$em);
+
+        $baseUri = getenv('TKDO_BASE_URI');
+        $client = new \GuzzleHttp\Client(['allow_redirects' => false]);
+
+        // First: fail once to increment counter
+        $client->request('POST', $baseUri . self::AUTHORIZE_PATH, [
+            'form_params' => [
+                'identifiant' => $utilisateur->getIdentifiant(),
+                'mdp' => 'wrong-password',
+                'client_id' => 'tkdo',
+                'redirect_uri' => self::VALID_REDIRECT_URI,
+                'response_type' => 'code',
+                'state' => 'test',
+            ],
+            'http_errors' => false,
+        ]);
+
+        self::$em->clear();
+        $reloaded = self::$em->find(\App\Appli\ModelAdaptor\UtilisateurAdaptor::class, $utilisateur->getId());
+        $this->assertEquals(1, $reloaded->getTentativesEchouees());
+
+        // Then: login successfully to reset
+        $response = $client->request('POST', $baseUri . self::AUTHORIZE_PATH, [
+            'form_params' => [
+                'identifiant' => $utilisateur->getIdentifiant(),
+                'mdp' => $utilisateur->getMdpClair(),
+                'client_id' => 'tkdo',
+                'redirect_uri' => self::VALID_REDIRECT_URI,
+                'response_type' => 'code',
+                'state' => 'test',
+            ],
+            'http_errors' => false,
+        ]);
+
+        $this->assertEquals(302, $response->getStatusCode());
+        $this->assertStringContainsString('code=', $response->getHeaderLine('Location'));
+
+        self::$em->clear();
+        $reloaded = self::$em->find(\App\Appli\ModelAdaptor\UtilisateurAdaptor::class, $utilisateur->getId());
+        $this->assertEquals(0, $reloaded->getTentativesEchouees());
+    }
 }

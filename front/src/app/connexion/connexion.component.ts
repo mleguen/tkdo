@@ -6,6 +6,7 @@ import { ActivatedRoute } from '@angular/router';
 import {
   BackendService,
   CLE_OAUTH_STATE,
+  CLE_SE_SOUVENIR,
   OAUTH_CLIENT_ID,
 } from '../backend.service';
 
@@ -25,6 +26,7 @@ export class ConnexionComponent {
   formConnexion = this.fb.group({
     identifiant: ['', Validators.required],
     mdp: ['', Validators.required],
+    seSouvenir: [false],
   });
 
   constructor() {
@@ -53,6 +55,12 @@ export class ConnexionComponent {
 
     // Build callback URL
     const callbackUrl = new URL('/auth/callback', this.document.baseURI).href;
+
+    // Store "remember me" preference for AuthCallbackComponent to read
+    sessionStorage.setItem(
+      CLE_SE_SOUVENIR,
+      JSON.stringify(this.formConnexion.get('seSouvenir')?.value ?? false),
+    );
 
     // Submit credentials to OAuth2 authorize endpoint via traditional form POST
     // The server validates and responds with a 302 redirect to the callback URL

@@ -1,6 +1,6 @@
 # Story 1.2: User Login
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 
@@ -54,66 +54,66 @@ Login exists and works via the OAuth2 flow implemented in Stories 1.1/1.1b/1.1c.
 
 ## Tasks / Subtasks
 
-- [ ] Task 1: Support login by email or username (AC: #1, #2, #3)
-  - [ ] 1.1 Add `readOneByIdentifiantOuEmail(string $identifiantOuEmail): Utilisateur` to `UtilisateurRepository` interface
-  - [ ] 1.2 Implement in `UtilisateurRepositoryAdaptor`: DQL query with `WHERE u.identifiant = :val OR u.email = :val`
-  - [ ] 1.3 Update `OAuthAuthorizeController::handlePost()` to use `readOneByIdentifiantOuEmail()` instead of `readOneByIdentifiant()`
+- [x] Task 1: Support login by email or username (AC: #1, #2, #3)
+  - [x] 1.1 Add `readOneByIdentifiantOuEmail(string $identifiantOuEmail): Utilisateur` to `UtilisateurRepository` interface
+  - [x] 1.2 Implement in `UtilisateurRepositoryAdaptor`: DQL query with `WHERE u.identifiant = :val OR u.email = :val`
+  - [x] 1.3 Update `OAuthAuthorizeController::handlePost()` to use `readOneByIdentifiantOuEmail()` instead of `readOneByIdentifiant()`
 
-- [ ] Task 2: Standardize error message (AC: #2, #3)
-  - [ ] 2.1 Change error text in `OAuthAuthorizeController::handlePost()` from `'identifiants invalides'` to `'Identifiant ou mot de passe incorrect'`
-  - [ ] 2.2 Verify same error message for both "user not found" and "wrong password" cases (both caught by `UtilisateurInconnuException`)
+- [x] Task 2: Standardize error message (AC: #2, #3)
+  - [x] 2.1 Change error text in `OAuthAuthorizeController::handlePost()` from `'identifiants invalides'` to `'Identifiant ou mot de passe incorrect'`
+  - [x] 2.2 Verify same error message for both "user not found" and "wrong password" cases (both caught by `UtilisateurInconnuException`)
 
-- [ ] Task 3: Record failed login attempts (AC: #3)
-  - [ ] 3.1 Create Doctrine migration `Version20260215120000`: add `tentatives_echouees INT NOT NULL DEFAULT 0` and `verrouille_jusqua DATETIME NULL` columns to `tkdo_utilisateur`
-  - [ ] 3.2 Add properties to `Utilisateur` interface: `getTentativesEchouees(): int`, `getVerrouilleJusqua(): ?DateTime`
-  - [ ] 3.3 Add Doctrine mapping + getters/setters to `UtilisateurAdaptor`: `$tentativesEchouees` (int), `$verrouilleJusqua` (?DateTime)
-  - [ ] 3.4 Add `incrementeTentativesEchouees()` and `reinitialiserTentativesEchouees()` methods to `Utilisateur` model
-  - [ ] 3.5 In `OAuthAuthorizeController::handlePost()` — on failed login: increment counter and persist
-  - [ ] 3.6 In `OAuthAuthorizeController::handlePost()` — on successful login: reset counter to 0 and persist
-  - [ ] 3.7 Note: Lockout enforcement (blocking after 5 attempts, 15-min lockout) is Story 1.4 — do NOT implement here
+- [x] Task 3: Record failed login attempts (AC: #3)
+  - [x] 3.1 Create Doctrine migration `Version20260215120000`: add `tentatives_echouees INT NOT NULL DEFAULT 0` and `verrouille_jusqua DATETIME NULL` columns to `tkdo_utilisateur`
+  - [x] 3.2 Add properties to `Utilisateur` interface: `getTentativesEchouees(): int`, `getVerrouilleJusqua(): ?DateTime`
+  - [x] 3.3 Add Doctrine mapping + getters/setters to `UtilisateurAdaptor`: `$tentativesEchouees` (int), `$verrouilleJusqua` (?DateTime)
+  - [x] 3.4 Add `incrementeTentativesEchouees()` and `reinitialiserTentativesEchouees()` methods to `Utilisateur` model
+  - [x] 3.5 In `OAuthAuthorizeController::handlePost()` — on failed login: increment counter and persist
+  - [x] 3.6 In `OAuthAuthorizeController::handlePost()` — on successful login: reset counter to 0 and persist
+  - [x] 3.7 Note: Lockout enforcement (blocking after 5 attempts, 15-min lockout) is Story 1.4 — do NOT implement here
 
-- [ ] Task 4: Add "Se souvenir de moi" checkbox to login form (AC: #4)
-  - [ ] 4.1 Add `seSouvenir` boolean form control (default: false) to `ConnexionComponent.formConnexion`
-  - [ ] 4.2 Add checkbox in `connexion.component.html`: label "Se souvenir de moi", id `seSouvenir`
-  - [ ] 4.3 In `ConnexionComponent.connecte()`: store `se_souvenir` value in sessionStorage before form submit
-  - [ ] 4.4 In `AuthCallbackComponent.ngOnInit()`: read `se_souvenir` from sessionStorage, pass to `backend.echangeCode()`
-  - [ ] 4.5 Update `BackendService.echangeCode()` signature to accept optional `seSouvenir: boolean` parameter
-  - [ ] 4.6 Include `se_souvenir` in POST body to `/api/auth/callback`
+- [x] Task 4: Add "Se souvenir de moi" checkbox to login form (AC: #4)
+  - [x] 4.1 Add `seSouvenir` boolean form control (default: false) to `ConnexionComponent.formConnexion`
+  - [x] 4.2 Add checkbox in `connexion.component.html`: label "Se souvenir de moi", id `seSouvenir`
+  - [x] 4.3 In `ConnexionComponent.connecte()`: store `se_souvenir` value in sessionStorage before form submit
+  - [x] 4.4 In `AuthCallbackComponent.ngOnInit()`: read `se_souvenir` from sessionStorage, pass to `backend.echangeCode()`
+  - [x] 4.5 Update `BackendService.echangeCode()` signature to accept optional `seSouvenir: boolean` parameter
+  - [x] 4.6 Include `se_souvenir` in POST body to `/api/auth/callback`
 
-- [ ] Task 5: Backend "Remember me" support (AC: #4)
-  - [ ] 5.1 Add `validiteSeSouvenir: int = 604800` (7 days in seconds) to `AuthSettings`
-  - [ ] 5.2 Add `getValiditeSeSouvenir(): int` method to `AuthService`
-  - [ ] 5.3 Update `BffAuthCallbackController.__invoke()`: read optional `se_souvenir` from request body
-  - [ ] 5.4 If `se_souvenir` is true: use `getValiditeSeSouvenir()` for JWT expiry and cookie Expires
-  - [ ] 5.5 If false or absent: use current `getValidite()` (3600s, 1 hour)
-  - [ ] 5.6 Parameterize `AuthService.encode()` to accept optional `?int $validiteOverride` for custom expiry
+- [x] Task 5: Backend "Remember me" support (AC: #4)
+  - [x] 5.1 Add `validiteSeSouvenir: int = 604800` (7 days in seconds) to `AuthSettings`
+  - [x] 5.2 Add `getValiditeSeSouvenir(): int` method to `AuthService`
+  - [x] 5.3 Update `BffAuthCallbackController.__invoke()`: read optional `se_souvenir` from request body
+  - [x] 5.4 If `se_souvenir` is true: use `getValiditeSeSouvenir()` for JWT expiry and cookie Expires
+  - [x] 5.5 If false or absent: use current `getValidite()` (3600s, 1 hour)
+  - [x] 5.6 Parameterize `AuthService.encode()` to accept optional `?int $validiteOverride` for custom expiry
 
-- [ ] Task 6: Post-login redirect logic (AC: #1)
-  - [ ] 6.1 In `AuthCallbackComponent`: change default redirect from `/occasion` to use stored `tkdo_lastGroupeId` if available, else `/occasion`
-  - [ ] 6.2 Redirect priority: `oauth_retour` (sessionStorage) > `tkdo_lastGroupeId` (localStorage) > `/occasion` (default)
-  - [ ] 6.3 Note: `tkdo_lastGroupeId` will be populated by group navigation when group UI is implemented (Epic 2). For now it will be empty, so default redirect remains `/occasion`
+- [x] Task 6: Post-login redirect logic (AC: #1)
+  - [x] 6.1 In `AuthCallbackComponent`: change default redirect from `/occasion` to use stored `tkdo_lastGroupeId` if available, else `/occasion`
+  - [x] 6.2 Redirect priority: `oauth_retour` (sessionStorage) > `tkdo_lastGroupeId` (localStorage) > `/occasion` (default)
+  - [x] 6.3 Note: `tkdo_lastGroupeId` will be populated by group navigation when group UI is implemented (Epic 2). For now it will be empty, so default redirect remains `/occasion`
 
-- [ ] Task 7: Update tests (AC: #1-4)
-  - [ ] 7.1 Backend integration tests — `OAuthAuthorizeControllerTest`:
+- [x] Task 7: Update tests (AC: #1-4)
+  - [x] 7.1 Backend integration tests — `OAuthAuthorizeControllerTest`:
     - Login with email instead of username succeeds
     - Login with invalid credentials returns correct error message
     - Failed login increments `tentatives_echouees` counter
     - Successful login resets `tentatives_echouees` counter
-  - [ ] 7.2 Backend integration tests — `BffAuthCallbackControllerTest`:
+  - [x] 7.2 Backend integration tests — `BffAuthCallbackControllerTest`:
     - With `se_souvenir: true`: JWT cookie Expires is ~7 days from now
     - With `se_souvenir: false` or absent: JWT cookie Expires is ~1 hour from now
-  - [ ] 7.3 Backend unit tests — `AuthServiceTest` (if needed):
+  - [x] 7.3 Backend unit tests — `AuthServiceTest` (if needed):
     - `encode()` with `validiteOverride` produces correct `exp` claim
-  - [ ] 7.4 Frontend component tests — `ConnexionComponent`:
+  - [x] 7.4 Frontend component tests — `ConnexionComponent`:
     - Checkbox renders and toggles
     - `se_souvenir` stored in sessionStorage when checked
     - `se_souvenir` NOT stored when unchecked
-  - [ ] 7.5 Frontend component tests — `AuthCallbackComponent`:
+  - [x] 7.5 Frontend component tests — `AuthCallbackComponent`:
     - Reads `se_souvenir` from sessionStorage and passes to `echangeCode()`
     - Redirect priority: oauth_retour > lastGroupeId > /occasion
-  - [ ] 7.6 Frontend unit tests — `BackendService`:
+  - [x] 7.6 Frontend unit tests — `BackendService`:
     - `echangeCode()` includes `se_souvenir` in request body when provided
-  - [ ] 7.7 Cypress E2E tests — update `connexion.cy.ts`:
+  - [x] 7.7 Cypress E2E tests — update `connexion.cy.ts`:
     - Full login flow with "Se souvenir de moi" checked
     - Login with email (not username)
     - Error message display on invalid credentials
@@ -338,12 +338,55 @@ a9c7237 docs(story-1.1c): address 6 LOW documentation review follow-ups
 
 ### Agent Model Used
 
-{{agent_model_name_version}}
+Claude Opus 4.6 (claude-opus-4-6)
 
 ### Debug Log References
 
+- **Doctrine metadata cache stale after adding new mapped properties**: After adding `$tentativesEchouees` and `$verrouilleJusqua` to `UtilisateurAdaptor`, integration tests read 0 for `tentatives_echouees` even after incrementing. Root cause: Doctrine metadata cache did not include the new fields. Fix: `./doctrine orm:clear-cache:metadata` + `./doctrine orm:generate-proxies`. No container restart needed — Doctrine cache commands are sufficient.
+- **E2E fixture email mismatch**: Test fixture had `alice@localhost` but actual DB email was `alice@slim-web` (derived from `TKDO_BASE_URI` env var). Fixed by querying actual DB values with `docker compose exec mysql mysql -u tkdo -pmdptkdo tkdo -e "SELECT identifiant, email FROM tkdo_utilisateur;"` and updating fixture accordingly.
+- **PHPStan `property.unusedType` on `$verrouilleJusqua`**: Property typed as `?DateTime` but never assigned a `DateTime` value in this story (lockout logic deferred to Story 1.4). Suppressed with `@phpstan-ignore property.unusedType` annotation.
+
 ### Completion Notes List
+
+- All 7 tasks completed successfully with full test coverage
+- Test results: 309 backend (164 unit + 145 integration), 65 frontend unit, 25 Cypress component, 9 Cypress E2E — all passing
+- **Lesson learned**: After adding new Doctrine-mapped properties, always run `./doctrine orm:clear-cache:metadata` and `./doctrine orm:generate-proxies` to refresh the metadata cache. Container restarts are unnecessary.
+- **MySQL command pattern**: The proper way to run MySQL queries against the dev database is: `docker compose exec mysql mysql -u tkdo -pmdptkdo tkdo -e "SQL_QUERY_HERE"`
 
 ### Change Log
 
+- **Login by email or username**: `OAuthAuthorizeController` now uses `readOneByIdentifiantOuEmail()` to accept either username or email for login
+- **Standardized error message**: Error on invalid credentials changed from "identifiants invalides" to "Identifiant ou mot de passe incorrect"
+- **Failed login attempt recording**: New `tentatives_echouees` counter on `tkdo_utilisateur` table, incremented on failure, reset on success (preparation for Story 1.4 rate limiting)
+- **"Se souvenir de moi" checkbox**: New checkbox on login form, stored via sessionStorage bridge, extends JWT/cookie validity to 7 days (604800s) vs default 1 hour (3600s)
+- **Post-login redirect**: Redirect priority updated to `oauth_retour` > `tkdo_lastGroupeId` > `/occasion`
+- **Database migration**: `Version20260215120000` adds `tentatives_echouees` and `verrouille_jusqua` columns
+
 ### File List
+
+**Created:**
+- `api/src/Infra/Migrations/Version20260215120000.php` — Migration for failed attempt columns
+- `api/test/Unit/Appli/Service/AuthServiceTest.php` — Unit tests for AuthService encode/validity
+
+**Modified (Backend):**
+- `api/src/Dom/Model/Utilisateur.php` — Added `getTentativesEchouees()`, `getVerrouilleJusqua()`, `incrementeTentativesEchouees()`, `reinitialiserTentativesEchouees()` to interface
+- `api/src/Appli/ModelAdaptor/UtilisateurAdaptor.php` — Added `$tentativesEchouees`, `$verrouilleJusqua` properties with Doctrine mapping and methods
+- `api/src/Dom/Repository/UtilisateurRepository.php` — Added `readOneByIdentifiantOuEmail()` to interface
+- `api/src/Appli/RepositoryAdaptor/UtilisateurRepositoryAdaptor.php` — Implemented `readOneByIdentifiantOuEmail()` with DQL
+- `api/src/Appli/Controller/OAuthAuthorizeController.php` — Email lookup, error message, attempt recording
+- `api/src/Appli/Controller/BffAuthCallbackController.php` — Read `se_souvenir`, adjust JWT/cookie validity
+- `api/src/Appli/Service/AuthService.php` — Added `validiteOverride` param to `encode()`, added `getValiditeSeSouvenir()`
+- `api/src/Appli/Settings/AuthSettings.php` — Added `validiteSeSouvenir` property (604800s)
+- `api/test/Int/OAuthAuthorizeControllerTest.php` — 5 new tests (email login, error messages, attempt counter)
+- `api/test/Int/BffAuthCallbackControllerTest.php` — 3 new tests (remember-me cookie duration)
+
+**Modified (Frontend):**
+- `front/src/app/connexion/connexion.component.ts` — Added `seSouvenir` form control, sessionStorage bridge
+- `front/src/app/connexion/connexion.component.html` — Added "Se souvenir de moi" checkbox
+- `front/src/app/auth-callback/auth-callback.component.ts` — Read `se_souvenir`, redirect priority logic
+- `front/src/app/backend.service.ts` — Updated `echangeCode()` with `seSouvenir` param and `CLE_SE_SOUVENIR` constant
+- `front/src/app/connexion/connexion.component.cy.ts` — 5 new component tests (checkbox behavior)
+- `front/src/app/auth-callback/auth-callback.component.spec.ts` — 4 new/updated tests (se_souvenir, redirect priority)
+- `front/src/app/backend.service.spec.ts` — 1 new + 1 updated test (se_souvenir in request body)
+- `front/cypress/e2e/connexion.cy.ts` — 3 new E2E tests (email login, error message, remember me)
+- `front/cypress/fixtures/utilisateurs.json` — Added `email` fields to all user fixtures

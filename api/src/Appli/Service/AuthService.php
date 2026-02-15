@@ -60,11 +60,12 @@ class AuthService
     /**
      * Encode un bearer token contenant l'authentification
      */
-    public function encode(AuthAdaptor $auth): string
+    public function encode(AuthAdaptor $auth, ?int $validiteOverride = null): string
     {
+        $validite = $validiteOverride ?? $this->settings->validite;
         $payload = [
             "sub" => $auth->getIdUtilisateur(),
-            "exp" => \time() + $this->settings->validite,
+            "exp" => \time() + $validite,
             "adm" => $auth->estAdmin(),
             "groupe_ids" => $auth->getGroupeIds(),
             "groupe_admin_ids" => $auth->getGroupeAdminIds(),
@@ -78,5 +79,13 @@ class AuthService
     public function getValidite(): int
     {
         return $this->settings->validite;
+    }
+
+    /**
+     * Get extended JWT validity for "Remember me" sessions, in seconds
+     */
+    public function getValiditeSeSouvenir(): int
+    {
+        return $this->settings->validiteSeSouvenir;
     }
 }

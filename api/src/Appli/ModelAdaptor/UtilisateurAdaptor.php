@@ -78,6 +78,17 @@ class UtilisateurAdaptor implements Utilisateur
      */
     private string $prefNotifIdees = PrefNotifIdees::Aucune;
 
+    /**
+     * @Column(name="tentatives_echouees", type="integer")
+     */
+    private int $tentativesEchouees = 0;
+
+    /**
+     * @Column(name="verrouille_jusqua", type="datetime", nullable=true)
+     * @phpstan-ignore property.unusedType (Doctrine-hydrated; lockout logic in Story 1.4)
+     */
+    private ?DateTime $verrouilleJusqua = null;
+
     public function __construct(?int $id = NULL)
     {
         if (isset($id)) $this->id = $id;
@@ -175,6 +186,22 @@ class UtilisateurAdaptor implements Utilisateur
     /**
      * {@inheritdoc}
      */
+    public function getTentativesEchouees(): int
+    {
+        return $this->tentativesEchouees;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getVerrouilleJusqua(): ?DateTime
+    {
+        return $this->verrouilleJusqua;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function setDateDerniereNotifPeriodique(DateTime $dateDerniereNotifPeriodique): Utilisateur
     {
         $this->dateDerniereNotifPeriodique = $dateDerniereNotifPeriodique;
@@ -254,6 +281,22 @@ class UtilisateurAdaptor implements Utilisateur
     {
         $this->prefNotifIdees = $prefNotifIdees;
         return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function incrementeTentativesEchouees(): void
+    {
+        $this->tentativesEchouees++;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function reinitialiserTentativesEchouees(): void
+    {
+        $this->tentativesEchouees = 0;
     }
 
     /**

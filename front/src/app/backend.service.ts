@@ -101,6 +101,7 @@ interface PostAuthCallbackDTO {
 }
 
 export const CLE_OAUTH_STATE = 'oauth_state';
+export const CLE_SE_SOUVENIR = 'oauth_se_souvenir';
 export const OAUTH_CLIENT_ID = 'tkdo';
 
 @Injectable({
@@ -229,7 +230,7 @@ export class BackendService {
     this.document.location.href = `${URL_OAUTH_AUTHORIZE}?${params.toString()}`;
   }
 
-  async echangeCode(code: string, state: string) {
+  async echangeCode(code: string, state: string, seSouvenir = false) {
     // Validate CSRF state parameter
     const storedState = sessionStorage.getItem(CLE_OAUTH_STATE);
     sessionStorage.removeItem(CLE_OAUTH_STATE);
@@ -242,7 +243,7 @@ export class BackendService {
     const { utilisateur } = await firstValueFrom(
       this.http.post<PostAuthCallbackDTO>(
         URL_AUTH_CALLBACK,
-        { code },
+        { code, se_souvenir: seSouvenir },
         { withCredentials: true },
       ),
     );

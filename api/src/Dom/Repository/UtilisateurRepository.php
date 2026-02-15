@@ -61,6 +61,11 @@ interface UtilisateurRepository
 
     /**
      * @throws UtilisateurInconnuException
+     */
+    public function readOneByIdentifiantOuEmail(string $identifiantOuEmail): Utilisateur;
+
+    /**
+     * @throws UtilisateurInconnuException
      * @throws IdentifiantDejaUtiliseException
      */
     public function update(Utilisateur $utilisateur): Utilisateur;

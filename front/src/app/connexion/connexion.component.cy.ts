@@ -2,7 +2,11 @@ import { provideRouter, Router } from '@angular/router';
 import { TestBed } from '@angular/core/testing';
 
 import { ConnexionComponent } from './connexion.component';
-import { BackendService, CLE_OAUTH_STATE } from '../backend.service';
+import {
+  BackendService,
+  CLE_OAUTH_STATE,
+  CLE_SE_SOUVENIR,
+} from '../backend.service';
 
 describe('ConnexionComponent', () => {
   let formSubmitStub: Cypress.Agent<sinon.SinonStub>;
@@ -77,6 +81,22 @@ describe('ConnexionComponent', () => {
 
     it('should not display error message initially', () => {
       cy.get('.alert-danger').should('not.exist');
+    });
+
+    it('should display "Se souvenir de moi" checkbox', () => {
+      cy.get('#seSouvenir').should('exist').should('be.visible');
+      cy.contains('label', 'Se souvenir de moi').should('exist');
+    });
+
+    it('should have checkbox unchecked by default', () => {
+      cy.get('#seSouvenir').should('not.be.checked');
+    });
+
+    it('should toggle checkbox', () => {
+      cy.get('#seSouvenir').check();
+      cy.get('#seSouvenir').should('be.checked');
+      cy.get('#seSouvenir').uncheck();
+      cy.get('#seSouvenir').should('not.be.checked');
     });
   });
 
@@ -194,6 +214,27 @@ describe('ConnexionComponent', () => {
     it('should not submit form when fields are empty', () => {
       cy.get('#btnSeConnecter').should('be.disabled');
       cy.get('@formSubmit').should('not.have.been.called');
+    });
+
+    it('should store se_souvenir=true in sessionStorage when checkbox is checked', () => {
+      cy.get('#identifiant').type('alice');
+      cy.get('#mdp').type('mdpalice');
+      cy.get('#seSouvenir').check();
+      cy.get('#btnSeConnecter').click();
+
+      cy.window().then(() => {
+        expect(sessionStorage.getItem(CLE_SE_SOUVENIR)).to.equal('true');
+      });
+    });
+
+    it('should store se_souvenir=false in sessionStorage when checkbox is not checked', () => {
+      cy.get('#identifiant').type('alice');
+      cy.get('#mdp').type('mdpalice');
+      cy.get('#btnSeConnecter').click();
+
+      cy.window().then(() => {
+        expect(sessionStorage.getItem(CLE_SE_SOUVENIR)).to.equal('false');
+      });
     });
   });
 

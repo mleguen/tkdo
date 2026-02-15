@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
-import { BackendService } from '../backend.service';
+import { BackendService, CLE_SE_SOUVENIR } from '../backend.service';
 
 @Component({
   selector: 'app-auth-callback',
@@ -33,13 +33,30 @@ export class AuthCallbackComponent implements OnInit {
       return;
     }
 
+    // Read "remember me" preference from sessionStorage bridge
+    const seSouvenir = JSON.parse(
+      sessionStorage.getItem(CLE_SE_SOUVENIR) || 'false',
+    );
+    sessionStorage.removeItem(CLE_SE_SOUVENIR);
+
     this.backend
-      .echangeCode(code, state)
+      .echangeCode(code, state, seSouvenir)
       .then(() => {
-        // Redirect to stored return URL or default to occasions list
-        const retour = sessionStorage.getItem('oauth_retour') || '/occasion';
+        // Redirect priority: oauth_retour > last active group > default
+        const retour = sessionStorage.getItem('oauth_retour');
         sessionStorage.removeItem('oauth_retour');
-        this.router.navigateByUrl(retour);
+        if (retour) {
+          this.router.navigateByUrl(retour);
+          return;
+        }
+
+        const lastGroupeId = localStorage.getItem('tkdo_lastGroupeId');
+        if (lastGroupeId) {
+          this.router.navigateByUrl(`/groupe/${lastGroupeId}`);
+          return;
+        }
+
+        this.router.navigateByUrl('/occasion');
       })
       .catch(() => {
         this.erreur = "échec de l'authentification";
