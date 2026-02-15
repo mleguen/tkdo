@@ -1,0 +1,426 @@
+# Story 2.2: Group Membership in JWT Claims
+
+Status: ready-for-dev
+
+## Story
+
+As a **developer**,
+I want group memberships included in JWT claims,
+So that group context is available for all authenticated requests.
+
+## Acceptance Criteria
+
+1. **Given** a user logs in successfully
+   **When** the JWT is generated
+   **Then** it includes a `groupe_ids` claim with array of active (non-archived) group IDs
+   **And** it includes a `groupe_admin_ids` claim with array of groups where user is admin
+
+2. **Given** a user is added to a new group
+   **When** they refresh their session (via invite flow)
+   **Then** the new group appears in their `groupe_ids` claim
+
+3. **Given** a group is archived
+   **When** the user's JWT is next refreshed
+   **Then** that group is removed from `groupe_ids`
+
+## Tasks / Subtasks
+
+- [ ] Task 1: Extend Auth interface and AuthAdaptor for `groupe_admin_ids` (AC: #1)
+  - [ ] 1.1 Add `getGroupeAdminIds(): array` to `api/src/Dom/Model/Auth.php`
+  - [ ] 1.2 Add `$groupeAdminIds` constructor parameter and getter to `api/src/Appli/ModelAdaptor/AuthAdaptor.php`
+  - [ ] 1.3 Update `AuthAdaptor::fromUtilisateur()` signature to accept `$groupeAdminIds` parameter
+  - [ ] 1.4 Update unit tests for AuthAdaptor
+
+- [ ] Task 2: Add `groupe_admin_ids` to JWT encode/decode (AC: #1)
+  - [ ] 2.1 Add `groupe_admin_ids` claim to `AuthService.encode()` payload
+  - [ ] 2.2 Parse `groupe_admin_ids` from payload in `AuthService.decode()` (with fallback to `[]` for old tokens)
+  - [ ] 2.3 Update existing AuthService unit tests
+
+- [ ] Task 3: Add membership query to GroupeRepository (AC: #1, #3)
+  - [ ] 3.1 Add `readAppartenancesForUtilisateur(int $utilisateurId): array` to `api/src/Dom/Repository/GroupeRepository.php`
+  - [ ] 3.2 Implement in `api/src/Appli/RepositoryAdaptor/GroupeRepositoryAdaptor.php` with DQL joining Appartenance + Groupe, filtering `archive = false`
+  - [ ] 3.3 Write integration tests for the new method (user with groups, user without groups, archived group exclusion, admin flag extraction)
+
+- [ ] Task 4: Update AuthTokenController to populate JWT claims (AC: #1, #2, #3)
+  - [ ] 4.1 Inject `GroupeRepository` into `AuthTokenController` constructor
+  - [ ] 4.2 Query user's active group memberships during token exchange
+  - [ ] 4.3 Extract `groupe_ids` (all active groups) and `groupe_admin_ids` (admin groups) from query result
+  - [ ] 4.4 Pass real arrays to `AuthAdaptor::fromUtilisateur()` (replace hardcoded `[]`)
+  - [ ] 4.5 Update response body to include real `groupe_ids` and `groupe_admin_ids`
+
+- [ ] Task 5: Write comprehensive integration tests (AC: #1, #2, #3)
+  - [ ] 5.1 Test token exchange with user in active groups returns correct `groupe_ids` and `groupe_admin_ids`
+  - [ ] 5.2 Test token exchange with user as admin in some groups returns correct `groupe_admin_ids`
+  - [ ] 5.3 Test token exchange with user in archived group excludes that group from `groupe_ids`
+  - [ ] 5.4 Test token exchange with user in no groups returns empty arrays
+  - [ ] 5.5 Test JWT cookie contains correct claims (decode and verify)
+  - [ ] 5.6 Run `./composer test` — all tests pass (274+ existing + new)
+
+## Dev Notes
+
+### Brownfield Context
+
+**JWT infrastructure already exists (Story 1.1):**
+- `AuthService.php` encodes/decodes JWT with `groupe_ids` claim — currently always empty `[]`
+- `AuthAdaptor.php` holds claims including `groupeIds` array — populated with `[]`
+- `AuthTokenController.php` (line 66): `AuthAdaptor::fromUtilisateur($utilisateur, [])` — the `[]` is what this story replaces
+- `AuthTokenController.php` (line 82): Response body returns `'groupe_ids' => []` — must return actual data
+- Story 1.1 left TODO comments at both locations: "Will be populated in Story 2.2+"
+
+**Group entities exist (Story 2.1):**
+- `Groupe` entity with `id, nom, archive, dateCreation` + `appartenances` OneToMany collection
+- `Appartenance` junction entity with `groupe_id, utilisateur_id, estAdmin, dateAjout`
+- `GroupeRepository` with `create, read, readAll, update` methods
+- Tables: `tkdo_groupe`, `tkdo_groupe_utilisateur` with FK constraints and composite PK
+
+**Story 2.1 explicitly deferred to 2.2:**
+- "Extend Utilisateur interface/entity — that's Story 2.2"
+- "No `inversedBy` on `$utilisateur` — Utilisateur extension happens in Story 2.2"
+- This means `AppartenanceAdaptor.$utilisateur` currently has `@ManyToOne` WITHOUT `inversedBy`
+
+**What this story does NOT do:**
+- No API endpoints (those are Stories 2.3+)
+- No frontend changes (JWT is HttpOnly cookie, frontend can't read it)
+- No Utilisateur interface extension (use DQL query in repository instead — cleaner, more efficient)
+
+### Technical Requirements
+
+#### Auth Interface Extension
+
+Add `getGroupeAdminIds()` to the existing `Auth` interface:
+
+```php
+// api/src/Dom/Model/Auth.php — ADD:
+/**
+ * @return int[]
+ */
+public function getGroupeAdminIds(): array;
+```
+
+#### AuthAdaptor Extension
+
+Add `$groupeAdminIds` parameter to constructor and factory method:
+
+```php
+// api/src/Appli/ModelAdaptor/AuthAdaptor.php
+
+/**
+ * @param int[] $groupeIds
+ * @param int[] $groupeAdminIds
+ */
+public static function fromUtilisateur(Utilisateur $utilisateur, array $groupeIds = [], array $groupeAdminIds = []): AuthAdaptor
+{
+    return new AuthAdaptor($utilisateur->getId(), $utilisateur->getAdmin(), $groupeIds, $groupeAdminIds);
+}
+
+/**
+ * @param int[] $groupeIds
+ * @param int[] $groupeAdminIds
+ */
+public function __construct(
+    private readonly int $idUtilisateur,
+    private readonly bool $admin,
+    private readonly array $groupeIds = [],
+    private readonly array $groupeAdminIds = []
+) {
+}
+
+/**
+ * @return int[]
+ */
+#[\Override]
+public function getGroupeAdminIds(): array
+{
+    return $this->groupeAdminIds;
+}
+```
+
+#### AuthService JWT Claims Extension
+
+Encode and decode `groupe_admin_ids`:
+
+```php
+// api/src/Appli/Service/AuthService.php
+
+// In encode():
+$payload = [
+    "sub" => $auth->getIdUtilisateur(),
+    "exp" => \time() + $this->settings->validite,
+    "adm" => $auth->estAdmin(),
+    "groupe_ids" => $auth->getGroupeIds(),
+    "groupe_admin_ids" => $auth->getGroupeAdminIds(),  // ADD
+];
+
+// In decode():
+/** @var int[] $groupeIds */
+$groupeIds = isset($payload->groupe_ids) ? (array) $payload->groupe_ids : [];
+/** @var int[] $groupeAdminIds */
+$groupeAdminIds = isset($payload->groupe_admin_ids) ? (array) $payload->groupe_admin_ids : [];
+return new AuthAdaptor(
+    intval($payload->sub),
+    isset($payload->adm) && $payload->adm,
+    $groupeIds,
+    $groupeAdminIds  // ADD
+);
+```
+
+#### GroupeRepository Membership Query
+
+Add a method to query a user's active group memberships efficiently via DQL (not by loading full entity graph):
+
+```php
+// api/src/Dom/Repository/GroupeRepository.php — ADD:
+
+/**
+ * @return Appartenance[]
+ */
+public function readAppartenancesForUtilisateur(int $utilisateurId): array;
+```
+
+Implementation in GroupeRepositoryAdaptor using DQL:
+
+```php
+// api/src/Appli/RepositoryAdaptor/GroupeRepositoryAdaptor.php — ADD:
+
+/**
+ * @return Appartenance[]
+ */
+public function readAppartenancesForUtilisateur(int $utilisateurId): array
+{
+    $qb = $this->em->createQueryBuilder();
+    $qb->select('a')
+        ->from(AppartenanceAdaptor::class, 'a')
+        ->join('a.groupe', 'g')
+        ->where('a.utilisateur = :utilisateurId')
+        ->andWhere('g.archive = false')
+        ->setParameter('utilisateurId', $utilisateurId);
+
+    /** @var Appartenance[] */
+    return $qb->getQuery()->getResult();
+}
+```
+
+Then extract IDs in the controller:
+
+```php
+$appartenances = $this->groupeRepository->readAppartenancesForUtilisateur($utilisateur->getId());
+$groupeIds = array_map(fn(Appartenance $a) => $a->getGroupe()->getId(), $appartenances);
+$groupeAdminIds = array_map(
+    fn(Appartenance $a) => $a->getGroupe()->getId(),
+    array_filter($appartenances, fn(Appartenance $a) => $a->getEstAdmin())
+);
+```
+
+#### AuthTokenController Update
+
+Inject GroupeRepository and populate claims:
+
+```php
+// api/src/Appli/Controller/AuthTokenController.php
+
+// Constructor — ADD GroupeRepository parameter:
+public function __construct(
+    private readonly AuthCodeRepository $authCodeRepository,
+    private readonly AuthService $authService,
+    private readonly EntityManager $em,
+    private readonly GroupeRepository $groupeRepository,  // ADD
+    private readonly LoggerInterface $logger,
+    private readonly RouteService $routeService,
+    private readonly UtilisateurRepository $utilisateurRepository
+) {
+}
+
+// In __invoke() — REPLACE lines 65-66:
+$appartenances = $this->groupeRepository->readAppartenancesForUtilisateur($utilisateur->getId());
+$groupeIds = array_map(fn(Appartenance $a) => $a->getGroupe()->getId(), $appartenances);
+$groupeAdminIds = array_map(
+    fn(Appartenance $a) => $a->getGroupe()->getId(),
+    array_filter($appartenances, fn(Appartenance $a) => $a->getEstAdmin())
+);
+$auth = AuthAdaptor::fromUtilisateur($utilisateur, $groupeIds, $groupeAdminIds);
+$jwt = $this->authService->encode($auth);
+
+// In response body — REPLACE lines 82:
+'groupe_ids' => $groupeIds,
+'groupe_admin_ids' => $groupeAdminIds,
+```
+
+### Architecture Compliance
+
+**From architecture.md — JWT Claims:**
+- `groupe_ids` claim in JWT for fast read-path access (ARCH4)
+- JWT claims are for read filtering only; writes MUST validate against database (Enforcement Rule 9)
+- Short-lived tokens; explicit refresh on invitation acceptance
+
+**From architecture.md — Group Isolation:**
+- Defense in Depth: Port validates membership, Repository filters queries (ARCH8)
+- Return 404 (not 403) for isolation violations
+- JWT `groupe_ids` claim enables implicit group context in API requests
+
+**From architecture.md — Entity Naming:**
+
+| Entity | Interface | Adaptor | Table |
+|--------|-----------|---------|-------|
+| Group | `Groupe` | `GroupeAdaptor` | `tkdo_groupe` |
+| Membership | `Appartenance` | `AppartenanceAdaptor` | `tkdo_groupe_utilisateur` |
+
+**From project-context.md — Mandatory Patterns:**
+- `declare(strict_types=1);` in EVERY PHP file
+- `#[\Override]` on all method overrides
+- Explicit return types on all methods (except `__construct`)
+- Old-style Doctrine annotations (`@Entity`, `@Column`), NOT PHP 8 attributes
+- PHPStan level 8 clean
+
+### Library/Framework Requirements
+
+- **Firebase JWT 6.4**: Already in use for RS256 encoding/decoding. No version changes needed.
+- **Doctrine ORM 2.17**: DQL QueryBuilder for membership queries. Already in use.
+- **PHP-DI 7.0**: Autowiring handles GroupeRepository injection into AuthTokenController. No config change needed (GroupeRepository already registered in Bootstrap.php).
+
+### File Structure Requirements
+
+**Files to Modify:**
+
+```
+api/src/
+├── Dom/
+│   ├── Model/
+│   │   └── Auth.php                     # Add getGroupeAdminIds()
+│   └── Repository/
+│       └── GroupeRepository.php         # Add readAppartenancesForUtilisateur()
+├── Appli/
+│   ├── ModelAdaptor/
+│   │   └── AuthAdaptor.php              # Add $groupeAdminIds parameter
+│   ├── RepositoryAdaptor/
+│   │   └── GroupeRepositoryAdaptor.php  # Implement membership query
+│   ├── Controller/
+│   │   └── AuthTokenController.php      # Inject GroupeRepo, populate claims
+│   └── Service/
+│       └── AuthService.php              # Add groupe_admin_ids to JWT
+
+api/test/
+├── Int/
+│   └── AuthTokenControllerTest.php      # Add group membership tests
+└── (possible new unit test files for AuthAdaptor/AuthService changes)
+```
+
+**No new files expected** — all changes extend existing files. If AuthAdaptor or AuthService lack unit tests, create them in the appropriate Unit test directory.
+
+### Testing Requirements
+
+**Integration Tests (`api/test/Int/AuthTokenControllerTest.php`) — ADD:**
+- `testValidCodeWithActiveGroupsReturnsGroupeIds`: Create user with 2 active groups (1 as admin), verify response `groupe_ids` contains both IDs, `groupe_admin_ids` contains only admin group ID
+- `testValidCodeWithArchivedGroupExcludesFromGroupeIds`: Create user with 1 active + 1 archived group, verify only active group in `groupe_ids`
+- `testValidCodeWithNoGroupsReturnsEmptyArrays`: Existing test already covers this (line 55 asserts `[]`), update to also check `groupe_admin_ids`
+
+**Integration Tests for GroupeRepositoryAdaptor — ADD to `api/test/Int/GroupeRepositoryTest.php`:**
+- `testReadAppartenancesForUtilisateurReturnsActiveGroupMemberships`
+- `testReadAppartenancesForUtilisateurExcludesArchivedGroups`
+- `testReadAppartenancesForUtilisateurWithNoGroupsReturnsEmpty`
+- `testReadAppartenancesForUtilisateurPreservesAdminFlag`
+
+**Verification:**
+```bash
+./composer test -- --testsuite=Unit       # All unit tests pass
+./composer test -- --testsuite=Int        # All integration tests pass
+./composer test                           # Full suite (274+ existing + new)
+./composer phpstan                        # PHPStan level 8 clean
+```
+
+### Anti-Pattern Prevention
+
+**DO NOT:**
+- Extend `Utilisateur` interface with group methods — this story only extends JWT claims infrastructure. The repository query approach is more efficient than loading full entity graphs through Doctrine lazy-loading.
+- Add `@OneToMany` to `UtilisateurAdaptor` for appartenances — not needed for this story. DQL query via GroupeRepository is cleaner and avoids loading unnecessary entity relationships.
+- Add `inversedBy` to `AppartenanceAdaptor.$utilisateur` — not needed for the DQL approach. The query joins directly on the Appartenance entity.
+- Create new controller or API endpoint — this story modifies existing token exchange only.
+- Trust JWT claims for write authorization — JWT `groupe_ids` may be stale. Writes must validate against database.
+- Forget backward compatibility in `AuthService.decode()` — old tokens without `groupe_admin_ids` must still decode (use `isset()` check with `[]` fallback).
+- Skip the `[]` default in AuthAdaptor constructor for `$groupeAdminIds` — existing code creates AuthAdaptor without admin IDs (e.g., decode of old tokens).
+- Modify frontend code — JWT is HttpOnly cookie, frontend cannot read it. Frontend gets group data from response body.
+- Use PHP 8 attributes instead of Doctrine annotations.
+- Use constructor property promotion inconsistently — AuthAdaptor already uses it, keep consistent.
+
+**DO:**
+- Use DQL QueryBuilder for the membership query (efficient, avoids N+1)
+- Filter `archive = false` in the DQL query (not in PHP after loading)
+- Use `array_map()` and `array_filter()` to extract IDs and admin IDs from Appartenance results
+- Maintain backward compatibility for JWT decode (old tokens without `groupe_admin_ids`)
+- Update the existing test that asserts `groupe_ids => []` (line 55 of AuthTokenControllerTest)
+- Remove TODO comments ("Will be populated in Story 2.2+") from AuthTokenController
+- Run `./composer test` after EACH task
+- Keep `GroupeRepository` registration in Bootstrap.php unchanged (already registered)
+
+### Previous Story Intelligence
+
+**From Story 2.1 (Groupe Entity & Database Schema) — DONE:**
+- GroupeBuilder has `withAppartenance(Utilisateur, bool, ?DateTime)` for easy test setup
+- `IntTestCase.tearDown()` cleans `AppartenanceAdaptor` before `GroupeAdaptor` (FK order)
+- 274 backend tests pass (158 unit + 116 integration, 1069 assertions)
+- PHPStan level 8 clean
+- `GroupeRepositoryAdaptor` has input validation on `create()` and `update()` (empty nom check)
+- Migration `Version20260214120000.php` creates both tables with correct FK constraints
+
+**From Story 1.1 (JWT Token Exchange System):**
+- Two-step auth flow: credentials -> auth code -> token exchange -> HttpOnly cookie
+- `AuthService` handles RS256 JWT encode/decode with Firebase JWT
+- `AuthAdaptor::fromUtilisateur()` factory creates Auth from Utilisateur + group arrays
+- AuthTokenController already has `EntityManager` injected (for auth code queries)
+- Cookie set via `CookieConfigTrait.addCookieHeader()` — no change needed
+- Frontend uses `withCredentials: true` to send cookies — no change needed
+
+**From Story 1.1 Dev Log:**
+- PHPStan level 8 requires explicit `@var` annotations for array types in query results
+- Test builders follow French fluent API: `GroupeBuilder::unGroupe()->withNom('test')`
+- IntTestCase `requestApi()` method supports both Slim and curl-based testing
+
+### Git Intelligence
+
+**Recent commit patterns:**
+- `feat(story-X.Y):` for main implementation
+- `fix(story-X.Y):` for review follow-ups
+- `chore(review):` for review-only changes
+- Branch naming: `story/X.Y-short-description` (with slash separator)
+- All 274 backend tests pass on current branch
+
+**Files from Story 2.1 relevant to Story 2.2:**
+- `api/src/Appli/ModelAdaptor/GroupeAdaptor.php` — has `@OneToMany` for appartenances
+- `api/src/Appli/ModelAdaptor/AppartenanceAdaptor.php` — has `@ManyToOne` for groupe and utilisateur
+- `api/src/Appli/RepositoryAdaptor/GroupeRepositoryAdaptor.php` — will add new method here
+- `api/test/Builder/GroupeBuilder.php` — has `withAppartenance()` for test convenience
+
+### Project Structure Notes
+
+- All modifications stay within existing hexagonal architecture layers
+- Auth claims (Dom) -> AuthAdaptor (Appli) -> AuthService (Appli) -> AuthTokenController (Appli)
+- GroupeRepository (Dom) -> GroupeRepositoryAdaptor (Appli) — already registered in Bootstrap.php
+- No new DI bindings needed — GroupeRepository is already wired
+
+### References
+
+- [Source: _bmad-output/planning-artifacts/epics.md#Epic-2, Story-2.2]
+- [Source: _bmad-output/planning-artifacts/architecture.md#Authentication-Security — JWT groupe_ids claim]
+- [Source: _bmad-output/planning-artifacts/architecture.md#Group-Isolation-Enforcement — Defense in Depth]
+- [Source: _bmad-output/planning-artifacts/architecture.md#Enforcement-Guidelines — Rule 9: JWT claims may be stale]
+- [Source: _bmad-output/project-context.md#Critical-Implementation-Rules]
+- [Source: api/src/Dom/Model/Auth.php] — Auth interface with getGroupeIds()
+- [Source: api/src/Appli/ModelAdaptor/AuthAdaptor.php] — Auth claims holder with groupeIds
+- [Source: api/src/Appli/Service/AuthService.php] — JWT encode/decode with groupe_ids
+- [Source: api/src/Appli/Controller/AuthTokenController.php:66] — "groupe_ids will be populated in Story 2.2+"
+- [Source: api/src/Appli/Controller/AuthTokenController.php:82] — Response body with hardcoded []
+- [Source: api/src/Appli/RepositoryAdaptor/GroupeRepositoryAdaptor.php] — GroupeRepository implementation
+- [Source: api/src/Appli/ModelAdaptor/AppartenanceAdaptor.php] — Junction entity with estAdmin flag
+- [Source: api/test/Int/AuthTokenControllerTest.php:55] — Existing test asserting groupe_ids = []
+- [Source: _bmad-output/implementation-artifacts/2-1-groupe-entity-database-schema.md] — Previous story context
+
+## Dev Agent Record
+
+### Agent Model Used
+
+{{agent_model_name_version}}
+
+### Debug Log References
+
+### Completion Notes List
+
+### File List
