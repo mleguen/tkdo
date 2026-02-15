@@ -239,6 +239,12 @@ public function __invoke(Request $request, Response $response): Response
 - Exception: Tests may legitimately fail at end of one task if another task in the same story is designed to fix them
 - **Failing tests block progress** - fix or explain before proceeding to the next task
 
+**Pull Request Descriptions:**
+- Expected sections: **Summary**, **Key Changes**, **Test Results**, **Progress**, and **Known Limitations** (when any)
+- Do NOT include Commits or Files Changed sections — GitHub already provides this information automatically
+- Progress should reflect the story lifecycle with checked/unchecked items showing what is done and what still needs doing (e.g., code review)
+- Do NOT list merge as a progress step — GitHub already indicates when a PR is merged
+
 **Docker & Scripts:**
 - Wrappers: `./console`, `./doctrine`, `./composer`, `./ng`, `./npm`, `./cypress`, `./k6`
 - `./composer test`, `./composer phpstan`, `./composer rector`
