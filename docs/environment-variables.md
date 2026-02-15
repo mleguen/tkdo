@@ -37,7 +37,7 @@ MYSQL_HOST=localhost
 MYSQL_DATABASE=tkdo
 MYSQL_USER=tkdo_user
 MYSQL_PASSWORD=secure_password
-TKDO_BASE_URI=https://tkdo.example.com
+TKDO_API_BASE_URI=https://tkdo.example.com
 TKDO_DEV_MODE=0
 ```
 
@@ -59,7 +59,7 @@ Set in Apache virtual host configuration:
     SetEnv MYSQL_DATABASE "tkdo"
     SetEnv MYSQL_USER "tkdo_user"
     SetEnv MYSQL_PASSWORD "secure_password"
-    SetEnv TKDO_BASE_URI "https://tkdo.example.com"
+    SetEnv TKDO_API_BASE_URI "https://tkdo.example.com"
     SetEnv TKDO_DEV_MODE "0"
 </VirtualHost>
 ```
@@ -331,7 +331,7 @@ MYSQL_PASSWORD=secure_random_password_here
 
 These variables configure the application behavior and URLs.
 
-### TKDO_BASE_URI
+### TKDO_API_BASE_URI
 
 **Description:** Base URL where the application is accessible
 
@@ -344,10 +344,10 @@ These variables configure the application behavior and URLs.
 **Examples:**
 
 ```bash
-TKDO_BASE_URI=https://tkdo.example.com           # Production
-TKDO_BASE_URI=https://gifts.company.com          # Custom domain
-TKDO_BASE_URI=http://localhost:4200              # Development
-TKDO_BASE_URI=http://192.168.1.100:8080         # Local network
+TKDO_API_BASE_URI=https://tkdo.example.com           # Production
+TKDO_API_BASE_URI=https://gifts.company.com          # Custom domain
+TKDO_API_BASE_URI=http://localhost:4200              # Development
+TKDO_API_BASE_URI=http://192.168.1.100:8080         # Local network
 ```
 
 **Usage:**
@@ -492,37 +492,37 @@ OAUTH2_CLIENT_SECRET=your-production-secret-here          # Production
 - Different secret for each environment
 - Rotate regularly in production
 
-### OAUTH2_REDIRECT_URI
+### TKDO_FRONT_BASE_URI
 
-**Description:** OAuth2 callback URL where users are redirected after authentication
+**Description:** Base URL of the frontend application. Used to build the OAuth2 redirect URI (`{TKDO_FRONT_BASE_URI}/auth/callback`).
 
-**Type:** String (URL)
+**Type:** String (URL, no trailing slash)
 
 **Required:** No
 
-**Default:** `http://localhost:4200/auth/callback`
+**Default:** `http://localhost:4200`
 
 **Examples:**
 
 ```bash
-OAUTH2_REDIRECT_URI=http://localhost:4200/auth/callback      # Development
-OAUTH2_REDIRECT_URI=https://tkdo.example.com/auth/callback   # Production
+TKDO_FRONT_BASE_URI=http://localhost:4200              # Development
+TKDO_FRONT_BASE_URI=https://tkdo.example.com           # Production
 ```
 
-**Why a separate env var?** `TKDO_BASE_URI` points to the **backend** (e.g., `http://localhost:8080`), but the OAuth2 redirect target is the **frontend** (e.g., `http://localhost:4200/auth/callback`). In development these are different origins; in production behind a reverse proxy they may share a domain but the distinction is still useful for clarity.
+**Why a separate env var from `TKDO_API_BASE_URI`?** `TKDO_API_BASE_URI` points to the **backend** (e.g., `http://localhost:8080`), while `TKDO_FRONT_BASE_URI` points to the **frontend** (e.g., `http://localhost:4200`). In development these are different origins; in production behind a reverse proxy they may share a domain.
 
 **Usage:**
 
-- Must match the URL registered with your OAuth2 provider
-- Used for redirect_uri validation (open redirect protection)
+- The code appends `/auth/callback` to build the full OAuth2 redirect URI
+- The resulting redirect URI must match what is registered with your OAuth2 provider
 - Must include protocol (`http://` or `https://`)
-- Path must be `/auth/callback` (handled by Angular `AuthCallbackComponent` — this is a frontend SPA route, not a server endpoint)
+- Used for redirect_uri validation (open redirect protection)
 
 **Impact:**
 
-- Authorization flow redirects here with the authorization code
+- Authorization flow redirects to `{TKDO_FRONT_BASE_URI}/auth/callback` with the authorization code
 - Path-based validation prevents open redirect attacks
-- Must be configured as allowed redirect URI in external IdP settings
+- When switching to an external IdP, register `{TKDO_FRONT_BASE_URI}/auth/callback` as allowed redirect URI
 
 ### Switching to External Identity Provider
 
@@ -531,7 +531,7 @@ To switch from the temporary auth server to an external IdP (Google, Auth0, etc.
 **1. Register your application with the IdP**
 
 - Obtain `OAUTH2_CLIENT_ID` and `OAUTH2_CLIENT_SECRET`
-- Register `OAUTH2_REDIRECT_URI` as an allowed callback URL
+- Register `{TKDO_FRONT_BASE_URI}/auth/callback` as an allowed callback URL
 
 **2. Update environment variables**
 
@@ -539,7 +539,7 @@ To switch from the temporary auth server to an external IdP (Google, Auth0, etc.
 # Example: Auth0
 OAUTH2_CLIENT_ID=AbC123XyZ
 OAUTH2_CLIENT_SECRET=your-auth0-client-secret
-OAUTH2_REDIRECT_URI=https://tkdo.example.com/auth/callback
+TKDO_FRONT_BASE_URI=https://tkdo.example.com
 ```
 
 **3. Update OAuth2Settings.php** (one-time code change)
@@ -567,7 +567,7 @@ These variables configure email sending.
 
 **Required:** No
 
-**Default:** `Tkdo <noreply@{hostname}>` where hostname is extracted from `TKDO_BASE_URI`
+**Default:** `Tkdo <noreply@{hostname}>` where hostname is extracted from `TKDO_API_BASE_URI`
 
 **Examples:**
 
@@ -639,7 +639,7 @@ See [Development Setup Guide](dev-setup.md#email-testing-with-maildev) for using
 #MYSQL_PASSWORD=mdptkdo
 
 # Application configuration (defaults are suitable for development)
-#TKDO_BASE_URI=http://localhost:4200
+#TKDO_API_BASE_URI=http://localhost:4200
 #TKDO_API_BASE_PATH=
 #TKDO_DEV_MODE=1
 
@@ -671,7 +671,7 @@ MYSQL_USER=tkdo_prod_user
 MYSQL_PASSWORD=randomly_generated_secure_password_here
 
 # Application configuration (must be set for production)
-TKDO_BASE_URI=https://tkdo.example.com
+TKDO_API_BASE_URI=https://tkdo.example.com
 #TKDO_API_BASE_PATH=/api
 TKDO_DEV_MODE=0
 
@@ -682,7 +682,7 @@ TKDO_DEV_MODE=0
 **Note:** Commented variables use suitable defaults. Required variables:
 
 - `MYSQL_PASSWORD` - Must be changed from default
-- `TKDO_BASE_URI` - Must match your domain
+- `TKDO_API_BASE_URI` - Must match your domain
 - `TKDO_DEV_MODE=0` - Must be set to production mode
 
 **Characteristics:**
@@ -705,7 +705,7 @@ MYSQL_USER=tkdo_staging_user
 MYSQL_PASSWORD=staging_password_here
 
 # Application configuration (staging URL)
-TKDO_BASE_URI=https://staging.tkdo.example.com
+TKDO_API_BASE_URI=https://staging.tkdo.example.com
 #TKDO_API_BASE_PATH=/api
 TKDO_DEV_MODE=0
 
@@ -792,7 +792,7 @@ Before deploying to production:
 
 - [ ] `TKDO_DEV_MODE` set to `0`
 - [ ] Strong `MYSQL_PASSWORD` set
-- [ ] `TKDO_BASE_URI` uses `https://`
+- [ ] `TKDO_API_BASE_URI` uses `https://`
 - [ ] `.env.prod` not in version control
 - [ ] `.env.prod` has correct file permissions (600 or 640)
 - [ ] All required variables are set
@@ -813,7 +813,7 @@ MYSQL_USER=tkdo_prod_user
 MYSQL_PASSWORD=XyZ123!SecureRandomPassword456
 
 # Application Configuration
-TKDO_BASE_URI=https://tkdo.example.com
+TKDO_API_BASE_URI=https://tkdo.example.com
 #TKDO_API_BASE_PATH=/api
 TKDO_DEV_MODE=0
 
@@ -834,7 +834,7 @@ TKDO_DEV_MODE=0
 | `MYSQL_DATABASE`     | No       | `tkdo`                  | String    | Database    |
 | `MYSQL_USER`         | No       | `tkdo`                  | String    | Database    |
 | `MYSQL_PASSWORD`     | No       | `mdptkdo`               | String 🔒 | Database    |
-| `TKDO_BASE_URI`      | No       | `http://localhost:4200` | URL       | Application |
+| `TKDO_API_BASE_URI`      | No       | `http://localhost:4200` | URL       | Application |
 | `TKDO_API_BASE_PATH` | No       | `` (empty)              | String    | Application |
 | `TKDO_DEV_MODE`      | No       | `1`                     | Boolean   | Application |
 | `TKDO_MAILER_FROM`   | No       | `Tkdo <noreply@host>`   | Email     | Email       |
@@ -848,7 +848,7 @@ The absolute minimum for production (relying on defaults):
 ```bash
 # api/.env.prod
 MYSQL_PASSWORD=your_secure_password_here
-TKDO_BASE_URI=https://tkdo.example.com
+TKDO_API_BASE_URI=https://tkdo.example.com
 TKDO_DEV_MODE=0
 ```
 

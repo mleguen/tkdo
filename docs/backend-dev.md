@@ -368,36 +368,6 @@ $app->post('/my-new-endpoint', MyNewController::class);
 
 Tkdo uses **OAuth2 authorization code flow** with a **Backend-For-Frontend (BFF) pattern** to keep JWTs secure in HttpOnly cookies. This architecture enables switching between the temporary built-in authorization server and external Identity Providers (Google, Auth0, etc.) with only configuration changes.
 
-#### Architecture Overview
-
-```
-┌──────────────────────────────────────────────────────────────────┐
-│                         FRONTEND (Angular)                        │
-│  • Redirects to /oauth/authorize (browser navigation)            │
-│  • Handles callback at /auth/callback (Angular SPA route,        │
-│    NOT a server endpoint — served by AuthCallbackComponent)      │
-│  • POSTs code to BFF /api/auth/callback (XHR)                    │
-└──────────────────────────────────────────────────────────────────┘
-                               │
-                               ▼
-┌──────────────────────────────────────────────────────────────────┐
-│              TEMPORARY AUTHORIZATION SERVER (PHP)                 │
-│  Routes: /oauth/authorize, /oauth/token, /oauth/userinfo         │
-│  • Validates credentials, issues auth codes                      │
-│  • Exchanges codes for access tokens (JWTs with user claims)     │
-│  • Will be REPLACED by external IdP post-MVP                     │
-└──────────────────────────────────────────────────────────────────┘
-                               │
-                               ▼
-┌──────────────────────────────────────────────────────────────────┐
-│                   PERMANENT BFF LAYER (PHP)                       │
-│  Routes: /api/auth/callback, /api/auth/logout                    │
-│  • Exchanges auth code via back-channel (league/oauth2-client)   │
-│  • Creates application JWT, sets HttpOnly cookie                 │
-│  • NO CODE CHANGES needed when switching IdPs                    │
-└──────────────────────────────────────────────────────────────────┘
-```
-
 #### Sequence Diagram
 
 ```
@@ -568,7 +538,7 @@ class OAuth2Settings
 {
     public string $clientId;        // From OAUTH2_CLIENT_ID env
     public string $clientSecret;    // From OAUTH2_CLIENT_SECRET env
-    public string $redirectUri;     // From OAUTH2_REDIRECT_URI env
+    public string $redirectUri;     // Built from TKDO_FRONT_BASE_URI + /auth/callback
     public string $urlAuthorize;    // /oauth/authorize (temp) or IdP URL
     public string $urlAccessToken;  // /oauth/token (temp) or IdP URL
     public string $urlResourceOwner; // /oauth/userinfo (temp) or IdP URL
@@ -586,7 +556,7 @@ To replace the temporary authorization server with Google, Auth0, etc.:
 ```bash
 OAUTH2_CLIENT_ID=your-idp-client-id
 OAUTH2_CLIENT_SECRET=your-idp-client-secret
-OAUTH2_REDIRECT_URI=https://yourapp.com/auth/callback
+TKDO_FRONT_BASE_URI=https://yourapp.com
 ```
 
 **2. Update OAuth2Settings.php URLs** (one-time code change):
@@ -1797,7 +1767,7 @@ Composer scripts provide shortcuts for common tasks.
 | ------------------ | --------------------------------- | ------------------------------------------- |
 | `console`          | `./console`                       | Run console commands (helper script)        |
 | `doctrine`         | `./doctrine`                      | Run Doctrine CLI (helper script)            |
-| `phpstan`          | `./composer run phpstan`          | Run PHPStan static analysis (256M memory, recommended over `./phpstan` wrapper) |
+| `phpstan`          | `./composer run phpstan`          | Run PHPStan static analysis (256M memory) |
 | `reset-doctrine`   | `./composer run reset-doctrine`   | Full database reset                         |
 | `install-fixtures` | `./composer run install-fixtures` | Reset DB and load fixtures                  |
 | `test`             | `./composer test`                 | Run all tests                               |
@@ -1870,12 +1840,8 @@ Composer scripts provide shortcuts for common tasks.
 #### Code Quality
 
 ```bash
-# Recommended: Run PHPStan via composer script (includes --memory-limit=256M automatically)
+# Run PHPStan (includes --memory-limit=256M automatically)
 ./composer run phpstan
-
-# Alternative: Run via wrapper script directly (you must pass --memory-limit yourself)
-# Use this when you need custom PHPStan flags (e.g., --debug, --generate-baseline)
-./phpstan analyze --memory-limit=256M
 
 # Run Rector for automated refactoring
 ./composer run rector

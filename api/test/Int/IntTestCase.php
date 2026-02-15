@@ -188,7 +188,7 @@ class IntTestCase extends TestCase
                 return "-d $k=$v";
             }, array_keys($data), $data)) : '';
 
-            $fullPath = getenv('TKDO_BASE_URI') . $path;
+            $fullPath = getenv('TKDO_API_BASE_URI') . $path;
             if ($query) $fullPath .= "?$query";
 
             exec(
@@ -215,7 +215,7 @@ class IntTestCase extends TestCase
     
             $response = $this->client->request(
                 $method,
-                getenv('TKDO_BASE_URI') . $path,
+                getenv('TKDO_API_BASE_URI') . $path,
                 [
                     'body' => is_null($data) ? '' : (count($data) ? json_encode($data) : '{}'),
                     'cookie' => true,

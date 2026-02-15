@@ -1,2 +1,0 @@
-#!/usr/bin/env bash
-docker compose run --rm --interactive php-cli vendor/bin/phpstan "$@"

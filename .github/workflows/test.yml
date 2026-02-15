@@ -307,7 +307,7 @@ jobs:
           MYSQL_USER: tkdo
           MYSQL_PASSWORD: mdptkdo
           MAILDEV_BASE_URI: http://127.0.0.1:1080/
-          TKDO_BASE_URI: http://localhost:8000
+          TKDO_API_BASE_URI: http://localhost:8000
           TKDO_DEV_MODE: "1"
           TKDO_MAILER_FROM: noreply@ci
         run: |
@@ -346,7 +346,7 @@ jobs:
           MYSQL_USER: tkdo
           MYSQL_PASSWORD: mdptkdo
           MAILDEV_BASE_URI: http://127.0.0.1:1080/
-          TKDO_BASE_URI: http://localhost:8000
+          TKDO_API_BASE_URI: http://localhost:8000
           TKDO_DEV_MODE: "1"
           TKDO_MAILER_FROM: noreply@ci
           # Multiple workers needed: BFF callback makes back-channel HTTP call
@@ -367,7 +367,7 @@ jobs:
           MYSQL_USER: tkdo
           MYSQL_PASSWORD: mdptkdo
           MAILDEV_BASE_URI: http://127.0.0.1:1080/
-          TKDO_BASE_URI: http://localhost:8000
+          TKDO_API_BASE_URI: http://localhost:8000
           TKDO_DEV_MODE: "1"
           TKDO_MAILER_FROM: noreply@ci
         run: composer test -- --testsuite=Int

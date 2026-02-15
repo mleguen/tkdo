@@ -142,6 +142,10 @@ This story refactors to OAuth2-compliant architecture, clearly separating:
 - [x] [AI-Review][LOW] Documentation confusion about PHPStan wrapper vs composer script — explain in docs/backend-dev.md why table shows "./composer run phpstan" instead of "./phpstan" wrapper, and clarify when to use each approach [docs/backend-dev.md:1753+1829] [PR#100 comments: [table](https://github.com/mleguen/tkdo/pull/100#discussion_r2809421918), [example](https://github.com/mleguen/tkdo/pull/100#discussion_r2809427889)]
 - [x] [AI-Review][LOW] OAUTH2_REDIRECT_URI env var purpose unclear — document in docs/environment-variables.md why this needs separate env var (frontend callback URL at http://localhost:4200/auth/callback) vs TKDO_BASE_URI (backend URL at http://localhost:8080) [docs/environment-variables.md:503] [PR#100 comment](https://github.com/mleguen/tkdo/pull/100#discussion_r2809446519)
 - [x] [AI-Review][LOW] Missing code comment for OAuth2 form cleanup workaround — add comment in connexion.component.cy.ts afterEach explaining form cleanup prevents test pollution (forms accumulate in DOM across tests), this is test-specific and doesn't happen in production [front/src/app/connexion/connexion.component.cy.ts:52] [PR#100 comment](https://github.com/mleguen/tkdo/pull/100#discussion_r2809542386)]
+- [x] [AI-Review][HIGH] OAUTH2_REDIRECT_URI naming convention — Current env var is route-specific when it could be a base URI pattern; consider renaming to TKDO_FRONT_BASE_URI (and TKDO_BASE_URI → TKDO_API_BASE_URI) for consistency and clarity [docs/environment-variables.md:512] [PR#100 unresolved thread](https://github.com/mleguen/tkdo/pull/100)
+- [x] [AI-Review][HIGH] Remove redundant Architecture Overview section — Text-based diagram (lines 371-398) is now obsolete; sequence diagram provides better clarity with no added value from prose description [docs/backend-dev.md:371-398] [PR#100 unresolved thread](https://github.com/mleguen/tkdo/pull/100)
+- [x] [AI-Review][HIGH] Remove ./phpstan wrapper script — Wrapper is now more complex to use than `./composer run phpstan`; helper that doesn't help should be deleted in favor of composer script only [docs/backend-dev.md + ./phpstan] [PR#100 unresolved thread](https://github.com/mleguen/tkdo/pull/100)
+- [x] [AI-Review][HIGH] Clarify form cleanup comment in Cypress test — Current comment explains test-specific workaround but user questions if DOM persistence between tests could happen in real life; if yes, fix should be in production code not test cleanup [front/src/app/connexion/connexion.component.cy.ts:52] [PR#100 unresolved thread](https://github.com/mleguen/tkdo/pull/100)
 
 ## Dev Notes
 
@@ -368,6 +372,7 @@ Claude Opus 4.6
 - 2026-02-15 — Post-Review CI Check & PR Comment Analysis: Adversarial code review marked story as done, but post-review CI check discovered 2 new CRITICAL test failures in ConnexionComponent Cypress tests (state reuse logic + error display). PR review check found 0 unresolved comments from submitted reviews (2 comments exist but are from PENDING/draft review, correctly filtered out per workflow). Story status reverted from done → in-progress. New action items: 2 CRITICAL (CI failures). Total Review Follow-ups: 16 items (14 completed [x], 2 new [ ]). CI Run: https://github.com/mleguen/tkdo/actions/runs/22036859600
 - 2026-02-15 — Final CI Failures Resolved (2 CRITICAL items): (1) State reuse test: Root cause was stale hidden OAuth2 forms accumulating in DOM across tests — `querySelector` returned form from prior test. Fixed by adding form cleanup in `afterEach`. Also fixed TS2339 error by splitting `cy.stub().returns().as()` chain (`.returns()` returns `sinon.SinonStub`, not `Cypress.Agent`). (2) Error display test: Root cause was component reading `erreur` from `route.snapshot` in constructor (one-time read), but test navigated after mount. Fixed by switching to `route.queryParamMap` observable with `takeUntilDestroyed()` for reactive param handling. All tests green: PHPStan OK, 272 backend (1057 assertions), 60 frontend, 225 component, 12 E2E.
 - 2026-02-15 — Final Documentation Review Follow-ups (6 LOW items): All documentation/comment improvements from PR review. (1) Added text-based sequence diagram to docs/backend-dev.md showing 10-step OAuth2 flow between browser, auth server, and BFF. (2) Clarified /auth/callback is an Angular SPA route, not a server endpoint. (3) Documented user info persistence: only user ID in localStorage, full object refetched via API on reload. (4) Clarified PHPStan: `./composer run phpstan` is recommended (includes --memory-limit=256M), `./phpstan` wrapper for custom flags. (5) Explained why OAUTH2_REDIRECT_URI is separate from TKDO_BASE_URI (frontend vs backend URL). (6) Expanded form cleanup comment in connexion.component.cy.ts explaining test pollution prevention.
+- 2026-02-15 — Final PR Review Follow-ups (4 HIGH items): (1) Renamed OAUTH2_REDIRECT_URI → TKDO_FRONT_BASE_URI: env var now stores frontend base URL (e.g., http://localhost:4200), code appends /auth/callback. Simpler config that doesn't depend on SPA route. (2) Renamed TKDO_BASE_URI → TKDO_API_BASE_URI across ~30 files (source, tests, CI, Docker, docs) for naming consistency with TKDO_FRONT_BASE_URI. (3) Removed redundant Architecture Overview box diagram from docs/backend-dev.md — sequence diagram provides better clarity. (4) Deleted ./phpstan wrapper script, updated docs to use only `./composer run phpstan`. (5) Clarified form cleanup comment in connexion.component.cy.ts — explicitly states this cannot happen in production because form.submit() always triggers full page navigation. All tests green: PHPStan OK, 145 unit, 127 integration (721 assertions), 60 frontend, 12 E2E.
 
 ### Change Log
 
@@ -431,6 +436,14 @@ Claude Opus 4.6
 - Documented OAUTH2_REDIRECT_URI vs TKDO_BASE_URI distinction in docs/environment-variables.md
 - Expanded form cleanup comment in front/src/app/connexion/connexion.component.cy.ts
 
+**Final PR review follow-ups (2026-02-15):**
+- Renamed OAUTH2_REDIRECT_URI → TKDO_FRONT_BASE_URI in OAuth2Settings.php and all documentation
+- Renamed TKDO_BASE_URI → TKDO_API_BASE_URI across source, tests, CI, Docker, and docs (~30 files)
+- Removed redundant Architecture Overview box diagram from docs/backend-dev.md
+- Deleted ./phpstan wrapper script, updated docs/backend-dev.md to remove wrapper references
+- Removed ./phpstan entry from docs/project-scan-report.json
+- Clarified form cleanup comment in connexion.component.cy.ts (production impossibility)
+
 ### File List
 
 **Created:**
@@ -475,9 +488,26 @@ Claude Opus 4.6
 - `api/src/Appli/Controller/OAuthTokenController.php` — Added client_id validation
 - `api/test/Int/OAuthAuthorizeControllerTest.php` — Added client_id validation test
 - `api/test/Int/OAuthTokenControllerTest.php` — Added client_id validation test
-- `.github/workflows/test.yml` — Added PHP_CLI_SERVER_WORKERS=4 for back-channel calls
-- `.github/workflows/e2e.yml` — Added PHP_CLI_SERVER_WORKERS=4 + /oauth/ nginx proxy rule
+- `.github/workflows/test.yml` — Added PHP_CLI_SERVER_WORKERS=4 for back-channel calls; renamed TKDO_BASE_URI → TKDO_API_BASE_URI
+- `.github/workflows/e2e.yml` — Added PHP_CLI_SERVER_WORKERS=4 + /oauth/ nginx proxy rule; renamed TKDO_BASE_URI → TKDO_API_BASE_URI
+- `api/src/Appli/Settings/OAuth2Settings.php` — OAUTH2_REDIRECT_URI → TKDO_FRONT_BASE_URI (builds redirect URI from base + /auth/callback); TKDO_BASE_URI → TKDO_API_BASE_URI
+- `api/src/Appli/Settings/UriSettings.php` — TKDO_BASE_URI → TKDO_API_BASE_URI
+- `api/test/Int/IntTestCase.php` — TKDO_BASE_URI → TKDO_API_BASE_URI
+- `api/test/Int/ErrorHandlingIntTest.php` — TKDO_BASE_URI → TKDO_API_BASE_URI
+- `api/test/Int/OAuthAuthorizeControllerTest.php` — TKDO_BASE_URI → TKDO_API_BASE_URI
+- `api/test/Int/BffAuthCallbackControllerTest.php` — TKDO_BASE_URI → TKDO_API_BASE_URI
+- `api/test/Int/OAuthTokenControllerTest.php` — TKDO_BASE_URI → TKDO_API_BASE_URI
+- `api/test/Int/AuthCookieIntTest.php` — TKDO_BASE_URI → TKDO_API_BASE_URI
+- `docker-compose.yml` — TKDO_BASE_URI → TKDO_API_BASE_URI
+- `docs/dev-setup.md` — TKDO_BASE_URI → TKDO_API_BASE_URI
+- `docs/deployment-apache.md` — TKDO_BASE_URI → TKDO_API_BASE_URI
+- `docs/environment-variables.md` — OAUTH2_REDIRECT_URI → TKDO_FRONT_BASE_URI; TKDO_BASE_URI → TKDO_API_BASE_URI
+- `docs/backend-dev.md` — Removed Architecture Overview box diagram; removed ./phpstan references; OAUTH2_REDIRECT_URI → TKDO_FRONT_BASE_URI
+- `docs/DOCUMENTATION-GUIDE.md` — TKDO_BASE_URI → TKDO_API_BASE_URI
+- `docs/project-scan-report.json` — Removed ./phpstan entry
+- `front/src/app/connexion/connexion.component.cy.ts` — Updated form cleanup comment
 
 **Deleted:**
 - `api/src/Appli/Controller/AuthLoginController.php` — Replaced by OAuthAuthorizeController
 - `api/test/Int/AuthLoginControllerTest.php` — Replaced by OAuthAuthorizeControllerTest
+- `./phpstan` — Wrapper script removed; use `./composer run phpstan` instead

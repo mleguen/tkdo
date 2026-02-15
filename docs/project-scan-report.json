@@ -91,7 +91,6 @@
           "./console": "Runs PHP console commands in Docker",
           "./doctrine": "Runs Doctrine CLI in Docker",
           "./cypress": "Runs Cypress tests in Docker",
-          "./phpstan": "Runs PHPStan static analysis in Docker",
           "./build": "Full build: generates auth keys, builds frontend, installs API dependencies",
           "./apache-pack": "Packages app for Apache deployment (creates tkdo-<version>.tar.gz)",
           "./init-ng": "One-time Angular project initialization (scaffolds entire frontend)"

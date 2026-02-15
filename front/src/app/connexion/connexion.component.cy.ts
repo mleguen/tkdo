@@ -47,10 +47,12 @@ describe('ConnexionComponent', () => {
   afterEach(() => {
     sessionStorage.clear();
     // Cleanup: connecte() appends a hidden <form> to document.body for the OAuth2
-    // POST redirect. In tests, forms accumulate across test cases because the DOM
-    // persists between tests. Without this cleanup, querySelector('#identifiant')
-    // could match a field from a prior test's form. This is test-specific — in
-    // production, the form submission triggers a full page navigation.
+    // POST redirect. In tests, form.submit() is stubbed so no navigation occurs,
+    // causing forms to accumulate across test cases. Without this cleanup,
+    // querySelector('#identifiant') could match a field from a prior test's form.
+    // This cannot happen in production: form.submit() always triggers a full page
+    // navigation (even on server errors, the browser navigates to the error page),
+    // so the form never persists in the DOM.
     document
       .querySelectorAll('form[action="/oauth/authorize"]')
       .forEach((f) => f.remove());

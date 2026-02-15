@@ -86,7 +86,7 @@ services:
       MYSQL_PASSWORD: mdptkdo
       MYSQL_PORT: 3306
       MYSQL_USER: tkdo
-      TKDO_BASE_URI: http://slim-web
+      TKDO_API_BASE_URI: http://slim-web
       TKDO_MAILER_FROM: noreply@slim
     profiles:
       - tools
@@ -109,7 +109,7 @@ services:
       MYSQL_PASSWORD: mdptkdo
       MYSQL_PORT: 3306
       MYSQL_USER: tkdo
-      TKDO_BASE_URI: http://slim-web
+      TKDO_API_BASE_URI: http://slim-web
       TKDO_DEV_MODE: "1"
       TKDO_MAILER_FROM: noreply@slim
       WWW_GID: ${GID:-1000}

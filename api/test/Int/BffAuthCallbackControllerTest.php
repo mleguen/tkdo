@@ -20,7 +20,7 @@ class BffAuthCallbackControllerTest extends IntTestCase
     {
         $utilisateur = $this->utilisateur()->withIdentifiant('utilisateur')->persist(self::$em);
 
-        $baseUri = getenv('TKDO_BASE_URI');
+        $baseUri = getenv('TKDO_API_BASE_URI');
         $client = new \GuzzleHttp\Client(['allow_redirects' => false]);
 
         $response = $client->request(
@@ -56,7 +56,7 @@ class BffAuthCallbackControllerTest extends IntTestCase
 
         $response = $client->request(
             'POST',
-            getenv('TKDO_BASE_URI') . self::CALLBACK_PATH,
+            getenv('TKDO_API_BASE_URI') . self::CALLBACK_PATH,
             [
                 'json' => ['code' => $code],
                 'http_errors' => false,
@@ -125,7 +125,7 @@ class BffAuthCallbackControllerTest extends IntTestCase
 
         $response = $client->request(
             'POST',
-            getenv('TKDO_BASE_URI') . self::CALLBACK_PATH,
+            getenv('TKDO_API_BASE_URI') . self::CALLBACK_PATH,
             [
                 'json' => ['code' => $code],
                 'http_errors' => false,
@@ -136,7 +136,7 @@ class BffAuthCallbackControllerTest extends IntTestCase
         // Use cookie to access a protected endpoint
         $userResponse = $client->request(
             'GET',
-            getenv('TKDO_BASE_URI') . '/utilisateur/' . $utilisateur->getId(),
+            getenv('TKDO_API_BASE_URI') . '/utilisateur/' . $utilisateur->getId(),
             ['http_errors' => false]
         );
 
