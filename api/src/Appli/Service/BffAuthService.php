@@ -33,10 +33,11 @@ class BffAuthService
     }
 
     /**
-     * Extract user claims from the access token via the resource owner endpoint.
-     * Uses standard GenericProvider::getResourceOwner() — no manual JWT decoding.
+     * Extract user identity from the access token via the resource owner endpoint.
+     * Only extracts 'sub' (user ID) — all application-specific data (nom, email,
+     * genre, admin, groups) is loaded from the database by BffAuthCallbackController.
      *
-     * @return array{sub: int, adm: bool, groupe_ids: int[]}
+     * @return array{sub: int}
      */
     public function extraitInfoUtilisateur(AccessTokenInterface $token): array
     {
@@ -47,13 +48,8 @@ class BffAuthService
         $owner = $this->provider->getResourceOwner($token);
         $data = $owner->toArray();
 
-        /** @var int[] $groupeIds */
-        $groupeIds = isset($data['groupe_ids']) ? (array) $data['groupe_ids'] : [];
-
         return [
             'sub' => (int) ($data['sub'] ?? 0),
-            'adm' => !empty($data['admin']),
-            'groupe_ids' => $groupeIds,
         ];
     }
 }

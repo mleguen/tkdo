@@ -13,7 +13,7 @@ use PHPUnit\Framework\TestCase;
 
 class BffAuthServiceTest extends TestCase
 {
-    public function testExtraitInfoUtilisateurUsesResourceOwner(): void
+    public function testExtraitInfoUtilisateurExtractsSubOnly(): void
     {
         $owner = new GenericResourceOwner([
             'sub' => 42,
@@ -32,15 +32,14 @@ class BffAuthServiceTest extends TestCase
         $result = $service->extraitInfoUtilisateur($mockToken);
 
         $this->assertEquals(42, $result['sub']);
-        $this->assertTrue($result['adm']);
-        $this->assertEquals([1, 2, 3], $result['groupe_ids']);
+        // Only 'sub' should be returned — app-specific data comes from DB
+        $this->assertArrayNotHasKey('adm', $result);
+        $this->assertArrayNotHasKey('groupe_ids', $result);
     }
 
-    public function testExtraitInfoUtilisateurDefaultValues(): void
+    public function testExtraitInfoUtilisateurDefaultSub(): void
     {
-        $owner = new GenericResourceOwner([
-            'sub' => 1,
-        ], 'sub');
+        $owner = new GenericResourceOwner([], 'sub');
 
         $mockProvider = $this->createMock(GenericProvider::class);
         $mockToken = $this->createMock(AccessToken::class);
@@ -51,9 +50,7 @@ class BffAuthServiceTest extends TestCase
         $service = new BffAuthService($mockProvider);
         $result = $service->extraitInfoUtilisateur($mockToken);
 
-        $this->assertEquals(1, $result['sub']);
-        $this->assertFalse($result['adm']);
-        $this->assertEquals([], $result['groupe_ids']);
+        $this->assertEquals(0, $result['sub']);
     }
 
     public function testExtraitInfoUtilisateurThrowsOnWrongTokenType(): void

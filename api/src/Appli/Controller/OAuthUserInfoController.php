@@ -17,8 +17,9 @@ use Slim\Exception\HttpUnauthorizedException;
  * TEMPORARY: OAuth2 Authorization Server — userinfo endpoint.
  * Will be replaced by external IdP (Google, Auth0, etc.) post-MVP.
  *
- * GET: Returns user claims for a valid Bearer access token.
- *      Standard OAuth2/OIDC pattern used by league/oauth2-client GenericProvider.
+ * GET: Returns standard OIDC claims (sub, name, email) from the access token.
+ *      Application-specific data (admin, genre, groups) is loaded
+ *      by BffAuthCallbackController from the database, not from IdP claims.
  */
 class OAuthUserInfoController
 {
@@ -42,13 +43,11 @@ class OAuthUserInfoController
             throw new HttpUnauthorizedException($request, 'utilisateur inconnu');
         }
 
+        // Standard OIDC userinfo claims only — no app-specific data
         return $this->routeService->getResponseWithJsonBody($response, json_encode([
             'sub' => $utilisateur->getId(),
-            'nom' => $utilisateur->getNom(),
+            'name' => $utilisateur->getNom(),
             'email' => $utilisateur->getEmail(),
-            'genre' => $utilisateur->getGenre(),
-            'admin' => $utilisateur->getAdmin(),
-            'groupe_ids' => $auth->getGroupeIds(),
         ], JSON_THROW_ON_ERROR));
     }
 }
