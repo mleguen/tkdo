@@ -62,6 +62,7 @@ class GroupeRepositoryAdaptor implements GroupeRepository
     {
         $qb = $this->em->createQueryBuilder();
         $qb->select('a')
+            // Eager-load Groupe entities to prevent N+1 queries when accessing getGroupe()->getId()
             ->addSelect('g')
             ->from(AppartenanceAdaptor::class, 'a')
             ->join('a.groupe', 'g')

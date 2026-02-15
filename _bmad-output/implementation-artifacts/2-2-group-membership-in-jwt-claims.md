@@ -65,6 +65,10 @@ So that group context is available for all authenticated requests.
 - [x] [AI-Review][MEDIUM] Test backward compatibility path: decode JWT missing `groupe_admin_ids` claim entirely (not just empty array). Current test round-trips through encode() which always writes claim. Need manual JWT payload construction. [GroupeRepositoryAdaptor.php:69](https://github.com/mleguen/tkdo/pull/102#discussion_r2809672992)
 - [x] [AI-Review][LOW] Fix N+1 query: add `->addSelect('g')` after join in `readAppartenancesForUtilisateur()` to fetch Groupe entities eagerly, preventing lazy-load queries when calling `getGroupe()->getId()` [GroupeRepositoryAdaptor.php:69](https://github.com/mleguen/tkdo/pull/102#discussion_r2809672984)
 - [x] [AI-Review][LOW] Remove unused import: `use Test\Builder\UtilisateurBuilder;` is not referenced (inherited from IntTestCase parent) [AuthTokenControllerTest.php:13](https://github.com/mleguen/tkdo/pull/102#discussion_r2809672988)
+- [x] [AI-Review][MEDIUM] Add inline comment documenting `addSelect('g')` N+1 prevention purpose — `GroupeRepositoryAdaptor.php:65`
+- [x] [AI-Review][HIGH] Add database index on `tkdo_groupe.archive` column to optimize DQL query filtering in `readAppartenancesForUtilisateur()` — requires new migration after Story 2.1's Version20260214120000
+- [x] [AI-Review][HIGH] Add warning/monitoring when user group count exceeds reasonable limit (suggest 50 groups) to prevent JWT cookie size exceeding browser 4KB limit. Use logging (not blocking) to stay compatible with family-first use case — `AuthTokenController.php:70-74`
+- [x] [AI-Review][MEDIUM] Consider reducing log level for successful token exchanges from INFO to DEBUG, or implement sampling (e.g., 1% of successes) to reduce production log volume — `AuthTokenController.php:83`
 
 ## Dev Notes
 
@@ -444,6 +448,7 @@ No issues encountered. All tasks completed in a single pass with red-green-refac
 - **Second Review Follow-ups:** Added inline documentation to AuthTokenController explaining: (1) why `array_values()` is critical for preventing JSON object serialization; (2) JWT claims are a snapshot and may become stale, which is acceptable per architecture Rule 9 (writes validate against database, not JWT); (3) Defense in Depth validation will be in Story 2.5. All tests still pass, PHPStan clean.
 - **PR Comments Reviewed (2026-02-15):** Reviewed 3 unresolved GitHub PR #102 comments from Copilot. Investigation: Read 6 files (GroupeRepositoryAdaptor, AuthTokenController, AuthTokenControllerTest, IntTestCase, AuthServiceTest, AuthService) with evidence-based classification. Validated: 3 valid (1 MEDIUM, 2 LOW), 0 duplicate, 0 invalid. Issues: (1) MEDIUM - Test backward compat gap for missing JWT claim; (2) LOW - N+1 query in readAppartenancesForUtilisateur; (3) LOW - Unused import in AuthTokenControllerTest. Updated Review Follow-ups section with 7 total action items (4 complete, 3 new). Responded to all PR comments with investigation evidence. Story status: in-progress until new action items resolved.
 - **Third Review Follow-ups (2026-02-15):** Addressed all 3 remaining PR comment findings: (1) MEDIUM — added `testDecodeTokenMissingGroupeAdminIdsClaimDefaultsToEmptyArray` unit test using manual `JWT::encode()` without `groupe_admin_ids` claim, verifying backward compat `isset()` fallback path; (2) LOW — added `->addSelect('g')` to DQL in `readAppartenancesForUtilisateur()` to eagerly fetch Groupe entities, preventing N+1 lazy-load queries; (3) LOW — removed unused `use Test\Builder\UtilisateurBuilder` import from AuthTokenControllerTest. Full suite: 300 tests / 1161 assertions, PHPStan level 8 clean.
+- **Fourth Review Follow-ups (2026-02-15):** Addressed all 3 remaining code review findings: (1) HIGH — created migration `Version20260215120000` adding `IDX_GROUPE_ARCHIVE` index on `tkdo_groupe.archive` column to optimize DQL membership query filtering; (2) HIGH — added warning log in AuthTokenController when user belongs to >50 groups to flag potential JWT cookie size exceeding browser 4KB limit (logging only, non-blocking per family-first use case); (3) MEDIUM — reduced successful token exchange log level from INFO to DEBUG to reduce production log volume. Full suite: 300 tests / 1161 assertions, PHPStan level 8 clean.
 
 ### File List
 
@@ -473,6 +478,12 @@ No issues encountered. All tasks completed in a single pass with red-green-refac
 - `api/test/Unit/Appli/Service/AuthServiceTest.php` — Added backward compat test with manual JWT payload missing `groupe_admin_ids`
 - `api/test/Int/AuthTokenControllerTest.php` — Removed unused `UtilisateurBuilder` import
 
+**New (fourth review follow-ups):**
+- `api/src/Infra/Migrations/Version20260215120000.php` — Migration adding `IDX_GROUPE_ARCHIVE` index on `tkdo_groupe.archive`
+
+**Modified (fourth review follow-ups):**
+- `api/src/Appli/Controller/AuthTokenController.php` — Added group count warning log (>50 groups), changed successful exchange log from INFO to DEBUG
+
 ## Change Log
 
 - 2026-02-15: Implemented group membership in JWT claims — `groupe_ids` and `groupe_admin_ids` now populated from database during token exchange. Added `readAppartenancesForUtilisateur()` DQL query filtering archived groups. 295 tests pass (21 new), PHPStan level 8 clean.
@@ -482,3 +493,5 @@ No issues encountered. All tasks completed in a single pass with red-green-refac
 - 2026-02-15: PR comment review (evidence-based) — Processed 3 GitHub PR #102 comments from Copilot with thorough investigation. Validated 3 valid findings: MEDIUM test backward compat gap, LOW N+1 query, LOW unused import. Updated story with 3 new action items. Posted investigation evidence to all PR comment threads. Story status: in-progress.
 - 2026-02-15: Addressed all 3 PR comment findings — Added backward compat unit test with manual JWT construction, fixed N+1 query with addSelect('g'), removed unused import. 300 tests / 1161 assertions pass, PHPStan level 8 clean. All 7/7 review items resolved. Story status: review.
 - 2026-02-15: PR Comments Resolved: Resolved 3 PR comment threads, marked completed action items as fixed, PR: #102, comment_ids: 2809672992, 2809672984, 2809672988
+- 2026-02-15: Fourth adversarial code review — Fixed MEDIUM docs-only issue (added N+1 prevention comment to GroupeRepositoryAdaptor.php:65). Created 3 new action items: HIGH database index on archive column, HIGH JWT payload size warning (family-first approach), MEDIUM log level adjustment. Story status: in-progress until action items resolved.
+- 2026-02-15: Addressed all 3 fourth review findings — Added IDX_GROUPE_ARCHIVE migration, group count warning log (>50 groups), changed token exchange log to DEBUG. 300 tests / 1161 assertions pass, PHPStan level 8 clean. All 11/11 review items resolved.
