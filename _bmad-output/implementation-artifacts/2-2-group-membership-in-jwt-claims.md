@@ -1,6 +1,6 @@
 # Story 2.2: Group Membership in JWT Claims
 
-Status: review
+Status: done
 
 ## Story
 
@@ -495,3 +495,4 @@ No issues encountered. All tasks completed in a single pass with red-green-refac
 - 2026-02-15: PR Comments Resolved: Resolved 3 PR comment threads, marked completed action items as fixed, PR: #102, comment_ids: 2809672992, 2809672984, 2809672988
 - 2026-02-15: Fourth adversarial code review — Fixed MEDIUM docs-only issue (added N+1 prevention comment to GroupeRepositoryAdaptor.php:65). Created 3 new action items: HIGH database index on archive column, HIGH JWT payload size warning (family-first approach), MEDIUM log level adjustment. Story status: in-progress until action items resolved.
 - 2026-02-15: Addressed all 3 fourth review findings — Added IDX_GROUPE_ARCHIVE migration, group count warning log (>50 groups), changed token exchange log to DEBUG. 300 tests / 1161 assertions pass, PHPStan level 8 clean. All 11/11 review items resolved.
+- 2026-02-15: Fifth adversarial code review — Comprehensive verification of all ACs, tasks, and review follow-ups. Found 0 HIGH, 0 MEDIUM issues. 2 LOW observations (JWT size heuristic, warning test coverage) are informational only, not defects. All 3 ACs implemented and tested, 300 tests passing, PHPStan clean. Story marked DONE.
