@@ -1,6 +1,6 @@
 # Story 2.2: Group Membership in JWT Claims
 
-Status: done
+Status: review
 
 ## Story
 
@@ -62,6 +62,9 @@ So that group context is available for all authenticated requests.
 - [x] [AI-Review][HIGH] Add integration test with 3+ groups where admin groups have non-consecutive indexes to verify JSON array serialization — `AuthTokenControllerTest.php`
 - [x] [AI-Review][MEDIUM] Add integration test for AC #2 (session refresh): login with no groups, add group to user, perform new token exchange, verify group appears in claims — `AuthTokenControllerTest.php`
 - [x] [AI-Review][LOW] Consider adding runtime `array_map('intval', ...)` in `AuthService.decode()` to ensure `groupe_ids` and `groupe_admin_ids` contain only integers after JWT decode — `AuthService.php:44-47`
+- [x] [AI-Review][MEDIUM] Test backward compatibility path: decode JWT missing `groupe_admin_ids` claim entirely (not just empty array). Current test round-trips through encode() which always writes claim. Need manual JWT payload construction. [GroupeRepositoryAdaptor.php:69](https://github.com/mleguen/tkdo/pull/102#discussion_r2809672992)
+- [x] [AI-Review][LOW] Fix N+1 query: add `->addSelect('g')` after join in `readAppartenancesForUtilisateur()` to fetch Groupe entities eagerly, preventing lazy-load queries when calling `getGroupe()->getId()` [GroupeRepositoryAdaptor.php:69](https://github.com/mleguen/tkdo/pull/102#discussion_r2809672984)
+- [x] [AI-Review][LOW] Remove unused import: `use Test\Builder\UtilisateurBuilder;` is not referenced (inherited from IntTestCase parent) [AuthTokenControllerTest.php:13](https://github.com/mleguen/tkdo/pull/102#discussion_r2809672988)
 
 ## Dev Notes
 
@@ -439,6 +442,8 @@ No issues encountered. All tasks completed in a single pass with red-green-refac
 - **Task 5:** Added 5 new integration tests: active groups with admin distinction, archived group exclusion, JWT cookie claim verification; updated existing no-groups test to verify `groupe_admin_ids`; full suite passes with 295 tests / 1129 assertions; PHPStan level 8 clean.
 - **Review Follow-ups:** Addressed all 4 code review findings: (1) CRITICAL — wrapped `array_map`/`array_filter` results with `array_values()` in AuthTokenController to prevent JSON object serialization from non-sequential keys; (2) HIGH — added integration test with 3 groups and non-consecutive admin indexes verifying sequential JSON array keys; (3) MEDIUM — added AC #2 session refresh integration test: login with no groups, add group, re-login, verify new group in claims; (4) LOW — added `array_map('intval', ...)` in AuthService.decode() for type safety on JWT-decoded arrays. Full suite: 299 tests / 1157 assertions, PHPStan level 8 clean.
 - **Second Review Follow-ups:** Added inline documentation to AuthTokenController explaining: (1) why `array_values()` is critical for preventing JSON object serialization; (2) JWT claims are a snapshot and may become stale, which is acceptable per architecture Rule 9 (writes validate against database, not JWT); (3) Defense in Depth validation will be in Story 2.5. All tests still pass, PHPStan clean.
+- **PR Comments Reviewed (2026-02-15):** Reviewed 3 unresolved GitHub PR #102 comments from Copilot. Investigation: Read 6 files (GroupeRepositoryAdaptor, AuthTokenController, AuthTokenControllerTest, IntTestCase, AuthServiceTest, AuthService) with evidence-based classification. Validated: 3 valid (1 MEDIUM, 2 LOW), 0 duplicate, 0 invalid. Issues: (1) MEDIUM - Test backward compat gap for missing JWT claim; (2) LOW - N+1 query in readAppartenancesForUtilisateur; (3) LOW - Unused import in AuthTokenControllerTest. Updated Review Follow-ups section with 7 total action items (4 complete, 3 new). Responded to all PR comments with investigation evidence. Story status: in-progress until new action items resolved.
+- **Third Review Follow-ups (2026-02-15):** Addressed all 3 remaining PR comment findings: (1) MEDIUM — added `testDecodeTokenMissingGroupeAdminIdsClaimDefaultsToEmptyArray` unit test using manual `JWT::encode()` without `groupe_admin_ids` claim, verifying backward compat `isset()` fallback path; (2) LOW — added `->addSelect('g')` to DQL in `readAppartenancesForUtilisateur()` to eagerly fetch Groupe entities, preventing N+1 lazy-load queries; (3) LOW — removed unused `use Test\Builder\UtilisateurBuilder` import from AuthTokenControllerTest. Full suite: 300 tests / 1161 assertions, PHPStan level 8 clean.
 
 ### File List
 
@@ -463,9 +468,17 @@ No issues encountered. All tasks completed in a single pass with red-green-refac
 - `api/test/Unit/Appli/Service/AuthServiceTest.php` — Fixed misleading comment on backward compat test, renamed test method
 - `_bmad-output/project-context.md` — Added `php` host prohibition rule, PHPStan memory limit note
 
+**Modified (third review follow-ups):**
+- `api/src/Appli/RepositoryAdaptor/GroupeRepositoryAdaptor.php` — Added `->addSelect('g')` for eager Groupe fetch (N+1 fix)
+- `api/test/Unit/Appli/Service/AuthServiceTest.php` — Added backward compat test with manual JWT payload missing `groupe_admin_ids`
+- `api/test/Int/AuthTokenControllerTest.php` — Removed unused `UtilisateurBuilder` import
+
 ## Change Log
 
 - 2026-02-15: Implemented group membership in JWT claims — `groupe_ids` and `groupe_admin_ids` now populated from database during token exchange. Added `readAppartenancesForUtilisateur()` DQL query filtering archived groups. 295 tests pass (21 new), PHPStan level 8 clean.
 - 2026-02-15: Adversarial code review — Fixed misleading test comment in AuthServiceTest. Added PHPStan memory limit and `php` host prohibition to project-context.md. Created 4 action items: CRITICAL array_values() bug, HIGH gap-index test, MEDIUM AC#2 refresh test, LOW decode type safety.
 - 2026-02-15: Addressed all 4 code review findings — Fixed CRITICAL array_values() bug, added HIGH non-consecutive index test, added MEDIUM AC#2 session refresh test, added LOW intval type safety. 299 tests / 1157 assertions pass, PHPStan level 8 clean.
 - 2026-02-15: Second adversarial code review — Added inline documentation to AuthTokenController explaining array_values() purpose and JWT claim staleness architectural trade-off (Rule 9). All tests pass, PHPStan clean. Story ready for completion.
+- 2026-02-15: PR comment review (evidence-based) — Processed 3 GitHub PR #102 comments from Copilot with thorough investigation. Validated 3 valid findings: MEDIUM test backward compat gap, LOW N+1 query, LOW unused import. Updated story with 3 new action items. Posted investigation evidence to all PR comment threads. Story status: in-progress.
+- 2026-02-15: Addressed all 3 PR comment findings — Added backward compat unit test with manual JWT construction, fixed N+1 query with addSelect('g'), removed unused import. 300 tests / 1161 assertions pass, PHPStan level 8 clean. All 7/7 review items resolved. Story status: review.
+- 2026-02-15: PR Comments Resolved: Resolved 3 PR comment threads, marked completed action items as fixed, PR: #102, comment_ids: 2809672992, 2809672984, 2809672988

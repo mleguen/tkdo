@@ -8,6 +8,7 @@ use App\Appli\ModelAdaptor\AuthAdaptor;
 use App\Appli\Service\AuthService;
 use App\Appli\Settings\AuthSettings;
 use App\Bootstrap;
+use Firebase\JWT\JWT;
 use PHPUnit\Framework\TestCase;
 
 class AuthServiceTest extends TestCase
@@ -56,6 +57,33 @@ class AuthServiceTest extends TestCase
         $token = $this->authService->encode($auth);
         $decoded = $this->authService->decode($token);
 
+        $this->assertEquals([], $decoded->getGroupeAdminIds());
+    }
+
+    public function testDecodeTokenMissingGroupeAdminIdsClaimDefaultsToEmptyArray(): void
+    {
+        // Manually construct a JWT payload WITHOUT groupe_admin_ids claim,
+        // simulating a token generated before Story 2.2 was deployed
+        $bootstrap = new Bootstrap();
+        $settings = new AuthSettings($bootstrap);
+
+        /** @var string $privateKey */
+        $privateKey = file_get_contents($settings->fichierClePrivee);
+
+        $payload = [
+            'sub' => 42,
+            'exp' => time() + 3600,
+            'adm' => false,
+            'groupe_ids' => [10, 20],
+            // groupe_admin_ids intentionally omitted
+        ];
+        $token = JWT::encode($payload, $privateKey, $settings->algo);
+
+        $decoded = $this->authService->decode($token);
+
+        $this->assertEquals(42, $decoded->getIdUtilisateur());
+        $this->assertFalse($decoded->estAdmin());
+        $this->assertEquals([10, 20], $decoded->getGroupeIds());
         $this->assertEquals([], $decoded->getGroupeAdminIds());
     }
 

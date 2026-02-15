@@ -62,6 +62,7 @@ class GroupeRepositoryAdaptor implements GroupeRepository
     {
         $qb = $this->em->createQueryBuilder();
         $qb->select('a')
+            ->addSelect('g')
             ->from(AppartenanceAdaptor::class, 'a')
             ->join('a.groupe', 'g')
             ->where('a.utilisateur = :utilisateurId')
