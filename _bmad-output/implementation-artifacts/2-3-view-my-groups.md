@@ -1,0 +1,687 @@
+# Story 2.3: View My Groups
+
+Status: ready-for-dev
+
+<!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
+
+## Story
+
+As a **user**,
+I want to see which groups I belong to,
+So that I understand my context and can navigate between groups.
+
+## Acceptance Criteria
+
+1. **Given** I am logged in
+   **When** I access the navigation dropdown (header)
+   **Then** I see a list of my active groups
+   **And** archived groups are shown separately with an "archived" label
+
+2. **Given** I belong to 3 active groups and 2 archived groups
+   **When** I view the dropdown
+   **Then** active groups appear first
+   **And** archived groups appear in a separate section
+
+3. **Given** I belong to no groups
+   **When** I view the dropdown
+   **Then** I see a message indicating no groups
+   **And** I can still access My List
+
+## Tasks / Subtasks
+
+- [ ] Task 1: Add `readToutesAppartenancesForUtilisateur()` to GroupeRepository (AC: #1, #2, #3)
+  - [ ] 1.1 Add method signature to `api/src/Dom/Repository/GroupeRepository.php`
+  - [ ] 1.2 Implement in `api/src/Appli/RepositoryAdaptor/GroupeRepositoryAdaptor.php` — DQL without `archive` filter, with eager-load `addSelect('g')`
+  - [ ] 1.3 Write integration tests for the new method (user with active+archived groups, user with no groups, admin flag preserved)
+
+- [ ] Task 2: Create GroupePort domain service (AC: #1, #2, #3)
+  - [ ] 2.1 Create `api/src/Dom/Port/GroupePort.php` — concrete class (not interface), following OccasionPort/UtilisateurPort pattern
+  - [ ] 2.2 Method `listeGroupesUtilisateur(Auth $auth): array` returns `['actifs' => Groupe[], 'archives' => Groupe[]]`
+  - [ ] 2.3 Write unit tests for GroupePort (mock GroupeRepository with ProphecyTrait)
+
+- [ ] Task 3: Add JSON encoding for groups in JsonService (AC: #1, #2)
+  - [ ] 3.1 Add `getPayloadGroupe(Groupe $groupe, bool $estAdmin): array` — private method returning `['id', 'nom', 'archive', 'estAdmin']`
+  - [ ] 3.2 Add `encodeListeGroupes(array $actifs, array $archives, array $adminIds): string` — public method
+  - [ ] 3.3 Write unit tests for JSON encoding methods
+
+- [ ] Task 4: Create ListGroupeController and register route (AC: #1, #2, #3)
+  - [ ] 4.1 Create `api/src/Appli/Controller/ListGroupeController.php` — extends AuthController, uses GroupePort + JsonService
+  - [ ] 4.2 Register route in `api/src/Bootstrap.php`: `$this->slimApp->group('/groupe', ...)` with `$group->get('', ListGroupeController::class)`
+  - [ ] 4.3 Write integration tests for `GET /api/groupe` endpoint (user with mixed groups, user with no groups, unauthenticated returns 401)
+
+- [ ] Task 5: Add Groupe interface and API method to frontend BackendService (AC: #1)
+  - [ ] 5.1 Add `Groupe` interface to `front/src/app/backend.service.ts`: `{ id: number; nom: string; archive: boolean; estAdmin: boolean }`
+  - [ ] 5.2 Add `GroupeResponse` interface: `{ actifs: Groupe[]; archives: Groupe[] }`
+  - [ ] 5.3 Add `URL_GROUPE` constant: `` `${URL_API}/groupe` ``
+  - [ ] 5.4 Add `groupes$` observable chained from `utilisateurConnecte$` via `switchMap` + `shareReplay(1)`
+  - [ ] 5.5 Write unit tests for BackendService groups observable
+
+- [ ] Task 6: Modify header component to show groups dropdown (AC: #1, #2, #3)
+  - [ ] 6.1 Subscribe to `groupes$` in `front/src/app/header/header.component.ts`
+  - [ ] 6.2 Add "Mes groupes" dropdown in `header.component.html` — ngbDropdown with active groups, separator, archived groups with "(archivé)" label
+  - [ ] 6.3 Handle no-groups state: display "Aucun groupe" message in dropdown
+  - [ ] 6.4 Add "Ma liste" link in dropdown (always accessible, even with no groups)
+  - [ ] 6.5 Group items link to `/groupe/{id}` (placeholder route for Story 2.4)
+  - [ ] 6.6 Write unit tests for header component groups dropdown rendering
+
+## Dev Notes
+
+### Brownfield Context
+
+**Groups backend exists (Stories 2.1 + 2.2):**
+- `Groupe` entity with `id, nom, archive, dateCreation` + `appartenances` OneToMany collection
+- `Appartenance` junction entity with `groupe_id, utilisateur_id, estAdmin, dateAjout`
+- `GroupeRepository` with `create, read, readAll, update, readAppartenancesForUtilisateur` methods
+- `readAppartenancesForUtilisateur()` filters `archive = false` (for JWT claims only) — Story 2.3 needs ALL groups including archived
+- JWT claims include `groupe_ids` (active only) and `groupe_admin_ids` (active admin groups only)
+
+**Auth response already includes group IDs (Story 2.2):**
+- `BffAuthCallbackController` returns `groupe_ids` and `groupe_admin_ids` in response body
+- Frontend receives these IDs at login but does NOT currently use them
+- JWT is HttpOnly cookie — frontend cannot read JWT, only the response body
+
+**No Port layer exists for groups:**
+- Existing Ports: `OccasionPort`, `UtilisateurPort`, `IdeePort`, `NotifPort`
+- GroupePort must be created — Ports are concrete classes in `Dom/Port/`, not interfaces
+- PHP-DI autowires Port classes automatically (no Bootstrap.php registration needed)
+
+**No frontend group code exists:**
+- No `Groupe` interface, no `GroupeService`, no group-related components
+- Header component has "Mes occasions" dropdown that lists occasions — use same pattern for groups
+- Backend.service.ts contains all models/interfaces (no separate model files)
+
+**What this story does NOT do:**
+- No group detail page (Story 2.4: View Group Members)
+- No group creation (Story 2.6: Create Group)
+- No group isolation enforcement (Story 2.5: Group Isolation)
+- No "Ma liste" page (Epic 3: My List)
+
+### Technical Requirements
+
+#### GroupeRepository Extension
+
+Add a new method that returns ALL group memberships including archived groups (unlike `readAppartenancesForUtilisateur` which filters archived):
+
+```php
+// api/src/Dom/Repository/GroupeRepository.php — ADD:
+
+/**
+ * Returns ALL group memberships for a user, including archived groups.
+ * Unlike readAppartenancesForUtilisateur(), does NOT filter by archive status.
+ * Use this for displaying group lists (Story 2.3+).
+ *
+ * @return Appartenance[]
+ */
+public function readToutesAppartenancesForUtilisateur(int $utilisateurId): array;
+```
+
+Implementation in GroupeRepositoryAdaptor:
+
+```php
+// api/src/Appli/RepositoryAdaptor/GroupeRepositoryAdaptor.php — ADD:
+
+/**
+ * @return Appartenance[]
+ */
+#[\Override]
+public function readToutesAppartenancesForUtilisateur(int $utilisateurId): array
+{
+    $qb = $this->em->createQueryBuilder();
+    $qb->select('a')
+        ->addSelect('g')  // Eager-load Groupe to prevent N+1
+        ->from(AppartenanceAdaptor::class, 'a')
+        ->join('a.groupe', 'g')
+        ->where('a.utilisateur = :utilisateurId')
+        ->setParameter('utilisateurId', $utilisateurId);
+
+    /** @var Appartenance[] */
+    return $qb->getQuery()->getResult();
+}
+```
+
+**Key difference from `readAppartenancesForUtilisateur`:** No `->andWhere('g.archive = false')` filter. This returns memberships in both active and archived groups.
+
+#### GroupePort Domain Service
+
+Create a new Port class following existing patterns (OccasionPort, UtilisateurPort):
+
+```php
+// api/src/Dom/Port/GroupePort.php — NEW:
+
+<?php
+declare(strict_types=1);
+
+namespace App\Dom\Port;
+
+use App\Dom\Model\Auth;
+use App\Dom\Model\Groupe;
+use App\Dom\Repository\GroupeRepository;
+
+class GroupePort
+{
+    public function __construct(
+        private readonly GroupeRepository $groupeRepository
+    ) {
+    }
+
+    /**
+     * Returns user's groups separated into active and archived.
+     * Any authenticated user can view their own groups (no admin check needed).
+     *
+     * @return array{actifs: Groupe[], archives: Groupe[]}
+     */
+    public function listeGroupesUtilisateur(Auth $auth): array
+    {
+        $appartenances = $this->groupeRepository->readToutesAppartenancesForUtilisateur(
+            $auth->getIdUtilisateur()
+        );
+
+        $actifs = [];
+        $archives = [];
+        foreach ($appartenances as $appartenance) {
+            $groupe = $appartenance->getGroupe();
+            if ($groupe->getArchive()) {
+                $archives[] = $groupe;
+            } else {
+                $actifs[] = $groupe;
+            }
+        }
+
+        return ['actifs' => $actifs, 'archives' => $archives];
+    }
+}
+```
+
+**Authorization:** No admin check needed — every authenticated user can view their own groups. The repository query inherently filters by `$auth->getIdUtilisateur()`.
+
+**PHP-DI:** GroupePort is a concrete class with autowirable constructor. No registration in Bootstrap.php needed.
+
+#### ListGroupeController
+
+```php
+// api/src/Appli/Controller/ListGroupeController.php — NEW:
+
+<?php
+declare(strict_types=1);
+
+namespace App\Appli\Controller;
+
+use App\Appli\Service\JsonService;
+use App\Appli\Service\RouteService;
+use App\Dom\Port\GroupePort;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+
+class ListGroupeController extends AuthController
+{
+    public function __construct(
+        private readonly GroupePort $groupePort,
+        private readonly JsonService $jsonService,
+        RouteService $routeService
+    ) {
+        parent::__construct($routeService);
+    }
+
+    #[\Override]
+    public function __invoke(
+        ServerRequestInterface $request,
+        ResponseInterface $response,
+        array $args = []
+    ): ResponseInterface {
+        $response = parent::__invoke($request, $response, $args);
+
+        $groupes = $this->groupePort->listeGroupesUtilisateur($this->getAuth());
+
+        return $this->routeService->getResponseWithJsonBody(
+            $response,
+            $this->jsonService->encodeListeGroupes(
+                $groupes['actifs'],
+                $groupes['archives'],
+                $this->getAuth()->getGroupeAdminIds()
+            )
+        );
+    }
+}
+```
+
+**Pattern notes:**
+- Extends `AuthController` (requires login)
+- Constructor: `private readonly` for injected services, `RouteService` passed to parent
+- `parent::__invoke()` called first to populate auth
+- Admin IDs from JWT claims to annotate groups with `estAdmin` flag
+- No exceptions expected (simple list query)
+
+#### JsonService Extension
+
+```php
+// api/src/Appli/Service/JsonService.php — ADD:
+
+/**
+ * @param int[] $adminIds Group IDs where user is admin
+ * @return array<string, mixed>
+ */
+private function getPayloadGroupe(Groupe $groupe, array $adminIds): array
+{
+    return [
+        'id' => $groupe->getId(),
+        'nom' => $groupe->getNom(),
+        'archive' => $groupe->getArchive(),
+        'estAdmin' => in_array($groupe->getId(), $adminIds, true),
+    ];
+}
+
+/**
+ * @param Groupe[] $actifs
+ * @param Groupe[] $archives
+ * @param int[] $adminIds
+ */
+public function encodeListeGroupes(array $actifs, array $archives, array $adminIds): string
+{
+    return $this->encode([
+        'actifs' => array_map(
+            fn(Groupe $g) => $this->getPayloadGroupe($g, $adminIds),
+            array_values($actifs)
+        ),
+        'archives' => array_map(
+            fn(Groupe $g) => $this->getPayloadGroupe($g, $adminIds),
+            array_values($archives)
+        ),
+    ]);
+}
+```
+
+**Response format:**
+```json
+{
+  "actifs": [
+    { "id": 1, "nom": "Famille", "archive": false, "estAdmin": false },
+    { "id": 3, "nom": "Amis", "archive": false, "estAdmin": true }
+  ],
+  "archives": [
+    { "id": 2, "nom": "Noël 2024", "archive": true, "estAdmin": false }
+  ]
+}
+```
+
+**Import needed in JsonService:** `use App\Dom\Model\Groupe;`
+
+#### Bootstrap.php Route Registration
+
+```php
+// api/src/Bootstrap.php — ADD route group (after /utilisateur group):
+
+$this->slimApp->group('/groupe', function (RouteCollectorProxyInterface $group) {
+    $group->get('', ListGroupeController::class);
+});
+```
+
+**Import needed:** `use App\Appli\Controller\ListGroupeController;`
+
+**Note:** Uses singular `/groupe` to match existing route patterns (`/occasion`, `/utilisateur`). Architecture.md says `/groupes` (plural) but the codebase convention is singular.
+
+#### Frontend: Groupe Interface and API Method
+
+```typescript
+// front/src/app/backend.service.ts — ADD interfaces:
+
+export interface Groupe {
+  id: number;
+  nom: string;
+  archive: boolean;
+  estAdmin: boolean;
+}
+
+export interface GroupeResponse {
+  actifs: Groupe[];
+  archives: Groupe[];
+}
+```
+
+```typescript
+// front/src/app/backend.service.ts — ADD URL constant:
+
+const URL_GROUPE = `${URL_API}/groupe`;
+```
+
+```typescript
+// front/src/app/backend.service.ts — ADD observable in constructor:
+
+// Groups loaded after login, cached with shareReplay
+this.groupes$ = this.utilisateurConnecte$.pipe(
+  switchMap((utilisateur) =>
+    utilisateur === null
+      ? of(null)
+      : this.http.get<GroupeResponse>(URL_GROUPE).pipe(
+          catchError(() => of({ actifs: [], archives: [] } as GroupeResponse))
+        )
+  ),
+  shareReplay(1),
+);
+```
+
+```typescript
+// front/src/app/backend.service.ts — ADD class property:
+
+groupes$: Observable<GroupeResponse | null>;
+```
+
+**Pattern notes:**
+- Chains from `utilisateurConnecte$` so groups reload on login/logout
+- `shareReplay(1)` caches the result for multiple subscribers (header, future components)
+- `catchError` returns empty groups on failure (graceful degradation)
+- Uses `withCredentials: true` automatically via `AuthBackendInterceptor`
+
+#### Frontend: Header Component Modification
+
+```typescript
+// front/src/app/header/header.component.ts — ADD:
+
+import { BackendService, GroupeResponse } from '../backend.service';
+
+// In component class, ADD property:
+groupes$!: Observable<GroupeResponse | null>;
+
+// In ngOnInit(), ADD:
+this.groupes$ = this.backend.groupes$;
+```
+
+```html
+<!-- front/src/app/header/header.component.html — ADD dropdown (after "Mes occasions" dropdown): -->
+
+<li class="nav-item" ngbDropdown>
+  <a class="nav-link" ngbDropdownToggle id="groupesDropdown">Mes groupes</a>
+  <div ngbDropdownMenu aria-labelledby="groupesDropdown">
+    @if (groupes$ | async; as groupes) {
+      @if (groupes.actifs.length === 0 && groupes.archives.length === 0) {
+        <span class="dropdown-item-text text-muted">Aucun groupe</span>
+      }
+      @for (groupe of groupes.actifs; track groupe.id) {
+        <a ngbDropdownItem [routerLink]="['/groupe', groupe.id]"
+           (click)="isMenuCollapsed = true">
+          {{ groupe.nom }}
+        </a>
+      }
+      @if (groupes.archives.length > 0) {
+        @if (groupes.actifs.length > 0) {
+          <div class="dropdown-divider"></div>
+        }
+        <h6 class="dropdown-header">Archivés</h6>
+        @for (groupe of groupes.archives; track groupe.id) {
+          <a ngbDropdownItem [routerLink]="['/groupe', groupe.id]"
+             (click)="isMenuCollapsed = true"
+             class="text-muted">
+            {{ groupe.nom }} (archivé)
+          </a>
+        }
+      }
+    }
+  </div>
+</li>
+```
+
+**Pattern notes:**
+- Follows exact same pattern as "Mes occasions" dropdown (ngbDropdown directives)
+- Uses `@if` / `@for` new Angular control flow syntax (not *ngIf/*ngFor)
+- `track groupe.id` required for `@for` loops
+- Group items link to `/groupe/{id}` — placeholder route for Story 2.4
+- Archived groups styled with `text-muted` and "(archivé)" suffix
+- Dropdown divider separates active from archived
+- `isMenuCollapsed = true` closes mobile menu on click (existing pattern)
+- "Aucun groupe" message for empty state (AC #3)
+
+**Header component imports — ADD:** `RouterModule` if not already imported (needed for `routerLink` in dropdown items).
+
+#### Frontend: Route Registration (Placeholder)
+
+```typescript
+// front/src/app/app.routes.ts — ADD (placeholder for Story 2.4):
+
+// No dedicated groups LIST page needed — groups are in header dropdown.
+// Individual group routes will be added in Story 2.4.
+```
+
+**Note:** Story 2.3 only adds the dropdown. The `/groupe/:idGroupe` route will be added in Story 2.4 (View Group Members). For now, the `[routerLink]` in the dropdown will navigate to a non-existent route — this is acceptable since group detail pages are the next story.
+
+**Alternative (if you want clicking to work now):** Add a minimal placeholder route:
+```typescript
+{
+  path: 'groupe/:idGroupe',
+  component: PlaceholderGroupeComponent, // or redirect to /occasion
+  canActivate: [ConnexionGuard],
+  runGuardsAndResolvers: 'always',
+}
+```
+
+### Architecture Compliance
+
+**From architecture.md — API Endpoints:**
+- `GET /api/groupes` — list of user's groups (architecture says plural, codebase pattern is singular → use `/groupe`)
+- Response includes active and archived groups with admin flag
+
+**From architecture.md — Group Isolation:**
+- No isolation enforcement needed for this story (user only sees their own groups via `readToutesAppartenancesForUtilisateur`)
+- Defense in Depth (Story 2.5) will add Port+Repository validation for group-scoped resources
+
+**From architecture.md — Navigation:**
+- "Ma liste" always accessible from header dropdown alongside group list
+- First login: "My List" or invited group context
+- Return visits: most recently active group (deferred — session persistence is a future story)
+
+**From architecture.md — Error Responses:**
+- `GET /api/groupe` returns empty arrays `{ actifs: [], archives: [] }` for user with no groups (not an error)
+- 401 for unauthenticated access (handled by AuthMiddleware)
+
+**From project-context.md — Mandatory Patterns:**
+- `declare(strict_types=1);` in EVERY PHP file
+- `#[\Override]` on `__invoke()` in controllers
+- Explicit return types on all methods (except `__construct`)
+- Old-style Doctrine annotations — no PHP 8 attributes on entities (not applicable here, no new entities)
+- PHPStan level 8 clean
+- Controllers extend `AuthController`, call `parent::__invoke()` first
+- `$this->routeService->getResponseWithJsonBody($response, $this->jsonService->encode*(...))` response pattern
+
+**From project-context.md — Architecture Boundaries:**
+- Controllers call Ports (not Repositories directly): `ListGroupeController → GroupePort → GroupeRepository`
+- Ports in `Dom/Port/` — concrete classes, autowired
+- No business logic in controllers
+
+### Library/Framework Requirements
+
+**Backend:**
+- **Doctrine ORM 2.17:** DQL QueryBuilder for membership queries. Already in use. No changes.
+- **PHP-DI 7.0:** Autowiring handles GroupePort injection. No config change needed.
+- **Slim 4.10:** Route group registration for `/groupe`. No changes.
+
+**Frontend:**
+- **Angular 21.0.8:** Standalone components with new control flow syntax. No changes.
+- **ng-bootstrap 20.0.0:** `NgbDropdownModule` for groups dropdown. Already imported in header component.
+- **RxJS 7.8.0:** `switchMap`, `shareReplay`, `catchError` for groups observable. No changes.
+
+### File Structure Requirements
+
+**New Files:**
+
+```
+api/src/
+├── Dom/
+│   └── Port/
+│       └── GroupePort.php                    # Domain service for group operations
+├── Appli/
+│   └── Controller/
+│       └── ListGroupeController.php          # GET /api/groupe endpoint
+
+api/test/
+├── Unit/
+│   └── Dom/
+│       └── Port/
+│           └── GroupePortTest.php            # Unit tests for GroupePort
+└── Int/
+    └── ListGroupeControllerTest.php          # Integration tests for API endpoint
+```
+
+**Files to Modify:**
+
+```
+api/src/
+├── Dom/
+│   └── Repository/
+│       └── GroupeRepository.php              # Add readToutesAppartenancesForUtilisateur()
+├── Appli/
+│   ├── RepositoryAdaptor/
+│   │   └── GroupeRepositoryAdaptor.php       # Implement new method
+│   ├── Service/
+│   │   └── JsonService.php                   # Add getPayloadGroupe(), encodeListeGroupes()
+│   └── Bootstrap.php                         # Add /groupe route group
+
+front/src/app/
+├── backend.service.ts                        # Add Groupe interface, GroupeResponse, groupes$ observable
+└── header/
+    ├── header.component.ts                   # Add groupes$ subscription
+    └── header.component.html                 # Add "Mes groupes" dropdown
+
+api/test/Int/
+└── GroupeRepositoryTest.php                  # Add tests for new repository method
+```
+
+### Testing Requirements
+
+**Backend Unit Tests (`api/test/Unit/Dom/Port/GroupePortTest.php`) — NEW:**
+- `testListeGroupesUtilisateurSeparatesActiveAndArchived`: Mock repository returning 2 active + 1 archived, verify separation
+- `testListeGroupesUtilisateurWithNoGroups`: Mock repository returning empty array, verify empty `actifs` and `archives`
+- `testListeGroupesUtilisateurWithOnlyArchived`: Mock repository returning only archived groups, verify `actifs` empty
+- `testListeGroupesUtilisateurPassesCorrectUserId`: Verify `readToutesAppartenancesForUtilisateur()` called with auth user ID
+
+**Backend Integration Tests (`api/test/Int/GroupeRepositoryTest.php`) — ADD:**
+- `testReadToutesAppartenancesForUtilisateurReturnsActiveAndArchived`: Create user with 1 active + 1 archived group, verify both returned
+- `testReadToutesAppartenancesForUtilisateurWithNoGroupsReturnsEmpty`: User with no groups
+- `testReadToutesAppartenancesForUtilisateurPreservesAdminFlag`: Verify estAdmin preserved
+
+**Backend Integration Tests (`api/test/Int/ListGroupeControllerTest.php`) — NEW:**
+- `testListGroupeReturnsActiveAndArchivedGroups`: Create user with 2 active + 1 archived group, verify JSON response structure with correct separation
+- `testListGroupeWithNoGroupsReturnsEmptyArrays`: User with no groups returns `{ actifs: [], archives: [] }`
+- `testListGroupeIncludesEstAdminFlag`: User is admin of one group, verify `estAdmin: true` for that group
+- `testListGroupeRequiresAuthentication`: Unauthenticated request returns 401
+
+**Frontend Unit Tests:**
+- `backend.service.spec.ts` — Test `groupes$` observable emits groups after login, null after logout
+- `header.component.spec.ts` — Test dropdown renders active groups, archived section, no-groups message
+
+**Verification:**
+```bash
+./composer test -- --testsuite=Unit       # All unit tests pass
+./composer test -- --testsuite=Int        # All integration tests pass
+./composer test                           # Full suite (319+ existing + new)
+./composer phpstan                        # PHPStan level 8 clean
+./npm test -- --watch=false --browsers=ChromeHeadless  # Frontend tests pass
+```
+
+### Anti-Pattern Prevention
+
+**DO NOT:**
+- Access `GroupeRepository` directly from `ListGroupeController` — MUST go through `GroupePort` (architecture boundary: controllers never access repositories)
+- Reuse `readAppartenancesForUtilisateur()` — it filters archived groups (for JWT claims). Story 2.3 needs ALL groups including archived.
+- Create a GroupePort interface + adaptor pattern — Ports are concrete classes in this codebase (unlike Repositories which use interface + adaptor)
+- Modify JWT claims or `BffAuthCallbackController` — JWT already includes `groupe_ids` for active groups. This story reads groups via a separate API endpoint.
+- Add `inversedBy` to `AppartenanceAdaptor.$utilisateur` — not needed, DQL query joins directly
+- Use `/api/groupes` (plural) in route — existing codebase convention is singular (`/occasion`, `/utilisateur`). Use `/groupe`.
+- Create a separate `GroupeService` on frontend — use `BackendService` which holds all API methods and observables
+- Create separate model files for `Groupe` interface — existing pattern puts interfaces in `backend.service.ts`
+- Use `*ngIf` or `*ngFor` in templates — project uses new Angular control flow syntax (`@if`, `@for`)
+- Forget `track` expression in `@for` loops — required by Angular
+- Use `constructor(private backend: BackendService)` — project uses `inject()` function for DI
+- Forget `parent::__invoke()` in controller — required for auth population
+- Forget `array_values()` on arrays passed to `array_map()` — prevents JSON object serialization from non-sequential keys
+
+**DO:**
+- Follow the ListOccasionController / ListUtilisateurController pattern for the new controller
+- Use `addSelect('g')` in DQL to eager-load Groupe entities (prevent N+1, same as existing method)
+- Use `ProphecyTrait` for mocking in unit tests (existing pattern)
+- Use `GroupeBuilder` with `withAppartenance()` and `withArchive()` in integration tests
+- Return `array_values()` wrapped arrays in JSON encoding (existing pattern in JsonService)
+- Use `shareReplay(1)` on `groupes$` observable (cached for multiple subscribers)
+- Use `catchError()` on groups API call (graceful degradation if endpoint fails)
+- Follow French naming: "Mes groupes", "Aucun groupe", "Archivés", "(archivé)"
+- Run `./composer test` after EACH task (not just at the end)
+- Run `./npm test -- --watch=false --browsers=ChromeHeadless` after frontend tasks
+
+### Previous Story Intelligence
+
+**From Story 2.2 (Group Membership in JWT Claims) — DONE:**
+- `readAppartenancesForUtilisateur()` exists but filters `archive = false` — cannot reuse for Story 2.3
+- `addSelect('g')` pattern for N+1 prevention already established — reuse in new method
+- `array_values()` wrapping required for JSON serialization — established in `BffAuthCallbackController`
+- GroupeBuilder has `withAppartenance(Utilisateur, bool, ?DateTime)` for easy test setup
+- 319 backend tests pass (PHPStan level 8 clean)
+- JWT claims include `groupe_ids` (active only) and `groupe_admin_ids` — use `getGroupeAdminIds()` from Auth to annotate groups with `estAdmin` flag
+
+**From Story 2.1 (Groupe Entity & Database Schema) — DONE:**
+- `GroupeAdaptor` has `getArchive(): bool` — use to separate active/archived
+- `GroupeBuilder` supports `withArchive(bool)` — use in tests to create archived groups
+- `IntTestCase.tearDown()` already cleans `AppartenanceAdaptor` before `GroupeAdaptor` (FK order)
+- `GroupeRepositoryAdaptor` has validation on `create()` and `update()` (empty nom check)
+- Migration `Version20260214120000` creates both tables with correct FK constraints
+
+**From Story 1.1 (JWT Token Exchange) / 1.1c (OAuth2 Standards):**
+- Auth flow: OAuth2 → BFF callback → JWT HttpOnly cookie + response body with user payload
+- Frontend receives `groupe_ids` and `groupe_admin_ids` in auth callback response but doesn't use them yet
+- `BackendService` has `utilisateurConnecte$` observable — chain `groupes$` from it
+- Header component subscribes to `utilisateurConnecte$` — same pattern for `groupes$`
+
+### Git Intelligence
+
+**Recent commit patterns:**
+- `feat(story-X.Y):` for main implementation
+- `fix(story-X.Y):` for review follow-ups
+- `chore(story-X.Y):` for documentation-only changes
+- `refactor(story-X.Y):` for non-functional changes
+- Branch naming: `story/X.Y-short-description` (with slash separator)
+- All 319 backend tests pass on current master branch
+
+**Files from Stories 2.1/2.2 relevant to Story 2.3:**
+- `api/src/Appli/RepositoryAdaptor/GroupeRepositoryAdaptor.php` — add new method here
+- `api/src/Dom/Repository/GroupeRepository.php` — add new method signature here
+- `api/src/Appli/Service/JsonService.php` — add encoding methods here
+- `api/src/Bootstrap.php` — add route here
+- `api/test/Builder/GroupeBuilder.php` — use `withAppartenance()` and `withArchive()` in tests
+- `api/test/Int/GroupeRepositoryTest.php` — add tests for new repository method here
+- `front/src/app/header/header.component.ts` and `.html` — modify for groups dropdown
+- `front/src/app/backend.service.ts` — add interfaces and observable
+
+### Project Structure Notes
+
+- All backend modifications stay within existing hexagonal architecture layers
+- Data flow: `ListGroupeController (Appli) → GroupePort (Dom) → GroupeRepository (Dom) → GroupeRepositoryAdaptor (Appli)`
+- Frontend: `header.component → BackendService.groupes$ → GET /api/groupe → ListGroupeController`
+- No new DI bindings needed for GroupePort — PHP-DI autowires concrete classes
+- Route `/groupe` follows existing singular convention (`/occasion`, `/utilisateur`)
+
+### References
+
+- [Source: _bmad-output/planning-artifacts/epics.md#Epic-2, Story-2.3]
+- [Source: _bmad-output/planning-artifacts/architecture.md#API-Endpoints — GET /api/groupes]
+- [Source: _bmad-output/planning-artifacts/architecture.md#Frontend-Architecture — My List Navigation, Header Dropdown]
+- [Source: _bmad-output/planning-artifacts/architecture.md#Group-Isolation-Enforcement — Defense in Depth]
+- [Source: _bmad-output/project-context.md#Critical-Implementation-Rules]
+- [Source: _bmad-output/project-context.md#Architecture-Boundaries — Controllers use Ports, not Repositories]
+- [Source: api/src/Dom/Repository/GroupeRepository.php] — Existing interface to extend
+- [Source: api/src/Appli/RepositoryAdaptor/GroupeRepositoryAdaptor.php] — readAppartenancesForUtilisateur pattern
+- [Source: api/src/Dom/Port/OccasionPort.php] — Port pattern reference
+- [Source: api/src/Appli/Controller/ListOccasionController.php] — Controller pattern reference
+- [Source: api/src/Appli/Service/JsonService.php] — JSON encoding pattern reference
+- [Source: api/src/Bootstrap.php] — Route and DI registration
+- [Source: front/src/app/backend.service.ts] — Frontend service pattern
+- [Source: front/src/app/header/header.component.ts] — Header navigation pattern
+- [Source: _bmad-output/implementation-artifacts/2-2-group-membership-in-jwt-claims.md] — Previous story context
+- [Source: _bmad-output/implementation-artifacts/2-1-groupe-entity-database-schema.md] — Entity context
+
+## Dev Agent Record
+
+### Agent Model Used
+
+{{agent_model_name_version}}
+
+### Debug Log References
+
+### Completion Notes List
+
+### File List
