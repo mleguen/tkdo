@@ -1,7 +1,10 @@
 ---
 stepsCompleted: ['step-01-init', 'step-02-discovery', 'step-03-success', 'step-04-journeys', 'step-05-domain (skipped)', 'step-06-innovation (skipped)', 'step-07-project-type', 'step-08-scoping', 'step-09-functional-requirements', 'step-10-nonfunctional', 'step-11-polish', 'step-e-01-discovery', 'step-e-02-review', 'step-e-03-edit']
-lastEdited: '2026-01-25'
+lastEdited: '2026-02-15'
 editHistory:
+  - date: '2026-02-15'
+    source: 'story-1.2-review-findings'
+    changes: 'Documented email non-uniqueness design constraint: added Authentication & User Identification section to System Architecture, updated FR1/FR2/FR5/FR8 to clarify that email is non-unique (family sharing pattern), username is the only guaranteed unique identifier, and login-by-email only works for unique emails'
   - date: '2026-01-25'
     source: 'ux-design-specification.md'
     changes: 'Aligned PRD with UX design decisions: added draft ideas concept (FR106-FR109), My List view (FR110-FR113), archived ideas handling (FR114-FR116), bulk share on invite (FR55b-FR55f), navigation architecture, API design principles, Journey 7, UX success metrics'
@@ -424,6 +427,20 @@ Sophie manages context-appropriate sharing across groups. The bulk share saved h
 
 ## System Architecture
 
+### Authentication & User Identification
+
+**Username as unique identifier:**
+- Username (identifiant) is the only guaranteed unique identifier in the system (cannot be changed after account creation)
+- Email addresses are intentionally non-unique by design to support family sharing patterns (couples sharing an email, parents managing children's accounts)
+
+**Login behavior:**
+- Users can log in with either username or email
+- Login-by-email is a convenience feature that only works when the email is unique to one user
+- Users with shared email addresses must log in using their unique username
+- The system returns a generic "Identifiant ou mot de passe incorrect" error for both invalid credentials and ambiguous email addresses (security by design)
+
+**Rationale:** Family-scale gift coordination applications naturally have multiple users sharing email addresses. Supporting shared emails eliminates friction for couples and parents while maintaining security through unique username authentication.
+
 ### Technology Stack
 
 tkdo is a **Single Page Application** built with Angular (existing). The rewrite maintains this architecture while pivoting the data model from occasion-centric to list-centric.
@@ -524,14 +541,14 @@ Test architecture (including negative/penetration-style tests) should be designe
 
 ### User & Account Management
 
-- **FR1:** Users can sign up by clicking a valid invite link and providing email and password
-- **FR2:** Users can log in with email/username and password
+- **FR1:** Users can sign up by clicking a valid invite link and providing email and password (email is not required to be unique)
+- **FR2:** Users can log in with email/username and password; login-by-email only succeeds when the email is unique to one user (users with shared emails must use their username)
 - **FR3:** Users can log out
 - **FR4:** Users can change their own password (minimum 8 characters)
-- **FR5:** Users can update their profile: name (minimum 3 characters), email, gender (M/F for French grammar in notifications)
+- **FR5:** Users can update their profile: name (minimum 3 characters), email (can be shared with other users), gender (M/F for French grammar in notifications)
 - **FR6:** Users can update their notification preferences (None/Instant/Daily)
 - **FR7:** Users can view their own profile information
-- **FR8:** Username (identifiant) cannot be changed after account creation
+- **FR8:** Username (identifiant) cannot be changed after account creation (username is the only guaranteed unique identifier)
 
 ### Idea Management
 

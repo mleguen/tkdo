@@ -64,7 +64,7 @@ Login exists and works via the OAuth2 flow implemented in Stories 1.1/1.1b/1.1c.
   - [x] 2.2 Verify same error message for both "user not found" and "wrong password" cases (both caught by `UtilisateurInconnuException`)
 
 - [x] Task 3: Record failed login attempts (AC: #3)
-  - [x] 3.1 Create Doctrine migration `Version20260215120000`: add `tentatives_echouees INT NOT NULL DEFAULT 0` and `verrouille_jusqua DATETIME NULL` columns to `tkdo_utilisateur`
+  - [x] 3.1 Create Doctrine migration `Version20260215130000`: add `tentatives_echouees INT NOT NULL DEFAULT 0` and `verrouille_jusqua DATETIME NULL` columns to `tkdo_utilisateur`
   - [x] 3.2 Add properties to `Utilisateur` interface: `getTentativesEchouees(): int`, `getVerrouilleJusqua(): ?DateTime`
   - [x] 3.3 Add Doctrine mapping + getters/setters to `UtilisateurAdaptor`: `$tentativesEchouees` (int), `$verrouilleJusqua` (?DateTime)
   - [x] 3.4 Add `incrementeTentativesEchouees()` and `reinitialiserTentativesEchouees()` methods to `Utilisateur` model
@@ -117,6 +117,25 @@ Login exists and works via the OAuth2 flow implemented in Stories 1.1/1.1b/1.1c.
     - Full login flow with "Se souvenir de moi" checked
     - Login with email (not username)
     - Error message display on invalid credentials
+
+### Review Follow-ups (AI)
+
+- [x] [AI-Review][HIGH] Implement graceful degradation for shared emails in login-by-email
+  - **Issue:** Current implementation throws `NonUniqueResultException` (500 error) when multiple users share the same email address, instead of gracefully returning "Identifiant ou mot de passe incorrect"
+  - **Context:** Email is intentionally non-unique per project design (families may share emails: couples, parents managing children). Login-by-email is a convenience feature that only works for users with unique emails.
+  - **Solution:** Modify `UtilisateurRepositoryAdaptor::readOneByIdentifiantOuEmail()` to:
+    1. First attempt exact match on `identifiant` (always unique)
+    2. If no match, attempt match on `email`
+    3. If email query returns multiple results, catch `NonUniqueResultException` and throw `UtilisateurInconnuException` instead (graceful degradation)
+  - **Files:** `api/src/Appli/RepositoryAdaptor/UtilisateurRepositoryAdaptor.php:142-157`
+  - **Tests:** Add integration test to `OAuthAuthorizeControllerTest` verifying that login with shared email returns "Identifiant ou mot de passe incorrect" (not 500 error)
+  - **Documentation:** Add note to Dev Notes explaining that login-by-email requires unique emails; users with shared emails must use their unique username
+
+- [x] [AI-Review][LOW] Document timing side-channel as known limitation (optional)
+  - **Issue:** Failed login attempts increment counter (DB write) only for existing users, not for non-existent users. This creates a subtle timing difference (~few ms) that could theoretically enable user enumeration.
+  - **Impact:** Very low practical risk; timing difference is minimal, and implementation correctly doesn't reveal which field was wrong
+  - **Note:** Story 1.4 (rate limiting) may address this with IP-based rate limiting
+  - **Action:** Consider adding to project-context.md "Known Technical Debt" or documenting in security review notes
 
 ## Dev Notes
 
@@ -212,13 +231,13 @@ try {
     $utilisateur = $this->utilisateurRepository->readOneByIdentifiantOuEmail($body['identifiant']);
     if (!$utilisateur->verifieMdp($body['mdp'])) {
         $utilisateur->incrementeTentativesEchouees();
-        $this->utilisateurRepository->actualise($utilisateur); // persist
+        $this->utilisateurRepository->update($utilisateur); // persist
         throw new UtilisateurInconnuException();
     }
     // Success: reset counter
     if ($utilisateur->getTentativesEchouees() > 0) {
         $utilisateur->reinitialiserTentativesEchouees();
-        $this->utilisateurRepository->actualise($utilisateur);
+        $this->utilisateurRepository->update($utilisateur);
     }
     // ... create auth code ...
 } catch (UtilisateurInconnuException) {
@@ -229,7 +248,7 @@ try {
 ### Project Structure Notes
 
 **Files to create:**
-- `api/src/Infra/Migrations/Version20260215120000.php` — Migration for failed attempt columns
+- `api/src/Infra/Migrations/Version20260215130000.php` — Migration for failed attempt columns
 
 **Files to modify:**
 - `api/src/Dom/Model/Utilisateur.php` — Add `getTentativesEchouees()`, `getVerrouilleJusqua()` to interface
@@ -348,8 +367,10 @@ Claude Opus 4.6 (claude-opus-4-6)
 
 ### Completion Notes List
 
-- All 7 tasks completed successfully with full test coverage
-- Test results: 309 backend (164 unit + 145 integration), 65 frontend unit, 25 Cypress component, 9 Cypress E2E — all passing
+- All 7 tasks + 2 review follow-ups completed successfully with full test coverage
+- Test results: 331 backend (166 unit + 165 integration), 65 frontend unit, 25 Cypress component, 9 Cypress E2E — all passing
+- ✅ Resolved review finding [HIGH]: Graceful degradation for shared emails — `readOneByIdentifiantOuEmail()` now prioritizes username match, catches `NonUniqueResultException` on email lookup, and throws `UtilisateurInconnuException` instead of 500 error
+- ✅ Resolved review finding [LOW]: Documented timing side-channel and login-by-email shared email limitation in project-context.md "Known Technical Debt" section
 - **Lesson learned**: After adding new Doctrine-mapped properties, always run `./doctrine orm:clear-cache:metadata` and `./doctrine orm:generate-proxies` to refresh the metadata cache. Container restarts are unnecessary.
 - **MySQL command pattern**: The proper way to run MySQL queries against the dev database is: `docker compose exec mysql mysql -u tkdo -pmdptkdo tkdo -e "SQL_QUERY_HERE"`
 
@@ -361,11 +382,13 @@ Claude Opus 4.6 (claude-opus-4-6)
 - **"Se souvenir de moi" checkbox**: New checkbox on login form, stored via sessionStorage bridge, extends JWT/cookie validity to 7 days (604800s) vs default 1 hour (3600s)
 - **Post-login redirect**: Redirect priority updated to `oauth_retour` > `tkdo_lastGroupeId` > `/occasion`
 - **Database migration**: `Version20260215120000` adds `tentatives_echouees` and `verrouille_jusqua` columns
+- **Shared email graceful degradation (review follow-up)**: `readOneByIdentifiantOuEmail()` refactored to prioritize username match, then email match with `NonUniqueResultException` handling — users with shared emails see standard error message instead of 500 error
+- **Known Technical Debt documented (review follow-up)**: Added timing side-channel and shared email login limitations to `project-context.md`
 
 ### File List
 
 **Created:**
-- `api/src/Infra/Migrations/Version20260215120000.php` — Migration for failed attempt columns
+- `api/src/Infra/Migrations/Version20260215130000.php` — Migration for failed attempt columns
 - `api/test/Unit/Appli/Service/AuthServiceTest.php` — Unit tests for AuthService encode/validity
 
 **Modified (Backend):**
@@ -377,7 +400,7 @@ Claude Opus 4.6 (claude-opus-4-6)
 - `api/src/Appli/Controller/BffAuthCallbackController.php` — Read `se_souvenir`, adjust JWT/cookie validity
 - `api/src/Appli/Service/AuthService.php` — Added `validiteOverride` param to `encode()`, added `getValiditeSeSouvenir()`
 - `api/src/Appli/Settings/AuthSettings.php` — Added `validiteSeSouvenir` property (604800s)
-- `api/test/Int/OAuthAuthorizeControllerTest.php` — 5 new tests (email login, error messages, attempt counter)
+- `api/test/Int/OAuthAuthorizeControllerTest.php` — 6 new tests (email login, error messages, attempt counter, shared email graceful degradation)
 - `api/test/Int/BffAuthCallbackControllerTest.php` — 3 new tests (remember-me cookie duration)
 
 **Modified (Frontend):**
@@ -390,3 +413,8 @@ Claude Opus 4.6 (claude-opus-4-6)
 - `front/src/app/backend.service.spec.ts` — 1 new + 1 updated test (se_souvenir in request body)
 - `front/cypress/e2e/connexion.cy.ts` — 3 new E2E tests (email login, error message, remember me)
 - `front/cypress/fixtures/utilisateurs.json` — Added `email` fields to all user fixtures
+
+**Modified (Meta):**
+- `_bmad-output/implementation-artifacts/1-2-user-login.md` — This story file itself (status, completion notes, file list)
+- `_bmad-output/implementation-artifacts/sprint-status.yaml` — Updated story status to "review"
+- `_bmad-output/project-context.md` — Added Known Technical Debt entries (timing side-channel, shared email login)

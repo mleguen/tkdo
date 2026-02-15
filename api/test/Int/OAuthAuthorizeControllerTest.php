@@ -344,6 +344,46 @@ class OAuthAuthorizeControllerTest extends IntTestCase
         $this->assertEquals(2, $reloaded->getTentativesEchouees());
     }
 
+    public function testPostLoginWithSharedEmailReturnsErrorNotServerError(): void
+    {
+        $sharedEmail = 'famille@test.com';
+        // Create two users with the same email (families sharing emails)
+        $this->utilisateur()
+            ->withIdentifiant('parent1')
+            ->withEmail($sharedEmail)
+            ->persist(self::$em);
+        $this->utilisateur()
+            ->withIdentifiant('parent2')
+            ->withEmail($sharedEmail)
+            ->persist(self::$em);
+
+        $baseUri = getenv('TKDO_BASE_URI');
+        $client = new \GuzzleHttp\Client(['allow_redirects' => false]);
+        $response = $client->request(
+            'POST',
+            $baseUri . self::AUTHORIZE_PATH,
+            [
+                'form_params' => [
+                    'identifiant' => $sharedEmail,
+                    'mdp' => 'mdpparent1',
+                    'client_id' => 'tkdo',
+                    'redirect_uri' => self::VALID_REDIRECT_URI,
+                    'response_type' => 'code',
+                    'state' => 'test',
+                ],
+                'http_errors' => false,
+            ]
+        );
+
+        // Should get a redirect with error message, NOT a 500 server error
+        $this->assertEquals(302, $response->getStatusCode());
+        $location = $response->getHeaderLine('Location');
+        $this->assertStringContainsString(
+            'erreur=' . urlencode('Identifiant ou mot de passe incorrect'),
+            $location
+        );
+    }
+
     public function testSuccessfulLoginResetsTentativesEchouees(): void
     {
         $utilisateur = $this->utilisateur()->withIdentifiant('resetcount')->persist(self::$em);

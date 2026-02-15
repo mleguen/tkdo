@@ -14,6 +14,7 @@ use App\Dom\Repository\UtilisateurRepository;
 use DateTime;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\NonUniqueResultException;
 
 class UtilisateurRepositoryAdaptor implements UtilisateurRepository
 {
@@ -141,15 +142,33 @@ EOS;
      */
     public function readOneByIdentifiantOuEmail(string $identifiantOuEmail): Utilisateur
     {
+        // 1. First attempt exact match on identifiant (always unique)
+        /** @var Utilisateur|null */
+        $utilisateur = $this->em->getRepository(UtilisateurAdaptor::class)->findOneBy([
+            'identifiant' => $identifiantOuEmail,
+        ]);
+        if ($utilisateur !== null) {
+            return $utilisateur;
+        }
+
+        // 2. If no username match, attempt match on email
+        //    Email is intentionally non-unique (families may share emails).
+        //    If multiple users share the email, gracefully degrade.
         $classDoctrineUtilisateur = UtilisateurAdaptor::class;
         $dql = <<<EOS
             SELECT u FROM $classDoctrineUtilisateur u
-            WHERE u.identifiant = :val OR u.email = :val
+            WHERE u.email = :val
 EOS;
-        /** @var Utilisateur|null */
-        $result = $this->em->createQuery($dql)
-            ->setParameter('val', $identifiantOuEmail)
-            ->getOneOrNullResult();
+        try {
+            /** @var Utilisateur|null */
+            $result = $this->em->createQuery($dql)
+                ->setParameter('val', $identifiantOuEmail)
+                ->getOneOrNullResult();
+        } catch (NonUniqueResultException) {
+            // Multiple users share this email — cannot determine which one.
+            // Login-by-email only works for users with unique emails.
+            throw new UtilisateurInconnuException();
+        }
         if ($result === null) {
             throw new UtilisateurInconnuException();
         }

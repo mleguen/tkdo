@@ -296,7 +296,8 @@ public function __invoke(Request $request, Response $response): Response
 
 ## Known Technical Debt
 
-No known technical debt at this time. Test suite runs clean with no warnings.
+- **Minor timing side-channel in login (Story 1.2):** Failed login attempts increment a counter (DB write) only for existing users. Non-existent users skip the DB write, creating a subtle timing difference (~few ms) that could theoretically enable user enumeration. Practical risk is very low; the error message is already generic ("Identifiant ou mot de passe incorrect") for both cases. Story 1.4 (IP-based rate limiting) will further mitigate this.
+- **Login-by-email requires unique emails (Story 1.2):** Email is intentionally non-unique in the DB (families may share emails: couples, parents managing children's accounts). Login-by-email is a convenience feature that only works when the email is unique. Users with shared emails must use their unique username. If a shared email is used, the system returns the standard error message gracefully (no 500 error).
 
 ---
 
