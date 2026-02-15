@@ -1,6 +1,6 @@
 # Story 2.2: Group Membership in JWT Claims
 
-Status: review
+Status: done
 
 ## Story
 
@@ -438,6 +438,7 @@ No issues encountered. All tasks completed in a single pass with red-green-refac
 - **Task 4:** Injected `GroupeRepository` into `AuthTokenController` constructor; replaced hardcoded `[]` with real membership query using `readAppartenancesForUtilisateur()`; extracted `groupe_ids` and `groupe_admin_ids` via `array_map`/`array_filter`; removed TODO comments from Story 1.1; added `groupe_admin_ids` to response body.
 - **Task 5:** Added 5 new integration tests: active groups with admin distinction, archived group exclusion, JWT cookie claim verification; updated existing no-groups test to verify `groupe_admin_ids`; full suite passes with 295 tests / 1129 assertions; PHPStan level 8 clean.
 - **Review Follow-ups:** Addressed all 4 code review findings: (1) CRITICAL — wrapped `array_map`/`array_filter` results with `array_values()` in AuthTokenController to prevent JSON object serialization from non-sequential keys; (2) HIGH — added integration test with 3 groups and non-consecutive admin indexes verifying sequential JSON array keys; (3) MEDIUM — added AC #2 session refresh integration test: login with no groups, add group, re-login, verify new group in claims; (4) LOW — added `array_map('intval', ...)` in AuthService.decode() for type safety on JWT-decoded arrays. Full suite: 299 tests / 1157 assertions, PHPStan level 8 clean.
+- **Second Review Follow-ups:** Added inline documentation to AuthTokenController explaining: (1) why `array_values()` is critical for preventing JSON object serialization; (2) JWT claims are a snapshot and may become stale, which is acceptable per architecture Rule 9 (writes validate against database, not JWT); (3) Defense in Depth validation will be in Story 2.5. All tests still pass, PHPStan clean.
 
 ### File List
 
@@ -456,7 +457,7 @@ No issues encountered. All tasks completed in a single pass with red-green-refac
 - `api/test/Unit/Appli/Service/AuthServiceTest.php` — 4 unit tests for AuthService JWT encode/decode
 
 **Modified (review follow-ups):**
-- `api/src/Appli/Controller/AuthTokenController.php` — Added `array_values()` wrapping on `$groupeIds` and `$groupeAdminIds`
+- `api/src/Appli/Controller/AuthTokenController.php` — Added `array_values()` wrapping on `$groupeIds` and `$groupeAdminIds`; added inline documentation for array_values() purpose and JWT claim staleness
 - `api/src/Appli/Service/AuthService.php` — Added `array_map('intval', ...)` for type safety in decode()
 - `api/test/Int/AuthTokenControllerTest.php` — Added 2 new integration tests (non-consecutive index, session refresh)
 - `api/test/Unit/Appli/Service/AuthServiceTest.php` — Fixed misleading comment on backward compat test, renamed test method
@@ -467,3 +468,4 @@ No issues encountered. All tasks completed in a single pass with red-green-refac
 - 2026-02-15: Implemented group membership in JWT claims — `groupe_ids` and `groupe_admin_ids` now populated from database during token exchange. Added `readAppartenancesForUtilisateur()` DQL query filtering archived groups. 295 tests pass (21 new), PHPStan level 8 clean.
 - 2026-02-15: Adversarial code review — Fixed misleading test comment in AuthServiceTest. Added PHPStan memory limit and `php` host prohibition to project-context.md. Created 4 action items: CRITICAL array_values() bug, HIGH gap-index test, MEDIUM AC#2 refresh test, LOW decode type safety.
 - 2026-02-15: Addressed all 4 code review findings — Fixed CRITICAL array_values() bug, added HIGH non-consecutive index test, added MEDIUM AC#2 session refresh test, added LOW intval type safety. 299 tests / 1157 assertions pass, PHPStan level 8 clean.
+- 2026-02-15: Second adversarial code review — Added inline documentation to AuthTokenController explaining array_values() purpose and JWT claim staleness architectural trade-off (Rule 9). All tests pass, PHPStan clean. Story ready for completion.
