@@ -22,7 +22,7 @@ class GroupeRepositoryAdaptor implements GroupeRepository
 
     public function create(string $nom): Groupe
     {
-        if (trim($nom) === '') throw new \InvalidArgumentException('nom cannot be empty');
+        if (trim($nom) === '') throw new \InvalidArgumentException('le nom ne peut pas être vide');
         $groupe = new GroupeAdaptor();
         $groupe->setNom($nom)
             ->setDateCreation(new DateTime());
@@ -36,7 +36,6 @@ class GroupeRepositoryAdaptor implements GroupeRepository
      */
     public function read(int $id): Groupe
     {
-        /** @var \Doctrine\ORM\EntityRepository<GroupeAdaptor> */
         $repository = $this->em->getRepository(GroupeAdaptor::class);
         /** @var Groupe|null */
         $groupe = $repository->find($id);
@@ -49,13 +48,13 @@ class GroupeRepositoryAdaptor implements GroupeRepository
      */
     public function readAll(): array
     {
-        /** @var \Doctrine\ORM\EntityRepository<GroupeAdaptor> */
         $repository = $this->em->getRepository(GroupeAdaptor::class);
         return $repository->findAll();
     }
 
     public function update(Groupe $groupe): Groupe
     {
+        if (trim($groupe->getNom()) === '') throw new \InvalidArgumentException('le nom ne peut pas être vide');
         $this->em->persist($groupe);
         $this->em->flush();
         return $groupe;

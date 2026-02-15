@@ -1,6 +1,6 @@
 # Story 2.1: Groupe Entity & Database Schema
 
-Status: review
+Status: done
 
 ## Story
 
@@ -647,6 +647,15 @@ Claude Opus 4.6 (claude-opus-4-6)
   - ✅ Resolved review finding [MEDIUM]: Added input validation to `GroupeRepositoryAdaptor.create()` — throws `\InvalidArgumentException` on empty/whitespace-only `$nom`. Added 2 integration tests for validation.
   - All 272 backend tests pass (158 unit + 114 integration, 1067 assertions)
   - PHPStan level 8 clean
+- **2026-02-15 - Third Adversarial Code Review (6 issues found, all fixed):**
+  - ✅ Fixed [MEDIUM]: Added validation to `update()` method — now validates nom is not empty, matching `create()` validation
+  - ✅ Fixed [MEDIUM]: Changed error message to French — "le nom ne peut pas être vide" for consistency with domain exceptions
+  - ✅ Fixed [LOW]: Added PHPDoc to private constructor in GroupeBuilder explaining factory pattern
+  - ✅ Fixed [LOW]: Removed redundant PHPDoc annotations in GroupeRepositoryAdaptor (`read()` and `readAll()`)
+  - ✅ Fixed [INFO]: Updated architecture.md Entity Naming table — corrected table names to include `tkdo_` prefix, added Appartenance entity
+  - Added 2 integration tests for `update()` validation (empty nom, whitespace-only nom)
+  - All 274 backend tests pass (158 unit + 116 integration, 1069 assertions)
+  - PHPStan level 8 clean
 
 ### Known Limitations (Deferred to Future Stories)
 
@@ -661,6 +670,7 @@ Claude Opus 4.6 (claude-opus-4-6)
 - 2026-02-14: Final adversarial code review — Fixed 2 documentation issues in GroupeFixture.php (misleading TODO comments, incorrect example code), created 2 action items for missing tests and validation
 - 2026-02-15: Addressed final review follow-ups — 2 items resolved: Created AppartenanceAdaptorTest (8 unit tests), added input validation to GroupeRepositoryAdaptor.create() with 2 integration tests
 - 2026-02-15: PR Comments Resolved: Resolved 1 PR comment thread, marked completed action items as fixed, PR: #101, comment_ids: 2807767130
+- 2026-02-15: Third adversarial code review — Fixed 6 issues (2 MEDIUM, 4 LOW): validation in update(), French error messages, code documentation, architecture doc corrections. Added 2 validation tests. 274 tests pass, PHPStan clean.
 
 ### File List
 
@@ -680,9 +690,12 @@ Claude Opus 4.6 (claude-opus-4-6)
 **Modified files:**
 - `api/src/Bootstrap.php` — Added GroupeRepository DI binding
 - `api/src/Appli/Fixture/GroupeFixture.php` — Updated TODO comments and example code (review follow-up)
-- `api/test/Builder/GroupeBuilder.php` — Replaced scaffold with real implementation
+- `api/src/Appli/RepositoryAdaptor/GroupeRepositoryAdaptor.php` — Added validation to update(), French error messages, cleaned PHPDoc
+- `api/test/Builder/GroupeBuilder.php` — Replaced scaffold with real implementation, added PHPDoc to constructor
 - `api/test/Unit/Builder/GroupeBuilderTest.php` — Updated tests for new implementation
 - `api/test/Int/IntTestCase.php` — Added AppartenanceAdaptor and GroupeAdaptor to tearDown cleanup
+- `api/test/Int/GroupeRepositoryTest.php` — Added validation tests for update() method
+- `_bmad-output/planning-artifacts/architecture.md` — Fixed Entity Naming table (tkdo_ prefix, added Appartenance)
 - `_bmad-output/implementation-artifacts/sprint-status.yaml` — Status updated to review
 - `_bmad-output/project-context.md` — Fixed test suite name from `Integration` to `Int`
 - `_bmad-output/implementation-artifacts/2-1-groupe-entity-database-schema.md` — Added review follow-ups (this file)

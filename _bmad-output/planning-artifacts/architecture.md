@@ -278,12 +278,13 @@ All patterns from `project-context.md` remain in effect:
 
 | Entity | Name | Table |
 |--------|------|-------|
-| Group | `Groupe` | `groupe` |
-| List | `Liste` | `liste` |
-| Comment | `Commentaire` | `commentaire` |
-| Invitation | `Invitation` | `invitation` |
-| Idea-Group visibility | `IdeeGroupeVisibilite` | `idee_groupe_visibilite` |
-| Comment-Group visibility | `CommentaireGroupeVisibilite` | `commentaire_groupe_visibilite` |
+| Group | `Groupe` | `tkdo_groupe` |
+| List | `Liste` | `tkdo_liste` |
+| Comment | `Commentaire` | `tkdo_commentaire` |
+| Invitation | `Invitation` | `tkdo_invitation` |
+| Membership | `Appartenance` | `tkdo_groupe_utilisateur` |
+| Idea-Group visibility | `IdeeGroupeVisibilite` | `tkdo_idee_groupe_visibilite` |
+| Comment-Group visibility | `CommentaireGroupeVisibilite` | `tkdo_commentaire_groupe_visibilite` |
 
 #### Group Isolation Query Pattern
 

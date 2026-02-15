@@ -34,6 +34,10 @@ class GroupeBuilder
     /** @var array<array{utilisateur: Utilisateur, estAdmin: bool, dateAjout: ?DateTime}> */
     private array $appartenances = [];
 
+    /**
+     * Private constructor enforces factory method pattern
+     * Use GroupeBuilder::unGroupe() to create instances
+     */
     private function __construct()
     {
         self::$counter++;
@@ -111,6 +115,7 @@ class GroupeBuilder
         $em->persist($groupe);
         $em->flush();
 
+        // Persist appartenances after groupe has an ID
         foreach ($this->appartenances as $appt) {
             $appartenance = new AppartenanceAdaptor($groupe, $appt['utilisateur']);
             $appartenance->setEstAdmin($appt['estAdmin'])

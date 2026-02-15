@@ -93,6 +93,26 @@ class GroupeRepositoryTest extends IntTestCase
         $this->assertEquals('Modifié', $reloaded->getNom());
     }
 
+    public function testUpdateThrowsOnEmptyNom(): void
+    {
+        $groupe = $this->repo->create('Valid Name');
+        $groupe->setNom('');
+
+        $this->expectException(\InvalidArgumentException::class);
+
+        $this->repo->update($groupe);
+    }
+
+    public function testUpdateThrowsOnWhitespaceOnlyNom(): void
+    {
+        $groupe = $this->repo->create('Valid Name');
+        $groupe->setNom('   ');
+
+        $this->expectException(\InvalidArgumentException::class);
+
+        $this->repo->update($groupe);
+    }
+
     public function testAppartenanceCanBeCreatedAndLinked(): void
     {
         $utilisateur = UtilisateurBuilder::aUser()->persist(self::$em);
