@@ -43,10 +43,13 @@ class AuthService
             $payload = JWT::decode($token, $key);
             /** @var int[] $groupeIds */
             $groupeIds = isset($payload->groupe_ids) ? (array) $payload->groupe_ids : [];
+            /** @var int[] $groupeAdminIds */
+            $groupeAdminIds = isset($payload->groupe_admin_ids) ? (array) $payload->groupe_admin_ids : [];
             return new AuthAdaptor(
                 intval($payload->sub),
                 isset($payload->adm) && $payload->adm,
-                $groupeIds
+                $groupeIds,
+                $groupeAdminIds
             );
         }
         catch (Exception) {
@@ -64,6 +67,7 @@ class AuthService
             "exp" => \time() + $this->settings->validite,
             "adm" => $auth->estAdmin(),
             "groupe_ids" => $auth->getGroupeIds(),
+            "groupe_admin_ids" => $auth->getGroupeAdminIds(),
         ];
         return JWT::encode($payload, $this->clePrivee, $this->settings->algo);
     }

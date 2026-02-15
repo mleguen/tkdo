@@ -63,7 +63,7 @@ development_status:
   # Epic 2: Groups & Membership
   epic-2: in-progress
   2-1-groupe-entity-database-schema: done
-  2-2-group-membership-in-jwt-claims: ready-for-dev
+  2-2-group-membership-in-jwt-claims: review
   2-3-view-my-groups: backlog
   2-4-view-group-members: backlog
   2-5-group-isolation-api-defense-in-depth: backlog

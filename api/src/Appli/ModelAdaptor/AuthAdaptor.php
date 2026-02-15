@@ -11,19 +11,22 @@ class AuthAdaptor implements Auth
 {
     /**
      * @param int[] $groupeIds
+     * @param int[] $groupeAdminIds
      */
-    public static function fromUtilisateur(Utilisateur $utilisateur, array $groupeIds = []): AuthAdaptor
+    public static function fromUtilisateur(Utilisateur $utilisateur, array $groupeIds = [], array $groupeAdminIds = []): AuthAdaptor
     {
-        return new AuthAdaptor($utilisateur->getId(), $utilisateur->getAdmin(), $groupeIds);
+        return new AuthAdaptor($utilisateur->getId(), $utilisateur->getAdmin(), $groupeIds, $groupeAdminIds);
     }
 
     /**
      * @param int[] $groupeIds
+     * @param int[] $groupeAdminIds
      */
     public function __construct(
         private readonly int $idUtilisateur,
         private readonly bool $admin,
-        private readonly array $groupeIds = []
+        private readonly array $groupeIds = [],
+        private readonly array $groupeAdminIds = []
     ) {
     }
 
@@ -52,5 +55,14 @@ class AuthAdaptor implements Auth
     public function getGroupeIds(): array
     {
         return $this->groupeIds;
+    }
+
+    /**
+     * @return int[]
+     */
+    #[\Override]
+    public function getGroupeAdminIds(): array
+    {
+        return $this->groupeAdminIds;
     }
 }

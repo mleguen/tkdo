@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Appli\RepositoryAdaptor;
 
+use App\Appli\ModelAdaptor\AppartenanceAdaptor;
 use App\Appli\ModelAdaptor\GroupeAdaptor;
 use App\Dom\Exception\GroupeInconnuException;
+use App\Dom\Model\Appartenance;
 use App\Dom\Model\Groupe;
 use App\Dom\Repository\GroupeRepository;
 use DateTime;
@@ -50,6 +52,24 @@ class GroupeRepositoryAdaptor implements GroupeRepository
     {
         $repository = $this->em->getRepository(GroupeAdaptor::class);
         return $repository->findAll();
+    }
+
+    /**
+     * @return Appartenance[]
+     */
+    #[\Override]
+    public function readAppartenancesForUtilisateur(int $utilisateurId): array
+    {
+        $qb = $this->em->createQueryBuilder();
+        $qb->select('a')
+            ->from(AppartenanceAdaptor::class, 'a')
+            ->join('a.groupe', 'g')
+            ->where('a.utilisateur = :utilisateurId')
+            ->andWhere('g.archive = false')
+            ->setParameter('utilisateurId', $utilisateurId);
+
+        /** @var Appartenance[] */
+        return $qb->getQuery()->getResult();
     }
 
     public function update(Groupe $groupe): Groupe

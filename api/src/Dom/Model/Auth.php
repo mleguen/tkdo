@@ -14,4 +14,9 @@ interface Auth
      * @return int[]
      */
     public function getGroupeIds(): array;
+
+    /**
+     * @return int[]
+     */
+    public function getGroupeAdminIds(): array;
 }

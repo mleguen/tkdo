@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Dom\Repository;
 
 use App\Dom\Exception\GroupeInconnuException;
+use App\Dom\Model\Appartenance;
 use App\Dom\Model\Groupe;
 
 interface GroupeRepository
@@ -19,6 +20,11 @@ interface GroupeRepository
      * @return Groupe[]
      */
     public function readAll(): array;
+
+    /**
+     * @return Appartenance[]
+     */
+    public function readAppartenancesForUtilisateur(int $utilisateurId): array;
 
     public function update(Groupe $groupe): Groupe;
 }

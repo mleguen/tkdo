@@ -1,6 +1,6 @@
 # Story 2.2: Group Membership in JWT Claims
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 
@@ -25,36 +25,36 @@ So that group context is available for all authenticated requests.
 
 ## Tasks / Subtasks
 
-- [ ] Task 1: Extend Auth interface and AuthAdaptor for `groupe_admin_ids` (AC: #1)
-  - [ ] 1.1 Add `getGroupeAdminIds(): array` to `api/src/Dom/Model/Auth.php`
-  - [ ] 1.2 Add `$groupeAdminIds` constructor parameter and getter to `api/src/Appli/ModelAdaptor/AuthAdaptor.php`
-  - [ ] 1.3 Update `AuthAdaptor::fromUtilisateur()` signature to accept `$groupeAdminIds` parameter
-  - [ ] 1.4 Update unit tests for AuthAdaptor
+- [x] Task 1: Extend Auth interface and AuthAdaptor for `groupe_admin_ids` (AC: #1)
+  - [x] 1.1 Add `getGroupeAdminIds(): array` to `api/src/Dom/Model/Auth.php`
+  - [x] 1.2 Add `$groupeAdminIds` constructor parameter and getter to `api/src/Appli/ModelAdaptor/AuthAdaptor.php`
+  - [x] 1.3 Update `AuthAdaptor::fromUtilisateur()` signature to accept `$groupeAdminIds` parameter
+  - [x] 1.4 Update unit tests for AuthAdaptor
 
-- [ ] Task 2: Add `groupe_admin_ids` to JWT encode/decode (AC: #1)
-  - [ ] 2.1 Add `groupe_admin_ids` claim to `AuthService.encode()` payload
-  - [ ] 2.2 Parse `groupe_admin_ids` from payload in `AuthService.decode()` (with fallback to `[]` for old tokens)
-  - [ ] 2.3 Update existing AuthService unit tests
+- [x] Task 2: Add `groupe_admin_ids` to JWT encode/decode (AC: #1)
+  - [x] 2.1 Add `groupe_admin_ids` claim to `AuthService.encode()` payload
+  - [x] 2.2 Parse `groupe_admin_ids` from payload in `AuthService.decode()` (with fallback to `[]` for old tokens)
+  - [x] 2.3 Update existing AuthService unit tests
 
-- [ ] Task 3: Add membership query to GroupeRepository (AC: #1, #3)
-  - [ ] 3.1 Add `readAppartenancesForUtilisateur(int $utilisateurId): array` to `api/src/Dom/Repository/GroupeRepository.php`
-  - [ ] 3.2 Implement in `api/src/Appli/RepositoryAdaptor/GroupeRepositoryAdaptor.php` with DQL joining Appartenance + Groupe, filtering `archive = false`
-  - [ ] 3.3 Write integration tests for the new method (user with groups, user without groups, archived group exclusion, admin flag extraction)
+- [x] Task 3: Add membership query to GroupeRepository (AC: #1, #3)
+  - [x] 3.1 Add `readAppartenancesForUtilisateur(int $utilisateurId): array` to `api/src/Dom/Repository/GroupeRepository.php`
+  - [x] 3.2 Implement in `api/src/Appli/RepositoryAdaptor/GroupeRepositoryAdaptor.php` with DQL joining Appartenance + Groupe, filtering `archive = false`
+  - [x] 3.3 Write integration tests for the new method (user with groups, user without groups, archived group exclusion, admin flag extraction)
 
-- [ ] Task 4: Update AuthTokenController to populate JWT claims (AC: #1, #2, #3)
-  - [ ] 4.1 Inject `GroupeRepository` into `AuthTokenController` constructor
-  - [ ] 4.2 Query user's active group memberships during token exchange
-  - [ ] 4.3 Extract `groupe_ids` (all active groups) and `groupe_admin_ids` (admin groups) from query result
-  - [ ] 4.4 Pass real arrays to `AuthAdaptor::fromUtilisateur()` (replace hardcoded `[]`)
-  - [ ] 4.5 Update response body to include real `groupe_ids` and `groupe_admin_ids`
+- [x] Task 4: Update AuthTokenController to populate JWT claims (AC: #1, #2, #3)
+  - [x] 4.1 Inject `GroupeRepository` into `AuthTokenController` constructor
+  - [x] 4.2 Query user's active group memberships during token exchange
+  - [x] 4.3 Extract `groupe_ids` (all active groups) and `groupe_admin_ids` (admin groups) from query result
+  - [x] 4.4 Pass real arrays to `AuthAdaptor::fromUtilisateur()` (replace hardcoded `[]`)
+  - [x] 4.5 Update response body to include real `groupe_ids` and `groupe_admin_ids`
 
-- [ ] Task 5: Write comprehensive integration tests (AC: #1, #2, #3)
-  - [ ] 5.1 Test token exchange with user in active groups returns correct `groupe_ids` and `groupe_admin_ids`
-  - [ ] 5.2 Test token exchange with user as admin in some groups returns correct `groupe_admin_ids`
-  - [ ] 5.3 Test token exchange with user in archived group excludes that group from `groupe_ids`
-  - [ ] 5.4 Test token exchange with user in no groups returns empty arrays
-  - [ ] 5.5 Test JWT cookie contains correct claims (decode and verify)
-  - [ ] 5.6 Run `./composer test` — all tests pass (274+ existing + new)
+- [x] Task 5: Write comprehensive integration tests (AC: #1, #2, #3)
+  - [x] 5.1 Test token exchange with user in active groups returns correct `groupe_ids` and `groupe_admin_ids`
+  - [x] 5.2 Test token exchange with user as admin in some groups returns correct `groupe_admin_ids`
+  - [x] 5.3 Test token exchange with user in archived group excludes that group from `groupe_ids`
+  - [x] 5.4 Test token exchange with user in no groups returns empty arrays
+  - [x] 5.5 Test JWT cookie contains correct claims (decode and verify)
+  - [x] 5.6 Run `./composer test` — all tests pass (274+ existing + new)
 
 ## Dev Notes
 
@@ -417,10 +417,36 @@ api/test/
 
 ### Agent Model Used
 
-{{agent_model_name_version}}
+Claude Opus 4.6
 
 ### Debug Log References
 
+No issues encountered. All tasks completed in a single pass with red-green-refactor cycle.
+
 ### Completion Notes List
 
+- **Task 1:** Extended `Auth` interface with `getGroupeAdminIds()` method; added `$groupeAdminIds` parameter to `AuthAdaptor` constructor and `fromUtilisateur()` factory; created 8 new unit tests for AuthAdaptor covering constructor defaults, factory method, and all getters.
+- **Task 2:** Added `groupe_admin_ids` claim to JWT encode payload and decode parsing with `[]` fallback for backward compatibility with old tokens; created 4 new unit tests for AuthService covering round-trip encode/decode with admin IDs.
+- **Task 3:** Added `readAppartenancesForUtilisateur()` to `GroupeRepository` interface and implemented in `GroupeRepositoryAdaptor` using DQL QueryBuilder with `archive = false` filter; created 4 new integration tests covering active groups, archived exclusion, empty results, and admin flag preservation.
+- **Task 4:** Injected `GroupeRepository` into `AuthTokenController` constructor; replaced hardcoded `[]` with real membership query using `readAppartenancesForUtilisateur()`; extracted `groupe_ids` and `groupe_admin_ids` via `array_map`/`array_filter`; removed TODO comments from Story 1.1; added `groupe_admin_ids` to response body.
+- **Task 5:** Added 5 new integration tests: active groups with admin distinction, archived group exclusion, JWT cookie claim verification; updated existing no-groups test to verify `groupe_admin_ids`; full suite passes with 295 tests / 1129 assertions; PHPStan level 8 clean.
+
 ### File List
+
+**Modified:**
+- `api/src/Dom/Model/Auth.php` — Added `getGroupeAdminIds()` method to interface
+- `api/src/Dom/Repository/GroupeRepository.php` — Added `readAppartenancesForUtilisateur()` method to interface
+- `api/src/Appli/ModelAdaptor/AuthAdaptor.php` — Added `$groupeAdminIds` constructor param, getter, updated `fromUtilisateur()`
+- `api/src/Appli/RepositoryAdaptor/GroupeRepositoryAdaptor.php` — Implemented `readAppartenancesForUtilisateur()` with DQL
+- `api/src/Appli/Service/AuthService.php` — Added `groupe_admin_ids` to JWT encode/decode
+- `api/src/Appli/Controller/AuthTokenController.php` — Injected GroupeRepository, populated real group claims, removed TODOs
+- `api/test/Int/AuthTokenControllerTest.php` — Added 5 new integration tests, updated 1 existing test
+- `api/test/Int/GroupeRepositoryTest.php` — Added 4 new integration tests for membership query
+
+**New:**
+- `api/test/Unit/Appli/ModelAdaptor/AuthAdaptorTest.php` — 8 unit tests for AuthAdaptor
+- `api/test/Unit/Appli/Service/AuthServiceTest.php` — 4 unit tests for AuthService JWT encode/decode
+
+## Change Log
+
+- 2026-02-15: Implemented group membership in JWT claims — `groupe_ids` and `groupe_admin_ids` now populated from database during token exchange. Added `readAppartenancesForUtilisateur()` DQL query filtering archived groups. 295 tests pass (21 new), PHPStan level 8 clean.

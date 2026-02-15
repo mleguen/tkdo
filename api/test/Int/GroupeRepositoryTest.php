@@ -131,4 +131,78 @@ class GroupeRepositoryTest extends IntTestCase
         $this->assertEquals($utilisateur->getId(), $appartenances[0]->getUtilisateur()->getId());
         $this->assertTrue($appartenances[0]->getEstAdmin());
     }
+
+    public function testReadAppartenancesForUtilisateurReturnsActiveGroupMemberships(): void
+    {
+        $utilisateur = UtilisateurBuilder::aUser()->persist(self::$em);
+        GroupeBuilder::unGroupe()
+            ->withNom('Groupe Actif A')
+            ->withAppartenance($utilisateur, false)
+            ->persist(self::$em);
+        GroupeBuilder::unGroupe()
+            ->withNom('Groupe Actif B')
+            ->withAppartenance($utilisateur, false)
+            ->persist(self::$em);
+
+        self::$em->clear();
+
+        $appartenances = $this->repo->readAppartenancesForUtilisateur($utilisateur->getId());
+
+        $this->assertCount(2, $appartenances);
+    }
+
+    public function testReadAppartenancesForUtilisateurExcludesArchivedGroups(): void
+    {
+        $utilisateur = UtilisateurBuilder::aUser()->persist(self::$em);
+        GroupeBuilder::unGroupe()
+            ->withNom('Groupe Actif')
+            ->withAppartenance($utilisateur, false)
+            ->persist(self::$em);
+        GroupeBuilder::unGroupe()
+            ->withNom('Groupe Archivé')
+            ->withArchive(true)
+            ->withAppartenance($utilisateur, false)
+            ->persist(self::$em);
+
+        self::$em->clear();
+
+        $appartenances = $this->repo->readAppartenancesForUtilisateur($utilisateur->getId());
+
+        $this->assertCount(1, $appartenances);
+        $this->assertEquals('Groupe Actif', $appartenances[0]->getGroupe()->getNom());
+    }
+
+    public function testReadAppartenancesForUtilisateurWithNoGroupsReturnsEmpty(): void
+    {
+        $utilisateur = UtilisateurBuilder::aUser()->persist(self::$em);
+
+        $appartenances = $this->repo->readAppartenancesForUtilisateur($utilisateur->getId());
+
+        $this->assertCount(0, $appartenances);
+    }
+
+    public function testReadAppartenancesForUtilisateurPreservesAdminFlag(): void
+    {
+        $utilisateur = UtilisateurBuilder::aUser()->persist(self::$em);
+        GroupeBuilder::unGroupe()
+            ->withNom('Groupe Admin')
+            ->withAppartenance($utilisateur, true)
+            ->persist(self::$em);
+        GroupeBuilder::unGroupe()
+            ->withNom('Groupe Membre')
+            ->withAppartenance($utilisateur, false)
+            ->persist(self::$em);
+
+        self::$em->clear();
+
+        $appartenances = $this->repo->readAppartenancesForUtilisateur($utilisateur->getId());
+
+        $this->assertCount(2, $appartenances);
+        $adminFlags = [];
+        foreach ($appartenances as $a) {
+            $adminFlags[$a->getGroupe()->getNom()] = $a->getEstAdmin();
+        }
+        $this->assertTrue($adminFlags['Groupe Admin']);
+        $this->assertFalse($adminFlags['Groupe Membre']);
+    }
 }
