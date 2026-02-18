@@ -28,7 +28,7 @@
     "doctrine/data-fixtures": "^1.6",
     "doctrine/migrations": "^3.4",
     "doctrine/orm": "^2.17",
-    "firebase/php-jwt": "^6.4",
+    "firebase/php-jwt": "^7.0",
     "league/oauth2-client": "^2.9",
     "monolog/monolog": "^2.9",
     "php-di/php-di": "^7.0",
