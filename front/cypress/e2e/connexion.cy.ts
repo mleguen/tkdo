@@ -157,12 +157,14 @@ describe('connexion/déconnexion/reconnexion', () => {
       cy.getCookies().then((cookies) => {
         const jwtCookie = cookies.find((c) => c.name === 'tkdo_jwt');
         expect(jwtCookie, 'tkdo_jwt cookie must exist').to.not.be.undefined;
-        // expiry should be set (not session cookie) and more than 1 day in the future
-        if (jwtCookie!.expiry) {
-          const now = Math.floor(Date.now() / 1000);
-          const dayInSeconds = 86400;
-          expect(jwtCookie!.expiry - now).to.be.greaterThan(dayInSeconds);
-        }
+        // expiry must be set (not a session cookie) and more than 1 day in the future
+        expect(
+          jwtCookie!.expiry,
+          'tkdo_jwt cookie must have an expiry',
+        ).to.be.a('number');
+        const now = Math.floor(Date.now() / 1000);
+        const dayInSeconds = 86400;
+        expect(jwtCookie!.expiry! - now).to.be.greaterThan(dayInSeconds);
       });
     });
   });

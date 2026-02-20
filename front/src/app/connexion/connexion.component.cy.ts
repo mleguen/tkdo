@@ -71,7 +71,7 @@ describe('ConnexionComponent', () => {
     });
 
     it('should have correct form field labels', () => {
-      cy.contains('label', 'Identifiant :').should('exist');
+      cy.contains('label', 'Identifiant ou email :').should('exist');
       cy.contains('label', 'Mot de passe :').should('exist');
     });
 

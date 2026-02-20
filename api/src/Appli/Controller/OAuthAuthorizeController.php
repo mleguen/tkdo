@@ -103,7 +103,8 @@ class OAuthAuthorizeController
                 ->withHeader('Location', $redirectUrl)
                 ->withStatus(302);
         } catch (UtilisateurInconnuException) {
-            $this->logger->warning("OAuth2: échec de connexion pour l'identifiant '{$body['identifiant']}'");
+            $sanitizedIdentifiant = preg_replace('/[\r\n\t]/', '', substr((string) $body['identifiant'], 0, 100));
+            $this->logger->warning('OAuth2: échec de connexion pour un identifiant', ['identifiant' => $sanitizedIdentifiant]);
 
             // Redirect back to login form with error — user stays in SPA flow
             $loginUrl = '/connexion?' . http_build_query([

@@ -186,6 +186,7 @@ class UtilisateurAdaptor implements Utilisateur
     /**
      * {@inheritdoc}
      */
+    #[\Override]
     public function getTentativesEchouees(): int
     {
         return $this->tentativesEchouees;
@@ -194,6 +195,7 @@ class UtilisateurAdaptor implements Utilisateur
     /**
      * {@inheritdoc}
      */
+    #[\Override]
     public function getVerrouilleJusqua(): ?DateTime
     {
         return $this->verrouilleJusqua;
@@ -286,6 +288,7 @@ class UtilisateurAdaptor implements Utilisateur
     /**
      * {@inheritdoc}
      */
+    #[\Override]
     public function incrementeTentativesEchouees(): void
     {
         $this->tentativesEchouees++;
@@ -294,6 +297,7 @@ class UtilisateurAdaptor implements Utilisateur
     /**
      * {@inheritdoc}
      */
+    #[\Override]
     public function reinitialiserTentativesEchouees(): void
     {
         $this->tentativesEchouees = 0;

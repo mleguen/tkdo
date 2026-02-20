@@ -437,6 +437,52 @@ class BffAuthCallbackControllerTest extends IntTestCase
     }
 
     /**
+     * Verify that truthy non-boolean values for se_souvenir do NOT trigger remember-me.
+     * Protects the strict `=== true` comparison from future regression.
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideTruthyNonBooleanValues')]
+    public function testTruthyNonBooleanSeSouvenirDoesNotTriggerRememberMe(mixed $truthyValue): void
+    {
+        ['code' => $code] = $this->createUserAndGetCode();
+
+        $cookieJar = new CookieJar();
+        $client = new \GuzzleHttp\Client(['cookies' => $cookieJar]);
+
+        $response = $client->request(
+            'POST',
+            getenv('TKDO_BASE_URI') . self::CALLBACK_PATH,
+            [
+                'json' => ['code' => $code, 'se_souvenir' => $truthyValue],
+                'http_errors' => false,
+            ]
+        );
+
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $cookie = $cookieJar->getCookieByName('tkdo_jwt');
+        $this->assertNotNull($cookie, 'Cookie tkdo_jwt should be set');
+
+        // Should get default ~1 hour expiry, NOT extended 7-day expiry
+        $expires = $cookie->getExpires();
+        $this->assertNotNull($expires);
+        $expectedMin = time() + 3600 - 30;
+        $expectedMax = time() + 3600 + 30;
+        $this->assertGreaterThanOrEqual($expectedMin, $expires);
+        $this->assertLessThanOrEqual($expectedMax, $expires);
+    }
+
+    /**
+     * @return array<string, array{mixed}>
+     */
+    public static function provideTruthyNonBooleanValues(): array
+    {
+        return [
+            'string "true"' => ['true'],
+            'integer 1' => [1],
+        ];
+    }
+
+    /**
      * Race condition test for concurrent code exchange is covered by
      * OAuthTokenControllerTest::testConcurrentCodeExchangeOnlyOneSucceeds.
      *

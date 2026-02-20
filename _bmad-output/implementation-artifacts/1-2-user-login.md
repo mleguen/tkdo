@@ -142,6 +142,21 @@ Login exists and works via the OAuth2 flow implemented in Stories 1.1/1.1b/1.1c.
   - **File:** `api/test/Int/OAuthAuthorizeControllerTest.php`
 
 - [x] [AI-Review][LOW] Strengthen `testPostLoginWithSharedEmailReturnsErrorNotServerError`: assert `tentatives_echouees` was not incremented for either shared-email user
+
+- [x] [AI-Review][MEDIUM] Update login form label and add shared-email hint (Option C, decided via party mode)
+  - **Issue:** Label "Identifiant :" does not communicate that email is also accepted as an identifier
+  - **Decision:** Change label to "Identifiant ou email :" + add hint below field: `"Si votre email est partagé avec un autre compte, utilisez votre identifiant."` — users sharing an email already know they do, so upfront hint is appropriate rather than progressive disclosure
+  - **File:** `front/src/app/connexion/connexion.component.html` — update label text, add `<small class="form-text text-muted">` hint; update any component tests asserting the old label text
+
+- [x] [AI-Review][MEDIUM] Fix E2E "Se souvenir de moi" test: remove conditional `if (jwtCookie!.expiry)` guard so the cookie expiry assertion always runs — currently the entire AC #4 expiry check is silently skipped if the cookie has no `expiry` attribute [front/cypress/e2e/connexion.cy.ts:161-165]
+
+- [x] [AI-Review][MEDIUM] Sanitize user-supplied identifier before interpolating into log message to prevent log injection; also consider whether logging raw email addresses aligns with project privacy policy [api/src/Appli/Controller/OAuthAuthorizeController.php:106]
+
+- [x] [AI-Review][LOW] Add `#[\Override]` attribute to the four new `UtilisateurAdaptor` methods (`incrementeTentativesEchouees`, `reinitialiserTentativesEchouees`, `getTentativesEchouees`, `getVerrouilleJusqua`) per project coding standards [api/src/Appli/ModelAdaptor/UtilisateurAdaptor.php:289-300]
+
+- [x] [AI-Review][LOW] Add integration test verifying that `se_souvenir` sent as a truthy non-boolean value (string `"true"`, int `1`) does not trigger remember-me — protects the `=== true` strict comparison from future regression [api/test/Int/BffAuthCallbackControllerTest.php]
+
+- [x] [AI-Review][LOW] Add DB side-effect assertion to `testPostLoginWithEmailSucceeds`: verify `tentatives_echouees` remains 0 after a successful email-based login [api/test/Int/OAuthAuthorizeControllerTest.php:210-239]
   - **Issue:** The test only verifies the redirect (302 + error message), but not that the graceful-degradation path (`NonUniqueResultException` → `UtilisateurInconnuException`) produced no DB side effects on either `parent1` or `parent2`.
   - **File:** `api/test/Int/OAuthAuthorizeControllerTest.php:347-385`
   - **Issue:** Failed login attempts increment counter (DB write) only for existing users, not for non-existent users. This creates a subtle timing difference (~few ms) that could theoretically enable user enumeration.
@@ -379,14 +394,20 @@ Claude Opus 4.6 (claude-opus-4-6)
 
 ### Completion Notes List
 
-- All 7 tasks + 5 review follow-ups completed successfully with full test coverage
-- Test results: 332 backend (166 unit + 166 integration), 65 frontend unit, 25 Cypress component, 15 Cypress E2E — all passing
+- All 7 tasks + 11 review follow-ups completed successfully with full test coverage
+- Test results: 334 backend (177 unit + 157 integration), 65 frontend unit, 25 Cypress component, 15 Cypress E2E — all passing
 - ✅ Resolved review finding [HIGH]: Graceful degradation for shared emails — `readOneByIdentifiantOuEmail()` now prioritizes username match, catches `NonUniqueResultException` on email lookup, and throws `UtilisateurInconnuException` instead of 500 error
 - ✅ Resolved review finding [LOW]: Documented timing side-channel and login-by-email shared email limitation in project-context.md "Known Technical Debt" section
 - ✅ Resolved review finding [MEDIUM]: Updated `PostAuthCallbackDTO` to accurately type the full server response (`email`, `genre`, `groupe_ids`, `groupe_admin_ids`). Eliminating the redundant GET was considered but deferred — the callback response lacks `identifiant` and `prefNotifIdees` fields required by `UtilisateurPrive`, so the GET remains necessary for profile views.
 - ✅ Resolved review finding [LOW]: Added `testPostLoginWithNonExistentUserProducesZeroDbWrites` integration test — verifies non-existent user login produces zero DB writes (existing user's `tentatives_echouees` remains 0).
 - ✅ Resolved review finding [LOW]: Strengthened `testPostLoginWithSharedEmailReturnsErrorNotServerError` — now asserts neither `parent1` nor `parent2`'s `tentatives_echouees` counter was incremented after shared email login attempt.
 - Added logging for failed login attempts in `OAuthAuthorizeController`
+- ✅ Resolved review finding [MEDIUM]: Updated login form label to "Identifiant ou email :" with shared-email hint below the field
+- ✅ Resolved review finding [MEDIUM]: Fixed E2E "Se souvenir de moi" test — removed conditional `if (jwtCookie!.expiry)` guard so cookie expiry assertion always runs
+- ✅ Resolved review finding [MEDIUM]: Sanitized user-supplied identifier in log message — uses structured logging context and strips newlines/tabs to prevent log injection, truncated to 100 chars
+- ✅ Resolved review finding [LOW]: Added `#[\Override]` attribute to `getTentativesEchouees`, `getVerrouilleJusqua`, `incrementeTentativesEchouees`, `reinitialiserTentativesEchouees` in `UtilisateurAdaptor`
+- ✅ Resolved review finding [LOW]: Added data-provider integration test verifying truthy non-boolean `se_souvenir` values (string `"true"`, int `1`) do not trigger remember-me
+- ✅ Resolved review finding [LOW]: Added DB side-effect assertion to `testPostLoginWithEmailSucceeds` — verifies `tentatives_echouees` remains 0 after successful email login
 - **Lesson learned**: After adding new Doctrine-mapped properties, always run `./doctrine orm:clear-cache:metadata` and `./doctrine orm:generate-proxies` to refresh the metadata cache. Container restarts are unnecessary.
 - **MySQL command pattern**: The proper way to run MySQL queries against the dev database is: `docker compose exec mysql mysql -u tkdo -pmdptkdo tkdo -e "SQL_QUERY_HERE"`
 
@@ -404,6 +425,12 @@ Claude Opus 4.6 (claude-opus-4-6)
 - **Non-existent user zero-writes test (review follow-up)**: New integration test verifying failed login for non-existent user produces zero DB writes
 - **Shared email test strengthened (review follow-up)**: Added `tentatives_echouees` assertions for both shared-email users
 - **Failed login logging**: Added warning log in `OAuthAuthorizeController` on failed login attempts
+- **Login form label updated (review follow-up)**: Changed label from "Identifiant :" to "Identifiant ou email :" with hint for shared-email users
+- **E2E remember-me test fixed (review follow-up)**: Removed conditional guard on cookie expiry assertion — now always validates AC #4
+- **Log injection prevention (review follow-up)**: Sanitized user-supplied identifier in failed login log message (strips newlines/tabs, truncates to 100 chars, uses structured context)
+- **Override attributes added (review follow-up)**: Added `#[\Override]` to 4 new `UtilisateurAdaptor` methods per project coding standards
+- **Truthy non-boolean se_souvenir test (review follow-up)**: New data-provider integration test verifying strict `=== true` comparison guards remember-me from string "true" and int 1
+- **Email login DB assertion (review follow-up)**: Strengthened `testPostLoginWithEmailSucceeds` with `tentatives_echouees` remains 0 assertion
 
 ### File List
 
@@ -413,25 +440,25 @@ Claude Opus 4.6 (claude-opus-4-6)
 
 **Modified (Backend):**
 - `api/src/Dom/Model/Utilisateur.php` — Added `getTentativesEchouees()`, `getVerrouilleJusqua()`, `incrementeTentativesEchouees()`, `reinitialiserTentativesEchouees()` to interface
-- `api/src/Appli/ModelAdaptor/UtilisateurAdaptor.php` — Added `$tentativesEchouees`, `$verrouilleJusqua` properties with Doctrine mapping and methods
+- `api/src/Appli/ModelAdaptor/UtilisateurAdaptor.php` — Added properties, Doctrine mapping, methods, and `#[\Override]` attributes
 - `api/src/Dom/Repository/UtilisateurRepository.php` — Added `readOneByIdentifiantOuEmail()` to interface
 - `api/src/Appli/RepositoryAdaptor/UtilisateurRepositoryAdaptor.php` — Implemented `readOneByIdentifiantOuEmail()` with DQL
-- `api/src/Appli/Controller/OAuthAuthorizeController.php` — Email lookup, error message, attempt recording
+- `api/src/Appli/Controller/OAuthAuthorizeController.php` — Email lookup, error message, attempt recording, sanitized log message
 - `api/src/Appli/Controller/BffAuthCallbackController.php` — Read `se_souvenir`, adjust JWT/cookie validity
 - `api/src/Appli/Service/AuthService.php` — Added `validiteOverride` param to `encode()`, added `getValiditeSeSouvenir()`
 - `api/src/Appli/Settings/AuthSettings.php` — Added `validiteSeSouvenir` property (604800s)
-- `api/test/Int/OAuthAuthorizeControllerTest.php` — 6 new tests (email login, error messages, attempt counter, shared email graceful degradation)
-- `api/test/Int/BffAuthCallbackControllerTest.php` — 3 new tests (remember-me cookie duration)
+- `api/test/Int/OAuthAuthorizeControllerTest.php` — 7 tests (email login + DB assertion, error messages, attempt counter, shared email, non-existent user)
+- `api/test/Int/BffAuthCallbackControllerTest.php` — 5 tests (remember-me cookie duration, truthy non-boolean se_souvenir)
 
 **Modified (Frontend):**
 - `front/src/app/connexion/connexion.component.ts` — Added `seSouvenir` form control, sessionStorage bridge
-- `front/src/app/connexion/connexion.component.html` — Added "Se souvenir de moi" checkbox
+- `front/src/app/connexion/connexion.component.html` — Added "Se souvenir de moi" checkbox, updated label to "Identifiant ou email :", added shared-email hint
 - `front/src/app/auth-callback/auth-callback.component.ts` — Read `se_souvenir`, redirect priority logic
 - `front/src/app/backend.service.ts` — Updated `echangeCode()` with `seSouvenir` param and `CLE_SE_SOUVENIR` constant
-- `front/src/app/connexion/connexion.component.cy.ts` — 5 new component tests (checkbox behavior)
+- `front/src/app/connexion/connexion.component.cy.ts` — 5 new component tests (checkbox behavior), updated label assertion
 - `front/src/app/auth-callback/auth-callback.component.spec.ts` — 4 new/updated tests (se_souvenir, redirect priority)
 - `front/src/app/backend.service.spec.ts` — 1 new + 1 updated test (se_souvenir in request body)
-- `front/cypress/e2e/connexion.cy.ts` — 3 new E2E tests (email login, error message, remember me)
+- `front/cypress/e2e/connexion.cy.ts` — 3 new E2E tests (email login, error message, remember me), fixed conditional expiry guard
 - `front/cypress/fixtures/utilisateurs.json` — Added `email` fields to all user fixtures
 
 **Modified (Meta):**

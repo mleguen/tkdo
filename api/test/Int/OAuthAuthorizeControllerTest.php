@@ -236,6 +236,12 @@ class OAuthAuthorizeControllerTest extends IntTestCase
         $location = $response->getHeaderLine('Location');
         $this->assertStringStartsWith(self::VALID_REDIRECT_URI, $location);
         $this->assertStringContainsString('code=', $location);
+
+        // Verify no DB side effects: tentatives_echouees remains 0 after successful email login
+        self::$em->clear();
+        $reloaded = self::$em->find(\App\Appli\ModelAdaptor\UtilisateurAdaptor::class, $utilisateur->getId());
+        $this->assertNotNull($reloaded);
+        $this->assertEquals(0, $reloaded->getTentativesEchouees(), 'tentatives_echouees should remain 0 after successful email login');
     }
 
     public function testPostInvalidCredentialsReturnsStandardizedErrorMessage(): void

@@ -2,13 +2,17 @@
 
 <form [formGroup]="formConnexion" (ngSubmit)="connecte()">
   <div class="form-group">
-    <label for="identifiant">Identifiant :</label>
+    <label for="identifiant">Identifiant ou email :</label>
     <input
       id="identifiant"
       type="text"
       formControlName="identifiant"
       class="form-control"
     />
+    <small class="form-text text-muted"
+      >Si votre email est partagé avec un autre compte, utilisez votre
+      identifiant.</small
+    >
   </div>
   <div class="form-group">
     <label for="mdp">Mot de passe :</label>
