@@ -22,6 +22,7 @@ class GroupeRepositoryAdaptor implements GroupeRepository
         $this->em = $em;
     }
 
+    #[\Override]
     public function create(string $nom): Groupe
     {
         if (trim($nom) === '') throw new \InvalidArgumentException('le nom ne peut pas être vide');
@@ -36,6 +37,7 @@ class GroupeRepositoryAdaptor implements GroupeRepository
     /**
      * {@inheritdoc}
      */
+    #[\Override]
     public function read(int $id): Groupe
     {
         $repository = $this->em->getRepository(GroupeAdaptor::class);
@@ -48,6 +50,7 @@ class GroupeRepositoryAdaptor implements GroupeRepository
     /**
      * {@inheritdoc}
      */
+    #[\Override]
     public function readAll(): array
     {
         $repository = $this->em->getRepository(GroupeAdaptor::class);
@@ -93,6 +96,7 @@ class GroupeRepositoryAdaptor implements GroupeRepository
         return $qb->getQuery()->getResult();
     }
 
+    #[\Override]
     public function update(Groupe $groupe): Groupe
     {
         if (trim($groupe->getNom()) === '') throw new \InvalidArgumentException('le nom ne peut pas être vide');

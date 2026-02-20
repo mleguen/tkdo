@@ -29,7 +29,7 @@ class GroupePort
             $appartenances = $this->groupeRepository->readToutesAppartenancesForUtilisateur(
                 $auth->getIdUtilisateur()
             );
-        } catch (\Throwable $e) {
+        } catch (\Exception $e) {
             throw new \RuntimeException(
                 'Impossible de charger les groupes de l\'utilisateur ' . $auth->getIdUtilisateur(),
                 0,

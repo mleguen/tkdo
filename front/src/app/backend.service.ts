@@ -5,7 +5,6 @@ import {
   Observable,
   Subject,
   firstValueFrom,
-  merge,
   of,
   throwError,
 } from 'rxjs';
@@ -146,7 +145,7 @@ export class BackendService {
       switchMap((utilisateur) =>
         utilisateur === null
           ? of(null)
-          : merge(this.refreshGroupes$.pipe(startWith(undefined))).pipe(
+          : this.refreshGroupes$.pipe(startWith(undefined)).pipe(
               switchMap(() =>
                 this.http.get<GroupeResponse>(URL_GROUPE).pipe(
                   map((res) => ({

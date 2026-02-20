@@ -64,7 +64,7 @@
               ngbDropdownItem
               [routerLink]="['/idee']"
               [queryParams]="{
-                idUtilisateur: (utilisateurConnecte$ | async)?.id,
+                idUtilisateur: utilisateur.id,
               }"
               (click)="isMenuCollapsed = true"
               >Ma liste</a

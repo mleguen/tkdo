@@ -79,6 +79,11 @@ So that I understand my context and can navigate between groups.
 - [x] [AI-Review][LOW] Add logging when users have zero groups [api/src/Dom/Port/GroupePort.php:43] — Log when both actifs and archives are empty. Helps track users removed from all groups (FR95/96) who may need re-invitation.
 - [x] [AI-Review][LOW] Add aria-label attributes to group dropdown items [front/src/app/header/header.component.html:37-56] — Screen reader users need context about active vs archived groups. Add aria-label="Active group: {nom}" and aria-label="Archived group: {nom}".
 - [x] [AI-Review][LOW] Handle non-existent /groupe/:id route links [front/src/app/header/header.component.html:39, 53] — Links navigate to route that doesn't exist until Story 2.4, causing 404. Consider disabling links or adding click handler with "Coming soon" toast.
+- [x] [AI-Review][MEDIUM] Fix double async pipe subscription in header template [front/src/app/header/header.component.html:67] — Inside `@if (utilisateurConnecte$ | async; as utilisateur)` block, Ma liste uses `(utilisateurConnecte$ | async)?.id` when `utilisateur.id` is already in scope. Replace with `utilisateur.id` to eliminate unnecessary extra subscription and remove the misleading `?.` safe-navigation operator.
+- [x] [AI-Review][MEDIUM] Add integration test asserting alphabetical sort order [api/test/Int/ListGroupeControllerTest.php:99-103] — `testListGroupeReturnsActiveAndArchivedGroups` uses `assertContains` but never verifies order. Add assertEquals on specific positions (e.g., `assertEquals('Amis', $body['actifs'][0]['nom'])`) to verify `orderBy g.nom ASC` is working. A sort regression would otherwise be invisible.
+- [x] [AI-Review][LOW] Remove redundant `merge()` wrapper in groupes$ observable [front/src/app/backend.service.ts:149] — `merge(refreshGroupes$.pipe(startWith(undefined)))` with a single argument is identical to `refreshGroupes$.pipe(startWith(undefined))`. Remove the `merge()` to simplify code and avoid implying there are multiple sources being merged.
+- [x] [AI-Review][LOW] Add missing `#[\Override]` on four pre-existing GroupeRepositoryAdaptor methods [api/src/Appli/RepositoryAdaptor/GroupeRepositoryAdaptor.php:25,39,51,96] — `create()`, `read()`, `readAll()`, and `update()` are interface implementations missing the mandatory `#[\Override]` attribute (project-context.md rule). New methods `readAppartenancesForUtilisateur` and `readToutesAppartenancesForUtilisateur` have it correctly; these four were missed.
+- [x] [AI-Review][LOW] Narrow \Throwable catch to \Exception in GroupePort [api/src/Dom/Port/GroupePort.php:32] — `catch (\Throwable $e)` also captures PHP \Error types (TypeError, OutOfMemoryError, etc.). Repository calls only throw \Exception subtypes. Change to `catch (\Exception $e)` to avoid silently converting fatal PHP errors into RuntimeExceptions.
 
 ## Dev Notes
 
@@ -721,6 +726,12 @@ None — clean implementation with no blocking issues.
 - ✅ Resolved review finding [LOW]: Added zero-groups logging in `ListGroupeController` (Appli layer, architecturally correct) via `LoggerInterface::info()`.
 - ✅ Resolved review finding [LOW]: Added `aria-label` attributes: "Groupe actif : {nom}" for active, "Groupe archivé : {nom}" for archived group items.
 - ✅ Resolved review finding [LOW]: Replaced `<a routerLink>` with disabled `<span>` elements for group items. No navigation until Story 2.4; tooltip "Bientôt disponible (Story 2.4)".
+- Known limitation (L4): During initial page load while `groupes$` is fetching, the "Mes groupes" dropdown shows only the divider and "Ma liste" link with no group list and no loading indicator. This is because `groupes$` does not emit until the HTTP request completes and no loading state was added. Acceptable for now; consider adding a spinner or skeleton state in a future UI polish story.
+- ✅ Resolved review finding [MEDIUM]: Fixed double async pipe subscription — replaced `(utilisateurConnecte$ | async)?.id` with `utilisateur.id` (already in scope from parent `@if` block) in "Ma liste" link.
+- ✅ Resolved review finding [MEDIUM]: Replaced `assertContains` with position-based `assertEquals` in `testListGroupeReturnsActiveAndArchivedGroups` to verify alphabetical sort order ('Amis' before 'Famille').
+- ✅ Resolved review finding [LOW]: Removed redundant `merge()` wrapper around single-argument `refreshGroupes$.pipe(startWith(undefined))` in `groupes$` observable. Removed unused `merge` import.
+- ✅ Resolved review finding [LOW]: Added `#[\Override]` attribute to four pre-existing GroupeRepositoryAdaptor methods (`create`, `read`, `readAll`, `update`) that were missing it.
+- ✅ Resolved review finding [LOW]: Narrowed `catch (\Throwable $e)` to `catch (\Exception $e)` in GroupePort to avoid silently converting fatal PHP errors.
 
 ### Implementation Plan
 
@@ -750,6 +761,7 @@ None — clean implementation with no blocking issues.
 - front/src/app/backend.service.spec.ts
 - front/src/app/header/header.component.ts
 - front/src/app/header/header.component.html
+- front/package-lock.json
 
 ## Change Log
 
@@ -758,3 +770,5 @@ None — clean implementation with no blocking issues.
 - 2026-02-15: Addressed code review findings — 5 items resolved. Added alphabetical sorting to DQL query, integration test for only-active-groups, response structure validation in frontend, performance limitation docs, and frontend edge case test. 334 backend tests pass (1 new), 69 frontend tests pass (1 new). PHPStan level 8 clean.
 - 2026-02-15: Second code review complete. 8 issues found (4 MEDIUM, 4 LOW). All issues require code changes — created 8 action items. Key findings: stale cache in groupes$ observable, silent error suppression, missing error handling in GroupePort, missing DB index on groupe.nom. Story status set to in-progress.
 - 2026-02-15: Addressed second code review findings — 8 items resolved. Cache invalidation via Subject, error logging in catchError, try-catch in GroupePort, DB index on groupe.nom, ksort consistency, zero-groups logging, aria-labels, disabled group links. 336 backend tests pass (2 new), 73 frontend tests pass (4 new). PHPStan level 8 clean.
+- 2026-02-20: Third code review complete. 0 HIGH, 2 MEDIUM, 4 LOW issues. Docs-only fixes applied: front/package-lock.json added to File List, loading-state limitation documented in Completion Notes. 5 code-change issues created as action items (M1: double async pipe, M2: missing sort order test, L1: redundant merge(), L2: missing #[Override] on 4 methods, L3: \Throwable→\Exception). Story status set to in-progress.
+- 2026-02-20: Addressed third code review findings — 5 items resolved. Fixed double async pipe, added sort order test assertion, removed redundant merge(), added 4 missing #[\Override], narrowed \Throwable to \Exception. Rebased onto master (chokidar override fix). 336 backend tests pass, 73 frontend tests pass. PHPStan level 8 clean.

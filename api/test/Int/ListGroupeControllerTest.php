@@ -96,9 +96,9 @@ class ListGroupeControllerTest extends IntTestCase
         $this->assertCount(2, $body['actifs']);
         $this->assertCount(1, $body['archives']);
 
-        $nomsActifs = array_column($body['actifs'], 'nom');
-        $this->assertContains('Famille', $nomsActifs);
-        $this->assertContains('Amis', $nomsActifs);
+        // Verify alphabetical sort order (orderBy g.nom ASC)
+        $this->assertEquals('Amis', $body['actifs'][0]['nom']);
+        $this->assertEquals('Famille', $body['actifs'][1]['nom']);
 
         $this->assertEquals('Noël 2024', $body['archives'][0]['nom']);
         $this->assertTrue($body['archives'][0]['archive']);
