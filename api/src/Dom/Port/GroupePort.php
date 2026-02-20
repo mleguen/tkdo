@@ -22,6 +22,7 @@ class GroupePort
      * (typical user belongs to <10 groups). Revisit if users reach 50+ groups.
      *
      * @return array{actifs: Groupe[], archives: Groupe[]}
+     * @throws \RuntimeException if repository call fails
      */
     public function listeGroupesUtilisateur(Auth $auth): array
     {

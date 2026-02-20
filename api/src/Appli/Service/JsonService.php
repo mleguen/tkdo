@@ -162,7 +162,12 @@ class JsonService
     }
 
     /**
-     * @param int[] $adminIds Group IDs where user is admin
+     * Note: $adminIds comes from JWT groupe_admin_ids which only includes active-group
+     * admin IDs. Archived groups will always have estAdmin=false, even if the user is
+     * admin in the DB, because readAppartenancesForUtilisateur (JWT source) filters
+     * archive=false.
+     *
+     * @param int[] $adminIds Group IDs where user is admin (active groups only, from JWT)
      * @return array<string, mixed>
      */
     private function getPayloadGroupe(Groupe $groupe, array $adminIds): array

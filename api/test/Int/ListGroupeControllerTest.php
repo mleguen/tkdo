@@ -82,7 +82,8 @@ class ListGroupeControllerTest extends IntTestCase
             ->withAppartenance($utilisateur, false)
             ->persist(self::$em);
         GroupeBuilder::unGroupe()
-            ->withNom('Été 2023')
+            // Use ASCII-safe name ('A' < 'N' in all collations, unlike 'É' which varies by collation)
+            ->withNom('Automne 2023')
             ->withArchive(true)
             ->withAppartenance($utilisateur, false)
             ->persist(self::$em);
@@ -106,7 +107,7 @@ class ListGroupeControllerTest extends IntTestCase
         $this->assertEquals('Famille', $body['actifs'][1]['nom']);
 
         // Verify archived groups are also sorted alphabetically
-        $this->assertEquals('Été 2023', $body['archives'][0]['nom']);
+        $this->assertEquals('Automne 2023', $body['archives'][0]['nom']);
         $this->assertEquals('Noël 2024', $body['archives'][1]['nom']);
         $this->assertTrue($body['archives'][0]['archive']);
         $this->assertTrue($body['archives'][1]['archive']);
@@ -156,12 +157,11 @@ class ListGroupeControllerTest extends IntTestCase
 
         $this->assertCount(2, $body['actifs']);
 
-        $adminFlags = [];
-        foreach ($body['actifs'] as $groupe) {
-            $adminFlags[$groupe['nom']] = $groupe['estAdmin'];
-        }
-        $this->assertTrue($adminFlags['Admin Group']);
-        $this->assertFalse($adminFlags['Member Group']);
+        // Verify alphabetical sort order and estAdmin flags by position
+        $this->assertEquals('Admin Group', $body['actifs'][0]['nom']);
+        $this->assertTrue($body['actifs'][0]['estAdmin']);
+        $this->assertEquals('Member Group', $body['actifs'][1]['nom']);
+        $this->assertFalse($body['actifs'][1]['estAdmin']);
     }
 
     public function testListGroupeWithOnlyActiveGroups(): void
@@ -194,6 +194,57 @@ class ListGroupeControllerTest extends IntTestCase
         // Verify alphabetical sort order (orderBy g.nom ASC)
         $this->assertEquals('Amis', $body['actifs'][0]['nom']);
         $this->assertEquals('Famille', $body['actifs'][1]['nom']);
+
+        // Verify estAdmin flags (Amis=true admin, Famille=false member)
+        $this->assertTrue($body['actifs'][0]['estAdmin']);
+        $this->assertFalse($body['actifs'][1]['estAdmin']);
+    }
+
+    /**
+     * Verifies that archived groups always have estAdmin=false, even when the user
+     * is admin of that group. This is because JWT groupe_admin_ids only includes
+     * active-group admin IDs (readAppartenancesForUtilisateur filters archive=false),
+     * so archived groups are never in the admin list.
+     */
+    public function testListGroupeArchivedGroupsAlwaysHaveEstAdminFalse(): void
+    {
+        $utilisateur = $this->utilisateur()->withIdentifiant('testuser')->persist(self::$em);
+
+        // User is admin of this archived group, but estAdmin should still be false
+        // because JWT only carries active-group admin IDs
+        GroupeBuilder::unGroupe()
+            ->withNom('Old Project')
+            ->withArchive(true)
+            ->withAppartenance($utilisateur, true) // admin=true in DB
+            ->persist(self::$em);
+
+        // Active group where user is admin (for comparison)
+        GroupeBuilder::unGroupe()
+            ->withNom('Current Team')
+            ->withAppartenance($utilisateur, true)
+            ->persist(self::$em);
+
+        ['client' => $client] = $this->authenticateUser($utilisateur);
+
+        $response = $client->request(
+            'GET',
+            getenv('TKDO_BASE_URI') . self::GROUPE_PATH,
+            ['http_errors' => false]
+        );
+
+        $this->assertEquals(200, $response->getStatusCode());
+        $body = json_decode((string) $response->getBody(), true);
+
+        $this->assertCount(1, $body['actifs']);
+        $this->assertCount(1, $body['archives']);
+
+        // Active group: estAdmin=true (admin ID present in JWT)
+        $this->assertEquals('Current Team', $body['actifs'][0]['nom']);
+        $this->assertTrue($body['actifs'][0]['estAdmin']);
+
+        // Archived group: estAdmin=false (admin ID NOT in JWT, even though DB says admin)
+        $this->assertEquals('Old Project', $body['archives'][0]['nom']);
+        $this->assertFalse($body['archives'][0]['estAdmin']);
     }
 
     public function testListGroupeRequiresAuthentication(): void

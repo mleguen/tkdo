@@ -312,6 +312,25 @@ describe('BackendService', () => {
       groupeReq.error(new ProgressEvent('error'), { status: 500 });
     });
 
+    it('should handle malformed groupes$ API response with Array.isArray() fallback', (done) => {
+      service['idUtilisateurConnecte$'].next(1);
+
+      service.groupes$.subscribe((groupes) => {
+        if (groupes !== null) {
+          expect(groupes).toEqual({ actifs: [], archives: [] });
+          done();
+        }
+      });
+
+      // utilisateurConnecte$ triggers user fetch
+      const userReq = httpMock.expectOne('/api/utilisateur/1');
+      userReq.flush(mockUtilisateur);
+
+      // groupes$ API returns malformed response (null arrays)
+      const groupeReq = httpMock.expectOne('/api/groupe');
+      groupeReq.flush({ actifs: null, archives: null });
+    });
+
     it('should refresh groupes$ when rafraichirGroupes is called', (done) => {
       service['idUtilisateurConnecte$'].next(1);
 
