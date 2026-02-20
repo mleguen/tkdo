@@ -348,11 +348,11 @@ class OAuthAuthorizeControllerTest extends IntTestCase
     {
         $sharedEmail = 'famille@test.com';
         // Create two users with the same email (families sharing emails)
-        $this->utilisateur()
+        $parent1 = $this->utilisateur()
             ->withIdentifiant('parent1')
             ->withEmail($sharedEmail)
             ->persist(self::$em);
-        $this->utilisateur()
+        $parent2 = $this->utilisateur()
             ->withIdentifiant('parent2')
             ->withEmail($sharedEmail)
             ->persist(self::$em);
@@ -382,6 +382,49 @@ class OAuthAuthorizeControllerTest extends IntTestCase
             'erreur=' . urlencode('Identifiant ou mot de passe incorrect'),
             $location
         );
+
+        // Verify no DB side effects: neither user's counter was incremented
+        self::$em->clear();
+        $reloadedParent1 = self::$em->find(\App\Appli\ModelAdaptor\UtilisateurAdaptor::class, $parent1->getId());
+        $reloadedParent2 = self::$em->find(\App\Appli\ModelAdaptor\UtilisateurAdaptor::class, $parent2->getId());
+        $this->assertNotNull($reloadedParent1);
+        $this->assertNotNull($reloadedParent2);
+        $this->assertEquals(0, $reloadedParent1->getTentativesEchouees(), 'parent1 tentatives_echouees should remain 0');
+        $this->assertEquals(0, $reloadedParent2->getTentativesEchouees(), 'parent2 tentatives_echouees should remain 0');
+    }
+
+    public function testPostLoginWithNonExistentUserProducesZeroDbWrites(): void
+    {
+        // Create a user as baseline to verify no collateral DB writes
+        $existingUser = $this->utilisateur()->withIdentifiant('existinguser')->persist(self::$em);
+        $this->assertEquals(0, $existingUser->getTentativesEchouees());
+
+        $baseUri = getenv('TKDO_BASE_URI');
+        $client = new \GuzzleHttp\Client(['allow_redirects' => false]);
+        $response = $client->request('POST', $baseUri . self::AUTHORIZE_PATH, [
+            'form_params' => [
+                'identifiant' => 'nonexistent-user-xyz',
+                'mdp' => 'anypassword',
+                'client_id' => 'tkdo',
+                'redirect_uri' => self::VALID_REDIRECT_URI,
+                'response_type' => 'code',
+                'state' => 'test',
+            ],
+            'http_errors' => false,
+        ]);
+
+        // Should redirect with error, not 500
+        $this->assertEquals(302, $response->getStatusCode());
+        $this->assertStringContainsString(
+            'erreur=' . urlencode('Identifiant ou mot de passe incorrect'),
+            $response->getHeaderLine('Location')
+        );
+
+        // Verify zero DB writes: existing user's counter untouched
+        self::$em->clear();
+        $reloaded = self::$em->find(\App\Appli\ModelAdaptor\UtilisateurAdaptor::class, $existingUser->getId());
+        $this->assertNotNull($reloaded);
+        $this->assertEquals(0, $reloaded->getTentativesEchouees());
     }
 
     public function testSuccessfulLoginResetsTentativesEchouees(): void

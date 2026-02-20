@@ -94,7 +94,15 @@ describe('BackendService', () => {
       });
       expect(callbackReq.request.withCredentials).toBe(true);
       callbackReq.flush({
-        utilisateur: { id: 1, nom: 'Test User', admin: false },
+        utilisateur: {
+          id: 1,
+          nom: 'Test User',
+          email: 'test@example.com',
+          genre: 'M',
+          admin: false,
+          groupe_ids: [],
+          groupe_admin_ids: [],
+        },
       });
 
       await echangePromise;
@@ -119,7 +127,15 @@ describe('BackendService', () => {
         se_souvenir: true,
       });
       callbackReq.flush({
-        utilisateur: { id: 1, nom: 'Test User', admin: false },
+        utilisateur: {
+          id: 1,
+          nom: 'Test User',
+          email: 'test@example.com',
+          genre: 'M',
+          admin: false,
+          groupe_ids: [],
+          groupe_admin_ids: [],
+        },
       });
 
       await echangePromise;

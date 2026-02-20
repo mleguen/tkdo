@@ -315,12 +315,15 @@ describe('ConnexionComponent with error query param', () => {
     }).then(() => {
       const router = TestBed.inject(Router);
       router.navigate(['connexion'], {
-        queryParams: { erreur: 'identifiants invalides', oauth: '1' },
+        queryParams: {
+          erreur: 'Identifiant ou mot de passe incorrect',
+          oauth: '1',
+        },
       });
     });
 
     cy.get('.alert-danger')
       .should('exist')
-      .should('contain.text', 'identifiants invalides');
+      .should('contain.text', 'Identifiant ou mot de passe incorrect');
   });
 });

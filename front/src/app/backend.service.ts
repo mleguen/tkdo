@@ -97,7 +97,11 @@ const CLE_ID_UTILISATEUR = 'id_utilisateur';
 const CLE_LISTE_OCCASIONS = 'occasions';
 
 interface PostAuthCallbackDTO {
-  utilisateur: Pick<UtilisateurPrive, 'id' | 'nom' | 'admin'>;
+  utilisateur: Pick<UtilisateurPrive, 'id' | 'nom' | 'email' | 'admin'> & {
+    genre: Genre;
+    groupe_ids: number[];
+    groupe_admin_ids: number[];
+  };
 }
 
 export const CLE_OAUTH_STATE = 'oauth_state';

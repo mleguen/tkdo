@@ -132,6 +132,18 @@ Login exists and works via the OAuth2 flow implemented in Stories 1.1/1.1b/1.1c.
   - **Documentation:** Add note to Dev Notes explaining that login-by-email requires unique emails; users with shared emails must use their unique username
 
 - [x] [AI-Review][LOW] Document timing side-channel as known limitation (optional)
+
+- [x] [AI-Review][MEDIUM] Update `PostAuthCallbackDTO` to match actual server response and consider using the already-returned data to skip redundant GET /api/utilisateur/:id on login
+  - **Issue:** `backend.service.ts:78-80` — DTO only types `Pick<UtilisateurPrive, 'id' | 'nom' | 'admin'>` but `BffAuthCallbackController` returns `email`, `genre`, `admin`, `groupe_ids`, `groupe_admin_ids`. The extra data (including group memberships loaded from DB) is silently discarded, then a redundant GET request fetches the same base user data.
+  - **Files:** `front/src/app/backend.service.ts:78-80`, `front/src/app/backend.service.spec.ts`
+
+- [x] [AI-Review][LOW] Add integration test verifying that a failed login attempt for a non-existent user produces zero DB writes
+  - **Issue:** `readOneByIdentifiantOuEmail()` throws `UtilisateurInconnuException` before any entity is loaded, so `tentatives_echouees` is never incremented for non-existent users. This is correct behavior but untested — no test asserts it.
+  - **File:** `api/test/Int/OAuthAuthorizeControllerTest.php`
+
+- [x] [AI-Review][LOW] Strengthen `testPostLoginWithSharedEmailReturnsErrorNotServerError`: assert `tentatives_echouees` was not incremented for either shared-email user
+  - **Issue:** The test only verifies the redirect (302 + error message), but not that the graceful-degradation path (`NonUniqueResultException` → `UtilisateurInconnuException`) produced no DB side effects on either `parent1` or `parent2`.
+  - **File:** `api/test/Int/OAuthAuthorizeControllerTest.php:347-385`
   - **Issue:** Failed login attempts increment counter (DB write) only for existing users, not for non-existent users. This creates a subtle timing difference (~few ms) that could theoretically enable user enumeration.
   - **Impact:** Very low practical risk; timing difference is minimal, and implementation correctly doesn't reveal which field was wrong
   - **Note:** Story 1.4 (rate limiting) may address this with IP-based rate limiting
@@ -367,10 +379,14 @@ Claude Opus 4.6 (claude-opus-4-6)
 
 ### Completion Notes List
 
-- All 7 tasks + 2 review follow-ups completed successfully with full test coverage
-- Test results: 331 backend (166 unit + 165 integration), 65 frontend unit, 25 Cypress component, 9 Cypress E2E — all passing
+- All 7 tasks + 5 review follow-ups completed successfully with full test coverage
+- Test results: 332 backend (166 unit + 166 integration), 65 frontend unit, 25 Cypress component, 15 Cypress E2E — all passing
 - ✅ Resolved review finding [HIGH]: Graceful degradation for shared emails — `readOneByIdentifiantOuEmail()` now prioritizes username match, catches `NonUniqueResultException` on email lookup, and throws `UtilisateurInconnuException` instead of 500 error
 - ✅ Resolved review finding [LOW]: Documented timing side-channel and login-by-email shared email limitation in project-context.md "Known Technical Debt" section
+- ✅ Resolved review finding [MEDIUM]: Updated `PostAuthCallbackDTO` to accurately type the full server response (`email`, `genre`, `groupe_ids`, `groupe_admin_ids`). Eliminating the redundant GET was considered but deferred — the callback response lacks `identifiant` and `prefNotifIdees` fields required by `UtilisateurPrive`, so the GET remains necessary for profile views.
+- ✅ Resolved review finding [LOW]: Added `testPostLoginWithNonExistentUserProducesZeroDbWrites` integration test — verifies non-existent user login produces zero DB writes (existing user's `tentatives_echouees` remains 0).
+- ✅ Resolved review finding [LOW]: Strengthened `testPostLoginWithSharedEmailReturnsErrorNotServerError` — now asserts neither `parent1` nor `parent2`'s `tentatives_echouees` counter was incremented after shared email login attempt.
+- Added logging for failed login attempts in `OAuthAuthorizeController`
 - **Lesson learned**: After adding new Doctrine-mapped properties, always run `./doctrine orm:clear-cache:metadata` and `./doctrine orm:generate-proxies` to refresh the metadata cache. Container restarts are unnecessary.
 - **MySQL command pattern**: The proper way to run MySQL queries against the dev database is: `docker compose exec mysql mysql -u tkdo -pmdptkdo tkdo -e "SQL_QUERY_HERE"`
 
@@ -381,9 +397,13 @@ Claude Opus 4.6 (claude-opus-4-6)
 - **Failed login attempt recording**: New `tentatives_echouees` counter on `tkdo_utilisateur` table, incremented on failure, reset on success (preparation for Story 1.4 rate limiting)
 - **"Se souvenir de moi" checkbox**: New checkbox on login form, stored via sessionStorage bridge, extends JWT/cookie validity to 7 days (604800s) vs default 1 hour (3600s)
 - **Post-login redirect**: Redirect priority updated to `oauth_retour` > `tkdo_lastGroupeId` > `/occasion`
-- **Database migration**: `Version20260215120000` adds `tentatives_echouees` and `verrouille_jusqua` columns
+- **Database migration**: `Version20260215130000` adds `tentatives_echouees` and `verrouille_jusqua` columns
 - **Shared email graceful degradation (review follow-up)**: `readOneByIdentifiantOuEmail()` refactored to prioritize username match, then email match with `NonUniqueResultException` handling — users with shared emails see standard error message instead of 500 error
 - **Known Technical Debt documented (review follow-up)**: Added timing side-channel and shared email login limitations to `project-context.md`
+- **PostAuthCallbackDTO fixed (review follow-up)**: Updated DTO typing to include `email`, `genre`, `groupe_ids`, `groupe_admin_ids` matching actual server response; updated test fixtures
+- **Non-existent user zero-writes test (review follow-up)**: New integration test verifying failed login for non-existent user produces zero DB writes
+- **Shared email test strengthened (review follow-up)**: Added `tentatives_echouees` assertions for both shared-email users
+- **Failed login logging**: Added warning log in `OAuthAuthorizeController` on failed login attempts
 
 ### File List
 
@@ -417,4 +437,7 @@ Claude Opus 4.6 (claude-opus-4-6)
 **Modified (Meta):**
 - `_bmad-output/implementation-artifacts/1-2-user-login.md` — This story file itself (status, completion notes, file list)
 - `_bmad-output/implementation-artifacts/sprint-status.yaml` — Updated story status to "review"
+- `_bmad-output/implementation-artifacts/1-1c-oauth2-standards-alignment.md` — Updated to reflect Story 2.2 OIDC fix merged
+- `_bmad-output/planning-artifacts/prd.md` — Updated to document shared email graceful degradation
 - `_bmad-output/project-context.md` — Added Known Technical Debt entries (timing side-channel, shared email login)
+- `docs/architecture.md` — Updated to reflect shared email login behavior
