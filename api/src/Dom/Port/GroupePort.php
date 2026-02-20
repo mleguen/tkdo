@@ -15,8 +15,8 @@ class GroupePort
     }
 
     /**
-     * Returns user's groups separated into active and archived.
-     * Groups are sorted alphabetically by name within each section.
+     * Returns user's groups separated into active and archived,
+     * pre-sorted alphabetically by name (sort applied at repository/DB level).
      *
      * Note: No pagination implemented. Acceptable for current usage
      * (typical user belongs to <10 groups). Revisit if users reach 50+ groups.

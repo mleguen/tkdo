@@ -32,7 +32,7 @@ class ListGroupeController extends AuthController
         $groupes = $this->groupePort->listeGroupesUtilisateur($this->getAuth());
 
         if (empty($groupes['actifs']) && empty($groupes['archives'])) {
-            $this->logger->info('User has zero groups', [
+            $this->logger->debug('User has zero groups', [
                 'utilisateurId' => $this->getAuth()->getIdUtilisateur(),
             ]);
         }

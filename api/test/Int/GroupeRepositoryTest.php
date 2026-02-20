@@ -199,9 +199,9 @@ class GroupeRepositoryTest extends IntTestCase
         $appartenances = $this->repo->readToutesAppartenancesForUtilisateur($utilisateur->getId());
 
         $this->assertCount(2, $appartenances);
-        $noms = array_map(fn($a) => $a->getGroupe()->getNom(), $appartenances);
-        $this->assertContains('Groupe Actif', $noms);
-        $this->assertContains('Groupe Archivé', $noms);
+        // Verify alphabetical sort order (orderBy g.nom ASC)
+        $this->assertEquals('Groupe Actif', $appartenances[0]->getGroupe()->getNom());
+        $this->assertEquals('Groupe Archivé', $appartenances[1]->getGroupe()->getNom());
     }
 
     public function testReadToutesAppartenancesForUtilisateurWithNoGroupsReturnsEmpty(): void

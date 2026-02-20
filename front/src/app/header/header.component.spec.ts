@@ -62,7 +62,7 @@ describe('HeaderComponent', () => {
     });
 
     const dropdownItems = fixture.nativeElement.querySelectorAll(
-      '#menuMesGroupes + div [ngbDropdownItem]',
+      '#menuMesGroupes + div [ngbdropdownitem]',
     );
     const texts = Array.from(dropdownItems).map((el) =>
       (el as Element).textContent?.trim(),
@@ -102,7 +102,7 @@ describe('HeaderComponent', () => {
     configure({ actifs: [], archives: [] });
 
     const dropdownItems = fixture.nativeElement.querySelectorAll(
-      '#menuMesGroupes + div [ngbDropdownItem]',
+      '#menuMesGroupes + div [ngbdropdownitem]',
     );
     const texts = Array.from(dropdownItems).map((el) =>
       (el as Element).textContent?.trim(),
@@ -155,7 +155,7 @@ describe('HeaderComponent', () => {
     });
 
     const items = fixture.nativeElement.querySelectorAll(
-      '#menuMesGroupes + div [ngbDropdownItem][aria-label]',
+      '#menuMesGroupes + div [ngbdropdownitem][aria-label]',
     );
     const labels = Array.from(items).map((el) =>
       (el as Element).getAttribute('aria-label'),
@@ -170,7 +170,7 @@ describe('HeaderComponent', () => {
     });
 
     const items = fixture.nativeElement.querySelectorAll(
-      '#menuMesGroupes + div [ngbDropdownItem][aria-label]',
+      '#menuMesGroupes + div [ngbdropdownitem][aria-label]',
     );
     const labels = Array.from(items).map((el) =>
       (el as Element).getAttribute('aria-label'),

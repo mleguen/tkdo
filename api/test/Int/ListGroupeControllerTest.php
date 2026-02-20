@@ -81,6 +81,11 @@ class ListGroupeControllerTest extends IntTestCase
             ->withArchive(true)
             ->withAppartenance($utilisateur, false)
             ->persist(self::$em);
+        GroupeBuilder::unGroupe()
+            ->withNom('Été 2023')
+            ->withArchive(true)
+            ->withAppartenance($utilisateur, false)
+            ->persist(self::$em);
 
         ['client' => $client] = $this->authenticateUser($utilisateur);
 
@@ -94,14 +99,17 @@ class ListGroupeControllerTest extends IntTestCase
         $body = json_decode((string) $response->getBody(), true);
 
         $this->assertCount(2, $body['actifs']);
-        $this->assertCount(1, $body['archives']);
+        $this->assertCount(2, $body['archives']);
 
         // Verify alphabetical sort order (orderBy g.nom ASC)
         $this->assertEquals('Amis', $body['actifs'][0]['nom']);
         $this->assertEquals('Famille', $body['actifs'][1]['nom']);
 
-        $this->assertEquals('Noël 2024', $body['archives'][0]['nom']);
+        // Verify archived groups are also sorted alphabetically
+        $this->assertEquals('Été 2023', $body['archives'][0]['nom']);
+        $this->assertEquals('Noël 2024', $body['archives'][1]['nom']);
         $this->assertTrue($body['archives'][0]['archive']);
+        $this->assertTrue($body['archives'][1]['archive']);
     }
 
     public function testListGroupeWithNoGroupsReturnsEmptyArrays(): void

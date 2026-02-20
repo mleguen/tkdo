@@ -4,6 +4,7 @@ import {
 } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
+import { filter, take, toArray } from 'rxjs';
 
 import {
   BackendService,
@@ -319,16 +320,17 @@ describe('BackendService', () => {
         archives: [],
       };
 
-      let emitCount = 0;
-      service.groupes$.subscribe((groupes) => {
-        if (groupes !== null) {
-          emitCount++;
-          if (emitCount === 2) {
-            expect(groupes).toEqual(mockGroupes);
-            done();
-          }
-        }
-      });
+      service.groupes$
+        .pipe(
+          filter((g): g is GroupeResponse => g !== null),
+          take(2),
+          toArray(),
+        )
+        .subscribe((emissions) => {
+          expect(emissions[0]).toEqual({ actifs: [], archives: [] });
+          expect(emissions[1]).toEqual(mockGroupes);
+          done();
+        });
 
       // First load
       const userReq = httpMock.expectOne('/api/utilisateur/1');
