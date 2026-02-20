@@ -10,9 +10,9 @@ use App\Appli\Settings\AuthSettings;
 use App\Bootstrap;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
-use PHPUnit\Framework\TestCase;
+use Test\Unit\Dom\Port\UnitTestCase;
 
-class AuthServiceTest extends TestCase
+class AuthServiceTest extends UnitTestCase
 {
     private AuthService $authService;
     private AuthSettings $settings;

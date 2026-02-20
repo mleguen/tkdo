@@ -301,6 +301,7 @@ class UtilisateurAdaptor implements Utilisateur
     public function reinitialiserTentativesEchouees(): void
     {
         $this->tentativesEchouees = 0;
+        // TODO Story 1.4: also clear $this->verrouilleJusqua when lockout enforcement is implemented
     }
 
     /**

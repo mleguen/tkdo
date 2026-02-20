@@ -164,6 +164,16 @@ Login exists and works via the OAuth2 flow implemented in Stories 1.1/1.1b/1.1c.
   - **Note:** Story 1.4 (rate limiting) may address this with IP-based rate limiting
   - **Action:** Consider adding to project-context.md "Known Technical Debt" or documenting in security review notes
 
+- [x] [AI-Review][MEDIUM] `AuthServiceTest` extends PHPUnit `TestCase` directly instead of project's `UnitTestCase` base class — violates testing convention from `project-context.md:179` ("Unit tests extend `UnitTestCase`"); risks missing setup/teardown that `UnitTestCase` provides and is inconsistent with all other unit tests in the project [api/test/Unit/Appli/Service/AuthServiceTest.php:16]
+
+- [x] [AI-Review][LOW] `readOneByIdentifiantOuEmail()` in `UtilisateurRepositoryAdaptor` missing `#[\Override]` attribute — story 1.2 added `#[\Override]` to 4 new `UtilisateurAdaptor` methods per project rule ("Use `#[\Override]` attribute on all method overrides"), but missed this new interface implementation added in the same story [api/src/Appli/RepositoryAdaptor/UtilisateurRepositoryAdaptor.php:143]
+
+- [x] [AI-Review][LOW] Missing `assertNotNull($reloaded)` null-check in `testSuccessfulLoginResetsTentativesEchouees` before calling `$reloaded->getTentativesEchouees()` (two occurrences: lines 458-459 and 478-479) — if `find()` ever returns null, test throws an opaque PHP `Error` instead of a clear PHPUnit failure; inconsistent with `testFailedLoginIncrementsTentativesEchouees:330` and `testPostLoginWithEmailSucceeds:242` which both null-check first [api/test/Int/OAuthAuthorizeControllerTest.php:458,478]
+
+- [x] [AI-Review][LOW] `reinitialiserTentativesEchouees()` only resets `tentativesEchouees` counter, not `verrouilleJusqua` — when Story 1.4 implements lockout enforcement, a successful login should clear both the counter and the lockout timestamp; the method name implies full reset but only does partial reset; add a code comment or update the `Utilisateur` interface contract before Story 1.4 begins [api/src/Appli/ModelAdaptor/UtilisateurAdaptor.php:300-303]
+
+- [x] [AI-Review][LOW] E2E "Se souvenir de moi" cookie expiry assertion has no upper bound — `expect(jwtCookie!.expiry! - now).to.be.greaterThan(dayInSeconds)` would silently pass a misconfigured 365-day cookie; add `.lessThan(dayInSeconds * 8)` to tightly bracket the expected 7-day window and catch `AuthSettings.validiteSeSouvenir` regressions [front/cypress/e2e/connexion.cy.ts:167]
+
 ## Dev Notes
 
 ### Architecture Overview
@@ -312,7 +322,7 @@ try {
 - Use `takeUntilDestroyed()` for observable subscriptions in components
 - PHPStan requires `@param` and `@var` annotations for arrays
 - `#[\Override]` on all controller `__invoke()` methods that extend base classes (but OAuthAuthorizeController does NOT extend a base class)
-- Test commands: `./composer test -- --testsuite=Unit`, `./composer test -- --testsuite=Integration`
+- Test commands: `./composer test -- --testsuite=Unit`, `./composer test -- --testsuite=Int`
 - E2E: `./composer run install-fixtures && ./npm run e2e` (fixtures MUST be reinstalled before EVERY E2E run)
 
 **Review findings to carry forward:**
@@ -362,7 +372,7 @@ a9c7237 docs(story-1.1c): address 6 LOW documentation review follow-ups
 
 **Test commands:**
 - `./composer test -- --testsuite=Unit` (quick check after each task)
-- `./composer test -- --testsuite=Integration` (endpoint verification)
+- `./composer test -- --testsuite=Int` (endpoint verification)
 - `./npm test -- --watch=false --browsers=ChromeHeadless` (frontend unit)
 - `./composer run install-fixtures && ./npm run e2e` (full E2E — reinstall fixtures every time)
 
@@ -394,7 +404,7 @@ Claude Opus 4.6 (claude-opus-4-6)
 
 ### Completion Notes List
 
-- All 7 tasks + 11 review follow-ups completed successfully with full test coverage
+- All 7 tasks + 16 review follow-ups completed successfully with full test coverage
 - Test results: 334 backend (177 unit + 157 integration), 65 frontend unit, 25 Cypress component, 15 Cypress E2E — all passing
 - ✅ Resolved review finding [HIGH]: Graceful degradation for shared emails — `readOneByIdentifiantOuEmail()` now prioritizes username match, catches `NonUniqueResultException` on email lookup, and throws `UtilisateurInconnuException` instead of 500 error
 - ✅ Resolved review finding [LOW]: Documented timing side-channel and login-by-email shared email limitation in project-context.md "Known Technical Debt" section
@@ -408,6 +418,11 @@ Claude Opus 4.6 (claude-opus-4-6)
 - ✅ Resolved review finding [LOW]: Added `#[\Override]` attribute to `getTentativesEchouees`, `getVerrouilleJusqua`, `incrementeTentativesEchouees`, `reinitialiserTentativesEchouees` in `UtilisateurAdaptor`
 - ✅ Resolved review finding [LOW]: Added data-provider integration test verifying truthy non-boolean `se_souvenir` values (string `"true"`, int `1`) do not trigger remember-me
 - ✅ Resolved review finding [LOW]: Added DB side-effect assertion to `testPostLoginWithEmailSucceeds` — verifies `tentatives_echouees` remains 0 after successful email login
+- ✅ Resolved review finding [MEDIUM]: `AuthServiceTest` now extends project's `UnitTestCase` base class instead of PHPUnit `TestCase` directly, consistent with all other unit tests
+- ✅ Resolved review finding [LOW]: Added `#[\Override]` attribute to `readOneByIdentifiantOuEmail()` in `UtilisateurRepositoryAdaptor`
+- ✅ Resolved review finding [LOW]: Added `assertNotNull($reloaded)` null-checks to both `find()` calls in `testSuccessfulLoginResetsTentativesEchouees`, consistent with other tests
+- ✅ Resolved review finding [LOW]: Added TODO comment to `reinitialiserTentativesEchouees()` in both `UtilisateurAdaptor` and `Utilisateur` interface contract noting Story 1.4 should also clear `verrouilleJusqua`
+- ✅ Resolved review finding [LOW]: Added upper bound `lessThan(dayInSeconds * 8)` to E2E cookie expiry assertion, tightly bracketing the expected 7-day window
 - **Lesson learned**: After adding new Doctrine-mapped properties, always run `./doctrine orm:clear-cache:metadata` and `./doctrine orm:generate-proxies` to refresh the metadata cache. Container restarts are unnecessary.
 - **MySQL command pattern**: The proper way to run MySQL queries against the dev database is: `docker compose exec mysql mysql -u tkdo -pmdptkdo tkdo -e "SQL_QUERY_HERE"`
 
@@ -431,6 +446,12 @@ Claude Opus 4.6 (claude-opus-4-6)
 - **Override attributes added (review follow-up)**: Added `#[\Override]` to 4 new `UtilisateurAdaptor` methods per project coding standards
 - **Truthy non-boolean se_souvenir test (review follow-up)**: New data-provider integration test verifying strict `=== true` comparison guards remember-me from string "true" and int 1
 - **Email login DB assertion (review follow-up)**: Strengthened `testPostLoginWithEmailSucceeds` with `tentatives_echouees` remains 0 assertion
+- **AuthServiceTest base class fix (review follow-up)**: Changed `AuthServiceTest` to extend `UnitTestCase` instead of PHPUnit `TestCase` per project testing conventions
+- **Override attribute on readOneByIdentifiantOuEmail (review follow-up)**: Added missing `#[\Override]` attribute to `UtilisateurRepositoryAdaptor::readOneByIdentifiantOuEmail()`
+- **Null-check consistency in test (review follow-up)**: Added `assertNotNull($reloaded)` guards to `testSuccessfulLoginResetsTentativesEchouees` for both `find()` calls
+- **reinitialiserTentativesEchouees contract clarification (review follow-up)**: Added TODO comments to `Utilisateur` interface and `UtilisateurAdaptor` noting Story 1.4 should also clear `verrouilleJusqua`
+- **E2E cookie expiry upper bound (review follow-up)**: Added `lessThan(dayInSeconds * 8)` assertion to bracket the expected 7-day remember-me window
+- **Test suite name fix (user)**: Mael corrected `--testsuite=Integration` references to `--testsuite=Int` across story files (1-1c, 1-2, 2-1) — the PHPUnit config uses `Int` as the integration test suite name, and the incorrect `Integration` name silently ran zero tests
 
 ### File List
 
@@ -464,7 +485,8 @@ Claude Opus 4.6 (claude-opus-4-6)
 **Modified (Meta):**
 - `_bmad-output/implementation-artifacts/1-2-user-login.md` — This story file itself (status, completion notes, file list)
 - `_bmad-output/implementation-artifacts/sprint-status.yaml` — Updated story status to "review"
-- `_bmad-output/implementation-artifacts/1-1c-oauth2-standards-alignment.md` — Updated to reflect Story 2.2 OIDC fix merged
+- `_bmad-output/implementation-artifacts/1-1c-oauth2-standards-alignment.md` — Updated to reflect Story 2.2 OIDC fix merged; fixed `--testsuite=Integration` → `--testsuite=Int` (user fix)
+- `_bmad-output/implementation-artifacts/2-1-groupe-entity-database-schema.md` — Fixed `--testsuite=Integration` → `--testsuite=Int` (user fix)
 - `_bmad-output/planning-artifacts/prd.md` — Updated to document shared email graceful degradation
 - `_bmad-output/project-context.md` — Added Known Technical Debt entries (timing side-channel, shared email login)
 - `docs/architecture.md` — Updated to reflect shared email login behavior

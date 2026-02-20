@@ -329,7 +329,7 @@ Files to delete:
 
 **Test commands:**
 - `./composer test -- --testsuite=Unit` (quick check after each task)
-- `./composer test -- --testsuite=Integration` (endpoint verification)
+- `./composer test -- --testsuite=Int` (endpoint verification)
 - `./npm test -- --watch=false --browsers=ChromeHeadless` (frontend unit)
 - `./composer run install-fixtures && ./npm run e2e` (full E2E)
 

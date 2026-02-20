@@ -140,6 +140,7 @@ EOS;
     /**
      * {@inheritdoc}
      */
+    #[\Override]
     public function readOneByIdentifiantOuEmail(string $identifiantOuEmail): Utilisateur
     {
         // 1. First attempt exact match on identifiant (always unique)

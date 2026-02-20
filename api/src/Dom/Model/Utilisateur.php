@@ -33,6 +33,7 @@ interface Utilisateur
     public function setPrefNotifIdees(string $prefNotifIdees): Utilisateur;
 
     public function incrementeTentativesEchouees(): void;
+    /** Resets tentativesEchouees to 0. Story 1.4: should also clear verrouilleJusqua when lockout is implemented. */
     public function reinitialiserTentativesEchouees(): void;
 
     public function verifieMdp(string $mdpClair): bool;

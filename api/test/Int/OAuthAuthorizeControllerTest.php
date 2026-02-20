@@ -455,6 +455,7 @@ class OAuthAuthorizeControllerTest extends IntTestCase
 
         self::$em->clear();
         $reloaded = self::$em->find(\App\Appli\ModelAdaptor\UtilisateurAdaptor::class, $utilisateur->getId());
+        $this->assertNotNull($reloaded);
         $this->assertEquals(1, $reloaded->getTentativesEchouees());
 
         // Then: login successfully to reset
@@ -475,6 +476,7 @@ class OAuthAuthorizeControllerTest extends IntTestCase
 
         self::$em->clear();
         $reloaded = self::$em->find(\App\Appli\ModelAdaptor\UtilisateurAdaptor::class, $utilisateur->getId());
+        $this->assertNotNull($reloaded);
         $this->assertEquals(0, $reloaded->getTentativesEchouees());
     }
 }
