@@ -12,6 +12,7 @@ This guide covers everything you need to know for developing the Tkdo frontend a
 - [Development Server](#development-server)
 - [Building for Production](#building-for-production)
 - [Upgrade Procedures](#upgrade-procedures)
+- [npm Overrides (Technical Debt)](#npm-overrides-technical-debt)
 - [Code Style and Conventions](#code-style-and-conventions)
 - [Component Architecture Patterns](#component-architecture-patterns)
 
@@ -666,6 +667,15 @@ The project maintains Angular and dependencies at the latest stable versions usi
 # Fix with breaking changes (careful!)
 ./npm audit fix --force
 ```
+
+### npm Overrides (Technical Debt)
+
+The `overrides` section in `front/package.json` contains workarounds for upstream dependency issues. These should be removed as soon as new package versions fix the root causes:
+
+| Override | Reason | Remove when |
+|---|---|---|
+| `qs >= 6.14.1` | Security vulnerability in older qs versions pulled transitively | The minimum version required by all transitive dependents is >= 6.14.1 |
+| `@angular-devkit/core > chokidar: ^5.0.0` | npm incorrectly dedupes chokidar@4.0.3 (from sass) for Angular packages that require ^5.0.0, causing missing readdirp@5.0.0 and broken builds/tests | sass upgrades its chokidar dependency to ^5.0.0, or Angular packages no longer conflict with sass's chokidar range |
 
 ## Code Style and Conventions
 
