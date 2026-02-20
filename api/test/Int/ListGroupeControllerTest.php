@@ -183,9 +183,9 @@ class ListGroupeControllerTest extends IntTestCase
         $this->assertCount(2, $body['actifs']);
         $this->assertCount(0, $body['archives']);
 
-        $nomsActifs = array_column($body['actifs'], 'nom');
-        $this->assertContains('Amis', $nomsActifs);
-        $this->assertContains('Famille', $nomsActifs);
+        // Verify alphabetical sort order (orderBy g.nom ASC)
+        $this->assertEquals('Amis', $body['actifs'][0]['nom']);
+        $this->assertEquals('Famille', $body['actifs'][1]['nom']);
     }
 
     public function testListGroupeRequiresAuthentication(): void

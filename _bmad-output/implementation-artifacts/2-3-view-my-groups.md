@@ -84,6 +84,8 @@ So that I understand my context and can navigate between groups.
 - [x] [AI-Review][LOW] Remove redundant `merge()` wrapper in groupes$ observable [front/src/app/backend.service.ts:149] — `merge(refreshGroupes$.pipe(startWith(undefined)))` with a single argument is identical to `refreshGroupes$.pipe(startWith(undefined))`. Remove the `merge()` to simplify code and avoid implying there are multiple sources being merged.
 - [x] [AI-Review][LOW] Add missing `#[\Override]` on four pre-existing GroupeRepositoryAdaptor methods [api/src/Appli/RepositoryAdaptor/GroupeRepositoryAdaptor.php:25,39,51,96] — `create()`, `read()`, `readAll()`, and `update()` are interface implementations missing the mandatory `#[\Override]` attribute (project-context.md rule). New methods `readAppartenancesForUtilisateur` and `readToutesAppartenancesForUtilisateur` have it correctly; these four were missed.
 - [x] [AI-Review][LOW] Narrow \Throwable catch to \Exception in GroupePort [api/src/Dom/Port/GroupePort.php:32] — `catch (\Throwable $e)` also captures PHP \Error types (TypeError, OutOfMemoryError, etc.). Repository calls only throw \Exception subtypes. Change to `catch (\Exception $e)` to avoid silently converting fatal PHP errors into RuntimeExceptions.
+- [x] [AI-Review][LOW] Fix double `.pipe()` chain in groupes$ observable; review entire backend.service.ts for similar redundant operator-chaining patterns (this is the 2nd such issue found — first was the merge() wrapper in the previous review) [front/src/app/backend.service.ts:148-160] — Change `this.refreshGroupes$.pipe(startWith(undefined)).pipe(switchMap(...))` to `this.refreshGroupes$.pipe(startWith(undefined), switchMap(...))`. Also audit the full file for other instances of `obs.pipe(A).pipe(B)` anti-patterns.
+- [x] [AI-Review][LOW] Add previous-exception assertion in testListeGroupesUtilisateurWrapsRepositoryException [api/test/Unit/Dom/Port/GroupePortTest.php:113-123] — After catching the RuntimeException, verify `$exception->getPrevious()` is the original repository exception to confirm the chain is preserved (the `0, $e` constructor argument in GroupePort.php:33-37 is otherwise untested).
 
 ## Dev Notes
 
@@ -732,6 +734,8 @@ None — clean implementation with no blocking issues.
 - ✅ Resolved review finding [LOW]: Removed redundant `merge()` wrapper around single-argument `refreshGroupes$.pipe(startWith(undefined))` in `groupes$` observable. Removed unused `merge` import.
 - ✅ Resolved review finding [LOW]: Added `#[\Override]` attribute to four pre-existing GroupeRepositoryAdaptor methods (`create`, `read`, `readAll`, `update`) that were missing it.
 - ✅ Resolved review finding [LOW]: Narrowed `catch (\Throwable $e)` to `catch (\Exception $e)` in GroupePort to avoid silently converting fatal PHP errors.
+- ✅ Resolved review finding [LOW]: Fixed double `.pipe()` chain in `groupes$` observable — merged into single `.pipe(startWith(undefined), switchMap(...))`. Audited full `backend.service.ts` — no other instances found.
+- ✅ Resolved review finding [LOW]: Added previous-exception assertion in `testListeGroupesUtilisateurWrapsRepositoryException` — refactored from `expectException` to try-catch pattern, verifying `getPrevious()` returns the original repository exception.
 
 ### Implementation Plan
 
@@ -762,6 +766,8 @@ None — clean implementation with no blocking issues.
 - front/src/app/header/header.component.ts
 - front/src/app/header/header.component.html
 - front/package-lock.json
+- front/package.json
+- docs/frontend-dev.md
 
 ## Change Log
 
@@ -772,3 +778,5 @@ None — clean implementation with no blocking issues.
 - 2026-02-15: Addressed second code review findings — 8 items resolved. Cache invalidation via Subject, error logging in catchError, try-catch in GroupePort, DB index on groupe.nom, ksort consistency, zero-groups logging, aria-labels, disabled group links. 336 backend tests pass (2 new), 73 frontend tests pass (4 new). PHPStan level 8 clean.
 - 2026-02-20: Third code review complete. 0 HIGH, 2 MEDIUM, 4 LOW issues. Docs-only fixes applied: front/package-lock.json added to File List, loading-state limitation documented in Completion Notes. 5 code-change issues created as action items (M1: double async pipe, M2: missing sort order test, L1: redundant merge(), L2: missing #[Override] on 4 methods, L3: \Throwable→\Exception). Story status set to in-progress.
 - 2026-02-20: Addressed third code review findings — 5 items resolved. Fixed double async pipe, added sort order test assertion, removed redundant merge(), added 4 missing #[\Override], narrowed \Throwable to \Exception. Rebased onto master (chokidar override fix). 336 backend tests pass, 73 frontend tests pass. PHPStan level 8 clean.
+- 2026-02-20: Fourth code review complete. 0 HIGH, 2 MEDIUM, 5 LOW issues. Fixed M1 (front/package.json added to File List), M2 (docs/frontend-dev.md added to File List), L2 (testListGroupeWithOnlyActiveGroups now uses positional assertEquals for sort order), L3 (sort order documented in GroupeRepository interface), L4 (ListGroupeController import moved to correct alphabetical position in Bootstrap.php). Created 2 action items: L1 (double pipe() chain + audit for other instances), L5 (previous-exception assertion in GroupePort test). Story status set to in-progress.
+- 2026-02-20: Addressed fourth code review findings — 2 items resolved. Fixed double `.pipe()` chain in groupes$ observable (audited full file, only instance). Added previous-exception assertion in GroupePort test. 336 backend tests pass, 73 frontend tests pass. PHPStan level 8 clean.

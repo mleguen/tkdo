@@ -112,13 +112,17 @@ class GroupePortTest extends UnitTestCase
 
     public function testListeGroupesUtilisateurWrapsRepositoryException(): void
     {
+        $originalException = new \RuntimeException('DB connection lost');
         $this->groupeRepositoryProphecy
             ->readToutesAppartenancesForUtilisateur(42)
-            ->willThrow(new \RuntimeException('DB connection lost'));
+            ->willThrow($originalException);
 
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessageMatches('/Impossible de charger les groupes/');
-
-        $this->groupePort->listeGroupesUtilisateur($this->authProphecy->reveal());
+        try {
+            $this->groupePort->listeGroupesUtilisateur($this->authProphecy->reveal());
+            $this->fail('Expected RuntimeException was not thrown');
+        } catch (\RuntimeException $e) {
+            $this->assertStringContainsString('Impossible de charger les groupes', $e->getMessage());
+            $this->assertSame($originalException, $e->getPrevious());
+        }
     }
 }

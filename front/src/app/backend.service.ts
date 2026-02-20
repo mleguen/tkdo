@@ -145,7 +145,8 @@ export class BackendService {
       switchMap((utilisateur) =>
         utilisateur === null
           ? of(null)
-          : this.refreshGroupes$.pipe(startWith(undefined)).pipe(
+          : this.refreshGroupes$.pipe(
+              startWith(undefined),
               switchMap(() =>
                 this.http.get<GroupeResponse>(URL_GROUPE).pipe(
                   map((res) => ({

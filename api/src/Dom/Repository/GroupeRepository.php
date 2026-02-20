@@ -29,6 +29,7 @@ interface GroupeRepository
     /**
      * Returns ALL group memberships for a user, including archived groups.
      * Unlike readAppartenancesForUtilisateur(), does NOT filter by archive status.
+     * Results are sorted alphabetically by group name (ASC).
      *
      * @return Appartenance[]
      */
