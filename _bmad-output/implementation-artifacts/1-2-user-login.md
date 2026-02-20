@@ -1,6 +1,6 @@
 # Story 1.2: User Login
 
-Status: review
+Status: done
 
 ## Story
 
@@ -173,6 +173,8 @@ Login exists and works via the OAuth2 flow implemented in Stories 1.1/1.1b/1.1c.
 - [x] [AI-Review][LOW] `reinitialiserTentativesEchouees()` only resets `tentativesEchouees` counter, not `verrouilleJusqua` — when Story 1.4 implements lockout enforcement, a successful login should clear both the counter and the lockout timestamp; the method name implies full reset but only does partial reset; add a code comment or update the `Utilisateur` interface contract before Story 1.4 begins [api/src/Appli/ModelAdaptor/UtilisateurAdaptor.php:300-303]
 
 - [x] [AI-Review][LOW] E2E "Se souvenir de moi" cookie expiry assertion has no upper bound — `expect(jwtCookie!.expiry! - now).to.be.greaterThan(dayInSeconds)` would silently pass a misconfigured 365-day cookie; add `.lessThan(dayInSeconds * 8)` to tightly bracket the expected 7-day window and catch `AuthSettings.validiteSeSouvenir` regressions [front/cypress/e2e/connexion.cy.ts:167]
+
+- [x] [AI-Review][LOW] Use structured logging for success logs in `OAuthAuthorizeController` and `BffAuthCallbackController` — both used raw string interpolation with `getNom()` (user-supplied, DB-stored data), inconsistent with the sanitized failure log established in this story; fixed to use structured context arrays: `['utilisateur_id' => ..., 'nom' => ...]` [api/src/Appli/Controller/OAuthAuthorizeController.php:92, api/src/Appli/Controller/BffAuthCallbackController.php:88]
 
 ## Dev Notes
 
@@ -423,6 +425,7 @@ Claude Opus 4.6 (claude-opus-4-6)
 - ✅ Resolved review finding [LOW]: Added `assertNotNull($reloaded)` null-checks to both `find()` calls in `testSuccessfulLoginResetsTentativesEchouees`, consistent with other tests
 - ✅ Resolved review finding [LOW]: Added TODO comment to `reinitialiserTentativesEchouees()` in both `UtilisateurAdaptor` and `Utilisateur` interface contract noting Story 1.4 should also clear `verrouilleJusqua`
 - ✅ Resolved review finding [LOW]: Added upper bound `lessThan(dayInSeconds * 8)` to E2E cookie expiry assertion, tightly bracketing the expected 7-day window
+- ✅ Resolved review finding [LOW]: Switched success logs in `OAuthAuthorizeController` and `BffAuthCallbackController` from raw string interpolation to structured context arrays — `getNom()` (user-supplied data) is no longer interpolated directly into log message strings, consistent with the sanitized failure log pattern
 - **Lesson learned**: After adding new Doctrine-mapped properties, always run `./doctrine orm:clear-cache:metadata` and `./doctrine orm:generate-proxies` to refresh the metadata cache. Container restarts are unnecessary.
 - **MySQL command pattern**: The proper way to run MySQL queries against the dev database is: `docker compose exec mysql mysql -u tkdo -pmdptkdo tkdo -e "SQL_QUERY_HERE"`
 
@@ -451,6 +454,7 @@ Claude Opus 4.6 (claude-opus-4-6)
 - **Null-check consistency in test (review follow-up)**: Added `assertNotNull($reloaded)` guards to `testSuccessfulLoginResetsTentativesEchouees` for both `find()` calls
 - **reinitialiserTentativesEchouees contract clarification (review follow-up)**: Added TODO comments to `Utilisateur` interface and `UtilisateurAdaptor` noting Story 1.4 should also clear `verrouilleJusqua`
 - **E2E cookie expiry upper bound (review follow-up)**: Added `lessThan(dayInSeconds * 8)` assertion to bracket the expected 7-day remember-me window
+- **Structured success logs (review follow-up)**: Switched `OAuthAuthorizeController` and `BffAuthCallbackController` success/debug logs from raw string interpolation to structured context arrays — `getNom()` no longer interpolated into message string
 - **Test suite name fix (user)**: Mael corrected `--testsuite=Integration` references to `--testsuite=Int` across story files (1-1c, 1-2, 2-1) — the PHPUnit config uses `Int` as the integration test suite name, and the incorrect `Integration` name silently ran zero tests
 
 ### File List

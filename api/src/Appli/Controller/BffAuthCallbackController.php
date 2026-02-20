@@ -85,7 +85,7 @@ class BffAuthCallbackController
             $auth = AuthAdaptor::fromUtilisateur($utilisateur, $groupeIds, $groupeAdminIds);
             $jwt = $this->authService->encode($auth, $validite);
 
-            $this->logger->debug("BFF: utilisateur {$utilisateur->getId()} ({$utilisateur->getNom()}) connecté via OAuth2 callback");
+            $this->logger->debug('BFF: utilisateur connecté via OAuth2 callback', ['utilisateur_id' => $utilisateur->getId(), 'nom' => $utilisateur->getNom()]);
 
             // Set HttpOnly cookie with JWT
             $response = $this->addCookieHeader($response, $jwt, $validite);

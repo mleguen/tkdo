@@ -89,7 +89,7 @@ class OAuthAuthorizeController
             // Create auth code with 60 second expiry
             $result = $this->authCodeRepository->create($utilisateur->getId(), 60);
 
-            $this->logger->info("OAuth2 auth code créé pour utilisateur {$utilisateur->getId()} ({$utilisateur->getNom()})");
+            $this->logger->info('OAuth2: auth code créé', ['utilisateur_id' => $utilisateur->getId(), 'nom' => $utilisateur->getNom()]);
 
             // Redirect back to redirect_uri with code and state
             $redirectUri = $body['redirect_uri'];
