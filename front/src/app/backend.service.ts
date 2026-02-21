@@ -141,9 +141,9 @@ export class BackendService {
       ),
       shareReplay(1),
     );
-    this.groupes$ = this.utilisateurConnecte$.pipe(
-      switchMap((utilisateur) =>
-        utilisateur === null
+    this.groupes$ = this.idUtilisateurConnecte$.pipe(
+      switchMap((idUtilisateur) =>
+        idUtilisateur === null
           ? of(null)
           : this.refreshGroupes$.pipe(
               startWith(undefined),
@@ -153,7 +153,15 @@ export class BackendService {
                     actifs: Array.isArray(res?.actifs) ? res.actifs : [],
                     archives: Array.isArray(res?.archives) ? res.archives : [],
                   })),
-                  catchError((err) => {
+                  catchError((err: HttpErrorResponse) => {
+                    if (err.status === 401 || err.status === 403) {
+                      this.effaceEtatLocal();
+                      return of(null);
+                    }
+                    // Intentional graceful degradation: non-auth errors return empty groups
+                    // (user sees "Aucun groupe" instead of an error), unlike occasions$ which
+                    // re-throws. Groups are supplementary navigation context; occasions are
+                    // core content where silent data loss would be misleading.
                     console.error('Failed to load groups:', err);
                     return of({ actifs: [], archives: [] } as GroupeResponse);
                   }),

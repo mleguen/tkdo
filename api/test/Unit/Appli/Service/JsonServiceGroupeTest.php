@@ -16,6 +16,7 @@ class JsonServiceGroupeTest extends TestCase
 
     private JsonService $jsonService;
 
+    #[\Override]
     protected function setUp(): void
     {
         $authServiceProphecy = $this->prophesize(AuthService::class);

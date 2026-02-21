@@ -4,7 +4,7 @@ import {
 } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
-import { filter, take, toArray } from 'rxjs';
+import { filter, take, toArray } from 'rxjs/operators';
 
 import {
   BackendService,
@@ -282,11 +282,7 @@ describe('BackendService', () => {
         }
       });
 
-      // utilisateurConnecte$ triggers user fetch first
-      const userReq = httpMock.expectOne('/api/utilisateur/1');
-      userReq.flush(mockUtilisateur);
-
-      // Then groupes$ triggers group fetch
+      // groupes$ chains from idUtilisateurConnecte$ directly (no user profile fetch needed)
       const groupeReq = httpMock.expectOne('/api/groupe');
       groupeReq.flush(mockGroupes);
     });
@@ -303,10 +299,6 @@ describe('BackendService', () => {
         }
       });
 
-      // utilisateurConnecte$ triggers user fetch
-      const userReq = httpMock.expectOne('/api/utilisateur/1');
-      userReq.flush(mockUtilisateur);
-
       // groupes$ API call fails
       const groupeReq = httpMock.expectOne('/api/groupe');
       groupeReq.error(new ProgressEvent('error'), { status: 500 });
@@ -322,13 +314,26 @@ describe('BackendService', () => {
         }
       });
 
-      // utilisateurConnecte$ triggers user fetch
-      const userReq = httpMock.expectOne('/api/utilisateur/1');
-      userReq.flush(mockUtilisateur);
-
       // groupes$ API returns malformed response (null arrays)
       const groupeReq = httpMock.expectOne('/api/groupe');
       groupeReq.flush({ actifs: null, archives: null });
+    });
+
+    it('should clear local state on groupes$ 401 error', (done) => {
+      // Set localStorage BEFORE triggering the observable so effaceEtatLocal() has something to clear
+      localStorage.setItem('id_utilisateur', JSON.stringify(1));
+      service['idUtilisateurConnecte$'].next(1);
+
+      service.groupes$.subscribe((groupes) => {
+        if (groupes === null) {
+          expect(localStorage.getItem('id_utilisateur')).toBeNull();
+          done();
+        }
+      });
+
+      // groupes$ API returns 401 (session expired)
+      const groupeReq = httpMock.expectOne('/api/groupe');
+      groupeReq.error(new ProgressEvent('error'), { status: 401 });
     });
 
     it('should refresh groupes$ when rafraichirGroupes is called', (done) => {
@@ -351,10 +356,7 @@ describe('BackendService', () => {
           done();
         });
 
-      // First load
-      const userReq = httpMock.expectOne('/api/utilisateur/1');
-      userReq.flush(mockUtilisateur);
-
+      // First load (groupes$ chains from idUtilisateurConnecte$ directly)
       const groupeReq1 = httpMock.expectOne('/api/groupe');
       groupeReq1.flush({ actifs: [], archives: [] });
 

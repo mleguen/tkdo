@@ -24,6 +24,7 @@ class GroupePortTest extends UnitTestCase
     /** @var GroupePort */
     private $groupePort;
 
+    #[\Override]
     public function setUp(): void
     {
         $this->groupeRepositoryProphecy = $this->prophesize(GroupeRepository::class);

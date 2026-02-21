@@ -178,6 +178,18 @@ describe('HeaderComponent', () => {
     expect(labels).toContain('Groupe archivé : Noël 2024');
   });
 
+  it('should always show "Ma liste" link when groupes$ is null (not yet loaded)', () => {
+    configure(null);
+
+    const dropdownItems = fixture.nativeElement.querySelectorAll(
+      '#menuMesGroupes + div [ngbdropdownitem]',
+    );
+    const texts = Array.from(dropdownItems).map((el) =>
+      (el as Element).textContent?.trim(),
+    );
+    expect(texts).toContain('Ma liste');
+  });
+
   it('should render group items as disabled spans (no navigation until Story 2.4)', () => {
     configure({
       actifs: [{ id: 1, nom: 'Famille', archive: false, estAdmin: false }],
@@ -189,5 +201,8 @@ describe('HeaderComponent', () => {
     );
     expect(spans.length).toBeGreaterThan(0);
     expect(spans[0].textContent?.trim()).toBe('Famille');
+    expect(spans[0].getAttribute('title')).toBe(
+      'Bientôt disponible (Story 2.4)',
+    );
   });
 });

@@ -231,12 +231,11 @@ class GroupeRepositoryTest extends IntTestCase
         $appartenances = $this->repo->readToutesAppartenancesForUtilisateur($utilisateur->getId());
 
         $this->assertCount(2, $appartenances);
-        $adminFlags = [];
-        foreach ($appartenances as $a) {
-            $adminFlags[$a->getGroupe()->getNom()] = $a->getEstAdmin();
-        }
-        $this->assertTrue($adminFlags['Groupe Admin']);
-        $this->assertFalse($adminFlags['Groupe Membre']);
+        // Verify alphabetical sort order (orderBy g.nom ASC): 'Groupe Admin' < 'Groupe Membre'
+        $this->assertEquals('Groupe Admin', $appartenances[0]->getGroupe()->getNom());
+        $this->assertTrue($appartenances[0]->getEstAdmin());
+        $this->assertEquals('Groupe Membre', $appartenances[1]->getGroupe()->getNom());
+        $this->assertFalse($appartenances[1]->getEstAdmin());
     }
 
     public function testReadAppartenancesForUtilisateurPreservesAdminFlag(): void
