@@ -37,7 +37,6 @@ MYSQL_HOST=localhost
 MYSQL_DATABASE=tkdo
 MYSQL_USER=tkdo_user
 MYSQL_PASSWORD=secure_password
-TKDO_BASE_URI=https://tkdo.example.com
 TKDO_DEV_MODE=0
 ```
 
@@ -59,7 +58,6 @@ Set in Apache virtual host configuration:
     SetEnv MYSQL_DATABASE "tkdo"
     SetEnv MYSQL_USER "tkdo_user"
     SetEnv MYSQL_PASSWORD "secure_password"
-    SetEnv TKDO_BASE_URI "https://tkdo.example.com"
     SetEnv TKDO_DEV_MODE "0"
 </VirtualHost>
 ```
@@ -333,36 +331,32 @@ These variables configure the application behavior and URLs.
 
 ### TKDO_BASE_URI
 
-**Description:** Base URL where the application is accessible
+**Description:** Base URL for CLI-only contexts (cron jobs, fixture loading). In HTTP contexts, the base URI is automatically derived from the incoming request's `Host` header and `X-Forwarded-Proto`, so this variable is not needed for the web application.
 
 **Type:** String (URL)
 
-**Required:** No
+**Required:** No (CLI-only)
 
 **Default:** `http://localhost:4200`
 
 **Examples:**
 
 ```bash
-TKDO_BASE_URI=https://tkdo.example.com           # Production
-TKDO_BASE_URI=https://gifts.company.com          # Custom domain
-TKDO_BASE_URI=http://localhost:4200              # Development
-TKDO_BASE_URI=http://192.168.1.100:8080         # Local network
+TKDO_BASE_URI=https://tkdo.example.com           # Production CLI (cron, fixtures)
+TKDO_BASE_URI=http://front                       # Docker CLI container
+TKDO_BASE_URI=http://localhost:4200              # Development default
 ```
 
 **Usage:**
 
-- Used in email notifications (links back to application)
-- Default email domain if none specified
+- Only used in CLI contexts (e.g. `NotifCommand` daily email digests, fixture loading)
+- In HTTP contexts (web requests), the base URI is derived from the request — this variable is ignored
 - Must include protocol (`http://` or `https://`)
 - Should **not** end with trailing slash
-- Must match actual URL users access
 
 **Impact:**
 
-- Password reset links in emails
-- Occasion invitations
-- User account creation notifications
+- CLI-generated email links (password reset, occasion invitations via cron)
 - Fixture-created users email domain (e.g. in production mode, admin account uses `admin@{hostname}` if `--admin-email` not specified)
 
 ### TKDO_API_BASE_PATH
@@ -500,7 +494,7 @@ OAUTH2_CLIENT_SECRET=your-production-secret-here          # Production
 
 **Required:** No
 
-**Default:** Falls back to `TKDO_BASE_URI`
+**Default:** `http://localhost:4200`
 
 **Examples:**
 
@@ -511,9 +505,10 @@ OAUTH2_ISSUER_BASE_URI=http://localhost:8000         # CI (PHP built-in server)
 
 **Usage:**
 
-- Only needed when the backend is at a different address than `TKDO_BASE_URI` (e.g., in Docker dev or CI)
-- Constructs the temporary auth server endpoint URLs: `/oauth/authorize`, `/oauth/token`, `/oauth/userinfo`
-- In production (behind reverse proxy), not needed — `TKDO_BASE_URI` works for both public and back-channel access
+- Base URL for back-channel calls to the built-in auth server (`/oauth/token`, `/oauth/userinfo`)
+- In Docker dev: set to internal backend hostname (e.g. `http://slim-web`)
+- In CI: set to the PHP built-in server address (e.g. `http://localhost:8000`)
+- In production (behind reverse proxy): set to the public URL or internal backend address
 
 ### Switching to External Identity Provider
 
@@ -631,7 +626,6 @@ See [Development Setup Guide](dev-setup.md#email-testing-with-maildev) for using
 #MYSQL_PASSWORD=mdptkdo
 
 # Application configuration (defaults are suitable for development)
-#TKDO_BASE_URI=http://localhost:4200
 #TKDO_API_BASE_PATH=
 #TKDO_DEV_MODE=1
 
@@ -663,18 +657,20 @@ MYSQL_USER=tkdo_prod_user
 MYSQL_PASSWORD=randomly_generated_secure_password_here
 
 # Application configuration (must be set for production)
-TKDO_BASE_URI=https://tkdo.example.com
 #TKDO_API_BASE_PATH=/api
 TKDO_DEV_MODE=0
 
-# Email configuration (optional, uses hostname from BASE_URI if not set)
+# CLI-only: base URI for cron jobs and fixture loading
+# Not needed for web requests (derived from Host header)
+#TKDO_BASE_URI=https://tkdo.example.com
+
+# Email configuration (optional, uses hostname from request in HTTP, TKDO_BASE_URI in CLI)
 #TKDO_MAILER_FROM=Tkdo <noreply@example.com>
 ```
 
 **Note:** Commented variables use suitable defaults. Required variables:
 
 - `MYSQL_PASSWORD` - Must be changed from default
-- `TKDO_BASE_URI` - Must match your domain
 - `TKDO_DEV_MODE=0` - Must be set to production mode
 
 **Characteristics:**
@@ -697,9 +693,11 @@ MYSQL_USER=tkdo_staging_user
 MYSQL_PASSWORD=staging_password_here
 
 # Application configuration (staging URL)
-TKDO_BASE_URI=https://staging.tkdo.example.com
 #TKDO_API_BASE_PATH=/api
 TKDO_DEV_MODE=0
+
+# CLI-only: base URI for cron jobs and fixture loading
+#TKDO_BASE_URI=https://staging.tkdo.example.com
 
 # Email configuration (optional, distinguish from production)
 #TKDO_MAILER_FROM=Tkdo Staging <noreply-staging@example.com>
@@ -784,11 +782,11 @@ Before deploying to production:
 
 - [ ] `TKDO_DEV_MODE` set to `0`
 - [ ] Strong `MYSQL_PASSWORD` set
-- [ ] `TKDO_BASE_URI` uses `https://`
 - [ ] `.env.prod` not in version control
 - [ ] `.env.prod` has correct file permissions (600 or 640)
 - [ ] All required variables are set
 - [ ] `TKDO_MAILER_FROM` uses production email address
+- [ ] `TKDO_BASE_URI` set if CLI cron jobs send emails (uses `https://`)
 
 ## Quick Reference
 
@@ -805,9 +803,11 @@ MYSQL_USER=tkdo_prod_user
 MYSQL_PASSWORD=XyZ123!SecureRandomPassword456
 
 # Application Configuration
-TKDO_BASE_URI=https://tkdo.example.com
 #TKDO_API_BASE_PATH=/api
 TKDO_DEV_MODE=0
+
+# CLI-only: base URI for cron jobs (not needed for web requests)
+#TKDO_BASE_URI=https://tkdo.example.com
 
 # Email Configuration
 #TKDO_MAILER_FROM=Tkdo <noreply@example.com>
@@ -826,7 +826,7 @@ TKDO_DEV_MODE=0
 | `MYSQL_DATABASE`     | No       | `tkdo`                  | String    | Database    |
 | `MYSQL_USER`         | No       | `tkdo`                  | String    | Database    |
 | `MYSQL_PASSWORD`     | No       | `mdptkdo`               | String 🔒 | Database    |
-| `TKDO_BASE_URI`      | No       | `http://localhost:4200` | URL       | Application |
+| `TKDO_BASE_URI`      | No       | `http://localhost:4200` | URL       | CLI only    |
 | `TKDO_API_BASE_PATH` | No       | `` (empty)              | String    | Application |
 | `TKDO_DEV_MODE`      | No       | `1`                     | Boolean   | Application |
 | `TKDO_MAILER_FROM`   | No       | `Tkdo <noreply@host>`   | Email     | Email       |
@@ -840,11 +840,12 @@ The absolute minimum for production (relying on defaults):
 ```bash
 # api/.env.prod
 MYSQL_PASSWORD=your_secure_password_here
-TKDO_BASE_URI=https://tkdo.example.com
 TKDO_DEV_MODE=0
 ```
 
 All other variables will use defaults suitable for typical installations.
+
+**Note:** `TKDO_BASE_URI` is only needed if you run CLI cron jobs (e.g. daily notification digests). In HTTP contexts, the base URI is derived from the request's `Host` header.
 
 ---
 

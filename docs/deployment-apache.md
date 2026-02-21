@@ -113,8 +113,10 @@ Create a file at `api/.env.prod` with your production settings. At minimum:
 ```bash
 # api/.env.prod
 MYSQL_PASSWORD=your_secure_password_here
-TKDO_BASE_URI=https://tkdo.example.com
 TKDO_DEV_MODE=0
+
+# CLI-only: needed if you run cron jobs (daily notification digests)
+#TKDO_BASE_URI=https://tkdo.example.com
 ```
 
 **For complete configuration examples with all available variables**, see [Environment Variables Reference - Method 1: .env File](environment-variables.md#method-1-env-file-recommended).
@@ -131,7 +133,6 @@ Alternatively, set variables in your Apache virtual host configuration using `Se
     DocumentRoot /var/www/tkdo
 
     SetEnv MYSQL_PASSWORD "secure_password_here"
-    SetEnv TKDO_BASE_URI "https://tkdo.example.com"
     SetEnv TKDO_DEV_MODE "0"
     # ... other variables as needed
 

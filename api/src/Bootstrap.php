@@ -31,6 +31,7 @@ use App\Appli\Handler\AppJsonErrorRenderer;
 use App\Appli\Handler\AppLogger;
 use App\Appli\Handler\AppPlainTextErrorRenderer;
 use App\Appli\Middleware\AuthMiddleware;
+use App\Appli\Middleware\UriMiddleware;
 use App\Appli\PluginAdaptor\MailPluginAdaptor;
 use App\Appli\PluginAdaptor\PasswordPluginAdaptor;
 use App\Appli\RepositoryAdaptor\AuthCodeRepositoryAdaptor;
@@ -108,7 +109,6 @@ class Bootstrap
             GenericProvider::class => fn(OAuth2Settings $settings) => new GenericProvider([
                 'clientId' => $settings->clientId,
                 'clientSecret' => $settings->clientSecret,
-                'redirectUri' => $settings->redirectUri,
                 'urlAuthorize' => $settings->urlAuthorize,
                 'urlAccessToken' => $settings->urlAccessToken,
                 'urlResourceOwnerDetails' => $settings->urlResourceOwner,
@@ -153,6 +153,7 @@ class Bootstrap
         if ($basePath) $this->slimApp->setBasePath($basePath);
 
         $this->slimApp->add(AuthMiddleware::class);
+        $this->slimApp->add(UriMiddleware::class);
 
         $this->slimApp->options('/{routes:.*}', fn(Request $request, Response $response) =>
             // CORS Pre-Flight OPTIONS Request Handler

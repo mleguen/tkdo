@@ -25,10 +25,11 @@ class BffAuthService
     /**
      * Exchange an authorization code for an access token via back-channel call.
      */
-    public function echangeCode(string $code): AccessTokenInterface
+    public function echangeCode(string $code, string $redirectUri): AccessTokenInterface
     {
         return $this->provider->getAccessToken('authorization_code', [
             'code' => $code,
+            'redirect_uri' => $redirectUri,
         ]);
     }
 

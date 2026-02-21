@@ -25,7 +25,7 @@ class ListGroupeControllerTest extends IntTestCase
             $utilisateur = $this->utilisateur()->withIdentifiant('testuser')->persist(self::$em);
         }
 
-        $baseUri = getenv('TKDO_BASE_URI');
+        $baseUri = self::apiBaseUri();
         $authClient = new \GuzzleHttp\Client(['allow_redirects' => false]);
 
         $response = $authClient->request(
@@ -36,7 +36,7 @@ class ListGroupeControllerTest extends IntTestCase
                     'identifiant' => $utilisateur->getIdentifiant(),
                     'mdp' => $utilisateur->getMdpClair(),
                     'client_id' => 'tkdo',
-                    'redirect_uri' => 'http://localhost:4200/auth/callback',
+                    'redirect_uri' => self::validRedirectUri(),
                     'response_type' => 'code',
                     'state' => 'test',
                 ],
@@ -92,7 +92,7 @@ class ListGroupeControllerTest extends IntTestCase
 
         $response = $client->request(
             'GET',
-            getenv('TKDO_BASE_URI') . self::GROUPE_PATH,
+            self::apiBaseUri() . self::GROUPE_PATH,
             ['http_errors' => false]
         );
 
@@ -119,7 +119,7 @@ class ListGroupeControllerTest extends IntTestCase
 
         $response = $client->request(
             'GET',
-            getenv('TKDO_BASE_URI') . self::GROUPE_PATH,
+            self::apiBaseUri() . self::GROUPE_PATH,
             ['http_errors' => false]
         );
 
@@ -148,7 +148,7 @@ class ListGroupeControllerTest extends IntTestCase
 
         $response = $client->request(
             'GET',
-            getenv('TKDO_BASE_URI') . self::GROUPE_PATH,
+            self::apiBaseUri() . self::GROUPE_PATH,
             ['http_errors' => false]
         );
 
@@ -181,7 +181,7 @@ class ListGroupeControllerTest extends IntTestCase
 
         $response = $client->request(
             'GET',
-            getenv('TKDO_BASE_URI') . self::GROUPE_PATH,
+            self::apiBaseUri() . self::GROUPE_PATH,
             ['http_errors' => false]
         );
 
@@ -228,7 +228,7 @@ class ListGroupeControllerTest extends IntTestCase
 
         $response = $client->request(
             'GET',
-            getenv('TKDO_BASE_URI') . self::GROUPE_PATH,
+            self::apiBaseUri() . self::GROUPE_PATH,
             ['http_errors' => false]
         );
 

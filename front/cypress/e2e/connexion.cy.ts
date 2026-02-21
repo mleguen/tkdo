@@ -120,7 +120,7 @@ describe('connexion/déconnexion/reconnexion', () => {
     const connexionPage = new ConnexionPage();
 
     cy.fixture('utilisateurs').then((utilisateurs) => {
-      const email = `${utilisateurs.soi.identifiant}@${Cypress.env('emailDomain')}`;
+      const email = `${utilisateurs.soi.identifiant}@example.com`;
       connexionPage.identifiant().type(email);
       connexionPage.motDePasse().type(utilisateurs.soi.mdp);
       connexionPage.boutonSeConnecter().click();

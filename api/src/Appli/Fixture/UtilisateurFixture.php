@@ -13,14 +13,12 @@ use Doctrine\Persistence\ObjectManager;
 class UtilisateurFixture extends AppAbstractFixture
 {
     private ?string $adminEmail = null;
-    private string $host;
 
     public function __construct(
         Bootstrap $bootstrap,
-        UriService $uriService
+        private readonly UriService $uriService
     ) {
         parent::__construct($bootstrap);
-        $this->host = $uriService->getHost();
     }
 
     public function setAdminEmail(?string $adminEmail = null): self
@@ -34,7 +32,7 @@ class UtilisateurFixture extends AppAbstractFixture
         if ($this->devMode) {
             $utilisateurs = [
                 'alice' => new UtilisateurAdaptor()
-                    ->setEmail("alice@$this->host")
+                    ->setEmail('alice@example.com')
                     ->setAdmin(true)
                     ->setGenre(Genre::Feminin)
                     ->setIdentifiant('alice')
@@ -42,7 +40,7 @@ class UtilisateurFixture extends AppAbstractFixture
                     ->setMdpClair('mdpalice')
                     ->setDateDerniereNotifPeriodique(new DateTime('2 days ago')),
                 'bob' => new UtilisateurAdaptor()
-                    ->setEmail("bob@$this->host")
+                    ->setEmail('bob@example.com')
                     ->setGenre(Genre::Masculin)
                     ->setIdentifiant('bob')
                     ->setNom('Bob')
@@ -50,7 +48,7 @@ class UtilisateurFixture extends AppAbstractFixture
                     ->setPrefNotifIdees(PrefNotifIdees::Instantanee)
                     ->setDateDerniereNotifPeriodique(new DateTime('2 days ago')),
                 'charlie' => new UtilisateurAdaptor()
-                    ->setEmail("charlie@$this->host")
+                    ->setEmail('charlie@example.com')
                     ->setGenre(Genre::Masculin)
                     ->setIdentifiant('charlie')
                     ->setMdpClair('mdpcharlie')
@@ -58,14 +56,14 @@ class UtilisateurFixture extends AppAbstractFixture
                     ->setPrefNotifIdees(PrefNotifIdees::Quotidienne)
                     ->setDateDerniereNotifPeriodique(new DateTime('2 days ago')),
                 'david' => new UtilisateurAdaptor()
-                    ->setEmail("david@$this->host")
+                    ->setEmail('david@example.com')
                     ->setGenre(Genre::Masculin)
                     ->setIdentifiant('david')
                     ->setMdpClair('mdpdavid')
                     ->setNom('David')
                     ->setDateDerniereNotifPeriodique(new DateTime('2 days ago')),
                 'eve' => new UtilisateurAdaptor()
-                    ->setEmail("eve@$this->host")
+                    ->setEmail('eve@example.com')
                     ->setGenre(Genre::Feminin)
                     ->setIdentifiant('eve')
                     ->setMdpClair('mdpeve')
@@ -75,7 +73,7 @@ class UtilisateurFixture extends AppAbstractFixture
         } else {
             $utilisateurs = [
                 'admin' => new UtilisateurAdaptor()
-                    ->setEmail($this->adminEmail ?? "admin@$this->host")
+                    ->setEmail($this->adminEmail ?? 'admin@' . $this->uriService->getHost())
                     ->setAdmin(true)
                     ->setGenre(Genre::Masculin)
                     ->setIdentifiant('admin')
@@ -95,7 +93,7 @@ class UtilisateurFixture extends AppAbstractFixture
         if ($this->devMode && $this->perfMode) {
             for ($i = 1; $i <= 6; $i++) {
                 $user = new UtilisateurAdaptor();
-                $user->setEmail("perf{$i}@{$this->host}")
+                $user->setEmail("perf{$i}@example.com")
                     ->setGenre($i % 2 === 0 ? Genre::Feminin : Genre::Masculin)
                     ->setIdentifiant("perf{$i}")
                     ->setNom("Perf User {$i}")

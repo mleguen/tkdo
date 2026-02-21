@@ -267,21 +267,20 @@ class IntTestCase extends TestCase
 
     /**
      * Base URI for API connectivity in integration tests.
-     * Uses TKDO_API_BASE_URI (internal Docker hostname) if set,
-     * falling back to TKDO_BASE_URI (public URL).
+     * Uses TKDO_API_BASE_URI if set, falling back to localhost default.
      */
     protected static function apiBaseUri(): string
     {
-        return (string) (getenv('TKDO_API_BASE_URI') ?: getenv('TKDO_BASE_URI') ?: 'http://localhost:4200');
+        return (string) (getenv('TKDO_API_BASE_URI') ?: 'http://localhost:4200');
     }
 
     /**
-     * Valid redirect_uri matching the server's configured OAuth2 redirect URI.
-     * Derived from TKDO_BASE_URI (public URL), NOT the internal API URI.
+     * Valid redirect_uri matching what the server expects from the request's Host header.
+     * Uses apiBaseUri() so the redirect_uri host matches the Host header Guzzle sends.
      */
     protected static function validRedirectUri(): string
     {
-        return (string) ((getenv('TKDO_BASE_URI') ?: 'http://localhost:4200') . '/auth/callback');
+        return self::apiBaseUri() . '/auth/callback';
     }
 
     public static function provideCurl(): Iterator

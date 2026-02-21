@@ -7,6 +7,7 @@ declare(strict_types=1);
 namespace App\Appli\Controller;
 
 use App\Appli\Service\RouteService;
+use App\Appli\Service\UriService;
 use App\Appli\Settings\OAuth2Settings;
 use App\Dom\Exception\UtilisateurInconnuException;
 use App\Dom\Repository\AuthCodeRepository;
@@ -30,6 +31,7 @@ class OAuthAuthorizeController
         private readonly LoggerInterface $logger,
         private readonly OAuth2Settings $oAuth2Settings,
         private readonly RouteService $routeService,
+        private readonly UriService $uriService,
         private readonly UtilisateurRepository $utilisateurRepository
     ) {
     }
@@ -143,8 +145,10 @@ class OAuthAuthorizeController
         }
 
         // Validate redirect_uri (open redirect protection)
-        // TEMPORARY: Exact match against the configured redirect_uri from TKDO_BASE_URI.
-        if ((string) $params['redirect_uri'] !== $this->oAuth2Settings->redirectUri) {
+        // TEMPORARY: Derive expected redirect_uri from the base URI set by UriMiddleware.
+        // This supports multiple domains (e.g. French/UK domains) without static configuration.
+        $expectedRedirectUri = (string) $this->uriService->getUri('/auth/callback');
+        if ((string) $params['redirect_uri'] !== $expectedRedirectUri) {
             throw new HttpBadRequestException($request, 'redirect_uri non autorisé');
         }
     }

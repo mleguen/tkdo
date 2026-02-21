@@ -538,7 +538,6 @@ class OAuth2Settings
 {
     public string $clientId;        // From OAUTH2_CLIENT_ID env
     public string $clientSecret;    // From OAUTH2_CLIENT_SECRET env
-    public string $redirectUri;     // Built from TKDO_BASE_URI + /auth/callback
     public string $urlAuthorize;    // /oauth/authorize (temp) or IdP URL
     public string $urlAccessToken;  // /oauth/token (temp) or IdP URL
     public string $urlResourceOwner; // /oauth/userinfo (temp) or IdP URL
@@ -1056,7 +1055,7 @@ class DoctrineSettings
 - `LogSettings` - Logging configuration
 - `MailSettings` - Email configuration
 - `MigrationSettings` - Database migrations
-- `UriSettings` - Base URI
+- `UriService` - Base URI (request-derived in HTTP, `TKDO_BASE_URI` fallback in CLI)
 
 ### Request Flow Example
 

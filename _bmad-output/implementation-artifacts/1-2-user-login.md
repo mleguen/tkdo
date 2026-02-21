@@ -192,6 +192,11 @@ Login exists and works via the OAuth2 flow implemented in Stories 1.1/1.1b/1.1c.
 
 - [x] [AI-Review][MEDIUM] Remove `OAUTH2_REDIRECT_URI` — was deliberately removed in story 1.1c; story 1.2 reintroduced it incorrectly when strengthening redirect_uri validation; root cause is `TKDO_BASE_URI: http://slim-web` (internal Docker hostname) not matching `http://localhost:8080/auth/callback` (what the browser sends via `document.baseURI`); correct fix: (1) remove `getenv('OAUTH2_REDIRECT_URI') ?:` from `OAuth2Settings.php`, keep `$baseUri . '/auth/callback'`; (2) in `docker-compose.yml`: remove both `OAUTH2_REDIRECT_URI` lines, change `TKDO_BASE_URI: http://slim-web` → `TKDO_BASE_URI: http://front` (the Docker frontend URL matching Cypress baseUrl), add `OAUTH2_ISSUER_BASE_URI: http://slim-web` for back-channel calls; (3) add `TKDO_API_BASE_URI: http://slim-web` to `php-cli` for integration test API connectivity; (4) update integration tests to use `apiBaseUri()` and `validRedirectUri()` helpers instead of reading `OAUTH2_REDIRECT_URI` [api/src/Appli/Settings/OAuth2Settings.php:23, docker-compose.yml:89+113, api/test/Int/] [PR#103 comment](https://github.com/mleguen/tkdo/pull/103#discussion_r2835671199)
 
+- [x] [AI-Review][MEDIUM] Fix redirect_uri validation for manual browser testing at `http://localhost:8080`
+  - **Issue:** After removing `OAUTH2_REDIRECT_URI` and setting `TKDO_BASE_URI=http://front`, the server expects `redirect_uri=http://front/auth/callback`. Cypress E2E (inside Docker, baseUrl=http://front) works, but the real browser at `http://localhost:8080` sends `redirect_uri=http://localhost:8080/auth/callback` → HTTP 400 "redirect_uri non autorisé".
+  - **Root cause:** Docker dev has two hostnames for the same frontend: `http://front` (Docker-internal) and `http://localhost:8080` (host port mapping). No single `TKDO_BASE_URI` value satisfies both.
+  - **Fix:** Removed `TKDO_BASE_URI` from HTTP contexts entirely. UriMiddleware now derives base URI from the request's `Host` header + `X-Forwarded-Proto`, so the redirect_uri always matches whichever domain the browser is using. `TKDO_BASE_URI` kept only as CLI fallback (cron jobs, fixtures).
+
 ## Dev Notes
 
 ### Architecture Overview
@@ -517,6 +522,7 @@ Claude Opus 4.6 (claude-opus-4-6)
 - **redirect_uri exact-match validation (review follow-up)**: Replaced path-only `redirect_uri` comparison with exact-match against configured URI; added `OAUTH2_REDIRECT_URI` env var to `OAuth2Settings` for Docker dev environments where the browser-visible URL differs from the backend internal URL; added integration test for same-path-different-host rejection
 - **Unused fixture email fields removed (review follow-up)**: Removed dead `email` fields from `utilisateurs.json` — email login test constructs addresses dynamically
 - **Test redirect_uri made dynamic (review follow-up)**: All integration test files now read `OAUTH2_REDIRECT_URI` env var (with fallback to `TKDO_BASE_URI + /auth/callback`) instead of hardcoding `http://localhost:4200/auth/callback`
+- 2026-02-21 - PR Comments Resolved: Posted "Fixed" replies to 2 PR comment threads (2 AI-authored resolved), PR: #103, comment_ids: 2835671193, 2835671199
 - 2026-02-21 - PR Comments Resolved: Posted "Fixed" replies to 2 PR comment threads (1 AI-authored resolved, 1 human-authored left for reviewer), PR: #103, comment_ids: 2835562213, 2835556350
 - **lastGroupeId validation (review follow-up)**: Added `/^\d+$/.test(lastGroupeId)` guard to post-login redirect — corrupted/non-numeric localStorage values now fall through to `/occasion` default instead of routing to invalid paths
 - **OAUTH2_REDIRECT_URI removed (review follow-up)**: Removed `OAUTH2_REDIRECT_URI` from `OAuth2Settings.php` and `docker-compose.yml`; redirect_uri now derived from `TKDO_BASE_URI` only. Changed `TKDO_BASE_URI` from `http://slim-web` to `http://front` (Docker frontend proxy URL). Added `OAUTH2_ISSUER_BASE_URI=http://slim-web` for back-channel OAuth2 calls, `TKDO_API_BASE_URI=http://slim-web` for integration test API connectivity. Added `apiBaseUri()` and `validRedirectUri()` helpers to `IntTestCase`, refactored all OAuth test files. Updated Cypress `emailDomain` default from `slim-web` to `front`.
@@ -540,8 +546,12 @@ Claude Opus 4.6 (claude-opus-4-6)
 ### File List
 
 **Created:**
+- `api/src/Appli/Middleware/UriMiddleware.php` — Slim middleware that derives base URI from HTTP request Host header + X-Forwarded-Proto
 - `api/src/Infra/Migrations/Version20260215140000.php` — Migration for failed attempt columns
 - `api/test/Unit/Appli/Service/AuthServiceTest.php` — Unit tests for AuthService encode/validity
+
+**Deleted:**
+- `api/src/Appli/Settings/UriSettings.php` — Replaced by request-aware UriService (CLI fallback reads TKDO_BASE_URI directly)
 
 **Modified (Backend):**
 - `api/src/Dom/Model/Utilisateur.php` — Added `getTentativesEchouees()`, `getVerrouilleJusqua()`, `incrementeTentativesEchouees()`, `reinitialiserTentativesEchouees()` to interface
@@ -552,8 +562,13 @@ Claude Opus 4.6 (claude-opus-4-6)
 - `api/src/Appli/Controller/BffAuthCallbackController.php` — Read `se_souvenir`, adjust JWT/cookie validity
 - `api/src/Appli/Service/AuthService.php` — Added `validiteOverride` param to `encode()`, added `getValiditeSeSouvenir()`
 - `api/src/Appli/Settings/AuthSettings.php` — Added `validiteSeSouvenir` property (604800s)
-- `api/src/Appli/Settings/OAuth2Settings.php` — Removed `OAUTH2_REDIRECT_URI` env var; redirect_uri now derived from `TKDO_BASE_URI` only
-- `api/test/Int/IntTestCase.php` — Added `apiBaseUri()` and `validRedirectUri()` helpers for test API connectivity and redirect_uri computation
+- `api/src/Appli/Fixture/UtilisateurFixture.php` — Dev fixture emails changed to static `@example.com`; production admin email still uses `uriService->getHost()` as CLI fallback
+- `api/src/Appli/Service/BffAuthService.php` — `echangeCode()` accepts `redirectUri` parameter (no longer hardcoded in GenericProvider config)
+- `api/src/Appli/Service/UriService.php` — Made request-aware: `setBaseUriFromRequest()` for HTTP, lazy `TKDO_BASE_URI` fallback for CLI; removed UriSettings dependency
+- `api/src/Appli/Settings/OAuth2Settings.php` — Removed `$redirectUri` property and `TKDO_BASE_URI` read; `OAUTH2_ISSUER_BASE_URI` falls back to `http://localhost:4200` directly
+- `api/src/Bootstrap.php` — Registered UriMiddleware; removed `redirectUri` from GenericProvider config
+- `api/test/Int/IntTestCase.php` — Simplified `apiBaseUri()`: removed `TKDO_BASE_URI` from fallback chain
+- `api/test/Int/ListGroupeControllerTest.php` — Uses `apiBaseUri()`/`validRedirectUri()` helpers instead of `getenv('TKDO_BASE_URI')`
 - `api/test/Int/OAuthAuthorizeControllerTest.php` — 7 tests (email login + DB assertion, error messages, attempt counter, shared email, non-existent user); refactored to use `apiBaseUri()`/`validRedirectUri()` helpers
 - `api/test/Int/AuthCookieIntTest.php` — Refactored to use `apiBaseUri()` and `validRedirectUri()` helpers
 - `api/test/Int/BffAuthCallbackControllerTest.php` — 5 tests (remember-me cookie duration, truthy non-boolean se_souvenir); refactored to use `apiBaseUri()`/`validRedirectUri()` helpers
@@ -569,16 +584,23 @@ Claude Opus 4.6 (claude-opus-4-6)
 - `front/src/app/connexion/connexion.component.cy.ts` — 5 new component tests (checkbox behavior), updated label assertion
 - `front/src/app/auth-callback/auth-callback.component.spec.ts` — 4 new/updated tests (se_souvenir, redirect priority)
 - `front/src/app/backend.service.spec.ts` — 1 new + 1 updated test (se_souvenir in request body)
-- `front/cypress.config.ts` — Added `emailDomain` env configuration for CI-compatible email login tests; updated default from `slim-web` to `front`
-- `front/cypress/e2e/connexion.cy.ts` — 3 new E2E tests (email login, error message, remember me), fixed conditional expiry guard
+- `front/cypress.config.ts` — Removed `emailDomain` env configuration (fixture emails now static `@example.com`)
+- `front/cypress/e2e/connexion.cy.ts` — 3 new E2E tests (email login, error message, remember me), fixed conditional expiry guard; email login uses static `@example.com`
 - `front/cypress/fixtures/utilisateurs.json` — Added `email` fields to all user fixtures
 - `front/cypress/po/connexion.po.ts` — Added `alertDanger()` and `seSouvenir()` PO methods
 
 **Modified (CI/Docker):**
-- `.github/workflows/e2e.yml` — Added `CYPRESS_EMAIL_DOMAIN: localhost` to E2E test step
-- `docker-compose.yml` — Removed `OAUTH2_REDIRECT_URI`; changed `TKDO_BASE_URI` from `http://slim-web` to `http://front`; added `OAUTH2_ISSUER_BASE_URI: http://slim-web` and `TKDO_API_BASE_URI: http://slim-web` to `php-cli`
+- `.github/workflows/e2e.yml` — Added `CYPRESS_EMAIL_DOMAIN: localhost` to E2E test step; removed `TKDO_BASE_URI` from PHP backend server step (now derived from request)
+- `.github/workflows/test.yml` — Removed `TKDO_BASE_URI` from backend server and test steps; integration tests use `TKDO_API_BASE_URI` instead
+- `docker-compose.yml` — Removed `TKDO_BASE_URI` from `slim-fpm` (HTTP context, now derived from request); kept in `php-cli` (CLI context)
+- `docker/front/Dockerfile` — Added `ProxyPreserveHost On` so backend receives correct Host header from reverse proxy
+- `docker/front-https/Dockerfile` — Added `ProxyPreserveHost On` and `RequestHeader set X-Forwarded-Proto "https"` for correct scheme detection
 
 **Modified (Docs/Dependencies):**
+- `docs/backend-dev.md` — Replaced `UriSettings` with `UriService` in settings list; removed `redirectUri` from `OAuth2Settings` description
+- `docs/deployment-apache.md` — Removed `TKDO_BASE_URI` from production setup; documented as CLI-only
+- `docs/dev-setup.md` — Removed `TKDO_BASE_URI` from Docker env example
+- `docs/environment-variables.md` — Rewrote `TKDO_BASE_URI` as CLI-only; updated `OAUTH2_ISSUER_BASE_URI` default; updated all configuration examples
 - `docs/frontend-dev.md` — Added "npm Overrides (Technical Debt)" section documenting chokidar and qs overrides
 - `front/package.json` — Added `@angular-devkit/core > chokidar: ^5.0.0` override to fix readdirp resolution failure
 - `front/package-lock.json` — Updated to reflect package.json override change

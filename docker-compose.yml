@@ -112,7 +112,6 @@ services:
       MYSQL_PORT: 3306
       MYSQL_USER: tkdo
       OAUTH2_ISSUER_BASE_URI: http://slim-web
-      TKDO_BASE_URI: http://front
       TKDO_DEV_MODE: "1"
       TKDO_MAILER_FROM: noreply@slim
       WWW_GID: ${GID:-1000}

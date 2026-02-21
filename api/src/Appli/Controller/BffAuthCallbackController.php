@@ -10,6 +10,7 @@ use App\Appli\ModelAdaptor\AuthAdaptor;
 use App\Appli\Service\AuthService;
 use App\Appli\Service\BffAuthService;
 use App\Appli\Service\RouteService;
+use App\Appli\Service\UriService;
 use App\Dom\Exception\UtilisateurInconnuException;
 use App\Dom\Model\Appartenance;
 use App\Dom\Repository\GroupeRepository;
@@ -38,6 +39,7 @@ class BffAuthCallbackController
         private readonly GroupeRepository $groupeRepository,
         private readonly LoggerInterface $logger,
         private readonly RouteService $routeService,
+        private readonly UriService $uriService,
         private readonly UtilisateurRepository $utilisateurRepository
     ) {
     }
@@ -53,7 +55,8 @@ class BffAuthCallbackController
 
         try {
             // Exchange auth code for access token via back-channel to /oauth/token
-            $accessToken = $this->bffAuthService->echangeCode($codeClair);
+            $redirectUri = (string) $this->uriService->getUri('/auth/callback');
+            $accessToken = $this->bffAuthService->echangeCode($codeClair, $redirectUri);
 
             // Extract user identity from access token (via userinfo endpoint)
             $claims = $this->bffAuthService->extraitInfoUtilisateur($accessToken);

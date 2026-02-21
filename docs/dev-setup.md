@@ -90,8 +90,7 @@ MYSQL_USER=tkdo
 MYSQL_PASSWORD=mdptkdo
 MYSQL_PORT=3306
 
-# Application URLs
-TKDO_BASE_URI=http://localhost:8080
+# Application settings
 TKDO_MAILER_FROM=noreply@localhost
 
 # Development mode flag

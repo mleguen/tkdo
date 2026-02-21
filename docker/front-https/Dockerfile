@@ -1,7 +1,7 @@
 FROM httpd:2.4
 
 # Enable required modules for HTTPS and proxying
-RUN sed -ri -e '/LoadModule (proxy_module|proxy_http_module|ssl_module|socache_shmcb_module)/s/^#//g' /usr/local/apache2/conf/httpd.conf && \
+RUN sed -ri -e '/LoadModule (proxy_module|proxy_http_module|ssl_module|socache_shmcb_module|headers_module)/s/^#//g' /usr/local/apache2/conf/httpd.conf && \
     echo 'Include conf/extra/httpd-ssl.conf' >> /usr/local/apache2/conf/httpd.conf
 
 # Create SSL configuration (dev-only: uses self-signed certs, not for production)
@@ -21,6 +21,8 @@ SSLSessionCacheTimeout  300\n\
     SSLEngine on\n\
     SSLCertificateFile "/usr/local/apache2/conf/certs/localhost.crt"\n\
     SSLCertificateKeyFile "/usr/local/apache2/conf/certs/localhost.key"\n\
+    ProxyPreserveHost On\n\
+    RequestHeader set X-Forwarded-Proto "https"\n\
     ProxyPass "/oauth/" "http://slim-web/oauth/"\n\
     ProxyPassReverse "/oauth/" "http://slim-web/oauth/"\n\
     ProxyPass "/api/" "http://slim-web/"\n\
