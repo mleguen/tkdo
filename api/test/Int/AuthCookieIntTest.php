@@ -20,18 +20,17 @@ class AuthCookieIntTest extends IntTestCase
     {
         $utilisateur = $this->utilisateur()->withIdentifiant('utilisateur')->persist(self::$em);
 
-        $baseUri = getenv('TKDO_BASE_URI');
         $client = new \GuzzleHttp\Client(['allow_redirects' => false]);
 
         $response = $client->request(
             'POST',
-            $baseUri . self::AUTHORIZE_PATH,
+            self::apiBaseUri() . self::AUTHORIZE_PATH,
             [
                 'form_params' => [
                     'identifiant' => $utilisateur->getIdentifiant(),
                     'mdp' => $utilisateur->getMdpClair(),
                     'client_id' => 'tkdo',
-                    'redirect_uri' => 'http://localhost:4200/auth/callback',
+                    'redirect_uri' => self::validRedirectUri(),
                     'response_type' => 'code',
                     'state' => 'test',
                 ],
@@ -57,7 +56,7 @@ class AuthCookieIntTest extends IntTestCase
         $client = new \GuzzleHttp\Client();
         $response = $client->request(
             'GET',
-            getenv('TKDO_BASE_URI') . '/utilisateur/' . $utilisateur->getId(),
+            self::apiBaseUri() . '/utilisateur/' . $utilisateur->getId(),
             [
                 'http_errors' => false,
             ]
@@ -100,7 +99,7 @@ class AuthCookieIntTest extends IntTestCase
 
         $callbackResponse = $client->request(
             'POST',
-            getenv('TKDO_BASE_URI') . self::CALLBACK_PATH,
+            self::apiBaseUri() . self::CALLBACK_PATH,
             [
                 'json' => ['code' => $code],
                 'http_errors' => false,
@@ -115,7 +114,7 @@ class AuthCookieIntTest extends IntTestCase
         // Logout
         $logoutResponse = $client->request(
             'POST',
-            getenv('TKDO_BASE_URI') . '/auth/logout',
+            self::apiBaseUri() . '/auth/logout',
             [
                 'http_errors' => false,
             ]
@@ -132,7 +131,7 @@ class AuthCookieIntTest extends IntTestCase
         // Verify protected endpoint returns 401 after logout
         $userResponse = $client->request(
             'GET',
-            getenv('TKDO_BASE_URI') . '/utilisateur/' . $utilisateur->getId(),
+            self::apiBaseUri() . '/utilisateur/' . $utilisateur->getId(),
             [
                 'http_errors' => false,
             ]

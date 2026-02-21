@@ -539,7 +539,7 @@ api/test/Int/IntTestCase.php            # Add entity cleanup
 **Verification:**
 ```bash
 ./composer test -- --testsuite=Unit     # All unit tests pass
-./composer test -- --testsuite=Integration  # All integration tests pass
+./composer test -- --testsuite=Int  # All integration tests pass
 ./composer test                         # Full suite (557+ existing + new)
 ```
 

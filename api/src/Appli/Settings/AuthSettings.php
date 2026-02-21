@@ -12,6 +12,7 @@ class AuthSettings
     public string $fichierClePrivee;
     public string $fichierClePublique;
     public int $validite = 3600;
+    public int $validiteSeSouvenir = 604800;
 
     public function __construct(
         Bootstrap $bootstrap

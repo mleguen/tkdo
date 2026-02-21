@@ -2,7 +2,11 @@ import { provideRouter, Router } from '@angular/router';
 import { TestBed } from '@angular/core/testing';
 
 import { ConnexionComponent } from './connexion.component';
-import { BackendService, CLE_OAUTH_STATE } from '../backend.service';
+import {
+  BackendService,
+  CLE_OAUTH_STATE,
+  CLE_SE_SOUVENIR,
+} from '../backend.service';
 
 describe('ConnexionComponent', () => {
   let formSubmitStub: Cypress.Agent<sinon.SinonStub>;
@@ -67,7 +71,7 @@ describe('ConnexionComponent', () => {
     });
 
     it('should have correct form field labels', () => {
-      cy.contains('label', 'Identifiant :').should('exist');
+      cy.contains('label', 'Identifiant ou email :').should('exist');
       cy.contains('label', 'Mot de passe :').should('exist');
     });
 
@@ -77,6 +81,22 @@ describe('ConnexionComponent', () => {
 
     it('should not display error message initially', () => {
       cy.get('.alert-danger').should('not.exist');
+    });
+
+    it('should display "Se souvenir de moi" checkbox', () => {
+      cy.get('#seSouvenir').should('exist').should('be.visible');
+      cy.contains('label', 'Se souvenir de moi').should('exist');
+    });
+
+    it('should have checkbox unchecked by default', () => {
+      cy.get('#seSouvenir').should('not.be.checked');
+    });
+
+    it('should toggle checkbox', () => {
+      cy.get('#seSouvenir').check();
+      cy.get('#seSouvenir').should('be.checked');
+      cy.get('#seSouvenir').uncheck();
+      cy.get('#seSouvenir').should('not.be.checked');
     });
   });
 
@@ -195,6 +215,27 @@ describe('ConnexionComponent', () => {
       cy.get('#btnSeConnecter').should('be.disabled');
       cy.get('@formSubmit').should('not.have.been.called');
     });
+
+    it('should store se_souvenir=true in sessionStorage when checkbox is checked', () => {
+      cy.get('#identifiant').type('alice');
+      cy.get('#mdp').type('mdpalice');
+      cy.get('#seSouvenir').check();
+      cy.get('#btnSeConnecter').click();
+
+      cy.window().then(() => {
+        expect(sessionStorage.getItem(CLE_SE_SOUVENIR)).to.equal('true');
+      });
+    });
+
+    it('should store se_souvenir=false in sessionStorage when checkbox is not checked', () => {
+      cy.get('#identifiant').type('alice');
+      cy.get('#mdp').type('mdpalice');
+      cy.get('#btnSeConnecter').click();
+
+      cy.window().then(() => {
+        expect(sessionStorage.getItem(CLE_SE_SOUVENIR)).to.equal('false');
+      });
+    });
   });
 
   describe('Return URL Handling', () => {
@@ -274,12 +315,15 @@ describe('ConnexionComponent with error query param', () => {
     }).then(() => {
       const router = TestBed.inject(Router);
       router.navigate(['connexion'], {
-        queryParams: { erreur: 'identifiants invalides', oauth: '1' },
+        queryParams: {
+          erreur: 'Identifiant ou mot de passe incorrect',
+          oauth: '1',
+        },
       });
     });
 
     cy.get('.alert-danger')
       .should('exist')
-      .should('contain.text', 'identifiants invalides');
+      .should('contain.text', 'Identifiant ou mot de passe incorrect');
   });
 });

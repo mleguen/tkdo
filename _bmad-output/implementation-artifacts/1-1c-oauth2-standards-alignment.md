@@ -147,6 +147,10 @@ This story refactors to OAuth2-compliant architecture, clearly separating:
 - [x] [AI-Review][HIGH] Remove ./phpstan wrapper script — Wrapper is now more complex to use than `./composer run phpstan`; helper that doesn't help should be deleted in favor of composer script only [docs/backend-dev.md + ./phpstan] [PR#100 unresolved thread](https://github.com/mleguen/tkdo/pull/100)
 - [x] [AI-Review][HIGH] Clarify form cleanup comment in Cypress test — Current comment explains test-specific workaround but user questions if DOM persistence between tests could happen in real life; if yes, fix should be in production code not test cleanup [front/src/app/connexion/connexion.component.cy.ts:52] [PR#100 unresolved thread](https://github.com/mleguen/tkdo/pull/100)
 
+## Known Issues
+
+- ~~**OAuthUserInfoController returns app-specific data**~~ — **RESOLVED in Story 2.2** (merged). OAuthUserInfoController now returns only standard OIDC claims (`sub`, `name`, `email`). BffAuthCallbackController loads app-specific data (`admin`, `groupe_ids`, `groupe_admin_ids`) from the `$utilisateur` entity and `GroupeRepository` directly from the database.
+
 ## Dev Notes
 
 ### Architecture Overview
@@ -325,7 +329,7 @@ Files to delete:
 
 **Test commands:**
 - `./composer test -- --testsuite=Unit` (quick check after each task)
-- `./composer test -- --testsuite=Integration` (endpoint verification)
+- `./composer test -- --testsuite=Int` (endpoint verification)
 - `./npm test -- --watch=false --browsers=ChromeHeadless` (frontend unit)
 - `./composer run install-fixtures && ./npm run e2e` (full E2E)
 

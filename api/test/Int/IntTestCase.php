@@ -188,7 +188,7 @@ class IntTestCase extends TestCase
                 return "-d $k=$v";
             }, array_keys($data), $data)) : '';
 
-            $fullPath = getenv('TKDO_BASE_URI') . $path;
+            $fullPath = self::apiBaseUri() . $path;
             if ($query) $fullPath .= "?$query";
 
             exec(
@@ -215,7 +215,7 @@ class IntTestCase extends TestCase
     
             $response = $this->client->request(
                 $method,
-                getenv('TKDO_BASE_URI') . $path,
+                self::apiBaseUri() . $path,
                 [
                     'body' => is_null($data) ? '' : (count($data) ? json_encode($data) : '{}'),
                     'cookie' => true,
@@ -263,6 +263,25 @@ class IntTestCase extends TestCase
             'nom' => $utilisateur->getNom(),
             'genre' => $utilisateur->getGenre(),
         ];
+    }
+
+    /**
+     * Base URI for API connectivity in integration tests.
+     * Uses TKDO_API_BASE_URI (internal Docker hostname) if set,
+     * falling back to TKDO_BASE_URI (public URL).
+     */
+    protected static function apiBaseUri(): string
+    {
+        return (string) (getenv('TKDO_API_BASE_URI') ?: getenv('TKDO_BASE_URI') ?: 'http://localhost:4200');
+    }
+
+    /**
+     * Valid redirect_uri matching the server's configured OAuth2 redirect URI.
+     * Derived from TKDO_BASE_URI (public URL), NOT the internal API URI.
+     */
+    protected static function validRedirectUri(): string
+    {
+        return (string) ((getenv('TKDO_BASE_URI') ?: 'http://localhost:4200') . '/auth/callback');
     }
 
     public static function provideCurl(): Iterator

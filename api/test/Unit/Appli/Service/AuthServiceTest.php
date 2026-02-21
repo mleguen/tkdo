@@ -9,17 +9,19 @@ use App\Appli\Service\AuthService;
 use App\Appli\Settings\AuthSettings;
 use App\Bootstrap;
 use Firebase\JWT\JWT;
-use PHPUnit\Framework\TestCase;
+use Firebase\JWT\Key;
+use Test\Unit\Dom\Port\UnitTestCase;
 
-class AuthServiceTest extends TestCase
+class AuthServiceTest extends UnitTestCase
 {
     private AuthService $authService;
+    private AuthSettings $settings;
 
     protected function setUp(): void
     {
         $bootstrap = new Bootstrap();
-        $settings = new AuthSettings($bootstrap);
-        $this->authService = new AuthService($settings);
+        $this->settings = new AuthSettings($bootstrap);
+        $this->authService = new AuthService($this->settings);
     }
 
     public function testEncodeDecodePreservesGroupeAdminIds(): void
@@ -64,11 +66,8 @@ class AuthServiceTest extends TestCase
     {
         // Manually construct a JWT payload WITHOUT groupe_admin_ids claim,
         // simulating a token generated before Story 2.2 was deployed
-        $bootstrap = new Bootstrap();
-        $settings = new AuthSettings($bootstrap);
-
         /** @var string $privateKey */
-        $privateKey = file_get_contents($settings->fichierClePrivee);
+        $privateKey = file_get_contents($this->settings->fichierClePrivee);
 
         $payload = [
             'sub' => 42,
@@ -77,7 +76,7 @@ class AuthServiceTest extends TestCase
             'groupe_ids' => [10, 20],
             // groupe_admin_ids intentionally omitted
         ];
-        $token = JWT::encode($payload, $privateKey, $settings->algo);
+        $token = JWT::encode($payload, $privateKey, $this->settings->algo);
 
         $decoded = $this->authService->decode($token);
 
@@ -98,5 +97,46 @@ class AuthServiceTest extends TestCase
         $this->assertTrue($decoded->estAdmin());
         $this->assertEquals([1, 2, 3], $decoded->getGroupeIds());
         $this->assertEquals([2], $decoded->getGroupeAdminIds());
+    }
+
+    public function testEncodeWithDefaultValiditeProducesCorrectExpClaim(): void
+    {
+        $auth = new AuthAdaptor(1, false, []);
+        $before = time();
+        $jwt = $this->authService->encode($auth);
+        $after = time();
+
+        $key = new Key(
+            file_get_contents($this->settings->fichierClePublique) ?: '',
+            $this->settings->algo
+        );
+        $payload = JWT::decode($jwt, $key);
+
+        $this->assertGreaterThanOrEqual($before + $this->settings->validite, $payload->exp);
+        $this->assertLessThanOrEqual($after + $this->settings->validite, $payload->exp);
+    }
+
+    public function testEncodeWithValiditeOverrideProducesCorrectExpClaim(): void
+    {
+        $auth = new AuthAdaptor(1, false, []);
+        $customValidite = 604800; // 7 days
+
+        $before = time();
+        $jwt = $this->authService->encode($auth, $customValidite);
+        $after = time();
+
+        $key = new Key(
+            file_get_contents($this->settings->fichierClePublique) ?: '',
+            $this->settings->algo
+        );
+        $payload = JWT::decode($jwt, $key);
+
+        $this->assertGreaterThanOrEqual($before + $customValidite, $payload->exp);
+        $this->assertLessThanOrEqual($after + $customValidite, $payload->exp);
+    }
+
+    public function testGetValiditeSeSouvenirReturnsSevenDays(): void
+    {
+        $this->assertEquals(604800, $this->authService->getValiditeSeSouvenir());
     }
 }

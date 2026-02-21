@@ -114,6 +114,64 @@ describe('connexion/déconnexion/reconnexion', () => {
     cy.contains("échec de l'authentification").should('be.visible');
   });
 
+  it('se connecter avec une adresse email', () => {
+    cy.visit('/');
+
+    const connexionPage = new ConnexionPage();
+
+    cy.fixture('utilisateurs').then((utilisateurs) => {
+      const email = `${utilisateurs.soi.identifiant}@${Cypress.env('emailDomain')}`;
+      connexionPage.identifiant().type(email);
+      connexionPage.motDePasse().type(utilisateurs.soi.mdp);
+      connexionPage.boutonSeConnecter().click();
+      connexionPage.nomUtilisateur().should('have.text', utilisateurs.soi.nom);
+    });
+  });
+
+  it("afficher le bon message d'erreur avec des identifiants invalides", () => {
+    cy.visit('/');
+
+    const connexionPage = new ConnexionPage();
+
+    connexionPage.identifiant().type('utilisateur-inexistant');
+    connexionPage.motDePasse().type('mauvais-mdp');
+    connexionPage.boutonSeConnecter().click();
+
+    connexionPage
+      .alertDanger()
+      .should('exist')
+      .should('contain.text', 'Identifiant ou mot de passe incorrect');
+  });
+
+  it('se connecter avec "Se souvenir de moi" coché', () => {
+    cy.visit('/');
+
+    const connexionPage = new ConnexionPage();
+
+    cy.fixture('utilisateurs').then((utilisateurs) => {
+      connexionPage.identifiant().type(utilisateurs.soi.identifiant);
+      connexionPage.motDePasse().type(utilisateurs.soi.mdp);
+      connexionPage.seSouvenir().check();
+      connexionPage.boutonSeConnecter().click();
+      connexionPage.nomUtilisateur().should('have.text', utilisateurs.soi.nom);
+
+      // Verify cookie has extended expiry (~7 days)
+      cy.getCookies().then((cookies) => {
+        const jwtCookie = cookies.find((c) => c.name === 'tkdo_jwt');
+        expect(jwtCookie, 'tkdo_jwt cookie must exist').to.not.be.undefined;
+        // expiry must be set (not a session cookie) and more than 1 day in the future
+        expect(
+          jwtCookie!.expiry,
+          'tkdo_jwt cookie must have an expiry',
+        ).to.be.a('number');
+        const now = Math.floor(Date.now() / 1000);
+        const dayInSeconds = 86400;
+        expect(jwtCookie!.expiry! - now).to.be.greaterThan(dayInSeconds);
+        expect(jwtCookie!.expiry! - now).to.be.lessThan(dayInSeconds * 8);
+      });
+    });
+  });
+
   it('se déconnecter et se reconnecter avec un autre identifiant', () => {
     cy.fixture('utilisateurs').then((utilisateurs) => {
       etantDonneQue(jeSuisConnecteEnTantQue(utilisateurs.soi));

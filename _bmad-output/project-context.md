@@ -173,6 +173,13 @@ public function __invoke(Request $request, Response $response): Response
 - Mock with `HttpTestingController` and `jasmine.createSpyObj()`
 - Clean up with `beforeEach()` and `localStorage.clear()`
 
+**Cypress E2E — Page Object Pattern (MANDATORY):**
+- ❌ NEVER use `cy.get(selector)` directly in E2E test files — wrap ALL selectors in Page Objects
+- ✅ ALWAYS use Page Object classes from `front/cypress/po/*.po.ts` for all UI interactions
+- When a selector is missing from the PO, ADD it to the PO class — do NOT inline it in the test
+- Example: `cy.get('.alert-danger')` → add `alertDanger() { return cy.get('.alert-danger'); }` to the relevant PO, then call `page.alertDanger()` in the test
+- Page Objects live in `front/cypress/po/` and extend `AppPage` when applicable
+
 **PHP Testing:**
 - All test files: `declare(strict_types=1);`
 - Test method naming: `testMethodName` format
@@ -239,6 +246,12 @@ public function __invoke(Request $request, Response $response): Response
 - Exception: Tests may legitimately fail at end of one task if another task in the same story is designed to fix them
 - **Failing tests block progress** - fix or explain before proceeding to the next task
 
+**Pull Request Descriptions:**
+- Expected sections: **Summary**, **Key Changes**, **Test Results**, **Progress**, and **Known Limitations** (when any)
+- Do NOT include Commits or Files Changed sections — GitHub already provides this information automatically
+- Progress should reflect the story lifecycle with checked/unchecked items showing what is done and what still needs doing (e.g., code review)
+- Do NOT list merge as a progress step — GitHub already indicates when a PR is merged
+
 **Docker & Scripts:**
 - Wrappers: `./console`, `./doctrine`, `./composer`, `./ng`, `./npm`, `./cypress`, `./k6`
 - `./composer test`, `./composer phpstan`, `./composer rector`
@@ -248,6 +261,8 @@ public function __invoke(Request $request, Response $response): Response
 **Database:**
 - Doctrine migrations: version-based naming
 - Fixtures: extend `AppAbstractFixture`, load with `./console -- fixtures`
+- MySQL CLI: `docker compose exec mysql mysql -u tkdo -pmdptkdo tkdo -e "SQL_QUERY_HERE"`
+- After adding new Doctrine-mapped properties, run `./doctrine orm:clear-cache:metadata` and `./doctrine orm:generate-proxies` to refresh the metadata cache (container restarts are unnecessary)
 
 **API:**
 - Base: `/api`, resources: `/api/{resource}`, actions: `/api/{resource}/{id}/{action}`
@@ -294,7 +309,8 @@ public function __invoke(Request $request, Response $response): Response
 
 ## Known Technical Debt
 
-No known technical debt at this time. Test suite runs clean with no warnings.
+- **Minor timing side-channel in login (Story 1.2):** Failed login attempts increment a counter (DB write) only for existing users. Non-existent users skip the DB write, creating a subtle timing difference (~few ms) that could theoretically enable user enumeration. Practical risk is very low; the error message is already generic ("Identifiant ou mot de passe incorrect") for both cases. Story 1.4 (IP-based rate limiting) will further mitigate this.
+- **Login-by-email requires unique emails (Story 1.2):** Email is intentionally non-unique in the DB (families may share emails: couples, parents managing children's accounts). Login-by-email is a convenience feature that only works when the email is unique. Users with shared emails must use their unique username. If a shared email is used, the system returns the standard error message gracefully (no 500 error).
 
 ---
 
@@ -311,4 +327,4 @@ No known technical debt at this time. Test suite runs clean with no warnings.
 - Update when technology stack changes
 - Review quarterly for outdated rules
 
-Last Updated: 2026-01-31
+Last Updated: 2026-02-21

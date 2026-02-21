@@ -49,6 +49,7 @@ class BffAuthCallbackController
     {
         $body = $this->routeService->getParsedRequestBody($request, ['code']);
         $codeClair = $body['code'];
+        $seSouvenir = ($body['se_souvenir'] ?? false) === true;
 
         try {
             // Exchange auth code for access token via back-channel to /oauth/token
@@ -72,17 +73,22 @@ class BffAuthCallbackController
             // Warn if user belongs to many groups — JWT cookie may exceed browser 4KB limit
             $groupCount = count($groupeIds);
             if ($groupCount > 50) {
-                $this->logger->warning("Utilisateur {$utilisateur->getId()} appartient à {$groupCount} groupes — risque de dépassement de la taille JWT cookie (4KB)");
+                $this->logger->warning('BFF: utilisateur appartient à de nombreux groupes — risque de dépassement de la taille JWT cookie (4KB)', ['utilisateur_id' => $utilisateur->getId(), 'group_count' => $groupCount]);
             }
+
+            // Determine JWT/cookie validity based on "remember me"
+            $validite = $seSouvenir
+                ? $this->authService->getValiditeSeSouvenir()
+                : $this->authService->getValidite();
 
             // Create application JWT and set HttpOnly cookie
             $auth = AuthAdaptor::fromUtilisateur($utilisateur, $groupeIds, $groupeAdminIds);
-            $jwt = $this->authService->encode($auth);
+            $jwt = $this->authService->encode($auth, $validite);
 
-            $this->logger->debug("BFF: utilisateur {$utilisateur->getId()} ({$utilisateur->getNom()}) connecté via OAuth2 callback");
+            $this->logger->debug('BFF: utilisateur connecté via OAuth2 callback', ['utilisateur_id' => $utilisateur->getId(), 'nom' => $utilisateur->getNom()]);
 
             // Set HttpOnly cookie with JWT
-            $response = $this->addCookieHeader($response, $jwt);
+            $response = $this->addCookieHeader($response, $jwt, $validite);
 
             // Return user info (not the JWT)
             return $this->routeService->getResponseWithJsonBody($response, json_encode([
@@ -97,19 +103,19 @@ class BffAuthCallbackController
                 ],
             ], JSON_THROW_ON_ERROR));
         } catch (IdentityProviderException $e) {
-            $this->logger->warning("BFF: échec échange code OAuth2: {$e->getMessage()}");
+            $this->logger->warning('BFF: échec échange code OAuth2', ['error' => $e->getMessage()]);
             throw new HttpUnauthorizedException($request, 'code invalide ou expiré');
         } catch (\RuntimeException $e) {
-            $this->logger->warning("BFF: erreur extraction info utilisateur: {$e->getMessage()}");
+            $this->logger->warning('BFF: erreur extraction info utilisateur', ['error' => $e->getMessage()]);
             throw new HttpUnauthorizedException($request, 'code invalide ou expiré');
         } catch (UtilisateurInconnuException) {
             throw new HttpUnauthorizedException($request, 'code invalide ou expiré');
         }
     }
 
-    private function addCookieHeader(ResponseInterface $response, string $jwt): ResponseInterface
+    private function addCookieHeader(ResponseInterface $response, string $jwt, int $validite): ResponseInterface
     {
-        $expires = time() + $this->authService->getValidite();
+        $expires = time() + $validite;
         $expiresGmt = gmdate('D, d M Y H:i:s', $expires) . ' GMT';
 
         $cookie = sprintf(

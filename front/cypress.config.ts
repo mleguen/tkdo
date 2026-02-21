@@ -14,6 +14,9 @@ const baseUrl = useHttps
 export default defineConfig({
   e2e: {
     baseUrl,
+    env: {
+      emailDomain: process.env['CYPRESS_EMAIL_DOMAIN'] || 'front',
+    },
     specPattern: 'cypress/e2e/**/*.cy.ts',
     // When using HTTPS with self-signed certs, disable same-origin policy
     // (chromeWebSecurity: false) and add --ignore-certificate-errors for

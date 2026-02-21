@@ -21,18 +21,17 @@ class BffAuthCallbackControllerTest extends IntTestCase
     {
         $utilisateur = $this->utilisateur()->withIdentifiant('utilisateur')->persist(self::$em);
 
-        $baseUri = getenv('TKDO_BASE_URI');
         $client = new \GuzzleHttp\Client(['allow_redirects' => false]);
 
         $response = $client->request(
             'POST',
-            $baseUri . self::AUTHORIZE_PATH,
+            self::apiBaseUri() . self::AUTHORIZE_PATH,
             [
                 'form_params' => [
                     'identifiant' => $utilisateur->getIdentifiant(),
                     'mdp' => $utilisateur->getMdpClair(),
                     'client_id' => 'tkdo',
-                    'redirect_uri' => 'http://localhost:4200/auth/callback',
+                    'redirect_uri' => self::validRedirectUri(),
                     'response_type' => 'code',
                     'state' => 'test',
                 ],
@@ -57,7 +56,7 @@ class BffAuthCallbackControllerTest extends IntTestCase
 
         $response = $client->request(
             'POST',
-            getenv('TKDO_BASE_URI') . self::CALLBACK_PATH,
+            self::apiBaseUri() . self::CALLBACK_PATH,
             [
                 'json' => ['code' => $code],
                 'http_errors' => false,
@@ -127,7 +126,7 @@ class BffAuthCallbackControllerTest extends IntTestCase
 
         $response = $client->request(
             'POST',
-            getenv('TKDO_BASE_URI') . self::CALLBACK_PATH,
+            self::apiBaseUri() . self::CALLBACK_PATH,
             [
                 'json' => ['code' => $code],
                 'http_errors' => false,
@@ -138,7 +137,7 @@ class BffAuthCallbackControllerTest extends IntTestCase
         // Use cookie to access a protected endpoint
         $userResponse = $client->request(
             'GET',
-            getenv('TKDO_BASE_URI') . '/utilisateur/' . $utilisateur->getId(),
+            self::apiBaseUri() . '/utilisateur/' . $utilisateur->getId(),
             ['http_errors' => false]
         );
 
@@ -168,7 +167,7 @@ class BffAuthCallbackControllerTest extends IntTestCase
 
         $response = $client->request(
             'POST',
-            getenv('TKDO_BASE_URI') . self::CALLBACK_PATH,
+            self::apiBaseUri() . self::CALLBACK_PATH,
             [
                 'json' => ['code' => $code],
                 'http_errors' => false,
@@ -205,7 +204,7 @@ class BffAuthCallbackControllerTest extends IntTestCase
 
         $response1 = $client1->request(
             'POST',
-            getenv('TKDO_BASE_URI') . self::CALLBACK_PATH,
+            self::apiBaseUri() . self::CALLBACK_PATH,
             [
                 'json' => ['code' => $code1],
                 'http_errors' => false,
@@ -224,7 +223,7 @@ class BffAuthCallbackControllerTest extends IntTestCase
             ->persist(self::$em);
 
         // Second login — get new auth code and exchange it
-        $baseUri = getenv('TKDO_BASE_URI');
+        $baseUri = self::apiBaseUri();
         $client2 = new \GuzzleHttp\Client(['allow_redirects' => false]);
 
         $authResponse = $client2->request(
@@ -235,7 +234,7 @@ class BffAuthCallbackControllerTest extends IntTestCase
                     'identifiant' => $utilisateur->getIdentifiant(),
                     'mdp' => $utilisateur->getMdpClair(),
                     'client_id' => 'tkdo',
-                    'redirect_uri' => 'http://localhost:4200/auth/callback',
+                    'redirect_uri' => self::validRedirectUri(),
                     'response_type' => 'code',
                     'state' => 'test',
                 ],
@@ -288,7 +287,7 @@ class BffAuthCallbackControllerTest extends IntTestCase
 
         $response = $client->request(
             'POST',
-            getenv('TKDO_BASE_URI') . self::CALLBACK_PATH,
+            self::apiBaseUri() . self::CALLBACK_PATH,
             [
                 'json' => ['code' => $code],
                 'http_errors' => false,
@@ -328,7 +327,7 @@ class BffAuthCallbackControllerTest extends IntTestCase
 
         $response = $client->request(
             'POST',
-            getenv('TKDO_BASE_URI') . self::CALLBACK_PATH,
+            self::apiBaseUri() . self::CALLBACK_PATH,
             [
                 'json' => ['code' => $code],
                 'http_errors' => false,
@@ -344,6 +343,142 @@ class BffAuthCallbackControllerTest extends IntTestCase
         // Verify the arrays are sequential (important for JSON serialization)
         $adminIds = $body['utilisateur']['groupe_admin_ids'];
         $this->assertEquals(array_values($adminIds), $adminIds);
+    }
+
+    public function testRememberMeTrueSetsExtendedCookieExpiry(): void
+    {
+        ['code' => $code] = $this->createUserAndGetCode();
+
+        $cookieJar = new CookieJar();
+        $client = new \GuzzleHttp\Client(['cookies' => $cookieJar]);
+
+        $response = $client->request(
+            'POST',
+            self::apiBaseUri() . self::CALLBACK_PATH,
+            [
+                'json' => ['code' => $code, 'se_souvenir' => true],
+                'http_errors' => false,
+            ]
+        );
+
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $cookie = $cookieJar->getCookieByName('tkdo_jwt');
+        $this->assertNotNull($cookie, 'Cookie tkdo_jwt should be set');
+
+        // Cookie Expires should be ~7 days from now (604800 seconds)
+        $expires = $cookie->getExpires();
+        $this->assertNotNull($expires);
+        $expectedMin = time() + 604800 - 30; // 30s tolerance
+        $expectedMax = time() + 604800 + 30;
+        $this->assertGreaterThanOrEqual($expectedMin, $expires);
+        $this->assertLessThanOrEqual($expectedMax, $expires);
+    }
+
+    public function testNoRememberMeSetsDefaultCookieExpiry(): void
+    {
+        ['code' => $code] = $this->createUserAndGetCode();
+
+        $cookieJar = new CookieJar();
+        $client = new \GuzzleHttp\Client(['cookies' => $cookieJar]);
+
+        $response = $client->request(
+            'POST',
+            self::apiBaseUri() . self::CALLBACK_PATH,
+            [
+                'json' => ['code' => $code], // no se_souvenir
+                'http_errors' => false,
+            ]
+        );
+
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $cookie = $cookieJar->getCookieByName('tkdo_jwt');
+        $this->assertNotNull($cookie, 'Cookie tkdo_jwt should be set');
+
+        // Cookie Expires should be ~1 hour from now (3600 seconds)
+        $expires = $cookie->getExpires();
+        $this->assertNotNull($expires);
+        $expectedMin = time() + 3600 - 30; // 30s tolerance
+        $expectedMax = time() + 3600 + 30;
+        $this->assertGreaterThanOrEqual($expectedMin, $expires);
+        $this->assertLessThanOrEqual($expectedMax, $expires);
+    }
+
+    public function testRememberMeFalseExplicitlySetsDefaultCookieExpiry(): void
+    {
+        ['code' => $code] = $this->createUserAndGetCode();
+
+        $cookieJar = new CookieJar();
+        $client = new \GuzzleHttp\Client(['cookies' => $cookieJar]);
+
+        $response = $client->request(
+            'POST',
+            self::apiBaseUri() . self::CALLBACK_PATH,
+            [
+                'json' => ['code' => $code, 'se_souvenir' => false],
+                'http_errors' => false,
+            ]
+        );
+
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $cookie = $cookieJar->getCookieByName('tkdo_jwt');
+        $this->assertNotNull($cookie, 'Cookie tkdo_jwt should be set');
+
+        // Same as no se_souvenir: ~1 hour
+        $expires = $cookie->getExpires();
+        $this->assertNotNull($expires);
+        $expectedMin = time() + 3600 - 30;
+        $expectedMax = time() + 3600 + 30;
+        $this->assertGreaterThanOrEqual($expectedMin, $expires);
+        $this->assertLessThanOrEqual($expectedMax, $expires);
+    }
+
+    /**
+     * Verify that truthy non-boolean values for se_souvenir do NOT trigger remember-me.
+     * Protects the strict `=== true` comparison from future regression.
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideTruthyNonBooleanValues')]
+    public function testTruthyNonBooleanSeSouvenirDoesNotTriggerRememberMe(mixed $truthyValue): void
+    {
+        ['code' => $code] = $this->createUserAndGetCode();
+
+        $cookieJar = new CookieJar();
+        $client = new \GuzzleHttp\Client(['cookies' => $cookieJar]);
+
+        $response = $client->request(
+            'POST',
+            self::apiBaseUri() . self::CALLBACK_PATH,
+            [
+                'json' => ['code' => $code, 'se_souvenir' => $truthyValue],
+                'http_errors' => false,
+            ]
+        );
+
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $cookie = $cookieJar->getCookieByName('tkdo_jwt');
+        $this->assertNotNull($cookie, 'Cookie tkdo_jwt should be set');
+
+        // Should get default ~1 hour expiry, NOT extended 7-day expiry
+        $expires = $cookie->getExpires();
+        $this->assertNotNull($expires);
+        $expectedMin = time() + 3600 - 30;
+        $expectedMax = time() + 3600 + 30;
+        $this->assertGreaterThanOrEqual($expectedMin, $expires);
+        $this->assertLessThanOrEqual($expectedMax, $expires);
+    }
+
+    /**
+     * @return array<string, array{mixed}>
+     */
+    public static function provideTruthyNonBooleanValues(): array
+    {
+        return [
+            'string "true"' => ['true'],
+            'integer 1' => [1],
+        ];
     }
 
     /**

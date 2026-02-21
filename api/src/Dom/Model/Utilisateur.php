@@ -20,6 +20,8 @@ interface Utilisateur
     /** @return Occasion[] */
     public function getOccasions(): array;
     public function getPrefNotifIdees(): string;
+    public function getTentativesEchouees(): int;
+    public function getVerrouilleJusqua(): ?DateTime;
 
     public function setAdmin(bool $admin): Utilisateur;
     public function setDateDerniereNotifPeriodique(DateTime $dateDerniereNotifPeriodique): Utilisateur;
@@ -29,6 +31,10 @@ interface Utilisateur
     public function setMdpClair(string $mdpClair): Utilisateur;
     public function setNom(string $nom): Utilisateur;
     public function setPrefNotifIdees(string $prefNotifIdees): Utilisateur;
+
+    public function incrementeTentativesEchouees(): void;
+    /** Resets tentativesEchouees to 0. Story 1.4: should also clear verrouilleJusqua when lockout is implemented. */
+    public function reinitialiserTentativesEchouees(): void;
 
     public function verifieMdp(string $mdpClair): bool;
 }

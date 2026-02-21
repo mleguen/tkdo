@@ -88,10 +88,21 @@ describe('BackendService', () => {
       // BFF callback request
       const callbackReq = httpMock.expectOne('/api/auth/callback');
       expect(callbackReq.request.method).toBe('POST');
-      expect(callbackReq.request.body).toEqual({ code: 'auth-code-123' });
+      expect(callbackReq.request.body).toEqual({
+        code: 'auth-code-123',
+        se_souvenir: false,
+      });
       expect(callbackReq.request.withCredentials).toBe(true);
       callbackReq.flush({
-        utilisateur: { id: 1, nom: 'Test User', admin: false },
+        utilisateur: {
+          id: 1,
+          nom: 'Test User',
+          email: 'test@example.com',
+          genre: 'M',
+          admin: false,
+          groupe_ids: [],
+          groupe_admin_ids: [],
+        },
       });
 
       await echangePromise;
@@ -99,6 +110,35 @@ describe('BackendService', () => {
       expect(localStorage.getItem('id_utilisateur')).toBe('1');
       // State should be cleared after use
       expect(sessionStorage.getItem('oauth_state')).toBeNull();
+    });
+
+    it('should include se_souvenir=true in request body when provided', async () => {
+      sessionStorage.setItem('oauth_state', 'test-state-abc');
+
+      const echangePromise = service.echangeCode(
+        'auth-code-123',
+        'test-state-abc',
+        true,
+      );
+
+      const callbackReq = httpMock.expectOne('/api/auth/callback');
+      expect(callbackReq.request.body).toEqual({
+        code: 'auth-code-123',
+        se_souvenir: true,
+      });
+      callbackReq.flush({
+        utilisateur: {
+          id: 1,
+          nom: 'Test User',
+          email: 'test@example.com',
+          genre: 'M',
+          admin: false,
+          groupe_ids: [],
+          groupe_admin_ids: [],
+        },
+      });
+
+      await echangePromise;
     });
 
     it('should reject echangeCode with invalid state (CSRF protection)', async () => {

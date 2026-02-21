@@ -590,6 +590,49 @@ For complete schema details and relationships, see [Database Documentation](./da
 
 ## Authentication Strategy
 
+### User Identification Model
+
+**Decision:** Username (identifiant) is the unique identifier; email addresses are intentionally non-unique to support family sharing patterns.
+
+**Rationale:**
+- **Family-Scale Application** - Couples and parents managing children's accounts often share a single email address
+- **Username as Primary Key** - Guarantees uniqueness and cannot be changed after account creation
+- **Email Convenience** - Users can log in with email when it's unique, falling back to username when shared
+- **No Friction** - Eliminates need for families to create separate email accounts just to use the application
+
+**Login Behavior:**
+
+Users can log in with either username or email:
+
+1. **Username Login** - Always works (usernames are unique by database constraint)
+2. **Email Login** - Convenience feature that works only when email is unique to one user
+3. **Shared Email Scenario** - Multiple users with same email must use their unique usernames
+4. **Error Handling** - System returns generic error "Identifiant ou mot de passe incorrect" for both invalid credentials and ambiguous email addresses (prevents user enumeration)
+
+**Implementation:**
+
+```php
+// UtilisateurRepositoryAdaptor.php
+public function readOneByIdentifiantOuEmail(string $identifiantOuEmail): Utilisateur
+{
+    // Try exact match on username (always unique)
+    // Fall back to email match (may be non-unique)
+    // Gracefully handle NonUniqueResultException for shared emails
+}
+```
+
+**Database Schema:**
+- `tkdo_utilisateur.identifiant` - VARCHAR(50), UNIQUE constraint, NOT NULL
+- `tkdo_utilisateur.email` - VARCHAR(255), NO UNIQUE constraint, NOT NULL
+- Users created via invite flow that auto-generates username or allows user to choose during signup
+
+**Trade-offs:**
+- Slightly more complex login logic (two-step lookup: username first, then email)
+- Users with shared emails must remember their unique username
+- Marginal timing side-channel for user enumeration (mitigated by minimal difference and generic error messages)
+
+**For Tkdo:** This design perfectly matches the family coordination use case where shared email addresses are common and expected, not an edge case.
+
 ### Token-Based Authentication
 
 **Decision:** Use JWT (JSON Web Tokens) with RS256 algorithm for stateless authentication.
