@@ -21,18 +21,17 @@ class BffAuthCallbackControllerTest extends IntTestCase
     {
         $utilisateur = $this->utilisateur()->withIdentifiant('utilisateur')->persist(self::$em);
 
-        $baseUri = getenv('TKDO_BASE_URI');
         $client = new \GuzzleHttp\Client(['allow_redirects' => false]);
 
         $response = $client->request(
             'POST',
-            $baseUri . self::AUTHORIZE_PATH,
+            self::apiBaseUri() . self::AUTHORIZE_PATH,
             [
                 'form_params' => [
                     'identifiant' => $utilisateur->getIdentifiant(),
                     'mdp' => $utilisateur->getMdpClair(),
                     'client_id' => 'tkdo',
-                    'redirect_uri' => (string) (getenv('OAUTH2_REDIRECT_URI') ?: ((getenv('TKDO_BASE_URI') ?: 'http://localhost:4200') . '/auth/callback')),
+                    'redirect_uri' => self::validRedirectUri(),
                     'response_type' => 'code',
                     'state' => 'test',
                 ],
@@ -57,7 +56,7 @@ class BffAuthCallbackControllerTest extends IntTestCase
 
         $response = $client->request(
             'POST',
-            getenv('TKDO_BASE_URI') . self::CALLBACK_PATH,
+            self::apiBaseUri() . self::CALLBACK_PATH,
             [
                 'json' => ['code' => $code],
                 'http_errors' => false,
@@ -127,7 +126,7 @@ class BffAuthCallbackControllerTest extends IntTestCase
 
         $response = $client->request(
             'POST',
-            getenv('TKDO_BASE_URI') . self::CALLBACK_PATH,
+            self::apiBaseUri() . self::CALLBACK_PATH,
             [
                 'json' => ['code' => $code],
                 'http_errors' => false,
@@ -138,7 +137,7 @@ class BffAuthCallbackControllerTest extends IntTestCase
         // Use cookie to access a protected endpoint
         $userResponse = $client->request(
             'GET',
-            getenv('TKDO_BASE_URI') . '/utilisateur/' . $utilisateur->getId(),
+            self::apiBaseUri() . '/utilisateur/' . $utilisateur->getId(),
             ['http_errors' => false]
         );
 
@@ -168,7 +167,7 @@ class BffAuthCallbackControllerTest extends IntTestCase
 
         $response = $client->request(
             'POST',
-            getenv('TKDO_BASE_URI') . self::CALLBACK_PATH,
+            self::apiBaseUri() . self::CALLBACK_PATH,
             [
                 'json' => ['code' => $code],
                 'http_errors' => false,
@@ -205,7 +204,7 @@ class BffAuthCallbackControllerTest extends IntTestCase
 
         $response1 = $client1->request(
             'POST',
-            getenv('TKDO_BASE_URI') . self::CALLBACK_PATH,
+            self::apiBaseUri() . self::CALLBACK_PATH,
             [
                 'json' => ['code' => $code1],
                 'http_errors' => false,
@@ -224,7 +223,7 @@ class BffAuthCallbackControllerTest extends IntTestCase
             ->persist(self::$em);
 
         // Second login — get new auth code and exchange it
-        $baseUri = getenv('TKDO_BASE_URI');
+        $baseUri = self::apiBaseUri();
         $client2 = new \GuzzleHttp\Client(['allow_redirects' => false]);
 
         $authResponse = $client2->request(
@@ -235,7 +234,7 @@ class BffAuthCallbackControllerTest extends IntTestCase
                     'identifiant' => $utilisateur->getIdentifiant(),
                     'mdp' => $utilisateur->getMdpClair(),
                     'client_id' => 'tkdo',
-                    'redirect_uri' => (string) (getenv('OAUTH2_REDIRECT_URI') ?: ((getenv('TKDO_BASE_URI') ?: 'http://localhost:4200') . '/auth/callback')),
+                    'redirect_uri' => self::validRedirectUri(),
                     'response_type' => 'code',
                     'state' => 'test',
                 ],
@@ -288,7 +287,7 @@ class BffAuthCallbackControllerTest extends IntTestCase
 
         $response = $client->request(
             'POST',
-            getenv('TKDO_BASE_URI') . self::CALLBACK_PATH,
+            self::apiBaseUri() . self::CALLBACK_PATH,
             [
                 'json' => ['code' => $code],
                 'http_errors' => false,
@@ -328,7 +327,7 @@ class BffAuthCallbackControllerTest extends IntTestCase
 
         $response = $client->request(
             'POST',
-            getenv('TKDO_BASE_URI') . self::CALLBACK_PATH,
+            self::apiBaseUri() . self::CALLBACK_PATH,
             [
                 'json' => ['code' => $code],
                 'http_errors' => false,
@@ -355,7 +354,7 @@ class BffAuthCallbackControllerTest extends IntTestCase
 
         $response = $client->request(
             'POST',
-            getenv('TKDO_BASE_URI') . self::CALLBACK_PATH,
+            self::apiBaseUri() . self::CALLBACK_PATH,
             [
                 'json' => ['code' => $code, 'se_souvenir' => true],
                 'http_errors' => false,
@@ -385,7 +384,7 @@ class BffAuthCallbackControllerTest extends IntTestCase
 
         $response = $client->request(
             'POST',
-            getenv('TKDO_BASE_URI') . self::CALLBACK_PATH,
+            self::apiBaseUri() . self::CALLBACK_PATH,
             [
                 'json' => ['code' => $code], // no se_souvenir
                 'http_errors' => false,
@@ -415,7 +414,7 @@ class BffAuthCallbackControllerTest extends IntTestCase
 
         $response = $client->request(
             'POST',
-            getenv('TKDO_BASE_URI') . self::CALLBACK_PATH,
+            self::apiBaseUri() . self::CALLBACK_PATH,
             [
                 'json' => ['code' => $code, 'se_souvenir' => false],
                 'http_errors' => false,
@@ -450,7 +449,7 @@ class BffAuthCallbackControllerTest extends IntTestCase
 
         $response = $client->request(
             'POST',
-            getenv('TKDO_BASE_URI') . self::CALLBACK_PATH,
+            self::apiBaseUri() . self::CALLBACK_PATH,
             [
                 'json' => ['code' => $code, 'se_souvenir' => $truthyValue],
                 'http_errors' => false,

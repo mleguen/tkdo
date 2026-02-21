@@ -8,17 +8,11 @@ class OAuthAuthorizeControllerTest extends IntTestCase
 {
     private const AUTHORIZE_PATH = '/oauth/authorize';
 
-    private static function validRedirectUri(): string
-    {
-        return (string) (getenv('OAUTH2_REDIRECT_URI')
-            ?: ((getenv('TKDO_BASE_URI') ?: 'http://localhost:4200') . '/auth/callback'));
-    }
-
     #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
     public function testGetRedirectsToLoginPage(bool $curl): void
     {
         // GET /oauth/authorize with valid params should redirect to /connexion
-        $baseUri = getenv('TKDO_BASE_URI');
+        $baseUri = self::apiBaseUri();
         $params = http_build_query([
             'response_type' => 'code',
             'client_id' => 'tkdo',
@@ -88,7 +82,7 @@ class OAuthAuthorizeControllerTest extends IntTestCase
     {
         $utilisateur = $this->utilisateur()->withIdentifiant('utilisateur')->persist(self::$em);
 
-        $baseUri = getenv('TKDO_BASE_URI');
+        $baseUri = self::apiBaseUri();
 
         $client = new \GuzzleHttp\Client(['allow_redirects' => false]);
         $response = $client->request(
@@ -126,7 +120,7 @@ class OAuthAuthorizeControllerTest extends IntTestCase
     {
         $utilisateur = $this->utilisateur()->withIdentifiant('utilisateur')->persist(self::$em);
 
-        $baseUri = getenv('TKDO_BASE_URI');
+        $baseUri = self::apiBaseUri();
 
         $client = new \GuzzleHttp\Client(['allow_redirects' => false]);
         $response = $client->request(
@@ -233,7 +227,7 @@ class OAuthAuthorizeControllerTest extends IntTestCase
             ->withEmail('emailuser@test.com')
             ->persist(self::$em);
 
-        $baseUri = getenv('TKDO_BASE_URI');
+        $baseUri = self::apiBaseUri();
         $client = new \GuzzleHttp\Client(['allow_redirects' => false]);
         $response = $client->request(
             'POST',
@@ -267,7 +261,7 @@ class OAuthAuthorizeControllerTest extends IntTestCase
     {
         $utilisateur = $this->utilisateur()->withIdentifiant('testmsg')->persist(self::$em);
 
-        $baseUri = getenv('TKDO_BASE_URI');
+        $baseUri = self::apiBaseUri();
         $client = new \GuzzleHttp\Client(['allow_redirects' => false]);
         $response = $client->request(
             'POST',
@@ -296,7 +290,7 @@ class OAuthAuthorizeControllerTest extends IntTestCase
 
     public function testPostUnknownUserReturnsStandardizedErrorMessage(): void
     {
-        $baseUri = getenv('TKDO_BASE_URI');
+        $baseUri = self::apiBaseUri();
         $client = new \GuzzleHttp\Client(['allow_redirects' => false]);
         $response = $client->request(
             'POST',
@@ -328,7 +322,7 @@ class OAuthAuthorizeControllerTest extends IntTestCase
         $utilisateur = $this->utilisateur()->withIdentifiant('failcount')->persist(self::$em);
         $this->assertEquals(0, $utilisateur->getTentativesEchouees());
 
-        $baseUri = getenv('TKDO_BASE_URI');
+        $baseUri = self::apiBaseUri();
         $client = new \GuzzleHttp\Client(['allow_redirects' => false]);
 
         // First failed attempt
@@ -382,7 +376,7 @@ class OAuthAuthorizeControllerTest extends IntTestCase
             ->withEmail($sharedEmail)
             ->persist(self::$em);
 
-        $baseUri = getenv('TKDO_BASE_URI');
+        $baseUri = self::apiBaseUri();
         $client = new \GuzzleHttp\Client(['allow_redirects' => false]);
         $response = $client->request(
             'POST',
@@ -424,7 +418,7 @@ class OAuthAuthorizeControllerTest extends IntTestCase
         $existingUser = $this->utilisateur()->withIdentifiant('existinguser')->persist(self::$em);
         $this->assertEquals(0, $existingUser->getTentativesEchouees());
 
-        $baseUri = getenv('TKDO_BASE_URI');
+        $baseUri = self::apiBaseUri();
         $client = new \GuzzleHttp\Client(['allow_redirects' => false]);
         $response = $client->request('POST', $baseUri . self::AUTHORIZE_PATH, [
             'form_params' => [
@@ -456,7 +450,7 @@ class OAuthAuthorizeControllerTest extends IntTestCase
     {
         $utilisateur = $this->utilisateur()->withIdentifiant('resetcount')->persist(self::$em);
 
-        $baseUri = getenv('TKDO_BASE_URI');
+        $baseUri = self::apiBaseUri();
         $client = new \GuzzleHttp\Client(['allow_redirects' => false]);
 
         // First: fail once to increment counter

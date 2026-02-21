@@ -175,6 +175,19 @@ describe('AuthCallbackComponent', () => {
     expect(sessionStorage.getItem(CLE_SE_SOUVENIR)).toBeNull();
   });
 
+  it('should ignore corrupted lastGroupeId and redirect to /occasion', async () => {
+    localStorage.setItem('tkdo_lastGroupeId', 'not-a-number');
+    configure({ code: 'test-code', state: 'test-state' });
+    backendSpy.echangeCode.and.returnValue(Promise.resolve());
+
+    const fixture = createComponent();
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    expect(router.navigateByUrl).toHaveBeenCalledWith('/occasion');
+    localStorage.removeItem('tkdo_lastGroupeId');
+  });
+
   it('should show error when code is missing', () => {
     configure({ code: null, state: 'test-state' });
 

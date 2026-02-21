@@ -64,7 +64,7 @@ Login exists and works via the OAuth2 flow implemented in Stories 1.1/1.1b/1.1c.
   - [x] 2.2 Verify same error message for both "user not found" and "wrong password" cases (both caught by `UtilisateurInconnuException`)
 
 - [x] Task 3: Record failed login attempts (AC: #3)
-  - [x] 3.1 Create Doctrine migration `Version20260215130000`: add `tentatives_echouees INT NOT NULL DEFAULT 0` and `verrouille_jusqua DATETIME NULL` columns to `tkdo_utilisateur`
+  - [x] 3.1 Create Doctrine migration `Version20260215140000`: add `tentatives_echouees INT NOT NULL DEFAULT 0` and `verrouille_jusqua DATETIME NULL` columns to `tkdo_utilisateur`
   - [x] 3.2 Add properties to `Utilisateur` interface: `getTentativesEchouees(): int`, `getVerrouilleJusqua(): ?DateTime`
   - [x] 3.3 Add Doctrine mapping + getters/setters to `UtilisateurAdaptor`: `$tentativesEchouees` (int), `$verrouilleJusqua` (?DateTime)
   - [x] 3.4 Add `incrementeTentativesEchouees()` and `reinitialiserTentativesEchouees()` methods to `Utilisateur` model
@@ -188,6 +188,10 @@ Login exists and works via the OAuth2 flow implemented in Stories 1.1/1.1b/1.1c.
 
 - [x] [AI-Review][LOW] Remove unused `email` fields from `front/cypress/fixtures/utilisateurs.json` — `soi.email`, `quiRecoitDeSoi.email`, and `tiers.email` are dead code since the email login test now constructs the address dynamically via `` `${utilisateurs.soi.identifiant}@${Cypress.env('emailDomain')}` `` and no other Cypress file reads these fields [front/cypress/fixtures/utilisateurs.json, front/cypress/e2e/connexion.cy.ts:123] [PR#103 comment](https://github.com/mleguen/tkdo/pull/103#discussion_r2835556350)
 
+- [x] [AI-Review][LOW] Validate `tkdo_lastGroupeId` before use in post-login redirect: add `/^\d+$/.test(lastGroupeId)` guard so garbage/corrupted localStorage values don't route the user to an invalid path after login — defensive coding that prevents a usability issue (unexpected 404 within SPA) [front/src/app/auth-callback/auth-callback.component.ts:58-60] [PR#103 comment](https://github.com/mleguen/tkdo/pull/103#discussion_r2835671193)
+
+- [x] [AI-Review][MEDIUM] Remove `OAUTH2_REDIRECT_URI` — was deliberately removed in story 1.1c; story 1.2 reintroduced it incorrectly when strengthening redirect_uri validation; root cause is `TKDO_BASE_URI: http://slim-web` (internal Docker hostname) not matching `http://localhost:8080/auth/callback` (what the browser sends via `document.baseURI`); correct fix: (1) remove `getenv('OAUTH2_REDIRECT_URI') ?:` from `OAuth2Settings.php`, keep `$baseUri . '/auth/callback'`; (2) in `docker-compose.yml`: remove both `OAUTH2_REDIRECT_URI` lines, change `TKDO_BASE_URI: http://slim-web` → `TKDO_BASE_URI: http://front` (the Docker frontend URL matching Cypress baseUrl), add `OAUTH2_ISSUER_BASE_URI: http://slim-web` for back-channel calls; (3) add `TKDO_API_BASE_URI: http://slim-web` to `php-cli` for integration test API connectivity; (4) update integration tests to use `apiBaseUri()` and `validRedirectUri()` helpers instead of reading `OAUTH2_REDIRECT_URI` [api/src/Appli/Settings/OAuth2Settings.php:23, docker-compose.yml:89+113, api/test/Int/] [PR#103 comment](https://github.com/mleguen/tkdo/pull/103#discussion_r2835671199)
+
 ## Dev Notes
 
 ### Architecture Overview
@@ -299,7 +303,7 @@ try {
 ### Project Structure Notes
 
 **Files to create:**
-- `api/src/Infra/Migrations/Version20260215130000.php` — Migration for failed attempt columns
+- `api/src/Infra/Migrations/Version20260215140000.php` — Migration for failed attempt columns
 
 **Files to modify:**
 - `api/src/Dom/Model/Utilisateur.php` — Add `getTentativesEchouees()`, `getVerrouilleJusqua()` to interface
@@ -418,6 +422,18 @@ Claude Opus 4.6 (claude-opus-4-6)
 
 ### Completion Notes List
 
+- **2026-02-21 - Third CI and PR Comments Review (Evidence-Based Investigation):**
+  - CI Status: 0 failing checks (all passing)
+  - PR Comments: Reviewed 3 unresolved GitHub PR comments from copilot-pull-request-reviewer
+  - Investigation: Read 4 files (auth-callback.component.ts, OAuthAuthorizeController.php, OAuth2Settings.php, docs/environment-variables.md) + git history for OAuth2Settings.php + 1.1c story
+  - Validated: 2 valid, 1 invalid
+  - Comment #2835671193 (lastGroupeId validation): VALID/LOW — added standalone action item
+  - Comment #2835671199 (stale comment): VALID but misdiagnosed initially → upon owner consultation, real fix is to remove OAUTH2_REDIRECT_URI entirely (deliberately removed in 1.1c, reintroduced incorrectly in 1.2); action item updated to MEDIUM
+  - Comment #2835671202 (document OAUTH2_REDIRECT_URI): INVALID — variable should not exist; responded OUT OF SCOPE with explanation
+  - Updated Review Follow-ups section: 2 new action items (1 LOW: lastGroupeId validation, 1 MEDIUM: remove OAUTH2_REDIRECT_URI)
+  - Story status: review → in-progress (2 new action items found)
+  - Responded to all 3 PR comments in PR #103 with investigation evidence
+
 - **2026-02-21 - Second CI and PR Comments Review (Evidence-Based Investigation):**
   - CI Status: 0 failing checks (all passing: Backend Unit, Backend Integration, Frontend Unit, Frontend Component ×4, E2E chrome, E2E firefox)
   - PR Comments: Reviewed 2 unresolved GitHub PR comments
@@ -438,8 +454,8 @@ Claude Opus 4.6 (claude-opus-4-6)
   - Story status: done → in-progress (4 new action items found)
   - Responded to all 4 PR comments in PR #103 with investigation evidence
 
-- All 7 tasks + 20 review follow-ups completed successfully with full test coverage
-- Test results: 334 backend (177 unit + 157 integration), 66 frontend unit, 230 Cypress component, 15 Cypress E2E — all passing
+- All 7 tasks + 22 review follow-ups completed successfully with full test coverage
+- Test results: 336 backend (177 unit + 159 integration), 68 frontend unit, 230 Cypress component, 15 Cypress E2E — all passing
 - ✅ Resolved review finding [HIGH]: Graceful degradation for shared emails — `readOneByIdentifiantOuEmail()` now prioritizes username match, catches `NonUniqueResultException` on email lookup, and throws `UtilisateurInconnuException` instead of 500 error
 - ✅ Resolved review finding [LOW]: Documented timing side-channel and login-by-email shared email limitation in project-context.md "Known Technical Debt" section
 - ✅ Resolved review finding [MEDIUM]: Updated `PostAuthCallbackDTO` to accurately type the full server response (`email`, `genre`, `groupe_ids`, `groupe_admin_ids`). Eliminating the redundant GET was considered but deferred — the callback response lacks `identifiant` and `prefNotifIdees` fields required by `UtilisateurPrive`, so the GET remains necessary for profile views.
@@ -464,6 +480,8 @@ Claude Opus 4.6 (claude-opus-4-6)
 - ✅ Resolved review finding [LOW]: Added `alertDanger()` and `seSouvenir()` methods to `ConnexionPage` PO and replaced direct `cy.get()` calls in E2E tests — E2E tests now fully follow the Page Object pattern
 - ✅ Resolved review finding [MEDIUM]: Strengthened `validateOAuthParams()` — replaced path-only `redirect_uri` validation with exact-match against `$this->oAuth2Settings->redirectUri`. Added `OAUTH2_REDIRECT_URI` env var support to `OAuth2Settings` for Docker dev environment (where browser URL differs from backend internal URL). Added integration test for same-path-different-host rejection. Updated all test files to use dynamic redirect_uri from env.
 - ✅ Resolved review finding [LOW]: Removed unused `email` fields from `utilisateurs.json` — dead code since email login test constructs addresses dynamically via `Cypress.env('emailDomain')`.
+- ✅ Resolved review finding [LOW]: Added `/^\d+$/.test(lastGroupeId)` guard to `AuthCallbackComponent` — garbage/corrupted `tkdo_lastGroupeId` localStorage values no longer route user to invalid paths after login. Added unit test verifying non-numeric values fall through to `/occasion` default.
+- ✅ Resolved review finding [MEDIUM]: Removed `OAUTH2_REDIRECT_URI` from `OAuth2Settings.php` and `docker-compose.yml` — redirect_uri now derived solely from `TKDO_BASE_URI + /auth/callback`. Changed `TKDO_BASE_URI` from `http://slim-web` to `http://front` (the Docker frontend proxy, matching Cypress E2E `baseUrl`). Added `OAUTH2_ISSUER_BASE_URI=http://slim-web` for back-channel calls, `TKDO_API_BASE_URI=http://slim-web` for integration test connectivity. Added `apiBaseUri()` and `validRedirectUri()` helpers to `IntTestCase`, refactored all OAuth integration tests to use them.
 - **Lesson learned**: After adding new Doctrine-mapped properties, always run `./doctrine orm:clear-cache:metadata` and `./doctrine orm:generate-proxies` to refresh the metadata cache. Container restarts are unnecessary.
 - **MySQL command pattern**: The proper way to run MySQL queries against the dev database is: `docker compose exec mysql mysql -u tkdo -pmdptkdo tkdo -e "SQL_QUERY_HERE"`
 
@@ -474,7 +492,7 @@ Claude Opus 4.6 (claude-opus-4-6)
 - **Failed login attempt recording**: New `tentatives_echouees` counter on `tkdo_utilisateur` table, incremented on failure, reset on success (preparation for Story 1.4 rate limiting)
 - **"Se souvenir de moi" checkbox**: New checkbox on login form, stored via sessionStorage bridge, extends JWT/cookie validity to 7 days (604800s) vs default 1 hour (3600s)
 - **Post-login redirect**: Redirect priority updated to `oauth_retour` > `tkdo_lastGroupeId` > `/occasion`
-- **Database migration**: `Version20260215130000` adds `tentatives_echouees` and `verrouille_jusqua` columns
+- **Database migration**: `Version20260215140000` adds `tentatives_echouees` and `verrouille_jusqua` columns
 - **Shared email graceful degradation (review follow-up)**: `readOneByIdentifiantOuEmail()` refactored to prioritize username match, then email match with `NonUniqueResultException` handling — users with shared emails see standard error message instead of 500 error
 - **Known Technical Debt documented (review follow-up)**: Added timing side-channel and shared email login limitations to `project-context.md`
 - **PostAuthCallbackDTO fixed (review follow-up)**: Updated DTO typing to include `email`, `genre`, `groupe_ids`, `groupe_admin_ids` matching actual server response; updated test fixtures
@@ -500,6 +518,8 @@ Claude Opus 4.6 (claude-opus-4-6)
 - **Unused fixture email fields removed (review follow-up)**: Removed dead `email` fields from `utilisateurs.json` — email login test constructs addresses dynamically
 - **Test redirect_uri made dynamic (review follow-up)**: All integration test files now read `OAUTH2_REDIRECT_URI` env var (with fallback to `TKDO_BASE_URI + /auth/callback`) instead of hardcoding `http://localhost:4200/auth/callback`
 - 2026-02-21 - PR Comments Resolved: Posted "Fixed" replies to 2 PR comment threads (1 AI-authored resolved, 1 human-authored left for reviewer), PR: #103, comment_ids: 2835562213, 2835556350
+- **lastGroupeId validation (review follow-up)**: Added `/^\d+$/.test(lastGroupeId)` guard to post-login redirect — corrupted/non-numeric localStorage values now fall through to `/occasion` default instead of routing to invalid paths
+- **OAUTH2_REDIRECT_URI removed (review follow-up)**: Removed `OAUTH2_REDIRECT_URI` from `OAuth2Settings.php` and `docker-compose.yml`; redirect_uri now derived from `TKDO_BASE_URI` only. Changed `TKDO_BASE_URI` from `http://slim-web` to `http://front` (Docker frontend proxy URL). Added `OAUTH2_ISSUER_BASE_URI=http://slim-web` for back-channel OAuth2 calls, `TKDO_API_BASE_URI=http://slim-web` for integration test API connectivity. Added `apiBaseUri()` and `validRedirectUri()` helpers to `IntTestCase`, refactored all OAuth test files. Updated Cypress `emailDomain` default from `slim-web` to `front`.
 - **Test suite name fix (user)**: Mael corrected `--testsuite=Integration` references to `--testsuite=Int` across story files (1-1c, 1-2, 2-1) — the PHPUnit config uses `Int` as the integration test suite name, and the incorrect `Integration` name silently ran zero tests
 - **E2E email domain fix (review follow-up)**: Made email domain configurable via `CYPRESS_EMAIL_DOMAIN` env var in `cypress.config.ts`; E2E test constructs email dynamically instead of using hardcoded fixture value; CI workflow sets `CYPRESS_EMAIL_DOMAIN: localhost`
 - **Accessibility fix (review follow-up)**: Added `aria-describedby="identifiantHelp"` to identifiant input and `id="identifiantHelp"` to hint text for WCAG 2.1 SC 1.3.1 compliance
@@ -520,7 +540,7 @@ Claude Opus 4.6 (claude-opus-4-6)
 ### File List
 
 **Created:**
-- `api/src/Infra/Migrations/Version20260215130000.php` — Migration for failed attempt columns
+- `api/src/Infra/Migrations/Version20260215140000.php` — Migration for failed attempt columns
 - `api/test/Unit/Appli/Service/AuthServiceTest.php` — Unit tests for AuthService encode/validity
 
 **Modified (Backend):**
@@ -532,28 +552,31 @@ Claude Opus 4.6 (claude-opus-4-6)
 - `api/src/Appli/Controller/BffAuthCallbackController.php` — Read `se_souvenir`, adjust JWT/cookie validity
 - `api/src/Appli/Service/AuthService.php` — Added `validiteOverride` param to `encode()`, added `getValiditeSeSouvenir()`
 - `api/src/Appli/Settings/AuthSettings.php` — Added `validiteSeSouvenir` property (604800s)
-- `api/src/Appli/Settings/OAuth2Settings.php` — Added `OAUTH2_REDIRECT_URI` env var support for redirect_uri configuration
-- `api/test/Int/OAuthAuthorizeControllerTest.php` — 7 tests (email login + DB assertion, error messages, attempt counter, shared email, non-existent user)
-- `api/test/Int/AuthCookieIntTest.php` — Updated redirect_uri to use dynamic `OAUTH2_REDIRECT_URI` env var
-- `api/test/Int/BffAuthCallbackControllerTest.php` — 5 tests (remember-me cookie duration, truthy non-boolean se_souvenir), updated redirect_uri to dynamic env var
-- `api/test/Int/OAuthTokenControllerTest.php` — Updated redirect_uri to use dynamic `OAUTH2_REDIRECT_URI` env var
+- `api/src/Appli/Settings/OAuth2Settings.php` — Removed `OAUTH2_REDIRECT_URI` env var; redirect_uri now derived from `TKDO_BASE_URI` only
+- `api/test/Int/IntTestCase.php` — Added `apiBaseUri()` and `validRedirectUri()` helpers for test API connectivity and redirect_uri computation
+- `api/test/Int/OAuthAuthorizeControllerTest.php` — 7 tests (email login + DB assertion, error messages, attempt counter, shared email, non-existent user); refactored to use `apiBaseUri()`/`validRedirectUri()` helpers
+- `api/test/Int/AuthCookieIntTest.php` — Refactored to use `apiBaseUri()` and `validRedirectUri()` helpers
+- `api/test/Int/BffAuthCallbackControllerTest.php` — 5 tests (remember-me cookie duration, truthy non-boolean se_souvenir); refactored to use `apiBaseUri()`/`validRedirectUri()` helpers
+- `api/test/Int/OAuthTokenControllerTest.php` — Refactored to use `apiBaseUri()` and `validRedirectUri()` helpers
+- `api/test/Int/ErrorHandlingIntTest.php` — Refactored to use `apiBaseUri()` helper
 
 **Modified (Frontend):**
 - `front/src/app/connexion/connexion.component.ts` — Added `seSouvenir` form control, sessionStorage bridge
 - `front/src/app/connexion/connexion.component.html` — Added "Se souvenir de moi" checkbox, updated label to "Identifiant ou email :", added shared-email hint
-- `front/src/app/auth-callback/auth-callback.component.ts` — Read `se_souvenir`, redirect priority logic
+- `front/src/app/auth-callback/auth-callback.component.ts` — Read `se_souvenir`, redirect priority logic, `lastGroupeId` validation guard
+- `front/src/app/auth-callback/auth-callback.component.spec.ts` — Added test for corrupted `lastGroupeId` values
 - `front/src/app/backend.service.ts` — Updated `echangeCode()` with `seSouvenir` param and `CLE_SE_SOUVENIR` constant
 - `front/src/app/connexion/connexion.component.cy.ts` — 5 new component tests (checkbox behavior), updated label assertion
 - `front/src/app/auth-callback/auth-callback.component.spec.ts` — 4 new/updated tests (se_souvenir, redirect priority)
 - `front/src/app/backend.service.spec.ts` — 1 new + 1 updated test (se_souvenir in request body)
-- `front/cypress.config.ts` — Added `emailDomain` env configuration for CI-compatible email login tests
+- `front/cypress.config.ts` — Added `emailDomain` env configuration for CI-compatible email login tests; updated default from `slim-web` to `front`
 - `front/cypress/e2e/connexion.cy.ts` — 3 new E2E tests (email login, error message, remember me), fixed conditional expiry guard
 - `front/cypress/fixtures/utilisateurs.json` — Added `email` fields to all user fixtures
 - `front/cypress/po/connexion.po.ts` — Added `alertDanger()` and `seSouvenir()` PO methods
 
 **Modified (CI/Docker):**
 - `.github/workflows/e2e.yml` — Added `CYPRESS_EMAIL_DOMAIN: localhost` to E2E test step
-- `docker-compose.yml` — Added `OAUTH2_REDIRECT_URI: http://front/auth/callback` to `slim-fpm` and `php-cli` for exact redirect_uri matching in Docker dev
+- `docker-compose.yml` — Removed `OAUTH2_REDIRECT_URI`; changed `TKDO_BASE_URI` from `http://slim-web` to `http://front`; added `OAUTH2_ISSUER_BASE_URI: http://slim-web` and `TKDO_API_BASE_URI: http://slim-web` to `php-cli`
 
 **Modified (Docs/Dependencies):**
 - `docs/frontend-dev.md` — Added "npm Overrides (Technical Debt)" section documenting chokidar and qs overrides

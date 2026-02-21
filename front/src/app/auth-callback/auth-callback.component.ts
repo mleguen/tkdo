@@ -56,7 +56,7 @@ export class AuthCallbackComponent implements OnInit {
         }
 
         const lastGroupeId = localStorage.getItem('tkdo_lastGroupeId');
-        if (lastGroupeId) {
+        if (lastGroupeId && /^\d+$/.test(lastGroupeId)) {
           this.router.navigateByUrl(`/groupe/${lastGroupeId}`);
           return;
         }
