@@ -9,9 +9,10 @@ use App\Dom\Model\Groupe;
 use App\Dom\Port\GroupePort;
 use App\Dom\Repository\GroupeRepository;
 use Prophecy\PhpUnit\ProphecyTrait;
+use PHPUnit\Framework\TestCase;
 use Prophecy\Prophecy\ObjectProphecy;
 
-class GroupePortTest extends UnitTestCase
+class GroupePortTest extends TestCase
 {
     use ProphecyTrait;
 

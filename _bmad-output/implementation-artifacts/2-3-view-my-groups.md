@@ -1,6 +1,6 @@
 # Story 2.3: View My Groups
 
-Status: review
+Status: done
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -105,6 +105,9 @@ So that I understand my context and can navigate between groups.
 - [x] [AI-Review][MEDIUM] Document or resolve groupes$ error-handling asymmetry vs occasions$ [front/src/app/backend.service.ts:156-163] — Non-401/403 errors (500, 503, network) in `groupes$` are silently swallowed returning `{ actifs: [], archives: [] }`, while `occasions$` re-throws them via `throwError()`. Users see "Aucun groupe" with no indication of failure. Either align behavior or add a comment explaining the intentional "graceful degradation" design decision so future maintainers don't accidentally "fix" it.
 - [x] [AI-Review][LOW] Fix RxJS import path inconsistency in backend.service.spec.ts [front/src/app/backend.service.spec.ts:7] — `import { filter, take, toArray } from 'rxjs'` imports operators from the root entry point, while the project convention (`backend.service.ts:11-18`) uses `'rxjs/operators'` for operators. Change to `import { filter, take, toArray } from 'rxjs/operators'`.
 - [x] [AI-Review][LOW] Add `configure(null)` test for "Ma liste always accessible when groupes$ is null" [front/src/app/header/header.component.spec.ts] — The existing test uses `configure({ actifs: [], archives: [] })` (empty but loaded) but not `configure(null)` (not-yet-loaded / 401 race). The "Ma liste" link is outside the `@if (groupes$ | async)` block and should render even when `groupes` is null. Add a test to lock this behavior in and prevent future refactoring from accidentally wrapping "Ma liste" inside the `@if` block.
+- [x] [AI-Review][LOW] Fix orphaned dropdown-divider when groupes$ is null [front/src/app/header/header.component.html:62-64] — When `groupes$` has not yet emitted (null state), the "Ma liste" divider renders without any group content above it. Wrap the divider in `@if (groupes$ | async)` to only show it when groups have loaded.
+- [x] [AI-Review][LOW] GroupePortTest extends UnitTestCase but doesn't use its data provider [api/test/Unit/Dom/Port/GroupePortTest.php:15] — `UnitTestCase` only provides `provideDataTestAdmin()` which `GroupePortTest` doesn't use. Change to extend `PHPUnit\Framework\TestCase` directly for clarity and consistency with what the test actually needs.
+- [x] [AI-Review][LOW] header.component.spec.ts only tests groups dropdown — add smoke tests for pre-existing header behavior [front/src/app/header/header.component.spec.ts] — All 9 tests focus exclusively on the "Mes groupes" dropdown. Add smoke tests for occasions dropdown, profile link, and admin link to ensure the test file provides basic coverage of the full header component.
 
 ## Dev Notes
 
@@ -775,6 +778,9 @@ None — clean implementation with no blocking issues.
 - ✅ Resolved review finding [MEDIUM]: Documented intentional graceful degradation design in `groupes$` catchError — comment explains why non-auth errors return empty groups (supplementary navigation context) unlike `occasions$` which re-throws (core content).
 - ✅ Resolved review finding [LOW]: Fixed RxJS import path from `'rxjs'` to `'rxjs/operators'` in `backend.service.spec.ts` — matching project convention used in `backend.service.ts`.
 - ✅ Resolved review finding [LOW]: Added `configure(null)` test in header spec — verifies "Ma liste" link renders even when `groupes$` is null (not-yet-loaded / 401 race), preventing future refactoring from wrapping it inside the `@if` block.
+- ✅ Resolved review finding [LOW]: Fixed orphaned dropdown-divider when `groupes$` is null — wrapped the "Ma liste" divider in `@if (groupes$ | async)` so it only renders when groups have loaded. Updated null-groupes test to assert `dividers.length === 0`.
+- ✅ Resolved review finding [LOW]: Changed `GroupePortTest` to extend `PHPUnit\Framework\TestCase` directly instead of `UnitTestCase` — test doesn't use `provideDataTestAdmin()` data provider.
+- ✅ Resolved review finding [LOW]: Added 3 smoke tests to `header.component.spec.ts` for pre-existing header behavior — occasions dropdown, profile link, and admin link. Updated `configure()` helper to accept optional `occasions` parameter. 79 frontend tests pass (3 new).
 
 ### Implementation Plan
 
@@ -829,3 +835,4 @@ None — clean implementation with no blocking issues.
 - 2026-02-21: Addressed eighth code review findings — 3 items resolved. Chained groupes$ from idUtilisateurConnecte$ with 401/403 handling, position-based admin flag assertions in repository test, tooltip assertion in header spec. 337 backend tests pass, 75 frontend tests pass (1 new). PHPStan level 8 clean.
 - 2026-02-21: Ninth code review complete. 0 HIGH, 3 MEDIUM, 2 LOW issues. All require code/test changes — created 5 action items. Key findings: missing #[\Override] on setUp() in both new test files (M1), weak 401 localStorage assertion (M2), groupes$ silently swallows non-auth errors unlike occasions$ (M3). Story status set to in-progress.
 - 2026-02-21: Addressed ninth code review findings — 5 items resolved. Added #[\Override] to setUp() in both test files, strengthened 401 localStorage test, documented graceful degradation design decision, fixed RxJS import path, added configure(null) test. 337 backend tests pass, 76 frontend tests pass (1 new). PHPStan level 8 clean.
+- 2026-02-21: Tenth code review complete. 0 HIGH, 0 MEDIUM, 3 LOW issues — all fixed automatically. Fixed orphaned divider when groupes$ is null, changed GroupePortTest base class to TestCase, added 3 smoke tests for pre-existing header behavior. 183 backend unit tests pass, 79 frontend tests pass (3 new). PHPStan level 8 clean. Story status set to done.

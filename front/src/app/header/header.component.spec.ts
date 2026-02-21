@@ -12,6 +12,7 @@ import {
   BackendService,
   Genre,
   GroupeResponse,
+  Occasion,
   UtilisateurPrive,
 } from '../backend.service';
 
@@ -31,10 +32,11 @@ describe('HeaderComponent', () => {
   function configure(
     groupes: GroupeResponse | null,
     utilisateur: UtilisateurPrive | null = mockUtilisateur,
+    occasions: Occasion[] = [],
   ) {
     const backendStub = {
       groupes$: of(groupes),
-      occasions$: of([]),
+      occasions$: of(occasions),
       utilisateurConnecte$: of(utilisateur),
     };
 
@@ -188,6 +190,12 @@ describe('HeaderComponent', () => {
       (el as Element).textContent?.trim(),
     );
     expect(texts).toContain('Ma liste');
+
+    // No orphaned divider when groups haven't loaded yet
+    const dividers = fixture.nativeElement.querySelectorAll(
+      '#menuMesGroupes + div .dropdown-divider',
+    );
+    expect(dividers.length).toBe(0);
   });
 
   it('should render group items as disabled spans (no navigation until Story 2.4)', () => {
@@ -204,5 +212,50 @@ describe('HeaderComponent', () => {
     expect(spans[0].getAttribute('title')).toBe(
       'Bientôt disponible (Story 2.4)',
     );
+  });
+
+  it('should render occasions dropdown when occasions exist', () => {
+    const occasions: Occasion[] = [
+      {
+        id: 1,
+        date: '2024-12-25',
+        titre: 'Noël 2024',
+        participants: [],
+        resultats: [],
+      },
+    ];
+    configure({ actifs: [], archives: [] }, mockUtilisateur, occasions);
+
+    const toggle = fixture.nativeElement.querySelector('#menuMesOccasions');
+    expect(toggle).toBeTruthy();
+    expect(toggle.textContent?.trim()).toBe('Mes occasions');
+
+    const items = fixture.nativeElement.querySelectorAll(
+      '.menuMesOccasionsItem',
+    );
+    expect(items.length).toBe(1);
+    expect(items[0].textContent?.trim()).toBe('Noël 2024');
+  });
+
+  it('should render profile link for logged-in user', () => {
+    configure({ actifs: [], archives: [] });
+
+    const profileLink = fixture.nativeElement.querySelector('#menuMonProfil');
+    expect(profileLink).toBeTruthy();
+    expect(profileLink.textContent?.trim()).toBe('Mon profil');
+
+    const userName = fixture.nativeElement.querySelector('#nomUtilisateur');
+    expect(userName?.textContent?.trim()).toBe('Test User');
+  });
+
+  it('should show admin link for admin users', () => {
+    const adminUser: UtilisateurPrive = { ...mockUtilisateur, admin: true };
+    configure({ actifs: [], archives: [] }, adminUser);
+
+    const navLinks = fixture.nativeElement.querySelectorAll('.nav-link');
+    const texts = Array.from(navLinks).map((el) =>
+      (el as Element).textContent?.trim(),
+    );
+    expect(texts).toContain('Administration');
   });
 });
