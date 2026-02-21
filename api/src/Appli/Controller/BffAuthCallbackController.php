@@ -73,7 +73,7 @@ class BffAuthCallbackController
             // Warn if user belongs to many groups — JWT cookie may exceed browser 4KB limit
             $groupCount = count($groupeIds);
             if ($groupCount > 50) {
-                $this->logger->warning("Utilisateur {$utilisateur->getId()} appartient à {$groupCount} groupes — risque de dépassement de la taille JWT cookie (4KB)");
+                $this->logger->warning('BFF: utilisateur appartient à de nombreux groupes — risque de dépassement de la taille JWT cookie (4KB)', ['utilisateur_id' => $utilisateur->getId(), 'group_count' => $groupCount]);
             }
 
             // Determine JWT/cookie validity based on "remember me"
@@ -103,10 +103,10 @@ class BffAuthCallbackController
                 ],
             ], JSON_THROW_ON_ERROR));
         } catch (IdentityProviderException $e) {
-            $this->logger->warning("BFF: échec échange code OAuth2: {$e->getMessage()}");
+            $this->logger->warning('BFF: échec échange code OAuth2', ['error' => $e->getMessage()]);
             throw new HttpUnauthorizedException($request, 'code invalide ou expiré');
         } catch (\RuntimeException $e) {
-            $this->logger->warning("BFF: erreur extraction info utilisateur: {$e->getMessage()}");
+            $this->logger->warning('BFF: erreur extraction info utilisateur', ['error' => $e->getMessage()]);
             throw new HttpUnauthorizedException($request, 'code invalide ou expiré');
         } catch (UtilisateurInconnuException) {
             throw new HttpUnauthorizedException($request, 'code invalide ou expiré');

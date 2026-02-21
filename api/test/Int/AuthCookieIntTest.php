@@ -31,7 +31,7 @@ class AuthCookieIntTest extends IntTestCase
                     'identifiant' => $utilisateur->getIdentifiant(),
                     'mdp' => $utilisateur->getMdpClair(),
                     'client_id' => 'tkdo',
-                    'redirect_uri' => 'http://localhost:4200/auth/callback',
+                    'redirect_uri' => (string) (getenv('OAUTH2_REDIRECT_URI') ?: ((getenv('TKDO_BASE_URI') ?: 'http://localhost:4200') . '/auth/callback')),
                     'response_type' => 'code',
                     'state' => 'test',
                 ],

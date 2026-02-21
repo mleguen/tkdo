@@ -36,9 +36,8 @@ export class AuthCallbackComponent implements OnInit {
     // Read "remember me" preference from sessionStorage bridge
     let seSouvenir = false;
     try {
-      seSouvenir = JSON.parse(
-        sessionStorage.getItem(CLE_SE_SOUVENIR) || 'false',
-      );
+      seSouvenir =
+        JSON.parse(sessionStorage.getItem(CLE_SE_SOUVENIR) || 'false') === true;
     } catch {
       seSouvenir = false;
     } finally {

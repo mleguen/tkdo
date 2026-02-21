@@ -142,12 +142,9 @@ class OAuthAuthorizeController
             throw new HttpBadRequestException($request, "champ 'response_type' manquant ou invalide (doit être 'code')");
         }
 
-        // Validate redirect_uri path (open redirect protection)
-        // TEMPORARY: Path-based validation works across dev environments (localhost, Docker).
-        // Combined with client_secret validation on /oauth/token, this prevents auth code theft.
-        $redirectPath = parse_url((string) $params['redirect_uri'], PHP_URL_PATH);
-        $allowedPath = parse_url($this->oAuth2Settings->redirectUri, PHP_URL_PATH);
-        if ($redirectPath !== $allowedPath) {
+        // Validate redirect_uri (open redirect protection)
+        // TEMPORARY: Exact match against the configured redirect_uri from TKDO_BASE_URI.
+        if ((string) $params['redirect_uri'] !== $this->oAuth2Settings->redirectUri) {
             throw new HttpBadRequestException($request, 'redirect_uri non autorisé');
         }
     }

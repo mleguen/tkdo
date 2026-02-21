@@ -157,6 +157,24 @@ describe('AuthCallbackComponent', () => {
     expect(sessionStorage.getItem(CLE_SE_SOUVENIR)).toBeNull();
   });
 
+  it('should pass false when se_souvenir is truthy non-boolean in sessionStorage (e.g. number 1)', async () => {
+    sessionStorage.setItem(CLE_SE_SOUVENIR, '1');
+    configure({ code: 'test-code', state: 'test-state' });
+    backendSpy.echangeCode.and.returnValue(Promise.resolve());
+
+    const fixture = createComponent();
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    // Number 1 is truthy but not strictly true — should not trigger remember-me
+    expect(backendSpy.echangeCode).toHaveBeenCalledWith(
+      'test-code',
+      'test-state',
+      false,
+    );
+    expect(sessionStorage.getItem(CLE_SE_SOUVENIR)).toBeNull();
+  });
+
   it('should show error when code is missing', () => {
     configure({ code: null, state: 'test-state' });
 

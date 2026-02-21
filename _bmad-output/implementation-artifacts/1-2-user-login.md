@@ -184,6 +184,10 @@ Login exists and works via the OAuth2 flow implemented in Stories 1.1/1.1b/1.1c.
 
 - [x] [AI-Review][LOW] Use structured logging for success logs in `OAuthAuthorizeController` and `BffAuthCallbackController` — both used raw string interpolation with `getNom()` (user-supplied, DB-stored data), inconsistent with the sanitized failure log established in this story; fixed to use structured context arrays: `['utilisateur_id' => ..., 'nom' => ...]` [api/src/Appli/Controller/OAuthAuthorizeController.php:92, api/src/Appli/Controller/BffAuthCallbackController.php:88]
 
+- [x] [AI-Review][MEDIUM] Strengthen `validateOAuthParams()` in `OAuthAuthorizeController` to compare the full `redirect_uri` (not just path) against the configured `oAuth2Settings->redirectUri` — current path-only validation allows an attacker to supply `https://attacker.com/auth/callback` which passes path validation and redirects the auth code to an attacker-controlled domain; the existing code comment ("Combined with client_secret validation on /oauth/token, this prevents auth code theft") is misleading because an attacker can use the BFF as a proxy with its server-side client_secret; fix: replace path-component comparison with exact-match against `$this->oAuth2Settings->redirectUri` [api/src/Appli/Controller/OAuthAuthorizeController.php:145-152] [PR#103 comment](https://github.com/mleguen/tkdo/pull/103#discussion_r2835562213)
+
+- [x] [AI-Review][LOW] Remove unused `email` fields from `front/cypress/fixtures/utilisateurs.json` — `soi.email`, `quiRecoitDeSoi.email`, and `tiers.email` are dead code since the email login test now constructs the address dynamically via `` `${utilisateurs.soi.identifiant}@${Cypress.env('emailDomain')}` `` and no other Cypress file reads these fields [front/cypress/fixtures/utilisateurs.json, front/cypress/e2e/connexion.cy.ts:123] [PR#103 comment](https://github.com/mleguen/tkdo/pull/103#discussion_r2835556350)
+
 ## Dev Notes
 
 ### Architecture Overview
@@ -414,6 +418,16 @@ Claude Opus 4.6 (claude-opus-4-6)
 
 ### Completion Notes List
 
+- **2026-02-21 - Second CI and PR Comments Review (Evidence-Based Investigation):**
+  - CI Status: 0 failing checks (all passing: Backend Unit, Backend Integration, Frontend Unit, Frontend Component ×4, E2E chrome, E2E firefox)
+  - PR Comments: Reviewed 2 unresolved GitHub PR comments
+  - Investigation: Read 5 files (utilisateurs.json, connexion.cy.ts, OAuthAuthorizeController.php, OAuth2Settings.php, grep output for .email usage)
+  - Validated: 2 valid (1 MEDIUM: redirect_uri path-only validation, 1 LOW: unused fixture email fields), 0 invalid
+  - Updated Review Follow-ups section: added 2 new action items
+  - Story status: done → in-progress (2 new action items found)
+  - Sprint status and epic file updated to reflect status change
+  - Responded to both PR comments in PR #103 with investigation evidence
+
 - **2026-02-21 - CI Checks and PR Comments Reviewed (Evidence-Based Investigation):**
   - CI Status: 2 failing E2E checks (chrome + firefox, same root cause) → 1 CRITICAL action item created
   - Root cause: `utilisateurs.json` hardcodes `alice@slim-web` (local Docker host) but CI `TKDO_BASE_URI=http://localhost:8080` generates `alice@localhost`. Test `se connecter avec une adresse email` fails because email doesn't exist in CI DB.
@@ -448,6 +462,8 @@ Claude Opus 4.6 (claude-opus-4-6)
 - ✅ Resolved review finding [LOW]: Added `aria-describedby="identifiantHelp"` to identifiant input and `id="identifiantHelp"` to shared-email hint — screen readers now announce the hint when the field is focused (WCAG 2.1 SC 1.3.1)
 - ✅ Resolved review finding [LOW]: Wrapped `JSON.parse(sessionStorage.getItem(CLE_SE_SOUVENIR))` in try/catch with `false` default and moved `removeItem` to `finally` block — malformed values no longer cause uncaught exceptions; added unit test for malformed input
 - ✅ Resolved review finding [LOW]: Added `alertDanger()` and `seSouvenir()` methods to `ConnexionPage` PO and replaced direct `cy.get()` calls in E2E tests — E2E tests now fully follow the Page Object pattern
+- ✅ Resolved review finding [MEDIUM]: Strengthened `validateOAuthParams()` — replaced path-only `redirect_uri` validation with exact-match against `$this->oAuth2Settings->redirectUri`. Added `OAUTH2_REDIRECT_URI` env var support to `OAuth2Settings` for Docker dev environment (where browser URL differs from backend internal URL). Added integration test for same-path-different-host rejection. Updated all test files to use dynamic redirect_uri from env.
+- ✅ Resolved review finding [LOW]: Removed unused `email` fields from `utilisateurs.json` — dead code since email login test constructs addresses dynamically via `Cypress.env('emailDomain')`.
 - **Lesson learned**: After adding new Doctrine-mapped properties, always run `./doctrine orm:clear-cache:metadata` and `./doctrine orm:generate-proxies` to refresh the metadata cache. Container restarts are unnecessary.
 - **MySQL command pattern**: The proper way to run MySQL queries against the dev database is: `docker compose exec mysql mysql -u tkdo -pmdptkdo tkdo -e "SQL_QUERY_HERE"`
 
@@ -477,12 +493,29 @@ Claude Opus 4.6 (claude-opus-4-6)
 - **reinitialiserTentativesEchouees contract clarification (review follow-up)**: Added TODO comments to `Utilisateur` interface and `UtilisateurAdaptor` noting Story 1.4 should also clear `verrouilleJusqua`
 - **E2E cookie expiry upper bound (review follow-up)**: Added `lessThan(dayInSeconds * 8)` assertion to bracket the expected 7-day remember-me window
 - **Structured success logs (review follow-up)**: Switched `OAuthAuthorizeController` and `BffAuthCallbackController` success/debug logs from raw string interpolation to structured context arrays — `getNom()` no longer interpolated into message string
+- **redirect_uri exact-match validation (review follow-up)**: Replaced path-only `redirect_uri` comparison with exact-match against configured URI; added `OAUTH2_REDIRECT_URI` env var to `OAuth2Settings` for Docker dev environments where the browser-visible URL differs from the backend internal URL; added integration test for same-path-different-host rejection
+- **Unused fixture email fields removed (review follow-up)**: Removed dead `email` fields from `utilisateurs.json` — email login test constructs addresses dynamically
+- **Test redirect_uri made dynamic (review follow-up)**: All integration test files now read `OAUTH2_REDIRECT_URI` env var (with fallback to `TKDO_BASE_URI + /auth/callback`) instead of hardcoding `http://localhost:4200/auth/callback`
+- **redirect_uri exact-match validation (review follow-up)**: Replaced path-only `redirect_uri` comparison with exact-match against configured URI; added `OAUTH2_REDIRECT_URI` env var to `OAuth2Settings` for Docker dev environments where the browser-visible URL differs from the backend internal URL; added integration test for same-path-different-host rejection
+- **Unused fixture email fields removed (review follow-up)**: Removed dead `email` fields from `utilisateurs.json` — email login test constructs addresses dynamically
+- **Test redirect_uri made dynamic (review follow-up)**: All integration test files now read `OAUTH2_REDIRECT_URI` env var (with fallback to `TKDO_BASE_URI + /auth/callback`) instead of hardcoding `http://localhost:4200/auth/callback`
+- 2026-02-21 - PR Comments Resolved: Posted "Fixed" replies to 2 PR comment threads (1 AI-authored resolved, 1 human-authored left for reviewer), PR: #103, comment_ids: 2835562213, 2835556350
 - **Test suite name fix (user)**: Mael corrected `--testsuite=Integration` references to `--testsuite=Int` across story files (1-1c, 1-2, 2-1) — the PHPUnit config uses `Int` as the integration test suite name, and the incorrect `Integration` name silently ran zero tests
 - **E2E email domain fix (review follow-up)**: Made email domain configurable via `CYPRESS_EMAIL_DOMAIN` env var in `cypress.config.ts`; E2E test constructs email dynamically instead of using hardcoded fixture value; CI workflow sets `CYPRESS_EMAIL_DOMAIN: localhost`
 - **Accessibility fix (review follow-up)**: Added `aria-describedby="identifiantHelp"` to identifiant input and `id="identifiantHelp"` to hint text for WCAG 2.1 SC 1.3.1 compliance
 - **SessionStorage resilience (review follow-up)**: Wrapped `CLE_SE_SOUVENIR` parse in try/catch with `finally` cleanup; added unit test for malformed sessionStorage values
 - **Page Object compliance (review follow-up)**: Added `alertDanger()` and `seSouvenir()` to `ConnexionPage` PO; E2E tests now use PO methods exclusively
+- **Structured exception logs (review follow-up)**: Converted `BffAuthCallbackController` string-interpolated warning messages to structured context arrays — all log messages now use consistent `$this->logger->warning('...', ['key' => $value])` pattern
+- **autocomplete attributes (review follow-up)**: Added `autocomplete="username"` and `autocomplete="current-password"` to login form inputs for correct browser autofill behavior
+- **Boolean cast for se_souvenir (review follow-up)**: `auth-callback.component.ts` now uses `=== true` explicit cast on `JSON.parse()` result; added unit test asserting number `1` does not trigger remember-me
+- **File List completeness (review follow-up)**: Documented `docs/frontend-dev.md`, `front/package.json`, `front/package-lock.json` in story File List
 - 2026-02-21 - PR Comments Resolved: Posted "Fixed" replies to 3 PR comment threads (2 AI-authored resolved, 1 human-authored left for reviewer), PR: #103, comment_ids: 2834645303, 2834645262, 2835254906
+- **2026-02-21 - Second Code Review (Claude Sonnet 4.6):**
+  - 0 CRITICAL, 0 HIGH, 2 MEDIUM, 4 LOW issues found and auto-fixed
+  - Fixed M1+M2: Added `docs/frontend-dev.md`, `front/package.json`, `front/package-lock.json` to story File List (files were in git diff but missing from documentation)
+  - Fixed L1+L2: `BffAuthCallbackController` — converted all remaining string-interpolated log messages to structured context arrays (exception catch logs at lines 106,109 and group count warning at line 76)
+  - Fixed L3: `connexion.component.html` — added `autocomplete="username"` to identifiant input and `autocomplete="current-password"` to mdp input for correct browser autofill
+  - Fixed L4: `auth-callback.component.ts` — cast `JSON.parse()` result with `=== true` for explicit boolean type safety; added unit test for valid-but-non-boolean JSON (e.g. number `1` must not trigger remember-me)
 
 ### File List
 
@@ -499,8 +532,11 @@ Claude Opus 4.6 (claude-opus-4-6)
 - `api/src/Appli/Controller/BffAuthCallbackController.php` — Read `se_souvenir`, adjust JWT/cookie validity
 - `api/src/Appli/Service/AuthService.php` — Added `validiteOverride` param to `encode()`, added `getValiditeSeSouvenir()`
 - `api/src/Appli/Settings/AuthSettings.php` — Added `validiteSeSouvenir` property (604800s)
+- `api/src/Appli/Settings/OAuth2Settings.php` — Added `OAUTH2_REDIRECT_URI` env var support for redirect_uri configuration
 - `api/test/Int/OAuthAuthorizeControllerTest.php` — 7 tests (email login + DB assertion, error messages, attempt counter, shared email, non-existent user)
-- `api/test/Int/BffAuthCallbackControllerTest.php` — 5 tests (remember-me cookie duration, truthy non-boolean se_souvenir)
+- `api/test/Int/AuthCookieIntTest.php` — Updated redirect_uri to use dynamic `OAUTH2_REDIRECT_URI` env var
+- `api/test/Int/BffAuthCallbackControllerTest.php` — 5 tests (remember-me cookie duration, truthy non-boolean se_souvenir), updated redirect_uri to dynamic env var
+- `api/test/Int/OAuthTokenControllerTest.php` — Updated redirect_uri to use dynamic `OAUTH2_REDIRECT_URI` env var
 
 **Modified (Frontend):**
 - `front/src/app/connexion/connexion.component.ts` — Added `seSouvenir` form control, sessionStorage bridge
@@ -515,8 +551,14 @@ Claude Opus 4.6 (claude-opus-4-6)
 - `front/cypress/fixtures/utilisateurs.json` — Added `email` fields to all user fixtures
 - `front/cypress/po/connexion.po.ts` — Added `alertDanger()` and `seSouvenir()` PO methods
 
-**Modified (CI):**
+**Modified (CI/Docker):**
 - `.github/workflows/e2e.yml` — Added `CYPRESS_EMAIL_DOMAIN: localhost` to E2E test step
+- `docker-compose.yml` — Added `OAUTH2_REDIRECT_URI: http://front/auth/callback` to `slim-fpm` and `php-cli` for exact redirect_uri matching in Docker dev
+
+**Modified (Docs/Dependencies):**
+- `docs/frontend-dev.md` — Added "npm Overrides (Technical Debt)" section documenting chokidar and qs overrides
+- `front/package.json` — Added `@angular-devkit/core > chokidar: ^5.0.0` override to fix readdirp resolution failure
+- `front/package-lock.json` — Updated to reflect package.json override change
 
 **Modified (Meta):**
 - `_bmad-output/implementation-artifacts/1-2-user-login.md` — This story file itself (status, completion notes, file list)

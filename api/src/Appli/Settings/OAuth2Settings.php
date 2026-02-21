@@ -20,7 +20,7 @@ class OAuth2Settings
         $this->clientId = (string) (getenv('OAUTH2_CLIENT_ID') ?: 'tkdo');
         $this->clientSecret = (string) (getenv('OAUTH2_CLIENT_SECRET') ?: 'dev-secret');
         $baseUri = (string) (getenv('TKDO_BASE_URI') ?: 'http://localhost:4200');
-        $this->redirectUri = $baseUri . '/auth/callback';
+        $this->redirectUri = (string) (getenv('OAUTH2_REDIRECT_URI') ?: ($baseUri . '/auth/callback'));
 
         // TEMPORARY: Points to the built-in auth server; will be replaced by external IdP URLs
         $issuerBaseUri = getenv('OAUTH2_ISSUER_BASE_URI')

@@ -7,7 +7,12 @@ namespace Test\Int;
 class OAuthAuthorizeControllerTest extends IntTestCase
 {
     private const AUTHORIZE_PATH = '/oauth/authorize';
-    private const VALID_REDIRECT_URI = 'http://localhost:4200/auth/callback';
+
+    private static function validRedirectUri(): string
+    {
+        return (string) (getenv('OAUTH2_REDIRECT_URI')
+            ?: ((getenv('TKDO_BASE_URI') ?: 'http://localhost:4200') . '/auth/callback'));
+    }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
     public function testGetRedirectsToLoginPage(bool $curl): void
@@ -17,7 +22,7 @@ class OAuthAuthorizeControllerTest extends IntTestCase
         $params = http_build_query([
             'response_type' => 'code',
             'client_id' => 'tkdo',
-            'redirect_uri' => self::VALID_REDIRECT_URI,
+            'redirect_uri' => self::validRedirectUri(),
             'state' => 'test-state-123',
         ]);
 
@@ -42,7 +47,7 @@ class OAuthAuthorizeControllerTest extends IntTestCase
         $this->requestApi(
             $curl,
             'GET',
-            self::AUTHORIZE_PATH . '?response_type=code&redirect_uri=' . urlencode(self::VALID_REDIRECT_URI),
+            self::AUTHORIZE_PATH . '?response_type=code&redirect_uri=' . urlencode(self::validRedirectUri()),
             $statusCode,
             $body
         );
@@ -56,7 +61,7 @@ class OAuthAuthorizeControllerTest extends IntTestCase
         $this->requestApi(
             $curl,
             'GET',
-            self::AUTHORIZE_PATH . '?client_id=tkdo&redirect_uri=' . urlencode(self::VALID_REDIRECT_URI),
+            self::AUTHORIZE_PATH . '?client_id=tkdo&redirect_uri=' . urlencode(self::validRedirectUri()),
             $statusCode,
             $body
         );
@@ -94,7 +99,7 @@ class OAuthAuthorizeControllerTest extends IntTestCase
                     'identifiant' => $utilisateur->getIdentifiant(),
                     'mdp' => $utilisateur->getMdpClair(),
                     'client_id' => 'tkdo',
-                    'redirect_uri' => self::VALID_REDIRECT_URI,
+                    'redirect_uri' => self::validRedirectUri(),
                     'response_type' => 'code',
                     'state' => 'csrf-state-abc',
                 ],
@@ -104,7 +109,7 @@ class OAuthAuthorizeControllerTest extends IntTestCase
 
         $this->assertEquals(302, $response->getStatusCode());
         $location = $response->getHeaderLine('Location');
-        $this->assertStringStartsWith(self::VALID_REDIRECT_URI, $location);
+        $this->assertStringStartsWith(self::validRedirectUri(), $location);
         $this->assertStringContainsString('code=', $location);
         $this->assertStringContainsString('state=csrf-state-abc', $location);
 
@@ -132,7 +137,7 @@ class OAuthAuthorizeControllerTest extends IntTestCase
                     'identifiant' => $utilisateur->getIdentifiant(),
                     'mdp' => 'mauvais' . $utilisateur->getMdpClair(),
                     'client_id' => 'tkdo',
-                    'redirect_uri' => self::VALID_REDIRECT_URI,
+                    'redirect_uri' => self::validRedirectUri(),
                     'response_type' => 'code',
                     'state' => 'test',
                 ],
@@ -174,6 +179,20 @@ class OAuthAuthorizeControllerTest extends IntTestCase
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
+    public function testGetSamePathDifferentHostRedirectUriReturns400(bool $curl): void
+    {
+        $this->requestApi(
+            $curl,
+            'GET',
+            self::AUTHORIZE_PATH . '?response_type=code&client_id=tkdo&redirect_uri=' . urlencode('https://attacker.com/auth/callback'),
+            $statusCode,
+            $body
+        );
+
+        $this->assertEquals(400, $statusCode);
+    }
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCurl')]
     public function testPostMissingFieldsReturns400(bool $curl): void
     {
         $this->requestApi(
@@ -199,7 +218,7 @@ class OAuthAuthorizeControllerTest extends IntTestCase
         $this->requestApi(
             $curl,
             'GET',
-            self::AUTHORIZE_PATH . '?response_type=code&client_id=wrong-client&redirect_uri=' . urlencode(self::VALID_REDIRECT_URI),
+            self::AUTHORIZE_PATH . '?response_type=code&client_id=wrong-client&redirect_uri=' . urlencode(self::validRedirectUri()),
             $statusCode,
             $body
         );
@@ -224,7 +243,7 @@ class OAuthAuthorizeControllerTest extends IntTestCase
                     'identifiant' => 'emailuser@test.com', // email instead of username
                     'mdp' => $utilisateur->getMdpClair(),
                     'client_id' => 'tkdo',
-                    'redirect_uri' => self::VALID_REDIRECT_URI,
+                    'redirect_uri' => self::validRedirectUri(),
                     'response_type' => 'code',
                     'state' => 'test',
                 ],
@@ -234,7 +253,7 @@ class OAuthAuthorizeControllerTest extends IntTestCase
 
         $this->assertEquals(302, $response->getStatusCode());
         $location = $response->getHeaderLine('Location');
-        $this->assertStringStartsWith(self::VALID_REDIRECT_URI, $location);
+        $this->assertStringStartsWith(self::validRedirectUri(), $location);
         $this->assertStringContainsString('code=', $location);
 
         // Verify no DB side effects: tentatives_echouees remains 0 after successful email login
@@ -258,7 +277,7 @@ class OAuthAuthorizeControllerTest extends IntTestCase
                     'identifiant' => $utilisateur->getIdentifiant(),
                     'mdp' => 'wrong-password',
                     'client_id' => 'tkdo',
-                    'redirect_uri' => self::VALID_REDIRECT_URI,
+                    'redirect_uri' => self::validRedirectUri(),
                     'response_type' => 'code',
                     'state' => 'test',
                 ],
@@ -287,7 +306,7 @@ class OAuthAuthorizeControllerTest extends IntTestCase
                     'identifiant' => 'nonexistent-user',
                     'mdp' => 'anypassword',
                     'client_id' => 'tkdo',
-                    'redirect_uri' => self::VALID_REDIRECT_URI,
+                    'redirect_uri' => self::validRedirectUri(),
                     'response_type' => 'code',
                     'state' => 'test',
                 ],
@@ -318,7 +337,7 @@ class OAuthAuthorizeControllerTest extends IntTestCase
                 'identifiant' => $utilisateur->getIdentifiant(),
                 'mdp' => 'wrong-password',
                 'client_id' => 'tkdo',
-                'redirect_uri' => self::VALID_REDIRECT_URI,
+                'redirect_uri' => self::validRedirectUri(),
                 'response_type' => 'code',
                 'state' => 'test',
             ],
@@ -337,7 +356,7 @@ class OAuthAuthorizeControllerTest extends IntTestCase
                 'identifiant' => $utilisateur->getIdentifiant(),
                 'mdp' => 'still-wrong',
                 'client_id' => 'tkdo',
-                'redirect_uri' => self::VALID_REDIRECT_URI,
+                'redirect_uri' => self::validRedirectUri(),
                 'response_type' => 'code',
                 'state' => 'test',
             ],
@@ -373,7 +392,7 @@ class OAuthAuthorizeControllerTest extends IntTestCase
                     'identifiant' => $sharedEmail,
                     'mdp' => 'mdpparent1',
                     'client_id' => 'tkdo',
-                    'redirect_uri' => self::VALID_REDIRECT_URI,
+                    'redirect_uri' => self::validRedirectUri(),
                     'response_type' => 'code',
                     'state' => 'test',
                 ],
@@ -412,7 +431,7 @@ class OAuthAuthorizeControllerTest extends IntTestCase
                 'identifiant' => 'nonexistent-user-xyz',
                 'mdp' => 'anypassword',
                 'client_id' => 'tkdo',
-                'redirect_uri' => self::VALID_REDIRECT_URI,
+                'redirect_uri' => self::validRedirectUri(),
                 'response_type' => 'code',
                 'state' => 'test',
             ],
@@ -446,7 +465,7 @@ class OAuthAuthorizeControllerTest extends IntTestCase
                 'identifiant' => $utilisateur->getIdentifiant(),
                 'mdp' => 'wrong-password',
                 'client_id' => 'tkdo',
-                'redirect_uri' => self::VALID_REDIRECT_URI,
+                'redirect_uri' => self::validRedirectUri(),
                 'response_type' => 'code',
                 'state' => 'test',
             ],
@@ -464,7 +483,7 @@ class OAuthAuthorizeControllerTest extends IntTestCase
                 'identifiant' => $utilisateur->getIdentifiant(),
                 'mdp' => $utilisateur->getMdpClair(),
                 'client_id' => 'tkdo',
-                'redirect_uri' => self::VALID_REDIRECT_URI,
+                'redirect_uri' => self::validRedirectUri(),
                 'response_type' => 'code',
                 'state' => 'test',
             ],

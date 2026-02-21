@@ -1,19 +1,16 @@
 {
   "soi": {
     "identifiant": "alice",
-    "email": "alice@slim-web",
     "mdp": "mdpalice",
     "nom": "Alice"
   },
   "quiRecoitDeSoi": {
     "identifiant": "charlie",
-    "email": "charlie@slim-web",
     "mdp": "mdpcharlie",
     "nom": "Charlie"
   },
   "tiers": {
     "identifiant": "bob",
-    "email": "bob@slim-web",
     "mdp": "mdpbob",
     "nom": "Bob"
   }
