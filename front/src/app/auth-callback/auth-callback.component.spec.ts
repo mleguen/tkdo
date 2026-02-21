@@ -139,6 +139,24 @@ describe('AuthCallbackComponent', () => {
     localStorage.removeItem('tkdo_lastGroupeId');
   });
 
+  it('should default to false when se_souvenir is malformed in sessionStorage', async () => {
+    sessionStorage.setItem(CLE_SE_SOUVENIR, '{malformed');
+    configure({ code: 'test-code', state: 'test-state' });
+    backendSpy.echangeCode.and.returnValue(Promise.resolve());
+
+    const fixture = createComponent();
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    expect(backendSpy.echangeCode).toHaveBeenCalledWith(
+      'test-code',
+      'test-state',
+      false,
+    );
+    // sessionStorage should still be cleaned up via finally block
+    expect(sessionStorage.getItem(CLE_SE_SOUVENIR)).toBeNull();
+  });
+
   it('should show error when code is missing', () => {
     configure({ code: null, state: 'test-state' });
 

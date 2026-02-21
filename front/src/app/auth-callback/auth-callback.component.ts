@@ -34,10 +34,16 @@ export class AuthCallbackComponent implements OnInit {
     }
 
     // Read "remember me" preference from sessionStorage bridge
-    const seSouvenir = JSON.parse(
-      sessionStorage.getItem(CLE_SE_SOUVENIR) || 'false',
-    );
-    sessionStorage.removeItem(CLE_SE_SOUVENIR);
+    let seSouvenir = false;
+    try {
+      seSouvenir = JSON.parse(
+        sessionStorage.getItem(CLE_SE_SOUVENIR) || 'false',
+      );
+    } catch {
+      seSouvenir = false;
+    } finally {
+      sessionStorage.removeItem(CLE_SE_SOUVENIR);
+    }
 
     this.backend
       .echangeCode(code, state, seSouvenir)

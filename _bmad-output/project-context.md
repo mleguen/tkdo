@@ -173,6 +173,13 @@ public function __invoke(Request $request, Response $response): Response
 - Mock with `HttpTestingController` and `jasmine.createSpyObj()`
 - Clean up with `beforeEach()` and `localStorage.clear()`
 
+**Cypress E2E — Page Object Pattern (MANDATORY):**
+- ❌ NEVER use `cy.get(selector)` directly in E2E test files — wrap ALL selectors in Page Objects
+- ✅ ALWAYS use Page Object classes from `front/cypress/po/*.po.ts` for all UI interactions
+- When a selector is missing from the PO, ADD it to the PO class — do NOT inline it in the test
+- Example: `cy.get('.alert-danger')` → add `alertDanger() { return cy.get('.alert-danger'); }` to the relevant PO, then call `page.alertDanger()` in the test
+- Page Objects live in `front/cypress/po/` and extend `AppPage` when applicable
+
 **PHP Testing:**
 - All test files: `declare(strict_types=1);`
 - Test method naming: `testMethodName` format
@@ -320,4 +327,4 @@ public function __invoke(Request $request, Response $response): Response
 - Update when technology stack changes
 - Review quarterly for outdated rules
 
-Last Updated: 2026-02-15
+Last Updated: 2026-02-21

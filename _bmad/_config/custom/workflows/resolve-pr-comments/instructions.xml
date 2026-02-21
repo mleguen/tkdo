@@ -4,9 +4,16 @@
   <critical>Communicate all responses in {communication_language} and language MUST be tailored to {user_skill_level}</critical>
   <critical>Generate all documents in {document_output_language}</critical>
 
+  <critical>Post "Fixed" replies to ALL completed action items with PR links (both AI and human-authored).
+    However, only RESOLVE (via GraphQL mutation) threads where the ORIGINAL review comment was authored
+    by a bot/AI account (e.g., `copilot[bot]`, `github-actions[bot]`, or any login ending in `[bot]`).
+    NEVER resolve threads authored by human reviewers — humans must resolve their own threads.
+    Filter by checking the comment author login from the GraphQL query.</critical>
+
   <objective>
     This workflow runs AFTER implementing fixes for review action items.
-    It finds completed action items ([x]) with PR comment links, posts "Fixed" comments, and resolves the threads.
+    It finds completed action items ([x]) with PR comment links, posts "Fixed" replies, and resolves AI-authored threads.
+    Human-authored threads get "Fixed" replies but are left unresolved for the reviewer to close.
   </objective>
 
   <design-notes>
@@ -175,15 +182,20 @@ Preparing to resolve {{completed_pr_count}} comment threads...</output>
       this workflow. This GraphQL query serves as a fallback to also catch threads that were
       resolved externally (e.g. manually by a reviewer on GitHub).
 
-      Query review threads for the remaining comment IDs to get their thread node IDs
-      and resolution status:
+      Query review threads for the remaining comment IDs to get their thread node IDs,
+      resolution status, AND original comment author:
       ```
-      gh api graphql -f query='{ repository(owner: "{{owner}}", name: "{{repo}}") { pullRequest(number: {{pr_number}}) { reviewThreads(first: 100) { nodes { id isResolved comments(first: 1) { nodes { databaseId } } } } } } }' \
-        --jq '.data.repository.pullRequest.reviewThreads.nodes[] | select(.comments.nodes[0].databaseId == COMMENT_ID_1 or ...) | {threadId: .id, commentId: .comments.nodes[0].databaseId, isResolved: .isResolved}'
+      gh api graphql -f query='{ repository(owner: "{{owner}}", name: "{{repo}}") { pullRequest(number: {{pr_number}}) { reviewThreads(first: 100) { nodes { id isResolved comments(first: 1) { nodes { databaseId author { login } } } } } } } }' \
+        --jq '.data.repository.pullRequest.reviewThreads.nodes[] | select(.comments.nodes[0].databaseId == COMMENT_ID_1 or ...) | {threadId: .id, commentId: .comments.nodes[0].databaseId, isResolved: .isResolved, authorLogin: .comments.nodes[0].author.login}'
       ```
 
       Store the thread node IDs for the resolve mutation later.
       Remove any remaining threads that are already resolved. Append to {{already_resolved}} for reporting.
+
+      **Critical: Filter out human-authored threads.**
+      Remove any threads where `authorLogin` does NOT end with `[bot]`.
+      Only threads authored by bot accounts (e.g., `copilot[bot]`) should be resolved.
+      Store human-authored threads as {{skipped_human_threads}} for reporting.
     </action>
 
     <check if="all remaining threads are already resolved">
@@ -268,6 +280,7 @@ Results:
 - Action items with PR links: {{completed_pr_count}}
 - Skipped (previous run, from Change Log): {{already_resolved_locally_count}}
 - Skipped (resolved externally): {{already_resolved_externally_count}}
+- Skipped (human-authored, not auto-resolved): {{skipped_human_count}}
 - PR comment threads posted to: {{posted_thread_count}}
   - Full responses: {{full_response_count}}
   - Short references: {{short_reference_count}}

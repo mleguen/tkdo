@@ -1,6 +1,10 @@
 import { AppPage } from './app.po';
 
 export class ConnexionPage extends AppPage {
+  alertDanger() {
+    return cy.get('.alert-danger');
+  }
+
   boutonSeConnecter() {
     return cy.get('#btnSeConnecter');
   }
@@ -11,5 +15,9 @@ export class ConnexionPage extends AppPage {
 
   motDePasse() {
     return cy.get('#mdp');
+  }
+
+  seSouvenir() {
+    return cy.get('#seSouvenir');
   }
 }

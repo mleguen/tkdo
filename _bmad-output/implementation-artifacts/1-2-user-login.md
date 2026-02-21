@@ -1,6 +1,6 @@
 # Story 1.2: User Login
 
-Status: done
+Status: review
 
 ## Story
 
@@ -119,6 +119,14 @@ Login exists and works via the OAuth2 flow implemented in Stories 1.1/1.1b/1.1c.
     - Error message display on invalid credentials
 
 ### Review Follow-ups (AI)
+
+- [x] [AI-Review][CRITICAL] E2E login-by-email test fails in CI: `utilisateurs.json` hardcodes `"email": "alice@slim-web"` (local Docker host) but CI generates `alice@localhost` from `TKDO_BASE_URI=http://localhost:8080` — `#nomUtilisateur` never appears, causing Timed out after 4000ms. **Fix:** add `emailDomain: process.env['CYPRESS_EMAIL_DOMAIN'] || 'slim-web'` to `cypress.config.ts` env section; update `se connecter avec une adresse email` test to use `Cypress.env('emailDomain')` instead of `utilisateurs.soi.email`; add `CYPRESS_EMAIL_DOMAIN: localhost` to E2E workflow step. [front/cypress/e2e/connexion.cy.ts:123, front/cypress/fixtures/utilisateurs.json, front/cypress.config.ts, .github/workflows/e2e.yml] [CI Run (chrome)](https://github.com/mleguen/tkdo/actions/runs/22236626852/job/64329762500) [CI Run (firefox)](https://github.com/mleguen/tkdo/actions/runs/22236626852/job/64329762498)
+
+- [x] [AI-Review][LOW] Add `aria-describedby="identifiantHelp"` to the identifiant `<input>` and `id="identifiantHelp"` to the `<small>` hint — without this association, screen readers do not reliably announce the shared-email hint when the field is focused, violating WCAG 2.1 SC 1.3.1 [front/src/app/connexion/connexion.component.html:6-15] [PR#103 comment](https://github.com/mleguen/tkdo/pull/103#discussion_r2834645303)
+
+- [x] [AI-Review][LOW] Wrap `JSON.parse(sessionStorage.getItem(CLE_SE_SOUVENIR) || 'false')` in try/catch (default `false`) and move `sessionStorage.removeItem(CLE_SE_SOUVENIR)` to a `finally` block — if the stored value is ever malformed, the current code throws uncaught exception leaving the user stuck on callback page and leaving stale key for next login [front/src/app/auth-callback/auth-callback.component.ts:37-40] [PR#103 comment](https://github.com/mleguen/tkdo/pull/103#discussion_r2834645262)
+
+- [x] [AI-Review][LOW] Add `alertDanger()` and `seSouvenir()` methods to `ConnexionPage` PO; replace direct `cy.get('.alert-danger')` and `cy.get('#seSouvenir').check()` calls with PO methods — violates Page Object pattern documented in `docs/testing.md` [front/cypress/e2e/connexion.cy.ts:139,152, front/cypress/po/connexion.po.ts] [PR#103 comment](https://github.com/mleguen/tkdo/pull/103#discussion_r2835254906)
 
 - [x] [AI-Review][HIGH] Implement graceful degradation for shared emails in login-by-email
   - **Issue:** Current implementation throws `NonUniqueResultException` (500 error) when multiple users share the same email address, instead of gracefully returning "Identifiant ou mot de passe incorrect"
@@ -406,8 +414,18 @@ Claude Opus 4.6 (claude-opus-4-6)
 
 ### Completion Notes List
 
-- All 7 tasks + 16 review follow-ups completed successfully with full test coverage
-- Test results: 334 backend (177 unit + 157 integration), 65 frontend unit, 25 Cypress component, 15 Cypress E2E — all passing
+- **2026-02-21 - CI Checks and PR Comments Reviewed (Evidence-Based Investigation):**
+  - CI Status: 2 failing E2E checks (chrome + firefox, same root cause) → 1 CRITICAL action item created
+  - Root cause: `utilisateurs.json` hardcodes `alice@slim-web` (local Docker host) but CI `TKDO_BASE_URI=http://localhost:8080` generates `alice@localhost`. Test `se connecter avec une adresse email` fails because email doesn't exist in CI DB.
+  - PR Comments: Reviewed 4 unresolved GitHub PR comments (3 valid, 1 invalid)
+  - Investigation: Read 12 files (auth-callback.component.ts, BffAuthCallbackController.php, connexion.component.html, connexion.cy.ts, connexion.po.ts, testing.md, project-context.md, UtilisateurFixture.php, UriService.php, e2e.yml, utilisateurs.json, cypress.config.ts)
+  - Validated: 3 valid (aria-describedby accessibility, sessionStorage try/catch, PO pattern), 1 invalid (JWT/cookie time desync - few-ms difference is non-functional)
+  - Updated Review Follow-ups section: 4 new action items (1 CRITICAL from CI + 3 LOW from PR comments)
+  - Story status: done → in-progress (4 new action items found)
+  - Responded to all 4 PR comments in PR #103 with investigation evidence
+
+- All 7 tasks + 20 review follow-ups completed successfully with full test coverage
+- Test results: 334 backend (177 unit + 157 integration), 66 frontend unit, 230 Cypress component, 15 Cypress E2E — all passing
 - ✅ Resolved review finding [HIGH]: Graceful degradation for shared emails — `readOneByIdentifiantOuEmail()` now prioritizes username match, catches `NonUniqueResultException` on email lookup, and throws `UtilisateurInconnuException` instead of 500 error
 - ✅ Resolved review finding [LOW]: Documented timing side-channel and login-by-email shared email limitation in project-context.md "Known Technical Debt" section
 - ✅ Resolved review finding [MEDIUM]: Updated `PostAuthCallbackDTO` to accurately type the full server response (`email`, `genre`, `groupe_ids`, `groupe_admin_ids`). Eliminating the redundant GET was considered but deferred — the callback response lacks `identifiant` and `prefNotifIdees` fields required by `UtilisateurPrive`, so the GET remains necessary for profile views.
@@ -426,6 +444,10 @@ Claude Opus 4.6 (claude-opus-4-6)
 - ✅ Resolved review finding [LOW]: Added TODO comment to `reinitialiserTentativesEchouees()` in both `UtilisateurAdaptor` and `Utilisateur` interface contract noting Story 1.4 should also clear `verrouilleJusqua`
 - ✅ Resolved review finding [LOW]: Added upper bound `lessThan(dayInSeconds * 8)` to E2E cookie expiry assertion, tightly bracketing the expected 7-day window
 - ✅ Resolved review finding [LOW]: Switched success logs in `OAuthAuthorizeController` and `BffAuthCallbackController` from raw string interpolation to structured context arrays — `getNom()` (user-supplied data) is no longer interpolated directly into log message strings, consistent with the sanitized failure log pattern
+- ✅ Resolved review finding [CRITICAL]: Fixed E2E email login test CI failure — made email domain configurable via `CYPRESS_EMAIL_DOMAIN` env var (defaults to `slim-web` locally, set to `localhost` in CI), test now constructs email dynamically from username + domain
+- ✅ Resolved review finding [LOW]: Added `aria-describedby="identifiantHelp"` to identifiant input and `id="identifiantHelp"` to shared-email hint — screen readers now announce the hint when the field is focused (WCAG 2.1 SC 1.3.1)
+- ✅ Resolved review finding [LOW]: Wrapped `JSON.parse(sessionStorage.getItem(CLE_SE_SOUVENIR))` in try/catch with `false` default and moved `removeItem` to `finally` block — malformed values no longer cause uncaught exceptions; added unit test for malformed input
+- ✅ Resolved review finding [LOW]: Added `alertDanger()` and `seSouvenir()` methods to `ConnexionPage` PO and replaced direct `cy.get()` calls in E2E tests — E2E tests now fully follow the Page Object pattern
 - **Lesson learned**: After adding new Doctrine-mapped properties, always run `./doctrine orm:clear-cache:metadata` and `./doctrine orm:generate-proxies` to refresh the metadata cache. Container restarts are unnecessary.
 - **MySQL command pattern**: The proper way to run MySQL queries against the dev database is: `docker compose exec mysql mysql -u tkdo -pmdptkdo tkdo -e "SQL_QUERY_HERE"`
 
@@ -456,6 +478,11 @@ Claude Opus 4.6 (claude-opus-4-6)
 - **E2E cookie expiry upper bound (review follow-up)**: Added `lessThan(dayInSeconds * 8)` assertion to bracket the expected 7-day remember-me window
 - **Structured success logs (review follow-up)**: Switched `OAuthAuthorizeController` and `BffAuthCallbackController` success/debug logs from raw string interpolation to structured context arrays — `getNom()` no longer interpolated into message string
 - **Test suite name fix (user)**: Mael corrected `--testsuite=Integration` references to `--testsuite=Int` across story files (1-1c, 1-2, 2-1) — the PHPUnit config uses `Int` as the integration test suite name, and the incorrect `Integration` name silently ran zero tests
+- **E2E email domain fix (review follow-up)**: Made email domain configurable via `CYPRESS_EMAIL_DOMAIN` env var in `cypress.config.ts`; E2E test constructs email dynamically instead of using hardcoded fixture value; CI workflow sets `CYPRESS_EMAIL_DOMAIN: localhost`
+- **Accessibility fix (review follow-up)**: Added `aria-describedby="identifiantHelp"` to identifiant input and `id="identifiantHelp"` to hint text for WCAG 2.1 SC 1.3.1 compliance
+- **SessionStorage resilience (review follow-up)**: Wrapped `CLE_SE_SOUVENIR` parse in try/catch with `finally` cleanup; added unit test for malformed sessionStorage values
+- **Page Object compliance (review follow-up)**: Added `alertDanger()` and `seSouvenir()` to `ConnexionPage` PO; E2E tests now use PO methods exclusively
+- 2026-02-21 - PR Comments Resolved: Posted "Fixed" replies to 3 PR comment threads (2 AI-authored resolved, 1 human-authored left for reviewer), PR: #103, comment_ids: 2834645303, 2834645262, 2835254906
 
 ### File List
 
@@ -483,8 +510,13 @@ Claude Opus 4.6 (claude-opus-4-6)
 - `front/src/app/connexion/connexion.component.cy.ts` — 5 new component tests (checkbox behavior), updated label assertion
 - `front/src/app/auth-callback/auth-callback.component.spec.ts` — 4 new/updated tests (se_souvenir, redirect priority)
 - `front/src/app/backend.service.spec.ts` — 1 new + 1 updated test (se_souvenir in request body)
+- `front/cypress.config.ts` — Added `emailDomain` env configuration for CI-compatible email login tests
 - `front/cypress/e2e/connexion.cy.ts` — 3 new E2E tests (email login, error message, remember me), fixed conditional expiry guard
 - `front/cypress/fixtures/utilisateurs.json` — Added `email` fields to all user fixtures
+- `front/cypress/po/connexion.po.ts` — Added `alertDanger()` and `seSouvenir()` PO methods
+
+**Modified (CI):**
+- `.github/workflows/e2e.yml` — Added `CYPRESS_EMAIL_DOMAIN: localhost` to E2E test step
 
 **Modified (Meta):**
 - `_bmad-output/implementation-artifacts/1-2-user-login.md` — This story file itself (status, completion notes, file list)

@@ -120,7 +120,8 @@ describe('connexion/déconnexion/reconnexion', () => {
     const connexionPage = new ConnexionPage();
 
     cy.fixture('utilisateurs').then((utilisateurs) => {
-      connexionPage.identifiant().type(utilisateurs.soi.email);
+      const email = `${utilisateurs.soi.identifiant}@${Cypress.env('emailDomain')}`;
+      connexionPage.identifiant().type(email);
       connexionPage.motDePasse().type(utilisateurs.soi.mdp);
       connexionPage.boutonSeConnecter().click();
       connexionPage.nomUtilisateur().should('have.text', utilisateurs.soi.nom);
@@ -136,7 +137,8 @@ describe('connexion/déconnexion/reconnexion', () => {
     connexionPage.motDePasse().type('mauvais-mdp');
     connexionPage.boutonSeConnecter().click();
 
-    cy.get('.alert-danger')
+    connexionPage
+      .alertDanger()
       .should('exist')
       .should('contain.text', 'Identifiant ou mot de passe incorrect');
   });
@@ -149,7 +151,7 @@ describe('connexion/déconnexion/reconnexion', () => {
     cy.fixture('utilisateurs').then((utilisateurs) => {
       connexionPage.identifiant().type(utilisateurs.soi.identifiant);
       connexionPage.motDePasse().type(utilisateurs.soi.mdp);
-      cy.get('#seSouvenir').check();
+      connexionPage.seSouvenir().check();
       connexionPage.boutonSeConnecter().click();
       connexionPage.nomUtilisateur().should('have.text', utilisateurs.soi.nom);
 
