@@ -120,6 +120,8 @@ Login exists and works via the OAuth2 flow implemented in Stories 1.1/1.1b/1.1c.
 
 ### Review Follow-ups (AI)
 
+- [x] [AI-Review][CRITICAL] `OAUTH2_ISSUER_BASE_URI` missing from CI PHP server env causes all BFF callback tests and E2E login tests to fail with 401 — `OAuth2Settings.php:23` falls back to `http://localhost:4200` when env var absent; in CI the PHP server runs on `localhost:8000`, so the BFF's back-channel call to `/oauth/token` hits a non-existent port → `\RuntimeException` → 401. **Fix:** add `OAUTH2_ISSUER_BASE_URI: http://localhost:8000` to the "Start PHP backend server" step env in BOTH `test.yml` AND `e2e.yml`. **Scope:** 17 integration test failures (BffAuthCallbackControllerTest ×10, AuthCookieIntTest ×1, ListGroupeControllerTest ×5 + DataProvider variants) + 12 E2E failures (all login-dependent tests). [api/src/Appli/Settings/OAuth2Settings.php:23, .github/workflows/test.yml, .github/workflows/e2e.yml] [CI Run (Integration)](https://github.com/mleguen/tkdo/actions/runs/22266034481/job/64412615084) [CI Run (E2E chrome)](https://github.com/mleguen/tkdo/actions/runs/22266034477/job/64412604980) [CI Run (E2E firefox)](https://github.com/mleguen/tkdo/actions/runs/22266034477/job/64412604979)
+
 - [x] [AI-Review][CRITICAL] E2E login-by-email test fails in CI: `utilisateurs.json` hardcodes `"email": "alice@slim-web"` (local Docker host) but CI generates `alice@localhost` from `TKDO_BASE_URI=http://localhost:8080` — `#nomUtilisateur` never appears, causing Timed out after 4000ms. **Fix:** add `emailDomain: process.env['CYPRESS_EMAIL_DOMAIN'] || 'slim-web'` to `cypress.config.ts` env section; update `se connecter avec une adresse email` test to use `Cypress.env('emailDomain')` instead of `utilisateurs.soi.email`; add `CYPRESS_EMAIL_DOMAIN: localhost` to E2E workflow step. [front/cypress/e2e/connexion.cy.ts:123, front/cypress/fixtures/utilisateurs.json, front/cypress.config.ts, .github/workflows/e2e.yml] [CI Run (chrome)](https://github.com/mleguen/tkdo/actions/runs/22236626852/job/64329762500) [CI Run (firefox)](https://github.com/mleguen/tkdo/actions/runs/22236626852/job/64329762498)
 
 - [x] [AI-Review][LOW] Add `aria-describedby="identifiantHelp"` to the identifiant `<input>` and `id="identifiantHelp"` to the `<small>` hint — without this association, screen readers do not reliably announce the shared-email hint when the field is focused, violating WCAG 2.1 SC 1.3.1 [front/src/app/connexion/connexion.component.html:6-15] [PR#103 comment](https://github.com/mleguen/tkdo/pull/103#discussion_r2834645303)
@@ -459,6 +461,7 @@ Claude Opus 4.6 (claude-opus-4-6)
   - Story status: done → in-progress (4 new action items found)
   - Responded to all 4 PR comments in PR #103 with investigation evidence
 
+- ✅ Resolved review finding [CRITICAL]: Added `OAUTH2_ISSUER_BASE_URI: http://localhost:8000` to "Start PHP backend server" step env in both `test.yml` and `e2e.yml` — without this, `OAuth2Settings.php:23` falls back to `http://localhost:4200` (frontend port), so the BFF's back-channel call to `/oauth/token` hits a non-existent server in CI, causing 401 on all BFF-dependent tests (17 integration + 12 E2E)
 - All 7 tasks + 22 review follow-ups completed successfully with full test coverage
 - Test results: 336 backend (177 unit + 159 integration), 68 frontend unit, 230 Cypress component, 15 Cypress E2E — all passing
 - ✅ Resolved review finding [HIGH]: Graceful degradation for shared emails — `readOneByIdentifiantOuEmail()` now prioritizes username match, catches `NonUniqueResultException` on email lookup, and throws `UtilisateurInconnuException` instead of 500 error
@@ -526,6 +529,8 @@ Claude Opus 4.6 (claude-opus-4-6)
 - 2026-02-21 - PR Comments Resolved: Posted "Fixed" replies to 2 PR comment threads (1 AI-authored resolved, 1 human-authored left for reviewer), PR: #103, comment_ids: 2835562213, 2835556350
 - **lastGroupeId validation (review follow-up)**: Added `/^\d+$/.test(lastGroupeId)` guard to post-login redirect — corrupted/non-numeric localStorage values now fall through to `/occasion` default instead of routing to invalid paths
 - **OAUTH2_REDIRECT_URI removed (review follow-up)**: Removed `OAUTH2_REDIRECT_URI` from `OAuth2Settings.php` and `docker-compose.yml`; redirect_uri now derived from `TKDO_BASE_URI` only. Changed `TKDO_BASE_URI` from `http://slim-web` to `http://front` (Docker frontend proxy URL). Added `OAUTH2_ISSUER_BASE_URI=http://slim-web` for back-channel OAuth2 calls, `TKDO_API_BASE_URI=http://slim-web` for integration test API connectivity. Added `apiBaseUri()` and `validRedirectUri()` helpers to `IntTestCase`, refactored all OAuth test files. Updated Cypress `emailDomain` default from `slim-web` to `front`.
+- **E2E cookie expiry lower bound tightened (review follow-up)**: Changed `greaterThan(dayInSeconds)` to `greaterThan(dayInSeconds * 6)` in "Se souvenir de moi" E2E test — properly brackets 7-day window as [6 days, 8 days] instead of [1 day, 8 days]
+- **SessionStorage cleanup on early return (review follow-up)**: `auth-callback.component.ts` — moved `CLE_SE_SOUVENIR` try/finally block before the `code`/`state` null-check, ensuring sessionStorage is always cleaned even if callback URL lacks OAuth params
 - **Test suite name fix (user)**: Mael corrected `--testsuite=Integration` references to `--testsuite=Int` across story files (1-1c, 1-2, 2-1) — the PHPUnit config uses `Int` as the integration test suite name, and the incorrect `Integration` name silently ran zero tests
 - **E2E email domain fix (review follow-up)**: Made email domain configurable via `CYPRESS_EMAIL_DOMAIN` env var in `cypress.config.ts`; E2E test constructs email dynamically instead of using hardcoded fixture value; CI workflow sets `CYPRESS_EMAIL_DOMAIN: localhost`
 - **Accessibility fix (review follow-up)**: Added `aria-describedby="identifiantHelp"` to identifiant input and `id="identifiantHelp"` to hint text for WCAG 2.1 SC 1.3.1 compliance
@@ -536,6 +541,23 @@ Claude Opus 4.6 (claude-opus-4-6)
 - **Boolean cast for se_souvenir (review follow-up)**: `auth-callback.component.ts` now uses `=== true` explicit cast on `JSON.parse()` result; added unit test asserting number `1` does not trigger remember-me
 - **File List completeness (review follow-up)**: Documented `docs/frontend-dev.md`, `front/package.json`, `front/package-lock.json` in story File List
 - 2026-02-21 - PR Comments Resolved: Posted "Fixed" replies to 3 PR comment threads (2 AI-authored resolved, 1 human-authored left for reviewer), PR: #103, comment_ids: 2834645303, 2834645262, 2835254906
+- **2026-02-22 - CI Checks and PR Comments Reviewed (Evidence-Based Investigation):**
+  - CI Status: 3 failing checks (Backend Integration, E2E chrome, E2E firefox) → 1 CRITICAL action item created (all 3 share same root cause)
+  - PR Comments: 0 unresolved review threads (all 26 PR comments already resolved)
+  - Investigation: Read 4 files (OAuth2Settings.php, BffAuthService.php, test.yml, IntTestCase.php) to confirm root cause
+  - Root cause: `OAUTH2_ISSUER_BASE_URI` env var missing from "Start PHP backend server" step in both `test.yml` and `e2e.yml` — BFF back-channel call goes to `http://localhost:4200` (fallback) instead of `http://localhost:8000` (actual PHP server), causing all BFF-dependent tests to fail with 401
+  - Updated Review Follow-ups section: 1 new CRITICAL action item at top of section
+  - Story status: done → in-progress (1 CRITICAL CI failure found)
+
+- **CI OAUTH2_ISSUER_BASE_URI fix (review follow-up)**: Added `OAUTH2_ISSUER_BASE_URI: http://localhost:8000` to "Start PHP backend server" step env in both `test.yml` and `e2e.yml` — fixes BFF back-channel calls failing with 401 in CI because the fallback `http://localhost:4200` hits the frontend, not the PHP server
+
+- **2026-02-22 - Third Code Review (Claude Sonnet 4.6):**
+  - 0 CRITICAL, 0 HIGH, 0 MEDIUM, 3 LOW issues found and auto-fixed
+  - All 4 ACs verified as IMPLEMENTED; all 7 tasks and 22 review follow-ups confirmed in code
+  - Fixed L1: `connexion.cy.ts:169` — tightened "Se souvenir de moi" cookie expiry lower bound from `greaterThan(dayInSeconds)` (1 day) to `greaterThan(dayInSeconds * 6)` (6 days), properly bracketing the 7-day window together with the existing `lessThan(dayInSeconds * 8)` upper bound
+  - Fixed L2: `auth-callback.component.ts` — moved `CLE_SE_SOUVENIR` sessionStorage read/cleanup before the `code`/`state` null-check early return, so the key is always removed even when OAuth params are missing
+  - Fixed L3: Story File List entry for `e2e.yml` — corrected stale "`CYPRESS_EMAIL_DOMAIN: localhost` added" note; actual final state uses static `@example.com` emails with no env var needed
+
 - **2026-02-21 - Second Code Review (Claude Sonnet 4.6):**
   - 0 CRITICAL, 0 HIGH, 2 MEDIUM, 4 LOW issues found and auto-fixed
   - Fixed M1+M2: Added `docs/frontend-dev.md`, `front/package.json`, `front/package-lock.json` to story File List (files were in git diff but missing from documentation)
@@ -590,8 +612,8 @@ Claude Opus 4.6 (claude-opus-4-6)
 - `front/cypress/po/connexion.po.ts` — Added `alertDanger()` and `seSouvenir()` PO methods
 
 **Modified (CI/Docker):**
-- `.github/workflows/e2e.yml` — Added `CYPRESS_EMAIL_DOMAIN: localhost` to E2E test step; removed `TKDO_BASE_URI` from PHP backend server step (now derived from request)
-- `.github/workflows/test.yml` — Removed `TKDO_BASE_URI` from backend server and test steps; integration tests use `TKDO_API_BASE_URI` instead
+- `.github/workflows/e2e.yml` — Removed `TKDO_BASE_URI` from PHP backend server step (now derived from request); static `@example.com` fixture emails make email-domain env var unnecessary; added `OAUTH2_ISSUER_BASE_URI: http://localhost:8000` to PHP server step for BFF back-channel calls
+- `.github/workflows/test.yml` — Removed `TKDO_BASE_URI` from backend server and test steps; integration tests use `TKDO_API_BASE_URI` instead; added `OAUTH2_ISSUER_BASE_URI: http://localhost:8000` to PHP server step for BFF back-channel calls
 - `docker-compose.yml` — Removed `TKDO_BASE_URI` from `slim-fpm` (HTTP context, now derived from request); kept in `php-cli` (CLI context)
 - `docker/front/Dockerfile` — Added `ProxyPreserveHost On` so backend receives correct Host header from reverse proxy
 - `docker/front-https/Dockerfile` — Added `ProxyPreserveHost On` and `RequestHeader set X-Forwarded-Proto "https"` for correct scheme detection

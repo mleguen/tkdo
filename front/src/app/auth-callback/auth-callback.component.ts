@@ -28,12 +28,7 @@ export class AuthCallbackComponent implements OnInit {
     const code = this.route.snapshot.queryParamMap.get('code');
     const state = this.route.snapshot.queryParamMap.get('state');
 
-    if (!code || !state) {
-      this.erreur = 'paramètres OAuth2 manquants';
-      return;
-    }
-
-    // Read "remember me" preference from sessionStorage bridge
+    // Read and clean up "remember me" preference regardless of OAuth params validity
     let seSouvenir = false;
     try {
       seSouvenir =
@@ -42,6 +37,11 @@ export class AuthCallbackComponent implements OnInit {
       seSouvenir = false;
     } finally {
       sessionStorage.removeItem(CLE_SE_SOUVENIR);
+    }
+
+    if (!code || !state) {
+      this.erreur = 'paramètres OAuth2 manquants';
+      return;
     }
 
     this.backend

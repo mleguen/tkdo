@@ -166,7 +166,7 @@ describe('connexion/déconnexion/reconnexion', () => {
         ).to.be.a('number');
         const now = Math.floor(Date.now() / 1000);
         const dayInSeconds = 86400;
-        expect(jwtCookie!.expiry! - now).to.be.greaterThan(dayInSeconds);
+        expect(jwtCookie!.expiry! - now).to.be.greaterThan(dayInSeconds * 6);
         expect(jwtCookie!.expiry! - now).to.be.lessThan(dayInSeconds * 8);
       });
     });

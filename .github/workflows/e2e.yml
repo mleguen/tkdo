@@ -184,6 +184,8 @@ jobs:
           MAILDEV_BASE_URI: http://127.0.0.1:1080/
           TKDO_DEV_MODE: "1"
           TKDO_MAILER_FROM: noreply@ci
+          # BFF back-channel calls /oauth/token on this same server
+          OAUTH2_ISSUER_BASE_URI: http://localhost:8000
           # Multiple workers needed: BFF callback makes back-channel HTTP call
           # to /oauth/token on the same server (requires concurrent request handling)
           PHP_CLI_SERVER_WORKERS: "4"
