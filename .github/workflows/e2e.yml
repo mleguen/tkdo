@@ -245,21 +245,21 @@ jobs:
               # OAuth2 endpoints go to PHP backend (preserves /oauth/ prefix)
               location /oauth/ {
                   proxy_pass http://localhost:8000/oauth/;
-                  proxy_set_header Host $host;
+                  proxy_set_header Host $http_host;
                   proxy_set_header X-Real-IP $remote_addr;
               }
 
               # API requests go to PHP backend (strips /api/ prefix)
               location /api/ {
                   proxy_pass http://localhost:8000/;
-                  proxy_set_header Host $host;
+                  proxy_set_header Host $http_host;
                   proxy_set_header X-Real-IP $remote_addr;
               }
 
               # Everything else goes to frontend
               location / {
                   proxy_pass http://localhost:4200/;
-                  proxy_set_header Host $host;
+                  proxy_set_header Host $http_host;
                   proxy_set_header X-Real-IP $remote_addr;
               }
           }
