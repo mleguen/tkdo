@@ -555,13 +555,8 @@ Claude Opus 4.6 (claude-opus-4-6)
 
 - **2026-02-23 - CI Checks Reviewed (Evidence-Based Investigation):**
   - CI Status: 12 E2E failures (chrome + firefox, connexion.cy.ts ×8 + liste-idees.cy.ts ×4) → 1 CRITICAL action item created
-  - PR Comments: 1 unresolved (`@mleguen`: document nginx fix in story file)
   - Root cause: After `596e9b0` introduced `UriMiddleware`/`UriService` to derive redirect_uri from request Host header, the nginx CI proxy used `proxy_set_header Host $host` which strips the port. PHP received `Host: localhost` (no `:8080`), derived `http://localhost/auth/callback`, but browser sent `http://localhost:8080/auth/callback` → 400 on every login attempt
-  - Investigation: Examined CI logs (12 failures all "Expected to find element: `#nomUtilisateur`"), traced to nginx `$host` vs `$http_host` behavior, verified via `UriService.setBaseUriFromRequest()` code path
-  - Fix: `proxy_set_header Host $http_host` in all 3 nginx location blocks in `e2e.yml`
   - Story status: review → in-progress (1 CI failure found); status → review after fix committed
-
-- **CI nginx $http_host fix (review follow-up)**: Replaced `proxy_set_header Host $host` with `proxy_set_header Host $http_host` in all three nginx location blocks in `.github/workflows/e2e.yml` — `$host` strips the port, causing `UriService` to derive `http://localhost/auth/callback` while the browser sends `http://localhost:8080/auth/callback` → 400 on every login → 12 E2E failures. `$http_host` preserves the full host + port so the derived redirect_uri always matches.
 
 - **2026-02-22 - Third Code Review (Claude Sonnet 4.6):**
   - 0 CRITICAL, 0 HIGH, 0 MEDIUM, 3 LOW issues found and auto-fixed
