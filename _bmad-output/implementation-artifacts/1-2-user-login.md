@@ -120,6 +120,8 @@ Login exists and works via the OAuth2 flow implemented in Stories 1.1/1.1b/1.1c.
 
 ### Review Follow-ups (AI)
 
+- [x] [AI-Review][CRITICAL] E2E CI: 12 login-dependent tests fail after `596e9b0` because nginx `$host` strips port → `UriService` derives `http://localhost/auth/callback` but browser sends `http://localhost:8080/auth/callback` → 400 "redirect_uri non autorisé" on every login. **Root cause:** nginx `proxy_set_header Host $host` strips the port number; `UriService.setBaseUriFromRequest()` uses the forwarded `Host` header to build the expected redirect_uri, so PHP sees `localhost` (no port) while the browser uses `localhost:8080`. **Fix:** replace `proxy_set_header Host $host` with `proxy_set_header Host $http_host` in all three nginx location blocks in `e2e.yml` — `$http_host` preserves the port. **Scope:** 12 E2E failures (all login-dependent tests: connexion.cy.ts ×8, liste-idees.cy.ts ×4). [.github/workflows/e2e.yml] [CI Run (chrome)](https://github.com/mleguen/tkdo/actions/runs/22283275867/job/64457271621) [CI Run (firefox)](https://github.com/mleguen/tkdo/actions/runs/22283275867/job/64457271629)
+
 - [x] [AI-Review][CRITICAL] `OAUTH2_ISSUER_BASE_URI` missing from CI PHP server env causes all BFF callback tests and E2E login tests to fail with 401 — `OAuth2Settings.php:23` falls back to `http://localhost:4200` when env var absent; in CI the PHP server runs on `localhost:8000`, so the BFF's back-channel call to `/oauth/token` hits a non-existent port → `\RuntimeException` → 401. **Fix:** add `OAUTH2_ISSUER_BASE_URI: http://localhost:8000` to the "Start PHP backend server" step env in BOTH `test.yml` AND `e2e.yml`. **Scope:** 17 integration test failures (BffAuthCallbackControllerTest ×10, AuthCookieIntTest ×1, ListGroupeControllerTest ×5 + DataProvider variants) + 12 E2E failures (all login-dependent tests). [api/src/Appli/Settings/OAuth2Settings.php:23, .github/workflows/test.yml, .github/workflows/e2e.yml] [CI Run (Integration)](https://github.com/mleguen/tkdo/actions/runs/22266034481/job/64412615084) [CI Run (E2E chrome)](https://github.com/mleguen/tkdo/actions/runs/22266034477/job/64412604980) [CI Run (E2E firefox)](https://github.com/mleguen/tkdo/actions/runs/22266034477/job/64412604979)
 
 - [x] [AI-Review][CRITICAL] E2E login-by-email test fails in CI: `utilisateurs.json` hardcodes `"email": "alice@slim-web"` (local Docker host) but CI generates `alice@localhost` from `TKDO_BASE_URI=http://localhost:8080` — `#nomUtilisateur` never appears, causing Timed out after 4000ms. **Fix:** add `emailDomain: process.env['CYPRESS_EMAIL_DOMAIN'] || 'slim-web'` to `cypress.config.ts` env section; update `se connecter avec une adresse email` test to use `Cypress.env('emailDomain')` instead of `utilisateurs.soi.email`; add `CYPRESS_EMAIL_DOMAIN: localhost` to E2E workflow step. [front/cypress/e2e/connexion.cy.ts:123, front/cypress/fixtures/utilisateurs.json, front/cypress.config.ts, .github/workflows/e2e.yml] [CI Run (chrome)](https://github.com/mleguen/tkdo/actions/runs/22236626852/job/64329762500) [CI Run (firefox)](https://github.com/mleguen/tkdo/actions/runs/22236626852/job/64329762498)
@@ -551,6 +553,16 @@ Claude Opus 4.6 (claude-opus-4-6)
 
 - **CI OAUTH2_ISSUER_BASE_URI fix (review follow-up)**: Added `OAUTH2_ISSUER_BASE_URI: http://localhost:8000` to "Start PHP backend server" step env in both `test.yml` and `e2e.yml` — fixes BFF back-channel calls failing with 401 in CI because the fallback `http://localhost:4200` hits the frontend, not the PHP server
 
+- **2026-02-23 - CI Checks Reviewed (Evidence-Based Investigation):**
+  - CI Status: 12 E2E failures (chrome + firefox, connexion.cy.ts ×8 + liste-idees.cy.ts ×4) → 1 CRITICAL action item created
+  - PR Comments: 1 unresolved (`@mleguen`: document nginx fix in story file)
+  - Root cause: After `596e9b0` introduced `UriMiddleware`/`UriService` to derive redirect_uri from request Host header, the nginx CI proxy used `proxy_set_header Host $host` which strips the port. PHP received `Host: localhost` (no `:8080`), derived `http://localhost/auth/callback`, but browser sent `http://localhost:8080/auth/callback` → 400 on every login attempt
+  - Investigation: Examined CI logs (12 failures all "Expected to find element: `#nomUtilisateur`"), traced to nginx `$host` vs `$http_host` behavior, verified via `UriService.setBaseUriFromRequest()` code path
+  - Fix: `proxy_set_header Host $http_host` in all 3 nginx location blocks in `e2e.yml`
+  - Story status: review → in-progress (1 CI failure found); status → review after fix committed
+
+- **CI nginx $http_host fix (review follow-up)**: Replaced `proxy_set_header Host $host` with `proxy_set_header Host $http_host` in all three nginx location blocks in `.github/workflows/e2e.yml` — `$host` strips the port, causing `UriService` to derive `http://localhost/auth/callback` while the browser sends `http://localhost:8080/auth/callback` → 400 on every login → 12 E2E failures. `$http_host` preserves the full host + port so the derived redirect_uri always matches.
+
 - **2026-02-22 - Third Code Review (Claude Sonnet 4.6):**
   - 0 CRITICAL, 0 HIGH, 0 MEDIUM, 3 LOW issues found and auto-fixed
   - All 4 ACs verified as IMPLEMENTED; all 7 tasks and 22 review follow-ups confirmed in code
@@ -612,7 +624,7 @@ Claude Opus 4.6 (claude-opus-4-6)
 - `front/cypress/po/connexion.po.ts` — Added `alertDanger()` and `seSouvenir()` PO methods
 
 **Modified (CI/Docker):**
-- `.github/workflows/e2e.yml` — Removed `TKDO_BASE_URI` from PHP backend server step (now derived from request); static `@example.com` fixture emails make email-domain env var unnecessary; added `OAUTH2_ISSUER_BASE_URI: http://localhost:8000` to PHP server step for BFF back-channel calls
+- `.github/workflows/e2e.yml` — Removed `TKDO_BASE_URI` from PHP backend server step (now derived from request); static `@example.com` fixture emails make email-domain env var unnecessary; added `OAUTH2_ISSUER_BASE_URI: http://localhost:8000` to PHP server step for BFF back-channel calls; changed `proxy_set_header Host $host` → `proxy_set_header Host $http_host` in nginx proxy config to preserve port number for correct redirect_uri derivation
 - `.github/workflows/test.yml` — Removed `TKDO_BASE_URI` from backend server and test steps; integration tests use `TKDO_API_BASE_URI` instead; added `OAUTH2_ISSUER_BASE_URI: http://localhost:8000` to PHP server step for BFF back-channel calls
 - `docker-compose.yml` — Removed `TKDO_BASE_URI` from `slim-fpm` (HTTP context, now derived from request); kept in `php-cli` (CLI context)
 - `docker/front/Dockerfile` — Added `ProxyPreserveHost On` so backend receives correct Host header from reverse proxy
