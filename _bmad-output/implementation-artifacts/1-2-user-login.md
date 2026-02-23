@@ -556,7 +556,7 @@ Claude Opus 4.6 (claude-opus-4-6)
 - **2026-02-23 - CI Checks Reviewed (Evidence-Based Investigation):**
   - CI Status: 12 E2E failures (chrome + firefox, connexion.cy.ts ×8 + liste-idees.cy.ts ×4) → 1 CRITICAL action item created
   - Root cause: After `596e9b0` introduced `UriMiddleware`/`UriService` to derive redirect_uri from request Host header, the nginx CI proxy used `proxy_set_header Host $host` which strips the port. PHP received `Host: localhost` (no `:8080`), derived `http://localhost/auth/callback`, but browser sent `http://localhost:8080/auth/callback` → 400 on every login attempt
-  - Story status: review → in-progress (1 CI failure found); status → review after fix committed
+  - Fix: `proxy_set_header Host $http_host` in all 3 nginx location blocks in `e2e.yml`
 
 - **2026-02-22 - Third Code Review (Claude Sonnet 4.6):**
   - 0 CRITICAL, 0 HIGH, 0 MEDIUM, 3 LOW issues found and auto-fixed
