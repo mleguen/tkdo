@@ -76,6 +76,15 @@ describe('ProfilComponent', () => {
       cy.get('#identifiant').should('have.attr', 'readonly');
     });
 
+    it('should have autocomplete="username" on identifiant field', () => {
+      cy.get('#identifiant').should('have.attr', 'autocomplete', 'username');
+    });
+
+    it('should have autocomplete="new-password" on password fields', () => {
+      cy.get('#mdp').should('have.attr', 'autocomplete', 'new-password');
+      cy.get('#confirmeMdp').should('have.attr', 'autocomplete', 'new-password');
+    });
+
     it('should not display feedback messages initially', () => {
       cy.get('.alert-success').should('not.exist');
       cy.get('.alert-danger').should('not.exist');

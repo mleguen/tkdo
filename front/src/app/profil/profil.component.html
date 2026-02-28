@@ -55,6 +55,7 @@
       readonly
       formControlName="identifiant"
       class="form-control"
+      autocomplete="username"
     />
   </div>
 
@@ -65,7 +66,7 @@
         id="mdp"
         type="password"
         formControlName="mdp"
-        autocomplete="off"
+        autocomplete="new-password"
         class="form-control"
       />
       @if (mdp.errors?.["minlength"]) {
@@ -81,7 +82,7 @@
         id="confirmeMdp"
         type="password"
         formControlName="confirmeMdp"
-        autocomplete="off"
+        autocomplete="new-password"
         class="form-control"
       />
       @if (formProfil.errors?.["sameValueIfDefined"]) {
