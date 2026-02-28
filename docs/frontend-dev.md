@@ -675,6 +675,7 @@ The `overrides` section in `front/package.json` contains workarounds for upstrea
 | Override | Reason | Remove when |
 |---|---|---|
 | `qs >= 6.14.1` | Security vulnerability in older qs versions pulled transitively | The minimum version required by all transitive dependents is >= 6.14.1 |
+| `serialize-javascript >= 7.0.3` | Security vulnerability in serialize-javascript < 7.0.3 pulled transitively by `copy-webpack-plugin` and `terser-webpack-plugin`, which both pin `^6.0.2` | `copy-webpack-plugin` and `terser-webpack-plugin` upgrade their `serialize-javascript` dependency to >= 7.0.3 |
 | `@angular-devkit/core > chokidar: ^5.0.0` | npm incorrectly dedupes chokidar@4.0.3 (from sass) for Angular packages that require ^5.0.0, causing missing readdirp@5.0.0 and broken builds/tests | sass upgrades its chokidar dependency to ^5.0.0, or Angular packages no longer conflict with sass's chokidar range |
 
 ## Code Style and Conventions
