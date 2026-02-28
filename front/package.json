@@ -19,7 +19,12 @@
   "private": true,
   "overrides": {
     "qs": ">=6.14.1",
-    "serialize-javascript": ">=7.0.3",
+    "copy-webpack-plugin": {
+      "serialize-javascript": "^7.0.3"
+    },
+    "terser-webpack-plugin": {
+      "serialize-javascript": "^7.0.3"
+    },
     "@angular-devkit/core": {
       "chokidar": "^5.0.0"
     }
