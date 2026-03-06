@@ -161,13 +161,32 @@ jobs:
           path: /opt/hostedtoolcache/firefox
           key: ${{ runner.os }}-firefox-latest-v7-${{ steps.week.outputs.week }}
 
+      # Detect Firefox version from restored cache so setup-firefox can find it in
+      # the tool cache without trying to download it (firefox-version: "*" is treated
+      # as a literal version and causes a 404 on Mozilla's FTP server)
+      - name: Get Firefox version from cache
+        if: matrix.browser == 'firefox' && steps.firefox-cache.outputs.cache-hit == 'true'
+        id: firefox-version
+        run: |
+          if [ -d "/opt/hostedtoolcache/firefox" ]; then
+            VERSION=$(ls /opt/hostedtoolcache/firefox/ | grep -v '^_' | sort -V | tail -1)
+            if [ -n "$VERSION" ]; then
+              echo "version=$VERSION" >> $GITHUB_OUTPUT
+              echo "Detected cached Firefox version: $VERSION"
+            else
+              echo "Warning: no Firefox version directories found in /opt/hostedtoolcache/firefox"
+            fi
+          else
+            echo "Warning: /opt/hostedtoolcache/firefox directory not found"
+          fi
+
       # Install Firefox for firefox browser tests
-      - name: Install Firefox from cache
+      # Uses cached version when available (avoids download), falls back to 'latest'
+      - name: Install Firefox
         if: matrix.browser == 'firefox'
         uses: browser-actions/setup-firefox@latest
         with:
-          # default would be 'latest' which is not compatible with tc.find() as not a semver
-          firefox-version: "*"
+          firefox-version: ${{ steps.firefox-version.outputs.version || 'latest' }}
 
       # Start backend PHP server in background
       # TKDO_DEV_MODE=1: disable Secure cookie flag (CI runs over HTTP)
