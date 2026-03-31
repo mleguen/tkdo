@@ -1,6 +1,6 @@
 # Story 1.2: User Login
 
-Status: review
+Status: done
 
 ## Story
 
