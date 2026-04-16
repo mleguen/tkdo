@@ -24,12 +24,62 @@ on:
 
 jobs:
   setup-firefox:
-    # Single Firefox setup job shared by all jobs that need Firefox
-    uses: ./.github/workflows/setup-firefox.yml
+    name: Setup Firefox Cache
+    runs-on: ubuntu-latest
     permissions:
       contents: read
+    outputs:
+      firefox-version: ${{ steps.fix-firefox-cache.outputs.firefox-version }}
+      week: ${{ steps.week.outputs.week }}
     # Skip for draft PRs - only run when PR is ready for review
     if: github.event_name != 'pull_request' || !github.event.pull_request.draft
+
+    steps:
+      # Get current year-week for Firefox cache key (updates weekly)
+      - name: Get current week
+        id: week
+        run: echo "week=$(date +%Y-W%V)" >> $GITHUB_OUTPUT
+
+      # Cache Firefox binary to speed up installation
+      # Cache key includes year-week to refresh weekly and get Firefox updates
+      - name: Cache Firefox binary
+        id: firefox-cache
+        uses: actions/cache@v4
+        with:
+          path: /opt/hostedtoolcache/firefox
+          key: ${{ runner.os }}-firefox-latest-v7-${{ steps.week.outputs.week }}
+
+      # Download & install latest Firefox only if cache miss
+      - name: Download & install latest Firefox
+        if: steps.firefox-cache.outputs.cache-hit != 'true'
+        id: setup-firefox
+        uses: browser-actions/setup-firefox@latest
+
+      # Rename cache directory from "latest" to actual version for tc.find() compatibility,
+      # then output the exact installed version (works for both cache-hit and cache-miss paths)
+      - name: Fix Firefox cache for tool-cache API
+        id: fix-firefox-cache
+        run: |
+          if [ "${{ steps.firefox-cache.outputs.cache-hit }}" != 'true' ]; then
+            VERSION="${{ steps.setup-firefox.outputs.firefox-version }}"
+            if [ -d "/opt/hostedtoolcache/firefox/latest" ]; then
+              echo "Renaming /opt/hostedtoolcache/firefox/latest to /opt/hostedtoolcache/firefox/$VERSION"
+              mv /opt/hostedtoolcache/firefox/latest "/opt/hostedtoolcache/firefox/$VERSION"
+              echo "Firefox $VERSION cached for tool-cache API compatibility"
+            fi
+          fi
+          if [ ! -d "/opt/hostedtoolcache/firefox" ]; then
+            echo "Firefox cache directory not found"
+            exit 1
+          fi
+          # Use sort -V (version sort) and take the highest version in case of multiple directories
+          VERSION=$(ls /opt/hostedtoolcache/firefox/ | grep -v '^latest$' | sort -V | tail -1)
+          if [ -z "$VERSION" ]; then
+            echo "No Firefox version found in cache directory"
+            exit 1
+          fi
+          echo "firefox-version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Firefox version: $VERSION"
 
   frontend-unit-tests:
     name: Frontend - Unit Tests
