@@ -55,31 +55,35 @@ jobs:
         id: setup-firefox
         uses: browser-actions/setup-firefox@latest
 
-      # Rename cache directory from "latest" to actual version for tc.find() compatibility,
-      # then output the exact installed version (works for both cache-hit and cache-miss paths)
+      # On cache-miss: rename 'latest' dir to the actual version for tc.find() compatibility
+      # On cache-hit: read the exact version from the already-named directory
       - name: Fix Firefox cache for tool-cache API
         id: fix-firefox-cache
         run: |
           if [ "${{ steps.firefox-cache.outputs.cache-hit }}" != 'true' ]; then
             VERSION="${{ steps.setup-firefox.outputs.firefox-version }}"
             if [ -d "/opt/hostedtoolcache/firefox/latest" ]; then
-              echo "Renaming /opt/hostedtoolcache/firefox/latest to /opt/hostedtoolcache/firefox/$VERSION"
               mv /opt/hostedtoolcache/firefox/latest "/opt/hostedtoolcache/firefox/$VERSION"
               echo "Firefox $VERSION cached for tool-cache API compatibility"
+              echo "firefox-version=$VERSION" >> $GITHUB_OUTPUT
+            else
+              echo "Firefox install failed: /opt/hostedtoolcache/firefox/latest not found"
+              exit 1
             fi
+          else
+            if [ ! -d "/opt/hostedtoolcache/firefox" ]; then
+              echo "Firefox cache directory not found"
+              exit 1
+            fi
+            # Use sort -V (version sort) and take the highest version in case of multiple directories
+            VERSION=$(ls /opt/hostedtoolcache/firefox/ | sort -V | tail -1)
+            if [ -z "$VERSION" ]; then
+              echo "No Firefox version found in cache directory"
+              exit 1
+            fi
+            echo "firefox-version=$VERSION" >> $GITHUB_OUTPUT
+            echo "Firefox version: $VERSION"
           fi
-          if [ ! -d "/opt/hostedtoolcache/firefox" ]; then
-            echo "Firefox cache directory not found"
-            exit 1
-          fi
-          # Use sort -V (version sort) and take the highest version in case of multiple directories
-          VERSION=$(ls /opt/hostedtoolcache/firefox/ | grep -v '^latest$' | sort -V | tail -1)
-          if [ -z "$VERSION" ]; then
-            echo "No Firefox version found in cache directory"
-            exit 1
-          fi
-          echo "firefox-version=$VERSION" >> $GITHUB_OUTPUT
-          echo "Firefox version: $VERSION"
 
   frontend-unit-tests:
     name: Frontend - Unit Tests
