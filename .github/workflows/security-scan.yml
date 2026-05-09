@@ -1,4 +1,4 @@
-name: "CodeQL"
+name: "Security Scan"
 
 on:
   push:
@@ -6,6 +6,7 @@ on:
       - master
     paths-ignore:
       - "**.md"
+      - "doc/**"
       - "docs/**"
       - "CHANGELOG.md"
       - "BACKLOG.md"
@@ -16,6 +17,7 @@ on:
       - "**"
     paths-ignore:
       - "**.md"
+      - "doc/**"
       - "docs/**"
       - "CHANGELOG.md"
       - "BACKLOG.md"
@@ -28,8 +30,8 @@ permissions:
   contents: read
 
 jobs:
-  analyze:
-    name: Analyze (${{ matrix.language }})
+  codeql:
+    name: CodeQL (${{ matrix.language }})
     runs-on: ubuntu-latest
     # Skip for draft PRs - only run when PR is ready for review
     if: github.event_name != 'pull_request' || !github.event.pull_request.draft
@@ -51,6 +53,19 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Set up Node.js (javascript-typescript only)
+        if: matrix.language == 'javascript-typescript'
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: "npm"
+          cache-dependency-path: "front/package-lock.json"
+
+      - name: Install frontend dependencies (javascript-typescript only)
+        if: matrix.language == 'javascript-typescript'
+        run: npm install --prefer-offline --no-audit
+        working-directory: ./front
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
