@@ -43,7 +43,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: ["actions", "javascript-typescript", "php"]
+        # CodeQL supports: actions, c-cpp, csharp, go, java-kotlin,
+        # javascript-typescript, python, ruby, swift.
+        # PHP is NOT supported by CodeQL — see php-security-scan job below.
+        language: ["actions", "javascript-typescript"]
 
     steps:
       - name: Checkout repository
@@ -61,3 +64,32 @@ jobs:
         uses: github/codeql-action/analyze@v3
         with:
           category: "/language:${{ matrix.language }}"
+
+  php-security-scan:
+    name: PHP Security Scan (Semgrep)
+    runs-on: ubuntu-latest
+    # Skip for draft PRs - only run when PR is ready for review
+    if: github.event_name != 'pull_request' || !github.event.pull_request.draft
+
+    permissions:
+      security-events: write
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Semgrep
+        run: pip install semgrep==1.127.0
+
+      - name: Run Semgrep PHP security scan
+        # continue-on-error so SARIF is always uploaded even when findings exist
+        continue-on-error: true
+        run: semgrep --config=p/php --sarif --output=semgrep-results.sarif api/
+
+      - name: Upload SARIF results to GitHub Code Scanning
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: semgrep-results.sarif
+          category: "semgrep-php"
