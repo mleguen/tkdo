@@ -59,7 +59,7 @@ describe('HeaderComponent', () => {
         .should('be.false');
     });
 
-    it('should not display hamburger menu toggle when logged in', () => {
+    it('should keep navbar expanded when logged in', () => {
       const mockBackend = createMockBackend();
 
       cy.mount(HeaderComponent, {
@@ -71,9 +71,9 @@ describe('HeaderComponent', () => {
         ],
       });
 
-      // Hamburger toggle button should exist but be hidden (not visible) by Bootstrap CSS on desktop
+      // Toggle button exists in DOM, but desktop behavior should keep the menu expanded
       cy.get('.navbar-toggler').should('exist');
-      cy.get('.navbar-toggler').should('not.be.visible');
+      cy.get('.navbar-collapse').should('have.class', 'show');
     });
 
     it('should display menu items immediately when logged in', () => {
