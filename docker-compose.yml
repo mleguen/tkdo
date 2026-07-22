@@ -80,7 +80,7 @@ services:
       XDG_CACHE_HOME: /opt/tkdo/.cache
       TKDO_DEV_MODE: "1"
       docker: "true"
-      MAILDEV_BASE_URI: http://maildev:1080/
+      MAILDEV_BASE_URI: http://maildev:1080/api
       MYSQL_DATABASE: tkdo
       MYSQL_HOST: mysql
       MYSQL_PASSWORD: mdptkdo
