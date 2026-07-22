@@ -390,7 +390,7 @@ jobs:
           MYSQL_DATABASE: tkdo
           MYSQL_USER: tkdo
           MYSQL_PASSWORD: mdptkdo
-          MAILDEV_BASE_URI: http://127.0.0.1:1080/
+          MAILDEV_BASE_URI: http://127.0.0.1:1080/api
           TKDO_DEV_MODE: "1"
           TKDO_MAILER_FROM: noreply@ci
           # BFF back-channel calls /oauth/token on this same server
@@ -412,7 +412,7 @@ jobs:
           MYSQL_DATABASE: tkdo
           MYSQL_USER: tkdo
           MYSQL_PASSWORD: mdptkdo
-          MAILDEV_BASE_URI: http://127.0.0.1:1080/
+          MAILDEV_BASE_URI: http://127.0.0.1:1080/api
           TKDO_API_BASE_URI: http://localhost:8000
           TKDO_DEV_MODE: "1"
           TKDO_MAILER_FROM: noreply@ci
@@ -533,7 +533,7 @@ jobs:
           MYSQL_DATABASE: tkdo
           MYSQL_USER: tkdo
           MYSQL_PASSWORD: mdptkdo
-          MAILDEV_BASE_URI: http://127.0.0.1:1080/
+          MAILDEV_BASE_URI: http://127.0.0.1:1080/api
           TKDO_BASE_URI: http://localhost:8080
           TKDO_DEV_MODE: "1"
           TKDO_MAILER_FROM: noreply@ci
@@ -571,7 +571,7 @@ jobs:
           MYSQL_DATABASE: tkdo
           MYSQL_USER: tkdo
           MYSQL_PASSWORD: mdptkdo
-          MAILDEV_BASE_URI: http://127.0.0.1:1080/
+          MAILDEV_BASE_URI: http://127.0.0.1:1080/api
           TKDO_DEV_MODE: "1"
           TKDO_MAILER_FROM: noreply@ci
           # BFF back-channel calls /oauth/token on this same server
