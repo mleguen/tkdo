@@ -305,6 +305,8 @@ jobs:
 
       maildev:
         image: maildev/maildev
+        env:
+          MAILDEV_WEB_IP: "::"
         ports:
           - 1025:1025
           - 1080:1080
@@ -456,6 +458,8 @@ jobs:
 
       maildev:
         image: maildev/maildev
+        env:
+          MAILDEV_WEB_IP: "::"
         ports:
           - 1025:1025
           - 1080:1080
