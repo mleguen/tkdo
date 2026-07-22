@@ -25,7 +25,7 @@ services:
       - https
 
   maildev:
-    image: maildev/maildev
+    image: maildev/maildev:3.0.0-rc.1
     ports:
       - ${MAILDEV_DEV_PORT:-1080}:1080
 
