@@ -8,6 +8,7 @@ import {
   SimpleChanges,
 } from '@angular/core';
 import moment from 'moment';
+// @ts-expect-error: moment locale files lack type declarations
 import 'moment/locale/fr';
 
 import { Idee, Utilisateur } from '../backend.service';
