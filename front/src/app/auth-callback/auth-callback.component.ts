@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 import { BackendService, CLE_SE_SOUVENIR } from '../backend.service';
@@ -21,6 +21,7 @@ export class AuthCallbackComponent implements OnInit {
   private readonly backend = inject(BackendService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   erreur?: string;
 
@@ -65,6 +66,7 @@ export class AuthCallbackComponent implements OnInit {
       })
       .catch(() => {
         this.erreur = "échec de l'authentification";
+        this.cdr.markForCheck();
       });
   }
 }
