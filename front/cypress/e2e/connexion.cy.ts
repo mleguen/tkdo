@@ -179,10 +179,6 @@ describe('connexion/déconnexion/reconnexion', () => {
       const anyPage = new AppPage();
       anyPage.boutonSeDeconnecter().click();
 
-      const deconnexionPage = new DeconnexionPage();
-      deconnexionPage.titre().should('have.text', 'Vous êtes déconnecté(e)');
-      deconnexionPage.boutonSeReconnecter().click();
-
       const connexionPage = new ConnexionPage();
       connexionPage.titre().should('have.text', 'Connexion');
       connexionPage.identifiant().type(utilisateurs.quiRecoitDeSoi.identifiant);
