@@ -1,5 +1,12 @@
 # Changelog
 
+## Next Release
+
+### Contributors
+- **Technical Tasks:**
+  - **Security Fixes:**
+    - postcss prototype hijacking in `fromJSON()` and source map loading outside `opts.from` folder (fixed in 8.5.17/8.5.18), via an npm override until the Angular 22 upgrade
+
 ## V1.5.0 (January 18, 2026)
 
 ### Users
