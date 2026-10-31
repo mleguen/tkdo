@@ -95,7 +95,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Install Semgrep
-        run: pip install semgrep==1.162.0
+        run: pip install -r .github/semgrep/requirements.txt
 
       - name: Run Semgrep PHP security scan
         # continue-on-error so SARIF is always uploaded even when findings exist
