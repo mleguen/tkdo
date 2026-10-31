@@ -21,3 +21,66 @@ updates:
         update-types:
           - minor
           - patch
+
+  - package-ecosystem: composer
+    directory: /api
+    schedule:
+      interval: monthly
+    # Major updates are migrations done manually
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - version-update:semver-major
+    groups:
+      # A single PR for all minor and patch updates (same rationale as /front)
+      api-minor-patch:
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
+
+  # Local stack images (Dependabot raises no security updates for Docker)
+  - package-ecosystem: docker
+    directories:
+      - /docker/*
+      - /front/docker/*
+    schedule:
+      interval: monthly
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - version-update:semver-major
+      # Runtime versions are aligned with production (PHP 8.4, MySQL), so
+      # moving them is a migration done manually, even for a "minor" bump
+      - dependency-name: php
+        update-types:
+          - version-update:semver-minor
+      - dependency-name: mysql
+        update-types:
+          - version-update:semver-minor
+    groups:
+      dockerfiles:
+        patterns:
+          - "*"
+
+  - package-ecosystem: docker-compose
+    directory: /
+    schedule:
+      interval: monthly
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - version-update:semver-major
+      # Runtime versions are aligned with production (PHP 8.4, MySQL), so
+      # moving them is a migration done manually, even for a "minor" bump
+      - dependency-name: php
+        update-types:
+          - version-update:semver-minor
+      - dependency-name: mysql
+        update-types:
+          - version-update:semver-minor
+    groups:
+      docker-compose:
+        patterns:
+          - "*"
