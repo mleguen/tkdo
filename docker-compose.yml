@@ -123,7 +123,7 @@ services:
   slim-web:
     depends_on:
       - slim-fpm
-    image: nginx:1.27
+    image: nginx:1.29
     ports:
       - ${API_DEV_PORT:-8081}:80
     volumes:
