@@ -84,3 +84,24 @@ updates:
       docker-compose:
         patterns:
           - "*"
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    groups:
+      # Majors are not ignored here: actions are referenced by major tag
+      # (e.g. @v4), so majors are the only updates Dependabot would raise
+      github-actions:
+        patterns:
+          - "*"
+
+  # Semgrep, installed by the security-scan workflow
+  - package-ecosystem: pip
+    directory: /.github/semgrep
+    schedule:
+      interval: monthly
+    groups:
+      semgrep:
+        patterns:
+          - "*"

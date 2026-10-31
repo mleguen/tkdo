@@ -54,7 +54,7 @@ jobs:
       - name: Download & install latest Firefox
         if: steps.firefox-cache.outputs.cache-hit != 'true'
         id: setup-firefox
-        uses: browser-actions/setup-firefox@latest
+        uses: browser-actions/setup-firefox@v1
 
       # On cache-miss: rename 'latest' dir to the actual version for tc.find() compatibility
       # On cache-hit: read the exact version from the already-named directory
@@ -169,7 +169,7 @@ jobs:
       # Install Firefox using the exact version output by the setup-firefox job
       - name: Install Firefox from cache
         if: matrix.browser == 'firefox'
-        uses: browser-actions/setup-firefox@latest
+        uses: browser-actions/setup-firefox@v1
         with:
           firefox-version: ${{ needs.setup-firefox.outputs.firefox-version }}
 
@@ -555,7 +555,7 @@ jobs:
       # Install Firefox using the exact version output by the setup-firefox job
       - name: Install Firefox from cache
         if: matrix.browser == 'firefox'
-        uses: browser-actions/setup-firefox@latest
+        uses: browser-actions/setup-firefox@v1
         with:
           firefox-version: ${{ needs.setup-firefox.outputs.firefox-version }}
 
