@@ -17,7 +17,7 @@ This guide provides comprehensive documentation for the Tkdo database schema, en
 
 ## Database Overview
 
-Tkdo uses **MySQL 5.7+** as its relational database management system with **Doctrine ORM 2.17+** for object-relational mapping.
+Tkdo uses **MySQL 8.0** as its relational database management system with **Doctrine ORM 2.17+** for object-relational mapping.
 
 ### Key Characteristics
 

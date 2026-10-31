@@ -26,7 +26,7 @@ This document outlines the investigation and recommendations for implementing Gi
 **Key Decisions:**
 - Use `actions/setup-node@v4` for Node.js 20
 - Use `shivammathur/setup-php@v2` for PHP 8.4
-- Use MySQL 5.7 service container for database
+- Use MySQL 8.0 service container for database
 - Use MailDev for email testing (actively maintained, UTF-8 support)
 - Implement tiered test execution with fail-fast
 - Use dependency caching for both npm and Composer
@@ -50,7 +50,7 @@ The local development environment uses Docker Compose with the following service
 flowchart LR
     npm[npm container<br/>Node.js tools] --> front[front container<br/>nginx :8080]
     composer[php-cli container<br/>Composer tools] --> api[slim-fpm<br/>PHP-FPM]
-    api --> mysql[(mysql<br/>MySQL 5.6)]
+    api --> mysql[(mysql<br/>MySQL 8.0)]
     api --> maildev[maildev<br/>:1080]
     front --> api
 
@@ -104,7 +104,7 @@ jobs:
 
     services:
       mysql:
-        image: mysql:5.7
+        image: mysql:8.0
         env:
           MYSQL_DATABASE: tkdo
           MYSQL_USER: tkdo
@@ -256,14 +256,14 @@ jobs:
 - Multiple Node.js versions supported
 - Fast installation
 
-### MySQL 5.7
+### MySQL 8.0
 
 **Service Container:**
 
 ```yaml
 services:
   mysql:
-    image: mysql:5.7
+    image: mysql:8.0
     env:
       MYSQL_DATABASE: tkdo
       MYSQL_USER: tkdo
@@ -280,7 +280,7 @@ services:
 
 **Status:** ✅ Fully supported
 
-**Note:** MySQL 5.7 reaches EOL in October 2023, but is still widely used. Consider migration to MySQL 8.0 in the future (tracked in backlog).
+**Note:** Aligned with the production MySQL version (8.0).
 
 ### MailDev
 
@@ -602,7 +602,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       mysql:
-        image: mysql:5.7
+        image: mysql:8.0
       maildev:
         image: maildev/maildev
     steps:
@@ -615,7 +615,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       mysql:
-        image: mysql:5.7
+        image: mysql:8.0
       maildev:
         image: maildev/maildev
     steps:
@@ -1072,7 +1072,7 @@ on:
 1. Frontend integration tests (mocked backend)
 2. Backend integration tests (real database)
 
-**Services:** MySQL 5.7, MailDev
+**Services:** MySQL 8.0, MailDev
 
 **Estimated execution time:** ~5-8 minutes
 
@@ -1083,7 +1083,7 @@ on:
 **Jobs:**
 1. Full stack E2E tests with Cypress
 
-**Services:** MySQL 5.7, MailDev
+**Services:** MySQL 8.0, MailDev
 
 **Trigger:** Only on PRs and main branch
 

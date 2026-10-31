@@ -51,7 +51,7 @@ updates:
       - dependency-name: "*"
         update-types:
           - version-update:semver-major
-      # Runtime versions are aligned with production (PHP 8.4, MySQL), so
+      # Runtime versions are aligned with production (PHP 8.4, MySQL 8.0), so
       # moving them is a migration done manually, even for a "minor" bump
       - dependency-name: php
         update-types:
@@ -72,7 +72,7 @@ updates:
       - dependency-name: "*"
         update-types:
           - version-update:semver-major
-      # Runtime versions are aligned with production (PHP 8.4, MySQL), so
+      # Runtime versions are aligned with production (PHP 8.4, MySQL 8.0), so
       # moving them is a migration done manually, even for a "minor" bump
       - dependency-name: php
         update-types:

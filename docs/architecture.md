@@ -38,7 +38,7 @@ graph TB
 
     subgraph Data["Data Layer"]
         ORM["Doctrine ORM"]
-        DB["MySQL 5.7+"]
+        DB["MySQL 8.0"]
     end
 
     subgraph External["External Services"]
@@ -975,12 +975,6 @@ Development/Production Stacks:
 - Enables API documentation auto-generation
 
 ### Other Considerations
-
-**MySQL 8 Migration:**
-- **Current:** MySQL 5.7
-- **Future:** MySQL 8.0+
-- **Benefits:** Better performance, window functions, improved JSON support
-- **Impact:** Minor - Doctrine ORM abstracts most differences
 
 **Angular Upgrade:**
 - **Current:** Angular 17

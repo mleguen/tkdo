@@ -244,7 +244,7 @@ graph TB
     Front --> Angular[angular container<br/>Build artifacts]
     Front --> SlimWeb[slim-web container<br/>nginx :8081]
     SlimWeb --> SlimFPM[slim-fpm container<br/>PHP-FPM + API code]
-    SlimFPM --> MySQL[mysql container<br/>MySQL 5.6]
+    SlimFPM --> MySQL[mysql container<br/>MySQL 8.0]
     SlimFPM --> MailDev[maildev container<br/>:1080]
     npm[npm container<br/>Node.js tools] -.->|Build| Angular
 ```
@@ -257,7 +257,7 @@ graph TB
 | **angular**  | Builds Angular application                   | -             |
 | **slim-web** | nginx server for API                         | 8081          |
 | **slim-fpm** | PHP-FPM running the Slim Framework API       | -             |
-| **mysql**    | MySQL 5.6 database                           | -             |
+| **mysql**    | MySQL 8.0 database                           | -             |
 | **maildev**  | Email testing server                         | 1080          |
 | **npm**      | Node.js tools (npm, ng, cypress, npx)        | 4200          |
 | **php-cli**  | PHP CLI tools (composer, doctrine, console)  | -             |

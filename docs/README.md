@@ -112,7 +112,7 @@ graph TB
     end
 
     subgraph Database["Database Layer"]
-        DB["MySQL 5.7+"]
+        DB["MySQL 8.0"]
         Schema["User accounts<br/>Occasions & Participants<br/>Gift ideas (soft deletes)<br/>Draw results<br/>Exclusion rules<br/>Doctrine migrations"]
     end
 
@@ -201,7 +201,7 @@ graph TB
 - Docker and Docker Compose (development)
 - Apache 2.4+ with mod_rewrite (production)
 - PHP 8.4 with extensions: dom, mbstring, pdo_mysql, zip (production)
-- MySQL 5.7+ (production)
+- MySQL 8.0 (production)
 
 ### Quick Start (Development)
 
