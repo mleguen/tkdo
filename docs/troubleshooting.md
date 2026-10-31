@@ -354,7 +354,7 @@ docker compose logs slim-fpm
 **Fix:** Recreate the volume (the local database only holds fixtures), then reinstall the fixtures:
 
 ```bash
-docker compose up -d --renew-anon-volumes mysql
+docker compose up -d --wait --renew-anon-volumes mysql
 ./composer run install-fixtures
 ```
 
