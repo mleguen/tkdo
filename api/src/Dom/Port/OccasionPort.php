@@ -202,6 +202,7 @@ class OccasionPort
     {
         mt_srand();
 
+        /** @var bool[] $dejaTire */
         $dejaTire = array_fill(0, $nbParticipants, false);
         $tabResultats = array_fill(0, $nbParticipants, 0);
 
