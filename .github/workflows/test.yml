@@ -45,7 +45,7 @@ jobs:
       # Cache key includes year-week to refresh weekly and get Firefox updates
       - name: Cache Firefox binary
         id: firefox-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: /opt/hostedtoolcache/firefox
           key: ${{ runner.os }}-firefox-latest-v7-${{ steps.week.outputs.week }}
@@ -94,10 +94,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: "24"
           cache: "npm"
@@ -105,7 +105,7 @@ jobs:
 
       # Cache Cypress binary to speed up installation
       - name: Cache Cypress binary
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/.cache/Cypress
           key: ${{ runner.os }}-cypress-${{ hashFiles('front/package-lock.json') }}
@@ -135,10 +135,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: "24"
           cache: "npm"
@@ -146,7 +146,7 @@ jobs:
 
       # Cache Cypress binary to speed up installation
       - name: Cache Cypress binary
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/.cache/Cypress
           key: ${{ runner.os }}-cypress-${{ hashFiles('front/package-lock.json') }}
@@ -161,7 +161,7 @@ jobs:
       - name: Cache Firefox binary
         if: matrix.browser == 'firefox'
         id: firefox-cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v6
         with:
           path: /opt/hostedtoolcache/firefox
           key: ${{ runner.os }}-firefox-latest-v7-${{ needs.setup-firefox.outputs.week }}
@@ -176,7 +176,7 @@ jobs:
       # cypress-io/github-action with install: false since we handle it above
       # Use cypress-split plugin for test sharding across parallel CI machines
       - name: Run component tests
-        uses: cypress-io/github-action@v6
+        uses: cypress-io/github-action@v7
         with:
           working-directory: ./front
           component: true
@@ -188,7 +188,7 @@ jobs:
 
       - name: Upload screenshots on failure
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: cypress-component-screenshots-${{ matrix.browser }}-${{ matrix.shard }}-${{ github.run_number }}
           path: front/cypress/screenshots
@@ -206,7 +206,7 @@ jobs:
 
       - name: Upload compressed videos
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: cypress-component-videos-${{ matrix.browser }}-${{ matrix.shard }}-${{ github.run_number }}
           path: cypress-component-videos.tar.gz
@@ -221,7 +221,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
@@ -236,7 +236,7 @@ jobs:
         working-directory: ./api
 
       - name: Cache Composer dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('api/composer.lock') }}
@@ -313,7 +313,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
@@ -328,7 +328,7 @@ jobs:
         working-directory: ./api
 
       - name: Cache Composer dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('api/composer.lock') }}
@@ -421,7 +421,7 @@ jobs:
 
       - name: Upload test logs on failure
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: backend-integration-logs-${{ github.run_number }}
           path: api/var/log
@@ -466,11 +466,11 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       # Set up Node.js for frontend build
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: '24'
           cache: 'npm'
@@ -478,7 +478,7 @@ jobs:
 
       # Cache Cypress binary to speed up installation
       - name: Cache Cypress binary
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/.cache/Cypress
           key: ${{ runner.os }}-cypress-${{ hashFiles('front/package-lock.json') }}
@@ -507,7 +507,7 @@ jobs:
         working-directory: ./api
 
       - name: Cache Composer dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('api/composer.lock') }}
@@ -547,7 +547,7 @@ jobs:
       - name: Cache Firefox binary
         if: matrix.browser == 'firefox'
         id: firefox-cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v6
         with:
           path: /opt/hostedtoolcache/firefox
           key: ${{ runner.os }}-firefox-latest-v7-${{ needs.setup-firefox.outputs.week }}
@@ -675,7 +675,7 @@ jobs:
       #   - E2E test: asserts HttpOnly prevents document.cookie access (XSS protection)
       #   - Backend test: asserts Set-Cookie includes Secure in production mode (MITM protection)
       - name: Run E2E tests
-        uses: cypress-io/github-action@v6
+        uses: cypress-io/github-action@v7
         with:
           working-directory: ./front
           browser: ${{ matrix.browser }}
@@ -694,7 +694,7 @@ jobs:
 
       - name: Upload screenshots on failure
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: cypress-e2e-screenshots-${{ matrix.browser }}-${{ github.run_number }}
           path: front/cypress/screenshots
@@ -712,7 +712,7 @@ jobs:
 
       - name: Upload compressed videos
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: cypress-e2e-videos-${{ matrix.browser }}-${{ github.run_number }}
           path: cypress-e2e-videos.tar.gz
@@ -721,7 +721,7 @@ jobs:
 
       - name: Upload backend logs on failure
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: e2e-backend-logs-${{ matrix.browser }}-${{ github.run_number }}
           path: api/var/log
