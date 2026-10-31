@@ -19,7 +19,7 @@ foreach ([
     FixturesCommand::class,
     NotifCommand::class,
 ] as $class) {
-    $symfonyConsoleApp->add($container->get($class));
+    $symfonyConsoleApp->addCommand($container->get($class));
 }
 
 $status = $symfonyConsoleApp->run();
