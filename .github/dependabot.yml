@@ -3,26 +3,21 @@ updates:
   - package-ecosystem: npm
     directory: /front
     schedule:
-      interval: weekly
+      interval: monthly
+    # Major updates (e.g. Angular majors) are migrations done manually
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - version-update:semver-major
     groups:
-      # Angular framework packages pin each other as exact peer dependencies,
-      # so they must always be bumped together (see #224)
-      angular-framework:
-        applies-to: version-updates
-        patterns:
-          - "@angular/*"
-        exclude-patterns:
-          - "@angular/cdk"
-          - "@angular/cli"
-      angular-framework-security:
-        applies-to: security-updates
-        patterns:
-          - "@angular/*"
-        exclude-patterns:
-          - "@angular/cdk"
-          - "@angular/cli"
+      # A single PR for all minor and patch updates, so that packages pinning
+      # each other as exact peer dependencies (e.g. Angular) move together.
+      # When a single-package security PR fails (see #224), use
+      # "Check for updates" in Insights > Dependency graph > Dependabot
+      # to trigger this update without waiting.
       front-minor-patch:
-        applies-to: version-updates
+        patterns:
+          - "*"
         update-types:
           - minor
           - patch
