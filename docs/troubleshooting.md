@@ -345,6 +345,19 @@ docker compose logs slim-fpm
    docker compose up -d
    ```
 
+### MySQL Container Fails After a MySQL Version Upgrade
+
+**Problem:** After pulling a change of the `mysql` image version (e.g. 5.6 to 8.0), the `mysql` container exits with errors such as `Unsupported redo log format` or `Data Dictionary initialization failed`
+
+**Cause:** `docker compose up` keeps the container's anonymous data volume when recreating it, and the new MySQL version cannot upgrade data files from the old one
+
+**Fix:** Recreate the volume (the local database only holds fixtures), then reinstall the fixtures:
+
+```bash
+docker compose up -d --renew-anon-volumes mysql
+./composer run install-fixtures
+```
+
 ## Production Deployment Issues
 
 Problems specific to deploying Tkdo in a production environment.

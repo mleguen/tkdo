@@ -702,7 +702,6 @@ Following the viewport testing audit, components with responsive behavior need v
 
 - Upgrade cypress as soon as a version depending on qs@6.14.1+ is available - with vulnerability GHSA-6rw7-vpxm-498p fixed -, to remove the qs npm package override we introduced in Jan. 25
 - Add a unique random slug to each entity, and use them in routes instead of ids to make it more difficult to forge routes
-- Upgrade to MySQL 8
 - Implement a backup strategy
 
 ### Infrastructure & Deployment
