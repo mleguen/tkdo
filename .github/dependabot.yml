@@ -1,0 +1,28 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /front
+    schedule:
+      interval: weekly
+    groups:
+      # Angular framework packages pin each other as exact peer dependencies,
+      # so they must always be bumped together (see #224)
+      angular-framework:
+        applies-to: version-updates
+        patterns:
+          - "@angular/*"
+        exclude-patterns:
+          - "@angular/cdk"
+          - "@angular/cli"
+      angular-framework-security:
+        applies-to: security-updates
+        patterns:
+          - "@angular/*"
+        exclude-patterns:
+          - "@angular/cdk"
+          - "@angular/cli"
+      front-minor-patch:
+        applies-to: version-updates
+        update-types:
+          - minor
+          - patch
